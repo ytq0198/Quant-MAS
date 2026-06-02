@@ -327,7 +327,7 @@ python scripts/download_data.py \
 |------|--------|----------|------|
 | 2.2 ML 训练输出 | **15** | LightGBM 未安装 | 先 `python -m pip install -r requirements-ml.txt` |
 | 2.2b GPU 训练 | **15b** | CUDA Tree Learner not enabled | 见 [M-010](#m-010-lightgbm-pypi-wheel-为-cpu-only)，编译 CUDA 版 LightGBM |
-| 2.3 ML 回测 | 16 | 模型路径不对 | 检查 `storage.server.yaml` 中 `models_dir` |
+| 2.4 Walk-forward | 17 | 窗口无数据 / 路径 | 检查 features.parquet 与 `walk_forward.yaml` |
 
 ### Step 2.2b GPU 训练 ✅ 已完成（2026-06-02）
 
@@ -388,7 +388,8 @@ python -m pip install -e .
 | M-009 | Step 2.1 | Stooq API Key | ✅ 已解决，流程见 M-009 |
 | — | Step 2.2 | LightGBM 真实训练 | ✅ EXP-20260601-006 |
 | — | Step 2.2b | GPU/CUDA 训练 | ✅ EXP-20260602-004（见 M-010） |
-| — | Step 2.3 | ML 回测 | ✅ EXP-20260602-005；**Prompt 17 当前** |
+| 2.4 Walk-forward | 17 | 见 M-010 若用 GPU 训练 | 本地 ✅；服务器 EXP-TODO-007 |
+| — | Step 2.5 | 风控 Prompt 18 | **当前** |
 
 ---
 

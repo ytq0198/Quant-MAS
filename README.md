@@ -21,7 +21,7 @@ python -m pytest -v
 python -c "import quant_mas"
 ```
 
-**Current test status:** **68 passed** (local Windows + server Linux, 2026-06-02).
+**Current test status:** **71 passed** (local, 2026-06-02; server pending pull → 71).
 
 ## Server
 
@@ -31,7 +31,8 @@ Recommended path: `/mnt/localDisk3/weizian/Quant-MAS`
 
 | Date | Check | Result |
 |------|--------|--------|
-| 2026-06-02 | `python -m pytest -v` | **68 passed** |
+| 2026-06-02 | `python -m pytest -v` | **71 passed**（含 Prompt 17） |
+| 2026-06-02 | Walk-forward local | Prompt 17 ✅，3 tests |
 | 2026-06-02 | GPU LightGBM training | `server_lgbm_gpu_001`, device=cuda |
 | 2026-06-02 | ML signal backtest | `server_ml_backtest_001`, sharpe 2.78 |
 | 2026-06-01 | Stooq download + real pipeline | **6033 rows**; `server_ma_cross_real_001` |
@@ -101,6 +102,10 @@ python scripts/train_model.py --config configs/train.gpu.yaml \
 python scripts/run_ml_backtest.py --config configs/backtest_ml.yaml \
   --storage-config configs/storage.server.yaml \
   --experiment-name server_ml_backtest_001
+
+python scripts/run_walk_forward.py --config configs/walk_forward.yaml \
+  --storage-config configs/storage.server.yaml \
+  --experiment-name server_walk_forward_001
 ```
 
 The setup script does not download large data. `download_data.py` and `download_data_resilient.sh` load `.env` automatically.

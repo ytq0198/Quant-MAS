@@ -56,6 +56,22 @@
 - 问题：仅为 smoke test，不代表真实市场表现
 - 下一步：用 sample parquet 或真实小规模数据验证
 
+### EXP-20260602-007：Prompt 17 Walk-forward 本地验证 ✅
+
+- 日期：2026-06-02
+- 阶段：Phase 2 Step 2.4（Prompt 17）
+- 环境：本地 Windows，Codex 改代码后
+- 数据：synthetic features + mock model（测试不依赖真实金融数据）
+- 模块：`walk_forward.py`、`save_walk_forward_report()`、`run_walk_forward.py`
+- 参数：
+  - `python -m pytest tests/test_walk_forward.py -v` → **3 passed**
+  - `python -m pytest -v` → **71 passed**
+  - `python scripts/run_walk_forward.py --help` → 正常
+- 验证点：按时间推进 train/val/test/oos 窗口；模型仅 train 拟合；OOS 接入 MLSignalStrategy + BacktestEngine；metrics 区分 train/val/test/oos
+- 产物（测试 tmp_path）：metrics.json、windows.csv、oos_equity_curve.csv、oos_trades.csv、summary.md
+- 问题：无
+- 下一步：服务器真实 walk-forward（EXP-TODO-007）
+
 ### EXP-20260602-005：服务器 ML 信号回测 ✅（Prompt 16）
 
 - 日期：2026-06-02
@@ -74,7 +90,7 @@
   - 报告：`outputs/reports/ml_backtest_latest/summary.md`
   - 日志：`/mnt/localDisk3/weizian/logs/ml_backtest_server_001.log`
 - 问题：无（链路验证通过；收益数值需后续 walk-forward 样本外复核）
-- 下一步：Prompt 17 Walk-forward
+- 下一步：walk-forward 本地 ✅（EXP-20260602-007）；服务器 OOS 待 EXP-TODO-007
 
 ### EXP-20260602-004：服务器 GPU LightGBM 训练 ✅（Prompt 15b）
 
@@ -230,11 +246,23 @@
 - 命令：`train_model.py --device cpu --experiment-name server_lgbm_cpu_001`
 - 状态：可选，未跑
 
-### EXP-TODO-004：Walk-forward 样本外（Prompt 17）
+### EXP-TODO-007：服务器 Walk-forward 真实实验（Prompt 17）
 
 - 日期：待定
-- 目标：多窗口切分 → 训练 → 回测 → 汇总样本外指标
-- 状态：**当前**（Codex Prompt 17）
+- 数据：真实 features（6033 rows）+ GPU 模型配置
+- 命令：
+  ```bash
+  python scripts/run_walk_forward.py \
+    --config configs/walk_forward.yaml \
+    --storage-config configs/storage.server.yaml \
+    --features-path /mnt/localDisk3/weizian/datasets/features/features.parquet \
+    --experiment-name server_walk_forward_001
+  ```
+- 状态：待验证（本地代码 ✅ EXP-20260602-007）
+
+### EXP-TODO-004：Walk-forward 样本外（Prompt 17）
+
+- 状态：本地代码 ✅（EXP-20260602-007）；服务器见 EXP-TODO-007
 
 ## 实验里程碑速查
 
@@ -243,4 +271,5 @@
 | EXP-20260601-004 | 2026-06-01 | Stooq 真实数据 + ma_cross | 6033 rows，sharpe ≈ 1.00 |
 | EXP-20260601-006 | 2026-06-01 | CPU LightGBM 训练 | test AUC 0.466 |
 | EXP-20260602-004 | 2026-06-02 | GPU LightGBM 训练 | device=cuda，test AUC 0.479 |
-| EXP-20260602-005 | 2026-06-02 | ML 信号回测 | sharpe 2.78（待 walk-forward 复核） |
+| EXP-20260602-007 | 2026-06-02 | Walk-forward 本地 | 71 passed，3 walk-forward tests |
+| EXP-20260602-005 | 2026-06-02 | ML 信号回测 | sharpe 2.78（单段；OOS 见 walk-forward） |

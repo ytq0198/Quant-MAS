@@ -10,7 +10,8 @@ GitHub 仓库：[https://github.com/ytq0198/Quant-MAS](https://github.com/ytq019
 
 | 日期 | 项目 | 结果 | 备注 |
 |------|------|------|------|
-| 2026-06-02 | pytest | **68 passed**（CUDA LightGBM 重装后） |
+| 2026-06-02 | Walk-forward 本地 | **71 passed**；Prompt 17 ✅ | 无 |
+| 2026-06-02 | pytest | **68 passed**（CUDA LightGBM 重装后；Prompt 17 前） |
 | 2026-06-02 | GPU 训练 | `server_lgbm_gpu_001`；device=cuda；test AUC 0.479 | 见 M-010 |
 | 2026-06-02 | ML 回测 | `server_ml_backtest_001`；sharpe **2.78** | Prompt 16 ✅ |
 | 2026-06-02 | pytest（旧） | **44 passed**（Python 3.11.15，1.19s） |
@@ -281,11 +282,21 @@ python scripts/run_ml_backtest.py \
 
 产物示例（2026-06-02）：sharpe **2.78**，max_drawdown **-0.246**，2011 bars；报告 `outputs/reports/ml_backtest_latest/summary.md`。
 
-**Walk-forward（Prompt 17，待实现）**：
+**Walk-forward（Prompt 17 ✅ 本地，待服务器 EXP-TODO-007）**：
 
 ```bash
-python scripts/run_walk_forward.py --config configs/walk_forward.yaml --storage-config configs/storage.server.yaml
+git pull origin main
+python -m pip install -e .
+python -m pytest -v   # 预期 71 passed
+
+python scripts/run_walk_forward.py \
+  --config configs/walk_forward.yaml \
+  --storage-config configs/storage.server.yaml \
+  --features-path /mnt/localDisk3/weizian/datasets/features/features.parquet \
+  --experiment-name server_walk_forward_001
 ```
+
+产物：`metrics.json`（含 train/val/test/oos）、`windows.csv`、`oos_equity_curve.csv`、`oos_trades.csv`、`summary.md`。
 
 ## 七、删除旧部署（如曾在 ~/quant-mas 建过）
 

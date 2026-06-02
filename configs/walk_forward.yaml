@@ -1,0 +1,32 @@
+model:
+  name: lightgbm_direction
+  device: auto
+  params:
+    n_estimators: 100
+    learning_rate: 0.05
+    num_leaves: 31
+    random_state: 42
+target: future_direction
+data:
+  features_path: data/features/features.parquet
+walk_forward:
+  train_window: 504
+  validation_window: 126
+  test_window: 126
+  oos_window: 63
+  step: 63
+  max_windows: null
+strategy:
+  name: ml_signal
+  buy_threshold: 0.6
+  sell_threshold: 0.4
+  max_weight: 1.0
+portfolio:
+  initial_cash: 100000
+costs:
+  commission_bps: 1.0
+  slippage_bps: 1.0
+output:
+  dir: outputs/reports/walk_forward_latest
+experiment:
+  name: walk_forward_oos

@@ -4,7 +4,7 @@
 
 ## 当前阶段
 
-**Phase 2**：Prompt 15b + 16 服务器验证 ✅。**当前：Prompt 17 Walk-forward**。
+**Phase 2**：Prompt 17 Walk-forward ✅（本地 **71 passed**）。**当前：Prompt 18 风控层 / 服务器 walk-forward**。
 
 ## Prompt 任务状态
 
@@ -22,14 +22,14 @@
 - [x] 最小端到端测试：`tests/test_end_to_end_pipeline.py`
 - [x] **Prompt 15**：ML 训练完整产物
 - [x] **Prompt 16**：MLSignalStrategy + `run_ml_backtest.py`
-- [x] **Prompt 15b**：LightGBM GPU/CUDA 训练（`device.py`、`--device`）
+- [x] **Prompt 17**：Walk-forward 样本外（`walk_forward.py`、`run_walk_forward.py`）
 
 ## 当前 pytest 状态
 
 | 环境 | Python | 结果 | 日期 |
 |------|--------|------|------|
-| 本地 Windows | 3.11+ | **68 passed** | 2026-06-01 |
-| 服务器 Linux | 3.11.15 | **68 passed** | 2026-06-02 |
+| 本地 Windows | 3.11+ | **71 passed** | 2026-06-02 |
+| 服务器 Linux | 3.11.15 | **68 passed**（待 pull Prompt 17 后复测 → 71） | 2026-06-02 |
 
 服务器验证环境：
 
@@ -60,6 +60,7 @@ python scripts/generate_report.py --help
 python scripts/run_agent.py --help
 python scripts/run_pipeline.py --help
 python scripts/run_ml_backtest.py --help
+python scripts/run_walk_forward.py --help
 ```
 
 ## 当前已实现能力
@@ -87,7 +88,7 @@ python scripts/run_ml_backtest.py --help
 - [x] SupervisorAgent 规则路由
 - [x] AgentEvent / ToolCallEvent / AgentFinishEvent
 - [x] LightGBM GPU/CUDA 训练支持（服务器 `server_lgbm_gpu_001`，EXP-20260602-004）
-- [x] MLSignalStrategy + ML 信号回测（服务器 `server_ml_backtest_001`，EXP-20260602-005）
+- [x] Walk-forward 样本外评估（Prompt 17，本地 71 passed）
 
 ## 下一阶段目标
 
@@ -104,9 +105,9 @@ python scripts/run_ml_backtest.py --help
 
 - [x] Step 2.1 真实数据 pipeline（服务器 Stooq + ma_cross 回测）
 - [x] Step 2.2b Prompt 15b：GPU/CUDA 服务器训练（EXP-20260602-004）
-- [x] Step 2.3 Prompt 16：ML 回测服务器验证（EXP-20260602-005，sharpe 2.78）
-- [ ] Step 2.4 Prompt 17：Walk-forward 样本外（**当前**）
-- [ ] 可选：CPU 对照训练 `server_lgbm_cpu_001`（EXP-TODO-006）
+- [x] Step 2.4 Prompt 17：Walk-forward 样本外（本地 71 passed，EXP-20260602-007）
+- [ ] Step 2.4 服务器 walk-forward 真实实验（EXP-TODO-007）
+- [ ] Step 2.5 / Prompt 18：基础风控层（**当前**）
 
 ### Phase 3：Agent 增强
 
@@ -116,9 +117,9 @@ python scripts/run_ml_backtest.py --help
 - [ ] 在不直接交易的前提下扩展研究和解释能力
 - [ ] 后续再评估是否引入 LangGraph / RAG / Memory 扩展
 
-## 研究解读（2026-06-02 服务器验收）
+## 研究解读（2026-06-02）
 
-- GPU 训练基础设施已验证（EXP-20260602-004，`device_resolved=cuda`）。
-- `server_lgbm_gpu_001` 的 val/test AUC 仍接近随机 → 下一步重点是 **模型与样本外验证**，而非设备链路。
-- `server_ml_backtest_001`（sharpe 2.78）证明 ML 回测闭环可用，但 **须 Prompt 17 walk-forward 复核** 后再作研究结论。
-- 可选：同一 features 上跑 `server_lgbm_cpu_001` 做 CPU/GPU metrics 对照（EXP-TODO-006）。
+- GPU 训练基础设施已验证（EXP-20260602-004）。
+- Prompt 17 walk-forward 本地实现完成（71 passed）；待服务器真实 features 跑 OOS 汇总（EXP-TODO-007）。
+- `server_ml_backtest_001` sharpe 2.78 为单段样本内结果，须结合 walk-forward OOS 指标解读。
+- 可选 CPU 对照：`server_lgbm_cpu_001`（EXP-TODO-006）。
