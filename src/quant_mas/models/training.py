@@ -21,6 +21,15 @@ class DatasetSplit:
     test: pd.DataFrame
 
 
+@dataclass(frozen=True)
+class SplitMetadata:
+    """Date range and sample counts for one chronological split."""
+
+    start_date: str
+    end_date: str
+    samples: int
+
+
 def resolve_target_column(frame: pd.DataFrame, target: str) -> str:
     """Resolve exact target name or a unique label-prefix match."""
     if target in frame.columns:
@@ -122,19 +131,85 @@ def split_by_time(
     return feature_splits, target_splits
 
 
+def split_by_time_with_metadata(
+    features_with_date: pd.DataFrame,
+    target: pd.Series,
+    train_ratio: float = 0.7,
+    validation_ratio: float = 0.15,
+    test_ratio: float = 0.15,
+) -> tuple[DatasetSplit, DatasetSplit, dict[str, SplitMetadata]]:
+    """Split by time and return split date ranges."""
+    feature_splits, target_splits = split_by_time(
+        features_with_date,
+        target,
+        train_ratio=train_ratio,
+        validation_ratio=validation_ratio,
+        test_ratio=test_ratio,
+    )
+    dates = pd.to_datetime(features_with_date["date"]).reset_index(drop=True)
+    lengths = {
+        "train": len(feature_splits.train),
+        "validation": len(feature_splits.validation),
+        "test": len(feature_splits.test),
+    }
+    offsets = {
+        "train": 0,
+        "validation": lengths["train"],
+        "test": lengths["train"] + lengths["validation"],
+    }
+    metadata = {
+        split_name: _metadata_for_dates(
+            dates.iloc[offsets[split_name] : offsets[split_name] + lengths[split_name]]
+        )
+        for split_name in ("train", "validation", "test")
+    }
+    return feature_splits, target_splits, metadata
+
+
 def evaluate_direction_model(
     model: BasePredictiveModel,
     features: pd.DataFrame,
     target: pd.Series,
     prefix: str,
+    split_metadata: SplitMetadata | None = None,
 ) -> dict[str, Any]:
     predictions = model.predict(features).astype(int)
     truth = target.astype(int).reset_index(drop=True)
     predictions = predictions.reset_index(drop=True)
+    probabilities = model.predict_proba(features).reset_index(drop=True)
     accuracy = float((predictions == truth).mean())
-    return {
+    metrics = {
         f"{prefix}_accuracy": accuracy,
+        f"{prefix}_auc": _safe_auc(truth, probabilities),
         f"{prefix}_samples": int(len(truth)),
         f"{prefix}_positive_rate": float(predictions.mean()) if len(predictions) else 0.0,
     }
+    if split_metadata is not None:
+        metrics[f"{prefix}_start_date"] = split_metadata.start_date
+        metrics[f"{prefix}_end_date"] = split_metadata.end_date
+    return metrics
 
+
+def _metadata_for_dates(dates: pd.Series) -> SplitMetadata:
+    return SplitMetadata(
+        start_date=str(dates.min().date()),
+        end_date=str(dates.max().date()),
+        samples=int(len(dates)),
+    )
+
+
+def _safe_auc(truth: pd.Series, probabilities: pd.Series) -> float | None:
+    if truth.nunique() < 2:
+        return None
+    ranked = probabilities.rank(method="average")
+    positive = truth == 1
+    negative = truth == 0
+    positive_count = int(positive.sum())
+    negative_count = int(negative.sum())
+    if positive_count == 0 or negative_count == 0:
+        return None
+    positive_rank_sum = float(ranked[positive].sum())
+    auc = (
+        positive_rank_sum - positive_count * (positive_count + 1) / 2
+    ) / (positive_count * negative_count)
+    return float(auc)

@@ -304,10 +304,20 @@ def _save_model_artifacts(
     metrics_path = output_dir / "metrics.json"
     feature_columns_path = output_dir / "feature_columns.json"
     metadata_path = output_dir / "metadata.json"
+    feature_importance_path = output_dir / "feature_importance.csv"
     metrics_path.write_text(json.dumps(metrics, indent=2), encoding="utf-8")
     feature_columns_path.write_text(
         json.dumps(feature_columns, indent=2),
         encoding="utf-8",
+    )
+    feature_importance = model.feature_importance()
+    if feature_importance.empty:
+        feature_importance = pd.DataFrame(
+            {"feature": feature_columns, "importance": [0.0] * len(feature_columns)}
+        )
+    feature_importance.loc[:, ["feature", "importance"]].to_csv(
+        feature_importance_path,
+        index=False,
     )
     metadata_path.write_text(
         json.dumps(
@@ -325,6 +335,7 @@ def _save_model_artifacts(
         "model": model_path,
         "metrics": metrics_path,
         "feature_columns": feature_columns_path,
+        "feature_importance": feature_importance_path,
         "metadata": metadata_path,
     }
 
@@ -336,4 +347,3 @@ def _stringify_paths(paths: dict[str, Path]) -> dict[str, str]:
 def _preview_text(path: Path, max_lines: int = 20) -> str:
     lines = path.read_text(encoding="utf-8").splitlines()
     return "\n".join(lines[:max_lines])
-

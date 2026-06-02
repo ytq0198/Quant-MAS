@@ -73,6 +73,24 @@
 - 问题：无
 - 下一步：真实数据下载与 pipeline
 
+### EXP-20260601-005：Prompt 15 ML 训练模块本地验证 ✅
+
+- 日期：2026-06-01
+- 阶段：Phase 2 Step 2.2（Prompt 15）
+- 环境：本地 Windows，Codex 改代码后
+- 数据：synthetic features（mock 模型，不依赖真实 LightGBM）
+- 策略 / 模型：`train_direction_model()` + mock direction model
+- 参数：`python -m pytest -v`
+- 指标：**53 passed**
+- 验证产物（测试 `tmp_path`）：
+  - `metrics.json`（train/val/test accuracy、auc、时间范围、样本数）
+  - `feature_importance.csv`
+  - `model.pkl`
+  - `feature_columns.json`、`metadata.json`
+  - ExperimentMemory 记录
+- 问题：无
+- 下一步：git push → 服务器 `requirements-ml.txt` + 真实 `train_model.py`
+
 ### EXP-20260601-004：服务器真实数据 Stooq 下载 + ma_cross pipeline ✅
 
 - 日期：2026-06-01
@@ -112,7 +130,13 @@
 ### EXP-TODO-002：LightGBM 真实训练实验
 
 - 日期：待定
-- 数据：真实 feature parquet（Step 2.1 已具备 raw + pipeline 特征链）
-- 策略 / 模型：LightGBMDirectionModel
-- 状态：待验证
-- 说明：服务器安装 `requirements-ml.txt` 后执行 Prompt 15
+- 数据：真实 feature parquet（Step 2.1 raw 数据已具备）
+- 策略 / 模型：LightGBMDirectionModel + Prompt 15 artifacts
+- 状态：待验证（Prompt 15 代码已完成，待服务器训练）
+- 说明：
+  ```bash
+  python -m pip install -r requirements-ml.txt
+  python scripts/train_model.py --config configs/train.yaml \
+    --storage-config configs/storage.server.yaml \
+    --experiment-name server_lgbm_001
+  ```

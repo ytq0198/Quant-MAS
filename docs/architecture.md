@@ -92,7 +92,7 @@ run_pipeline.py     端到端 pipeline
 - Moving Average Cross 策略
 - 下一根 bar 成交的轻量回测引擎
 - 回测指标和报告保存
-- LightGBM 模型封装（mock 测试通过；**真实训练待 Prompt 15**）
+- LightGBM 模型封装 + Prompt 15 完整训练产物（**本地 53 passed**；服务器真实训练待验证）
 - 时间序列切分和 label 泄露防护
 - 统一端到端 pipeline
 
@@ -141,7 +141,8 @@ run_pipeline.py     端到端 pipeline
 ### Phase 2 机器学习实验 🔄 当前
 
 - [x] Step 2.1 真实数据 + ma_cross pipeline
-- [ ] Prompt 15：LightGBM 真实训练与完整输出
+- [x] Prompt 15：训练 artifacts + ExperimentMemory（本地 53 passed）
+- [ ] 服务器真实 LightGBM 训练
 - [ ] ML signal 回测（Prompt 16）
 - [ ] Walk-forward（Prompt 17）
 

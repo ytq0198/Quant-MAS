@@ -74,7 +74,19 @@ class LightGBMDirectionModel(BasePredictiveModel):
             "feature_columns": self.feature_columns,
         }
 
+    def feature_importance(self) -> pd.DataFrame:
+        self._require_fitted()
+        if not hasattr(self.model, "feature_importances_"):
+            return pd.DataFrame(
+                {"feature": self.feature_columns, "importance": [0.0] * len(self.feature_columns)}
+            )
+        return pd.DataFrame(
+            {
+                "feature": self.feature_columns,
+                "importance": self.model.feature_importances_,
+            }
+        ).sort_values("importance", ascending=False, ignore_index=True)
+
     def _require_fitted(self) -> None:
         if self.model is None:
             raise ValueError("Model is not fitted")
-

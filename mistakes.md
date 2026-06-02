@@ -366,7 +366,7 @@ python -m pip install -e .
 |------|------|------|----------|
 | M-007 | Step 2.1 | yfinance 真实数据全量下载 | Yahoo 限流；已改用 Stooq 完成（EXP-20260601-004） |
 | M-009 | Step 2.1 | Stooq API Key | ✅ 已解决，流程见 M-009 |
-| — | Step 2.2 | LightGBM 真实训练 | **当前** — Prompt 15 |
+| — | Step 2.2 | LightGBM 真实训练 | Prompt 15 代码 ✅；**服务器待训** |
 
 ---
 

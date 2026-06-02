@@ -54,7 +54,7 @@ class ExperimentMemory:
                 key: str(Path(value).expanduser())
                 for key, value in (artifacts or {}).items()
             },
-            params=params or {},
+            params=_json_safe(params or {}),
             notes=notes,
         )
         records = self.list()
@@ -79,3 +79,12 @@ class ExperimentMemory:
             encoding="utf-8",
         )
 
+
+def _json_safe(value: Any) -> Any:
+    if isinstance(value, Path):
+        return str(value.expanduser())
+    if isinstance(value, dict):
+        return {str(key): _json_safe(item) for key, item in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [_json_safe(item) for item in value]
+    return value

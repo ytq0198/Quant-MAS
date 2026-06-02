@@ -37,3 +37,6 @@ class BasePredictiveModel(ABC):
     def metadata(self) -> dict[str, Any]:
         """Return lightweight model metadata."""
 
+    def feature_importance(self) -> pd.DataFrame:
+        """Return feature importance as feature/importance rows when available."""
+        return pd.DataFrame(columns=["feature", "importance"])

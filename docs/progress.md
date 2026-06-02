@@ -4,8 +4,7 @@
 
 ## 当前阶段
 
-**Phase 2 Step 2.2**：Codex Prompt 15（ML 训练）。  
-Phase 1 已收口：服务器 pytest 44 passed + Stooq 真实 pipeline（EXP-20260601-004）。
+**Phase 2**：Prompt 15 代码已完成（本地 **53 passed**）；下一步 **服务器真实 LightGBM 训练**，然后 **Prompt 16**。
 
 ## Prompt 任务状态
 
@@ -21,13 +20,14 @@ Phase 1 已收口：服务器 pytest 44 passed + Stooq 真实 pipeline（EXP-202
 - [x] Prompt 10：SupervisorAgent 和内部任务流
 - [x] 统一端到端 pipeline：`scripts/run_pipeline.py`
 - [x] 最小端到端测试：`tests/test_end_to_end_pipeline.py`
+- [x] **Prompt 15**：ML 训练完整产物（metrics、feature_importance、model.pkl、ExperimentMemory）
 
 ## 当前 pytest 状态
 
 | 环境 | Python | 结果 | 日期 |
 |------|--------|------|------|
-| 本地 Windows | 3.11+ | **44 passed** | 2026-06-02 |
-| 服务器 Linux | 3.11.15 | **44 passed**（1.19s） | 2026-06-02 |
+| 本地 Windows | 3.11+ | **53 passed** | 2026-06-01 |
+| 服务器 Linux | 3.11.15 | **44 passed**（待 pull Prompt 15 后复测） | 2026-06-02 |
 
 服务器验证环境：
 
@@ -75,7 +75,7 @@ python scripts/run_pipeline.py --help
 - [x] 回测指标：total_return、sharpe、max_drawdown、final_equity 等
 - [x] 回测报告保存：metrics、equity curve、trades、summary
 - [x] ExperimentMemory JSON 记录
-- [x] LightGBM 模型封装，真实训练待验证
+- [x] LightGBM 模型封装 + **Prompt 15** 完整训练产物（mock 测试通过）
 - [x] 时间序列切分 70/15/15
 - [x] label 泄露防护
 - [x] Message / LLMClient / MockLLMClient / BaseAgent
@@ -93,18 +93,19 @@ python scripts/run_pipeline.py --help
 - [x] 服务器全量 pytest 验证（44 passed）
 - [x] Stooq 真实数据下载（AAPL / MSFT / SPY，2018–2025，6033 rows）
 - [x] 服务器真实 `run_pipeline.py`（`server_ma_cross_real_001`）
-- [ ] 安装 `requirements-ml.txt`（lightgbm）并验证真实训练
+- [ ] 在服务器验证真实 LightGBM 训练与 artifacts
 - [ ] 增加基础风险检查模块
 
 ### Phase 2：机器学习真实实验 🔄 当前
 
 - [x] Step 2.1 真实数据 pipeline（服务器 Stooq + ma_cross 回测）
-- [ ] Step 2.2 Prompt 15：完善 ML 训练输出（**当前**）
+- [x] Step 2.2 Prompt 15：ML 训练模块增强（本地 53 passed，mock 模型）
+- [ ] Step 2.2 服务器真实 LightGBM 训练（`requirements-ml.txt`）
 - [ ] Step 2.3 Prompt 16：ML 信号策略 + 回测
 - [ ] Step 2.4 Prompt 17：Walk-forward 样本外
 - [ ] 安装并验证 LightGBM 真实训练
-- [ ] 输出样本外指标与特征重要性
-- [ ] 将模型训练结果写入 ExperimentMemory
+- [ ] 输出样本外指标与特征重要性（服务器真实训练后）
+- [ ] 将模型训练结果写入 ExperimentMemory（真实实验）
 
 ### Phase 3：Agent 增强
 
