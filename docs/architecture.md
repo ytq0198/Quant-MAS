@@ -57,7 +57,9 @@ Quant MAS
 │   ├── BacktestTool
 │   ├── TrainModelTool
 │   ├── ReportTool
-│   └── RiskTool（risk_check）
+│   ├── RiskTool（risk_check）
+│   ├── MLBacktestTool（ml_backtest）
+│   └── PipelineTool（pipeline）
 │
 ├── Agent Layer
 │   ├── Message
@@ -119,7 +121,9 @@ run_pipeline.py     端到端 pipeline
 - `BacktestTool`
 - `TrainModelTool`
 - `ReportTool`
-- `RiskTool`（`risk_check`；Prompt 18）
+- `RiskTool`（`risk_check`）
+- `MLBacktestTool`（`ml_backtest`，Prompt 19）
+- `PipelineTool`（`pipeline`，Prompt 19）
 
 工具返回摘要、指标和路径，不返回完整 DataFrame。
 
@@ -134,7 +138,7 @@ run_pipeline.py     端到端 pipeline
 - `SupervisorAgent`
 - Agent 事件类型
 
-当前 SupervisorAgent 使用规则路由，不调用真实 LLM。
+当前 SupervisorAgent 使用规则路由，支持 7 类任务（含 ml_backtest / risk_check / pipeline），不调用真实 LLM。
 
 ### Memory Layer
 
@@ -148,7 +152,7 @@ run_pipeline.py     端到端 pipeline
 ### 第一～二阶段 ✅
 
 - [x] 服务器 Python 3.11 环境部署
-- [x] 全量 pytest 验证（**76 passed** 含风控，2026-06-01）
+- [x] 全量 pytest 验证（**87 passed** 含 Prompt 19，2026-06-01）
 - [x] Stooq 真实数据下载（6033 rows，AAPL/MSFT/SPY 2018–2025）
 - [x] 服务器真实 pipeline（`server_ma_cross_real_001`）
 - [x] Prompt 15–17：ML 训练、ML 回测、walk-forward OOS
@@ -157,14 +161,16 @@ run_pipeline.py     端到端 pipeline
 
 - [x] Prompt 18：基础风控层（RiskLimits / RiskTool，EXP-20260601-009）
 
-### 第三阶段 🔄 当前
+### 第三阶段 ✅
 
-- [ ] Prompt 19：增强 SupervisorAgent 路由
-- 增强报告 Agent、实验审计事件
+- [x] Prompt 19：Supervisor 7 类路由 + MLBacktestTool + PipelineTool
 
-### 第四～六阶段
+### 第四阶段 🔄 当前
 
-- **第四阶段**：Memory + RAG（Prompt 20）
+- [ ] Prompt 20：Memory + RAG
+
+### 第五～六阶段
+
 - **第五阶段**：LangGraph 编排（暂缓）
 - **第六阶段**：Paper Trading（暂缓）
 

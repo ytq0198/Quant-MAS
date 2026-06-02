@@ -32,6 +32,21 @@
 
 ## 当前验证记录
 
+### EXP-20260601-011：Prompt 19 Supervisor 路由本地验证 ✅
+
+- 日期：2026-06-01
+- 阶段：第三阶段（Prompt 19）
+- 模块：`MLBacktestTool`、`PipelineTool`、Supervisor 扩展、`run_agent.py`（7 工具）
+- 指标：
+  - `tests/test_supervisor_agent.py`：**17 passed**
+  - 全量 `python -m pytest -v`：**87 passed**（+11 测试）
+- 验收：
+  - ml_backtest / risk_check / pipeline 中英文路由
+  - kwargs 别名映射（data_path、tool_config、risk_config 等）
+  - `run_agent.py --help` 正常
+- 问题：无
+- 下一步：Prompt 20 Memory/RAG；push 后服务器 pytest 复验
+
 ### EXP-20260601-009：Prompt 18 基础风控层本地验证 ✅
 
 - 日期：2026-06-01

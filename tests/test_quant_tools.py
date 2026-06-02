@@ -6,7 +6,14 @@ from typing import Any
 import pandas as pd
 
 from quant_mas.models import BasePredictiveModel
-from quant_mas.tools import BacktestTool, DataSummaryTool, ReportTool, TrainModelTool
+from quant_mas.tools import (
+    BacktestTool,
+    DataSummaryTool,
+    MLBacktestTool,
+    PipelineTool,
+    ReportTool,
+    TrainModelTool,
+)
 
 
 class ThresholdDirectionModel(BasePredictiveModel):
@@ -88,6 +95,31 @@ def make_features(path: Path) -> pd.DataFrame:
                 "close": 10.0 + index,
                 "return_1": index / 100.0,
                 "ma_5": 10.0 + index / 2.0,
+                "future_return_5": 0.01 if index % 2 else -0.01,
+                "future_direction_5": 1 if index % 2 else 0,
+            }
+        )
+    frame = pd.DataFrame(rows)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    frame.to_parquet(path, index=False)
+    return frame
+
+
+def make_ml_features(path: Path) -> pd.DataFrame:
+    rows = []
+    for index in range(12):
+        close = 10.0 + index
+        rows.append(
+            {
+                "date": pd.Timestamp("2026-01-01") + pd.Timedelta(days=index),
+                "symbol": "AAA",
+                "open": close,
+                "high": close + 1.0,
+                "low": close - 1.0,
+                "close": close,
+                "volume": 1000 + index,
+                "return_1": index / 100.0,
+                "ma_5": close / 2.0,
                 "future_return_5": 0.01 if index % 2 else -0.01,
                 "future_direction_5": 1 if index % 2 else 0,
             }
@@ -221,3 +253,90 @@ def test_report_tool_returns_latest_summary_path(tmp_path) -> None:
     assert result.metadata["experiment_name"] == "tool_backtest"
     assert Path(result.metadata["summary"]).exists()
 
+
+def test_ml_backtest_tool_runs_with_mock_model(tmp_path) -> None:
+    storage_config = make_storage_config(tmp_path)
+    feature_path = tmp_path / "features.parquet"
+    config_path = tmp_path / "backtest_ml.yaml"
+    output_dir = tmp_path / "reports" / "ml"
+    make_ml_features(feature_path)
+    config_path.write_text(
+        "\n".join(
+            [
+                "model:",
+                f"  path: {tmp_path / 'model.pkl'}",
+                "data:",
+                f"  features_path: {feature_path}",
+                "strategy:",
+                "  name: ml_signal",
+                "  buy_threshold: 0.6",
+                "  sell_threshold: 0.4",
+                "  max_weight: 1.0",
+                "portfolio:",
+                "  initial_cash: 1000",
+                "costs:",
+                "  commission_bps: 0",
+                "  slippage_bps: 0",
+                "output:",
+                f"  dir: {output_dir}",
+                "experiment:",
+                "  name: tool_ml_backtest",
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+    result = MLBacktestTool(model=ThresholdDirectionModel()).run(
+        config_path=config_path,
+        storage_config=storage_config,
+    )
+
+    assert "ML backtest completed" in result.content
+    assert "total_return" in result.metadata["metrics"]
+    assert Path(result.metadata["artifacts"]["summary"]).exists()
+    assert Path(result.metadata["experiment_memory"]).exists()
+
+
+def test_pipeline_tool_runs_local_sample_without_network(tmp_path) -> None:
+    storage_config = make_storage_config(tmp_path)
+    raw_dir = tmp_path / "raw"
+    features_dir = tmp_path / "features"
+    output_dir = tmp_path / "reports" / "pipeline"
+    backtest_config = tmp_path / "backtest.yaml"
+    features_config = tmp_path / "features.yaml"
+    make_ohlcv(raw_dir / "market_data.parquet")
+    make_ml_features(features_dir / "features.parquet")
+    backtest_config.write_text(
+        "\n".join(
+            [
+                "strategy:",
+                "  name: moving_average_cross",
+                "  fast_window: 2",
+                "  slow_window: 3",
+                "portfolio:",
+                "  initial_cash: 1000",
+                "costs:",
+                "  commission_bps: 0",
+                "  slippage_bps: 0",
+            ]
+        ),
+        encoding="utf-8",
+    )
+    features_config.write_text("technical: {}\nlabels: {}\n", encoding="utf-8")
+
+    result = PipelineTool().run(
+        storage_config=storage_config,
+        raw_dir=raw_dir,
+        features_dir=features_dir,
+        output_dir=output_dir,
+        features_config=features_config,
+        backtest_config=backtest_config,
+        skip_download=True,
+        skip_features=True,
+        experiment_name="tool_pipeline",
+    )
+
+    assert "Pipeline completed" in result.content
+    assert "total_return" in result.metadata["metrics"]
+    assert Path(result.metadata["artifacts"]["summary"]).exists()
+    assert Path(result.metadata["paths"]["experiment_memory"]).exists()

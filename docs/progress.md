@@ -4,9 +4,9 @@
 
 ## 当前所处阶段
 
-**第二阶段** ✅ · **第二阶段扩展** ✅（Prompt 18，EXP-20260601-009）。
+**第三阶段** ✅ 已完成（Prompt 19，EXP-20260601-011）。
 
-**当前：第三阶段 Prompt 19**（Supervisor 路由增强）。
+**当前：第四阶段 Prompt 20**（Memory + RAG）。
 
 ## Prompt 任务状态
 
@@ -24,15 +24,16 @@
 - [x] 最小端到端测试：`tests/test_end_to_end_pipeline.py`
 - [x] **Prompt 15**：ML 训练完整产物
 - [x] **Prompt 16**：MLSignalStrategy + `run_ml_backtest.py`
-- [x] **Prompt 17**：Walk-forward 样本外（`walk_forward.py`、`run_walk_forward.py`）
-- [x] **Prompt 18**：基础风控层（RiskLimits / RiskTool / `tests/test_risk.py`）
+- [x] **Prompt 17**：Walk-forward 样本外
+- [x] **Prompt 18**：基础风控层
+- [x] **Prompt 19**：Supervisor 路由（MLBacktestTool / PipelineTool / RiskTool）
 
 ## 当前 pytest 状态
 
 | 环境 | Python | 结果 | 日期 |
 |------|--------|------|------|
-| 本地 Windows | 3.11+ | **76 passed** | 2026-06-01 |
-| 服务器 Linux | 3.11.15 | **76 passed** | 2026-06-01 |
+| 本地 Windows | 3.11+ | **87 passed** | 2026-06-01 |
+| 服务器 Linux | 3.11.15 | **76 passed**（待 pull 复验） | 2026-06-01 |
 
 服务器验证环境：
 
@@ -49,7 +50,7 @@ Conda 环境：/mnt/localDisk3/weizian/conda_envs/quant-mas
 - 测试不访问真实网络。
 - 测试不调用真实 LLM API。
 - 测试不要求真实 LightGBM。
-- 服务器上必须使用 `python -m pytest`，不能裸敲 `pytest`（否则会误用 Python 3.9）。
+- 服务器上必须使用 `python -m pytest`，不能裸敲 `pytest`。
 - 服务器上必须使用 `python -m pip`，不能裸敲 `pip`。
 
 ## 当前可用 CLI
@@ -71,64 +72,41 @@ python scripts/run_walk_forward.py --help
 - [x] Parquet 数据存储
 - [x] YAML 路径配置和目录管理
 - [x] OHLCV 数据校验
-- [x] Stooq 下载接口（`StooqFetcher` + `STOOQ_API_KEY`），服务器真实下载已验证
-- [x] yfinance 下载接口（服务器 IP 易限流，备用）
-- [x] 技术指标特征
-- [x] future return / direction label
-- [x] 按 symbol 分组构建特征，避免多标的污染
-- [x] Moving Average Cross 策略
-- [x] 下一根 bar 成交的轻量回测引擎
-- [x] 交易成本模型：commission / slippage
-- [x] 回测指标：total_return、sharpe、max_drawdown、final_equity 等
-- [x] 回测报告保存：metrics、equity curve、trades、summary
-- [x] ExperimentMemory JSON 记录
-- [x] LightGBM 真实训练（服务器 `server_lgbm_001`，EXP-20260601-006）
-- [x] 时间序列切分 70/15/15
-- [x] label 泄露防护
-- [x] Message / LLMClient / MockLLMClient / BaseAgent
-- [x] BaseTool / ToolRegistry / ToolResult
-- [x] DataSummaryTool / BacktestTool / TrainModelTool / ReportTool
-- [x] SupervisorAgent 规则路由
-- [x] AgentEvent / ToolCallEvent / AgentFinishEvent
-- [x] LightGBM GPU/CUDA 训练支持（服务器 `server_lgbm_gpu_001`，EXP-20260602-004）
-- [x] Walk-forward 样本外（服务器 `server_walk_forward_001`，EXP-20260602-008，OOS sharpe 0.586）
-- [x] RiskLimits / RiskDecision / exposure / drawdown_guard / RiskTool（Prompt 18）
+- [x] Stooq 下载接口（服务器真实下载已验证）
+- [x] yfinance 下载接口（备用）
+- [x] 技术指标特征 / future label / 按 symbol 分组特征
+- [x] Moving Average Cross 策略 + 轻量回测引擎
+- [x] 回测报告 + ExperimentMemory
+- [x] LightGBM 训练（CPU + GPU/CUDA）
+- [x] MLSignalStrategy + ML 回测 + walk-forward OOS
+- [x] RiskLimits / RiskTool 基础风控
+- [x] Agent Core + 7 个 Quant Tools + Supervisor 7 类路由
 
 ## 分阶段目标
 
-### 第零～第一阶段：量化核心 MVP ✅
+### 第零～第二阶段 ✅
 
-- [x] 在服务器 Python 3.11 环境中完整安装核心依赖
-- [x] 服务器全量 pytest 验证（**76 passed**，2026-06-01，EXP-20260601-010）
-- [x] Stooq 真实数据下载（AAPL / MSFT / SPY，2018–2025，6033 rows）
-- [x] 服务器真实 `run_pipeline.py`（`server_ma_cross_real_001`）
+- [x] 量化核心 MVP + ML 实验链路（Prompt 1–17、15b）
+- [x] 服务器 walk-forward OOS sharpe 0.586（EXP-20260602-008）
 
-### 第二阶段：机器学习真实实验 ✅
+### 第二阶段扩展 ✅
 
-- [x] Step 2.1 真实数据 pipeline（服务器 Stooq + ma_cross 回测）
-- [x] Step 2.2b Prompt 15b：GPU/CUDA 服务器训练（EXP-20260602-004）
-- [x] Step 2.4 Prompt 17：Walk-forward（本地 EXP-20260602-007 + 服务器 EXP-20260602-008）
+- [x] Prompt 18 风控（76 passed，EXP-20260601-009/010）
 
-### 第二阶段扩展：基础风控 ✅
+### 第三阶段 ✅
 
-- [x] Prompt 18：RiskLimits、RiskDecision、RiskTool、`configs/risk.yaml`
-- [x] `tests/test_risk.py` 5 passed；全量 76 passed（EXP-20260601-009）
+- [x] Prompt 19：MLBacktestTool、PipelineTool、Supervisor 扩展（87 passed，EXP-20260601-011）
 
-### 第三阶段：Agent 增强 🔄 当前
+### 第四阶段 🔄 当前
 
-- [ ] Prompt 19：增强 SupervisorAgent 路由（ML 回测、风控、pipeline）
-- [ ] 增加 Agent 事件审计报告
-- [ ] 将 ReportAgent 与真实报告产物对接
+- [ ] Prompt 20：Memory + RAG 雏形
 
-### 第四～六阶段：后续
+### 第五～六阶段
 
-- [ ] **第四阶段** Prompt 20：Memory + RAG 雏形
-- [ ] **第五阶段** LangGraph 编排（暂缓）
-- [ ] **第六阶段** Paper Trading（暂缓，不做实盘）
+- [ ] LangGraph 编排（暂缓）
+- [ ] Paper Trading（暂缓）
 
 ## 研究解读（2026-06-02）
 
-- **第二阶段 ML 链路已全部跑通**（训练 → ML 回测 → walk-forward OOS）。
-- 单段 ML 回测 sharpe **2.78**（EXP-20260602-005）≫ walk-forward OOS sharpe **0.586**（EXP-20260602-008）→ 报告应 **以 OOS 为准**。
-- 下一步 **Prompt 19** Supervisor 路由；模型调参留作后续研究。
-- 可选 CPU 对照：`server_lgbm_cpu_001`（EXP-TODO-006）。
+- **第二阶段 ML 链路已全部跑通**；报告以 walk-forward OOS 为准（sharpe 0.586）。
+- **Agent 层** 现已可路由 ML 回测、风控、pipeline；下一步 **Prompt 20** Memory/RAG。

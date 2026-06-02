@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from typing import Any
 
 from quant_mas.core import AgentEvent, AgentFinishEvent, ToolCallEvent
-from quant_mas.tools import ToolRegistry, ToolResult
+from quant_mas.tools import ToolRegistry
 
 
 @dataclass(frozen=True)
@@ -18,10 +18,13 @@ class RouteRule:
 
 
 DEFAULT_ROUTE_RULES = (
+    RouteRule("ml_backtest", ("ml backtest", "ml_backtest", "机器学习回测", "ml回测", "ML回测")),
+    RouteRule("risk_check", ("risk", "风控", "风险", "风险检查")),
+    RouteRule("pipeline", ("pipeline", "全流程", "端到端", "end to end")),
     RouteRule("backtest", ("backtest", "回测", "策略测试")),
     RouteRule("train_model", ("train", "model", "训练", "模型")),
     RouteRule("report", ("report", "summary", "报告", "摘要")),
-    RouteRule("data_summary", ("data", "dataset", "summary", "数据", "概览")),
+    RouteRule("data_summary", ("data", "dataset", "数据", "概览")),
 )
 
 
@@ -61,7 +64,9 @@ class SupervisorAgent:
                     metadata={"step": step},
                 )
             )
-            result = self.tool_registry.get(tool_name).run(**self._kwargs_for_tool(tool_name, tool_kwargs))
+            result = self.tool_registry.get(tool_name).run(
+                **self._kwargs_for_tool(tool_name, tool_kwargs)
+            )
             finish = AgentFinishEvent(
                 result=result.content,
                 metadata={
@@ -78,7 +83,10 @@ class SupervisorAgent:
         for rule in self.route_rules:
             if any(keyword.lower() in normalized for keyword in rule.keywords):
                 return rule.tool_name
-        raise ValueError(f"No tool route matched task: {task}")
+        available = ", ".join(rule.tool_name for rule in self.route_rules)
+        raise ValueError(
+            f"No tool route matched task: {task}. Available task types: {available}"
+        )
 
     @staticmethod
     def _kwargs_for_tool(tool_name: str, kwargs: dict[str, Any]) -> dict[str, Any]:
@@ -92,5 +100,15 @@ class SupervisorAgent:
                 if alias in common:
                     common["path"] = common[alias]
                     break
+        if tool_name == "risk_check":
+            if "config_path" not in common and "risk_config_path" in common:
+                common["config_path"] = common["risk_config_path"]
+        if tool_name == "ml_backtest":
+            if "config_path" not in common and "tool_config" in common:
+                common["config_path"] = common["tool_config"]
+            if "features_path" not in common and "input_path" in common:
+                common["features_path"] = common["input_path"]
+        if tool_name == "pipeline":
+            if "backtest_config" not in common and "tool_config" in common:
+                common["backtest_config"] = common["tool_config"]
         return common
-

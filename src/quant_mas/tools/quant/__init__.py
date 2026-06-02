@@ -10,6 +10,8 @@ import importlib.util
 from pathlib import Path
 
 from quant_mas.tools.quant.risk_tool import RiskTool
+from quant_mas.tools.quant.ml_backtest_tool import MLBacktestTool
+from quant_mas.tools.quant.pipeline_tool import PipelineTool
 
 _legacy_path = Path(__file__).resolve().parent.parent / "quant.py"
 _spec = importlib.util.spec_from_file_location("_quant_mas_legacy_quant_tools", _legacy_path)
@@ -26,6 +28,8 @@ ReportTool = _legacy.ReportTool
 __all__ = [
     "BacktestTool",
     "DataSummaryTool",
+    "MLBacktestTool",
+    "PipelineTool",
     "ReportTool",
     "RiskTool",
     "TrainModelTool",
