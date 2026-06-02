@@ -1,6 +1,6 @@
 # Quant MAS 实验记录
 
-更新时间：2026-06-01
+更新时间：2026-06-02
 
 本文件用于记录真实实验和重要验证。不要记录未经实际运行的数据结果；尚未真实运行的项目标记为“待验证”。
 
@@ -56,6 +56,49 @@
 - 问题：仅为 smoke test，不代表真实市场表现
 - 下一步：用 sample parquet 或真实小规模数据验证
 
+### EXP-20260602-005：服务器 ML 信号回测 ✅（Prompt 16）
+
+- 日期：2026-06-02
+- 阶段：Phase 2 Step 2.3（Prompt 16 服务器验证）
+- 环境：a6000-9961，CUDA LightGBM 4.6.0
+- 数据：真实 features + GPU 训练模型（`server_lgbm_gpu_001`）
+- 策略 / 模型：`MLSignalStrategy` + `LightGBMDirectionModel` pred_proba
+- 参数：`run_ml_backtest.py --experiment-name server_ml_backtest_001`
+- 指标（2011 bars）：
+  - total_return：**68.27**（脚本输出比例，非百分号）
+  - annualized_return：**0.701**
+  - sharpe：**2.78**
+  - max_drawdown：**-0.246**
+  - final_equity：**6,927,128.57**
+- 产物路径：
+  - 报告：`outputs/reports/ml_backtest_latest/summary.md`
+  - 日志：`/mnt/localDisk3/weizian/logs/ml_backtest_server_001.log`
+- 问题：无（链路验证通过；收益数值需后续 walk-forward 样本外复核）
+- 下一步：Prompt 17 Walk-forward
+
+### EXP-20260602-004：服务器 GPU LightGBM 训练 ✅（Prompt 15b）
+
+- 日期：2026-06-02
+- 阶段：Phase 2 Step 2.2b（Prompt 15b 服务器验证）
+- 环境：a6000-9961，4× RTX A6000，驱动 580，CUDA 13.0
+- 数据：真实 features（6033 rows，与 EXP-20260601-006 相同）
+- 策略 / 模型：`LightGBMDirectionModel`，`--device cuda`，`future_direction_5`
+- 参数：`configs/train.gpu.yaml`，`--experiment-name server_lgbm_gpu_001`
+- device（metadata / metrics）：
+  - `device_requested`: cuda
+  - `device_resolved`: cuda
+  - `device_fallback`: false
+  - `device_reason`: null
+- 指标：
+  - train：accuracy **0.869**，AUC **0.961**，4170 samples
+  - val：accuracy **0.445**，AUC **0.457**，894 samples
+  - test：accuracy **0.456**，AUC **0.479**，894 samples
+  - feature_count：15
+- 产物路径：`/mnt/localDisk3/weizian/models/lightgbm_direction_latest/`
+- 问题：首次训练失败 — PyPI CPU-only LightGBM（见 M-010）；源码编译 CUDA 版后成功
+- 与 CPU 基线（EXP-20260601-006）：val/test AUC 仍 ~0.46–0.48，属模型过拟合问题，非 GPU 链路问题
+- 下一步：可选 `server_lgbm_cpu_001` 对照；Prompt 17
+
 ### EXP-20260602-003：服务器全量 pytest 验证
 
 - 日期：2026-06-02
@@ -68,7 +111,7 @@
 - 数据：synthetic（pytest 内置，不联网）
 - 策略 / 模型：全模块单元 / 集成测试
 - 参数：`python -m pytest -v`
-- 指标：**44 passed in 1.19s**
+- 指标：**44 passed in 1.19s**（2026-06-02 初验；同日后 pull GPU 代码并重装 CUDA LightGBM 后为 **68 passed**）
 - 产物路径：无（测试不产生持久产物）
 - 问题：无
 - 下一步：真实数据下载与 pipeline
@@ -181,36 +224,10 @@
 
 ## 待验证实验
 
-### EXP-TODO-003：ML 信号真实回测（Prompt 16 服务器）
+### EXP-TODO-006：CPU 对照训练（可选）
 
-- 日期：待定
-- 数据：真实 features + `server_lgbm_001` 模型
-- 命令：
-  ```bash
-  python scripts/run_ml_backtest.py \
-    --config configs/backtest_ml.yaml \
-    --storage-config configs/storage.server.yaml \
-    --features-path /mnt/localDisk3/weizian/datasets/features/features.parquet \
-    --model-path /mnt/localDisk3/weizian/models/lightgbm_direction_latest/model.pkl \
-    --experiment-name server_ml_backtest_001
-  ```
-- 状态：待验证
-
-### EXP-TODO-005：服务器 GPU LightGBM 训练（Prompt 15b）
-
-- 日期：待定
-- 数据：真实 features（6033 rows）
-- 命令：
-  ```bash
-  nvidia-smi
-  python scripts/train_model.py \
-    --config configs/train.gpu.yaml \
-    --storage-config configs/storage.server.yaml \
-    --device cuda \
-    --experiment-name server_lgbm_gpu_001
-  cat /mnt/localDisk3/weizian/models/lightgbm_direction_latest/metadata.json | grep device
-  ```
-- 验收：`device_resolved` 为 `cuda`（非 fallback）；对比 EXP-20260601-006 CPU 指标
-- 状态：待验证
+- 目的：与 EXP-20260601-006 / EXP-20260602-004 在同一 features 上对比 CPU vs GPU metrics
+- 命令：`train_model.py --device cpu --experiment-name server_lgbm_cpu_001`
+- 状态：可选，未跑
 
 ### EXP-TODO-004：Walk-forward 样本外（Prompt 17）

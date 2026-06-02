@@ -2,9 +2,9 @@
 # Install after requirements.txt:
 #   python -m pip install -r requirements-ml.txt
 #
-# Note: the default PyPI LightGBM wheel is often CPU-only.
-# For CUDA training on NVIDIA servers, verify the installed LightGBM build
-# supports CUDA/OpenCL, or build LightGBM with CUDA support following the
-# official LightGBM documentation.
+# For CUDA training on NVIDIA servers (see mistakes.md M-010), build from source:
+#   python -m pip uninstall -y lightgbm
+#   python -m pip install --no-binary lightgbm \
+#     --config-settings=cmake.define.USE_CUDA=ON 'lightgbm==4.6.0'
 lightgbm>=4.0
 xgboost>=2.0

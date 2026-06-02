@@ -145,10 +145,9 @@ run_pipeline.py     端到端 pipeline
 - [x] Step 2.1 真实数据 + ma_cross pipeline
 - [x] Prompt 15：训练 artifacts + ExperimentMemory（本地 53 passed）
 - [x] 服务器真实 LightGBM 训练（EXP-20260601-006）
-- [x] Prompt 16：MLSignalStrategy + `run_ml_backtest.py`（本地 68 passed）
-- [x] Prompt 15b：GPU/CUDA 训练支持（`tests/test_device.py` 10 passed）
-- [ ] 服务器 GPU 训练（EXP-TODO-005）
-- [ ] Walk-forward（Prompt 17）
+- [x] Prompt 16：MLSignalStrategy + `run_ml_backtest.py`（服务器 EXP-20260602-005）
+- [x] Prompt 15b：GPU/CUDA 训练（服务器 EXP-20260602-004）
+- [ ] Walk-forward（Prompt 17，**当前**）
 
 ### Phase 3 Agent 增强
 

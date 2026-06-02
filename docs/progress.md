@@ -1,10 +1,10 @@
 # Quant MAS 开发进度
 
-更新时间：2026-06-01
+更新时间：2026-06-02
 
 ## 当前阶段
 
-**Phase 2**：Prompt 16 + GPU 训练支持 ✅（本地 **68 passed**）。**当前：服务器 GPU 训练 / ML 回测 + Prompt 17**。
+**Phase 2**：Prompt 15b + 16 服务器验证 ✅。**当前：Prompt 17 Walk-forward**。
 
 ## Prompt 任务状态
 
@@ -29,7 +29,7 @@
 | 环境 | Python | 结果 | 日期 |
 |------|--------|------|------|
 | 本地 Windows | 3.11+ | **68 passed** | 2026-06-01 |
-| 服务器 Linux | 3.11.15 | 待 pull 后复测 | 2026-06-02 |
+| 服务器 Linux | 3.11.15 | **68 passed** | 2026-06-02 |
 
 服务器验证环境：
 
@@ -86,8 +86,8 @@ python scripts/run_ml_backtest.py --help
 - [x] DataSummaryTool / BacktestTool / TrainModelTool / ReportTool
 - [x] SupervisorAgent 规则路由
 - [x] AgentEvent / ToolCallEvent / AgentFinishEvent
-- [x] LightGBM GPU/CUDA 训练支持（`resolve_training_device`，auto fallback CPU）
-- [x] MLSignalStrategy + ML 信号回测（Prompt 16，mock 测试通过）
+- [x] LightGBM GPU/CUDA 训练支持（服务器 `server_lgbm_gpu_001`，EXP-20260602-004）
+- [x] MLSignalStrategy + ML 信号回测（服务器 `server_ml_backtest_001`，EXP-20260602-005）
 
 ## 下一阶段目标
 
@@ -103,11 +103,10 @@ python scripts/run_ml_backtest.py --help
 ### Phase 2：机器学习真实实验 🔄 当前
 
 - [x] Step 2.1 真实数据 pipeline（服务器 Stooq + ma_cross 回测）
-- [x] Step 2.3 Prompt 16：MLSignalStrategy + ML 回测（本地 57 passed）
-- [x] Step 2.2b Prompt 15b：GPU/CUDA 训练支持（本地 68 passed）
-- [ ] Step 2.3 服务器真实 ML 回测（EXP-TODO-003）
-- [ ] Step 2.2b 服务器 GPU 训练（EXP-TODO-005，`server_lgbm_gpu_001`）
+- [x] Step 2.2b Prompt 15b：GPU/CUDA 服务器训练（EXP-20260602-004）
+- [x] Step 2.3 Prompt 16：ML 回测服务器验证（EXP-20260602-005，sharpe 2.78）
 - [ ] Step 2.4 Prompt 17：Walk-forward 样本外（**当前**）
+- [ ] 可选：CPU 对照训练 `server_lgbm_cpu_001`（EXP-TODO-006）
 
 ### Phase 3：Agent 增强
 

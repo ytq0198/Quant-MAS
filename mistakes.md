@@ -3,7 +3,7 @@
 > 记录各开发阶段遇到的典型问题、根因与解决方法，便于复盘和避免重复踩坑。  
 > 与 [`项目指导.md`](项目指导.md) §20 操作手册、`docs/server_commands.md` 配合使用。
 
-**最后更新**：2026-06-01  
+**最后更新**：2026-06-02  
 **维护方式**：每遇到新问题，在对应 Phase 章节末尾追加一条（含日期、步骤、现象、根因、解法）。
 
 ---
@@ -19,7 +19,7 @@
   - [Step 1.14 服务器部署与 pytest（Prompt 14）](#step-114-服务器部署与-pytestprompt-14)
   - [Step 1.5 真实数据 pipeline（§20.2，✅ 已完成）](#step-15-真实数据-pipeline202-已完成-2026-06-01)
 - [Phase 2：机器学习实验（进行中）](#phase-2机器学习实验进行中)
-  - [Step 2.1 真实数据下载 ✅](#step-21-真实数据下载--已完成2026-06-01)
+  - [Step 2.2b GPU 训练 ✅](#step-22b-gpu-训练--已完成2026-06-02)
 - [跨阶段通用规则](#跨阶段通用规则)
 - [待验证 / 未完全解决](#待验证--未完全解决)
 
@@ -52,6 +52,7 @@
 | [M-007](#m-007-yfinance-限流与网络超时) | P1 | Phase 1 Step 1.5 / Phase 2 Step 2.1 | YFRateLimitError |
 | [M-008](#m-008-windows-pytest-临时目录权限) | P2 | Phase 1 / 本地 pytest | PermissionError |
 | [M-009](#m-009-stooq-需要-api-key) | P1 | Phase 1 Step 1.5 / Phase 2 Step 2.1 | Stooq apikey |
+| [M-010](#m-010-lightgbm-pypi-wheel-为-cpu-only) | **P0** | Phase 2 / Step 2.2b | LightGBM CUDA build |
 
 ---
 
@@ -325,7 +326,26 @@ python scripts/download_data.py \
 | 步骤 | Prompt | 潜在问题 | 说明 |
 |------|--------|----------|------|
 | 2.2 ML 训练输出 | **15** | LightGBM 未安装 | 先 `python -m pip install -r requirements-ml.txt` |
+| 2.2b GPU 训练 | **15b** | CUDA Tree Learner not enabled | 见 [M-010](#m-010-lightgbm-pypi-wheel-为-cpu-only)，编译 CUDA 版 LightGBM |
 | 2.3 ML 回测 | 16 | 模型路径不对 | 检查 `storage.server.yaml` 中 `models_dir` |
+
+### Step 2.2b GPU 训练 ✅ 已完成（2026-06-02）
+
+服务器 **4× RTX A6000** 上 `--device cuda` 训练与 ML 回测均已通过。  
+实验记录：**EXP-20260602-004**（GPU 训练）、**EXP-20260602-005**（ML 回测）。
+
+#### M-010 LightGBM PyPI wheel 为 CPU-only
+
+| 项 | 内容 |
+|----|------|
+| **日期** | 2026-06-02 |
+| **阶段** | Phase 2 / Step 2.2b（Prompt 15b） |
+| **现象** | `train_model.py --device cuda` 在 `fit()` 时报错：`[LightGBM] [Fatal] CUDA Tree Learner was not enabled in this build.`；metadata 中 `device_resolved=cuda`、`device_fallback=false` |
+| **根因** | 1) `pip install lightgbm` 默认 wheel 常为 CPU-only；2) `resolve_training_device()` 仅检测 `nvidia-smi`，**未**检测 LightGBM 是否带 CUDA 编译 |
+| **解决方法** | 服务器上从源码编译 CUDA 版（约 5 分钟）：<br>`python -m pip uninstall -y lightgbm`<br>`python -m pip install --no-binary lightgbm --config-settings=cmake.define.USE_CUDA=ON 'lightgbm==4.6.0'`<br>冒烟：`python -c "from lightgbm import LGBMClassifier; LGBMClassifier(device='cuda').fit([[0],[1]], [0,1])"` |
+| **相关文件** | `docs/server_commands.md` §五、`requirements-ml.txt`、`src/quant_mas/utils/device.py` |
+| **验证记录** | EXP-20260602-004：`server_lgbm_gpu_001`，device=cuda，test AUC 0.479 |
+| **后续改进** | 可在 `device.py` 增加 LightGBM CUDA 编译检测，避免 `fit()` 才 Fatal |
 
 *本节随 Phase 2 推进持续追加。*
 
@@ -367,8 +387,8 @@ python -m pip install -e .
 | M-007 | Step 2.1 | yfinance 真实数据全量下载 | Yahoo 限流；已改用 Stooq 完成（EXP-20260601-004） |
 | M-009 | Step 2.1 | Stooq API Key | ✅ 已解决，流程见 M-009 |
 | — | Step 2.2 | LightGBM 真实训练 | ✅ EXP-20260601-006 |
-| — | Step 2.2b | GPU/CUDA 训练 | Prompt 15b 本地 ✅（68 passed）；**服务器 cuda 待验证** |
-| — | Step 2.3 | ML 回测 | Prompt 16 本地 ✅；**服务器 ML 回测 + Prompt 17** |
+| — | Step 2.2b | GPU/CUDA 训练 | ✅ EXP-20260602-004（见 M-010） |
+| — | Step 2.3 | ML 回测 | ✅ EXP-20260602-005；**Prompt 17 当前** |
 
 ---
 

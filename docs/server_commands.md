@@ -8,12 +8,15 @@ GitHub 仓库：[https://github.com/ytq0198/Quant-MAS](https://github.com/ytq019
 
 ## 验证记录
 
-| 日期 | 项目 | 结果 |
-|------|------|------|
-| 2026-06-02 | pytest | **44 passed**（Python 3.11.15，1.19s） |
+| 日期 | 项目 | 结果 | 备注 |
+|------|------|------|------|
+| 2026-06-02 | pytest | **68 passed**（CUDA LightGBM 重装后） |
+| 2026-06-02 | GPU 训练 | `server_lgbm_gpu_001`；device=cuda；test AUC 0.479 | 见 M-010 |
+| 2026-06-02 | ML 回测 | `server_ml_backtest_001`；sharpe **2.78** | Prompt 16 ✅ |
+| 2026-06-02 | pytest（旧） | **44 passed**（Python 3.11.15，1.19s） |
 | 2026-06-01 | LightGBM 训练 | `server_lgbm_001`；test AUC 0.466 | 过拟合基线 |
 | 2026-06-01 | Prompt 16 + GPU 本地 | **68 passed**；`--device` 可用 | 无 |
-| 2026-06-01 | 真实数据 + pipeline | Stooq 6033 rows；`server_ma_cross_real_001` |
+| 2026-06-01 | 真实数据 + pipeline | Stooq 6033 rows；`server_ma_cross_real_001` | — |
 
 ### pytest
 
@@ -205,7 +208,31 @@ python scripts/train_model.py \
 
 ### GPU / CUDA 训练（A6000）
 
-PyPI 默认 LightGBM wheel **可能是 CPU-only**。若 `--device cuda` 未真正使用 GPU，需按 [LightGBM 官方文档](https://lightgbm.readthedocs.io/en/latest/GPU-Tutorial.html) 安装或编译 CUDA 版。
+**首次 GPU 训练前**必须确认 LightGBM 为 CUDA 编译版。PyPI 默认 wheel 常为 **CPU-only**；仅 `nvidia-smi` 可见 **不能** 保证 `--device cuda` 可用。若未编译 CUDA 版，`fit()` 会直接报错且 **不会** 自动 fallback：
+
+```text
+[LightGBM] [Fatal] CUDA Tree Learner was not enabled in this build.
+```
+
+详见 [`mistakes.md` M-010](../mistakes.md#m-010-lightgbm-pypi-wheel-为-cpu-only)。
+
+#### 0. 安装 CUDA 版 LightGBM（服务器首次必做，约 5 分钟）
+
+```bash
+conda activate /mnt/localDisk3/weizian/conda_envs/quant-mas
+cd /mnt/localDisk3/weizian/Quant-MAS
+
+python -m pip uninstall -y lightgbm
+python -m pip install --no-binary lightgbm \
+  --config-settings=cmake.define.USE_CUDA=ON 'lightgbm==4.6.0'
+
+# 冒烟：应不报错
+python -c "from lightgbm import LGBMClassifier; LGBMClassifier(device='cuda').fit([[0],[1]], [0,1])"
+```
+
+环境：4× NVIDIA RTX A6000，驱动 580，CUDA 13.0（2026-06-02 已验证）。
+
+#### 1. 训练
 
 ```bash
 nvidia-smi
@@ -216,16 +243,28 @@ python scripts/train_model.py \
   --device cuda \
   --experiment-name server_lgbm_gpu_001
 
-# 确认 device 字段（应为 cuda；若 fallback 则见 device_reason）
-cat /mnt/localDisk3/weizian/models/lightgbm_direction_latest/metadata.json | grep device
-cat /mnt/localDisk3/weizian/models/lightgbm_direction_latest/metrics.json | grep device
+# 确认 device 字段（应为 cuda 且 fallback=false）
+grep device /mnt/localDisk3/weizian/models/lightgbm_direction_latest/metadata.json
+grep device /mnt/localDisk3/weizian/models/lightgbm_direction_latest/metrics.json
 ```
 
-无 GPU 或 CUDA 不可用时，Quant MAS 自动 **fallback 到 CPU**，并在 `metrics.json` / `metadata.json` 记录 `device_fallback` 与 `device_reason`。
+#### CPU 对照（可选，与 EXP-20260601-006 对比）
+
+```bash
+python scripts/train_model.py \
+  --config configs/train.yaml \
+  --storage-config configs/storage.server.yaml \
+  --device cpu \
+  --experiment-name server_lgbm_cpu_001
+```
+
+~6k 行数据上 GPU 加速可能不明显；对照重点为 metrics 是否一致、metadata 中 `device_resolved` 是否正确。
+
+无 GPU 或 CUDA 不可用时，Quant MAS 在 **设备检测阶段** 可 fallback 到 CPU；但若 `device=cuda` 且 LightGBM 本身无 CUDA 支持，会在 `fit()` 时 **Fatal**（见 M-010）。
 
 ## 六、ML 回测 / Walk-forward
 
-**ML 回测（Prompt 16 ✅，待服务器验证）**：
+**ML 回测（Prompt 16 ✅，服务器已验证 EXP-20260602-005）**：
 
 ```bash
 git pull origin main
@@ -239,6 +278,8 @@ python scripts/run_ml_backtest.py \
   --model-path /mnt/localDisk3/weizian/models/lightgbm_direction_latest/model.pkl \
   --experiment-name server_ml_backtest_001
 ```
+
+产物示例（2026-06-02）：sharpe **2.78**，max_drawdown **-0.246**，2011 bars；报告 `outputs/reports/ml_backtest_latest/summary.md`。
 
 **Walk-forward（Prompt 17，待实现）**：
 
