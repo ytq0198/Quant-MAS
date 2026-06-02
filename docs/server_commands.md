@@ -6,17 +6,14 @@ GitHub 仓库：[https://github.com/ytq0198/Quant-MAS](https://github.com/ytq019
 
 > **重要**：必须先 `conda activate quant-mas`，再用 `python -m pytest` 和 `python -m pip`，不要裸敲 `pytest` / `pip`。
 
-## 验证记录（2026-06-02）
+## 验证记录
 
-| 项目 | 值 |
-|------|-----|
-| 主机 | a6000-9961 |
-| 项目路径 | `/mnt/localDisk3/weizian/Quant-MAS` |
-| Conda 环境 | `/mnt/localDisk3/weizian/conda_envs/quant-mas` |
-| Python | 3.11.15 |
-| pytest | **44 passed in 1.19s** |
+| 日期 | 项目 | 结果 |
+|------|------|------|
+| 2026-06-02 | pytest | **44 passed**（Python 3.11.15，1.19s） |
+| 2026-06-01 | 真实数据 + pipeline | Stooq 6033 rows；`server_ma_cross_real_001`（sharpe ≈ 1.00） |
 
-验证命令：
+### pytest
 
 ```bash
 conda activate /mnt/localDisk3/weizian/conda_envs/quant-mas
@@ -141,6 +138,8 @@ SOURCE=stooq SYMBOLS="AAPL MSFT SPY" bash server/download_data_resilient.sh
 
 ### 方式 B：手动单条下载
 
+`download_data.py` 启动时会自动加载项目根 `.env`（`STOOQ_API_KEY`）。
+
 ```bash
 python scripts/download_data.py \
   --symbols AAPL \
@@ -168,25 +167,31 @@ python scripts/merge_parquet.py \
 
 ## 四、端到端 Pipeline
 
+真实数据已下载时（`market_data.parquet` 已存在）：
+
 ```bash
 cd /mnt/localDisk3/weizian/Quant-MAS
-conda activate quant-mas
+conda activate /mnt/localDisk3/weizian/conda_envs/quant-mas
 
 python scripts/run_pipeline.py \
   --symbols AAPL MSFT SPY \
   --start 2018-01-01 \
   --end 2025-12-31 \
   --storage-config configs/storage.server.yaml \
-  --experiment-name server_ma_cross_001
+  --skip-download \
+  --experiment-name server_ma_cross_real_001
 ```
 
-或：`bash server/run_small_pipeline.sh`
+**已验证（2026-06-01）**：6033 feature rows；sharpe ≈ 1.00；产物 `/mnt/localDisk3/weizian/reports/server_ma_cross_real_001/`。
 
-## 五、ML 训练
+Synthetic / 小数据 smoke test：`bash server/run_small_pipeline.sh`
+
+## 五、ML 训练（Prompt 15 — 当前步骤）
 
 ```bash
-conda activate quant-mas
+conda activate /mnt/localDisk3/weizian/conda_envs/quant-mas
 cd /mnt/localDisk3/weizian/Quant-MAS
+python -m pip install -r requirements-ml.txt
 
 python scripts/train_model.py \
   --config configs/train.yaml \

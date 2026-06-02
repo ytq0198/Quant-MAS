@@ -1,10 +1,11 @@
 # Quant MAS 开发进度
 
-更新时间：2026-06-02
+更新时间：2026-06-01
 
 ## 当前阶段
 
-Phase 1 收口中：当前已经完成最小量化闭环的主要工程模块，并新增端到端 pipeline 与端到端测试。
+**Phase 2 Step 2.2**：Codex Prompt 15（ML 训练）。  
+Phase 1 已收口：服务器 pytest 44 passed + Stooq 真实 pipeline（EXP-20260601-004）。
 
 ## Prompt 任务状态
 
@@ -63,7 +64,8 @@ python scripts/run_pipeline.py --help
 - [x] Parquet 数据存储
 - [x] YAML 路径配置和目录管理
 - [x] OHLCV 数据校验
-- [x] yfinance 下载接口，真实下载待验证
+- [x] Stooq 下载接口（`StooqFetcher` + `STOOQ_API_KEY`），服务器真实下载已验证
+- [x] yfinance 下载接口（服务器 IP 易限流，备用）
 - [x] 技术指标特征
 - [x] future return / direction label
 - [x] 按 symbol 分组构建特征，避免多标的污染
@@ -85,24 +87,24 @@ python scripts/run_pipeline.py --help
 
 ## 下一阶段目标
 
-### Phase 1：最小量化闭环收口
+### Phase 1：最小量化闭环收口 ✅
 
 - [x] 在服务器 Python 3.11 环境中完整安装核心依赖
 - [x] 服务器全量 pytest 验证（44 passed）
-- [ ] 安装 `requirements-data.txt`（yfinance）并验证真实数据下载
+- [x] Stooq 真实数据下载（AAPL / MSFT / SPY，2018–2025，6033 rows）
+- [x] 服务器真实 `run_pipeline.py`（`server_ma_cross_real_001`）
 - [ ] 安装 `requirements-ml.txt`（lightgbm）并验证真实训练
-- [ ] 用小规模真实数据验证 `run_pipeline.py`
-- [ ] 整理一份真实 pipeline 运行报告
 - [ ] 增加基础风险检查模块
 
-### Phase 2：机器学习真实实验
+### Phase 2：机器学习真实实验 🔄 当前
 
-- [ ] 安装并验证 LightGBM
-- [ ] 使用真实特征数据训练方向模型
-- [ ] 输出样本外指标
-- [ ] 输出特征重要性
+- [x] Step 2.1 真实数据 pipeline（服务器 Stooq + ma_cross 回测）
+- [ ] Step 2.2 Prompt 15：完善 ML 训练输出（**当前**）
+- [ ] Step 2.3 Prompt 16：ML 信号策略 + 回测
+- [ ] Step 2.4 Prompt 17：Walk-forward 样本外
+- [ ] 安装并验证 LightGBM 真实训练
+- [ ] 输出样本外指标与特征重要性
 - [ ] 将模型训练结果写入 ExperimentMemory
-- [ ] 对 ML 信号做样本外回测
 
 ### Phase 3：Agent 增强
 

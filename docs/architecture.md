@@ -65,7 +65,8 @@ Quant MAS
 ## 当前 CLI 入口
 
 ```text
-download_data.py    数据下载接口
+download_data.py    数据下载（yfinance / Stooq）
+merge_parquet.py    合并分年 parquet
 build_features.py   特征构建
 run_backtest.py     均线策略回测
 train_model.py      模型训练
@@ -83,14 +84,15 @@ run_pipeline.py     端到端 pipeline
 - Parquet 数据读写
 - YAML 存储目录管理
 - OHLCV 数据校验
-- yfinance fetcher 接口，真实联网下载待验证
+- `YFinanceFetcher`（接口；服务器 IP 易 Yahoo 限流）
+- `StooqFetcher` + `STOOQ_API_KEY`（**服务器真实下载已验证**，EXP-20260601-004）
 - 技术指标特征
 - future return / direction label
 - 按 symbol 分组的特征 pipeline
 - Moving Average Cross 策略
 - 下一根 bar 成交的轻量回测引擎
 - 回测指标和报告保存
-- LightGBM 模型封装，真实训练待验证
+- LightGBM 模型封装（mock 测试通过；**真实训练待 Prompt 15**）
 - 时间序列切分和 label 泄露防护
 - 统一端到端 pipeline
 
@@ -127,21 +129,21 @@ run_pipeline.py     端到端 pipeline
 
 ## 后续计划
 
-### Phase 1 收口
+### Phase 1 收口 ✅
 
 - [x] 服务器 Python 3.11 环境部署
 - [x] 全量 pytest 验证（44 passed，2026-06-02）
-- [ ] 安装 data/ml 可选依赖
-- [ ] 用真实或 sample parquet 验证完整 pipeline
+- [x] Stooq 真实数据下载（6033 rows，AAPL/MSFT/SPY 2018–2025）
+- [x] 服务器真实 pipeline（`server_ma_cross_real_001`）
 - [ ] 增加风险检查模块
 - [ ] 完善报告格式
 
-### Phase 2 机器学习实验
+### Phase 2 机器学习实验 🔄 当前
 
-- 真实安装和验证 LightGBM
-- 样本外训练与评估
-- 特征重要性
-- ML signal 回测
+- [x] Step 2.1 真实数据 + ma_cross pipeline
+- [ ] Prompt 15：LightGBM 真实训练与完整输出
+- [ ] ML signal 回测（Prompt 16）
+- [ ] Walk-forward（Prompt 17）
 
 ### Phase 3 Agent 增强
 

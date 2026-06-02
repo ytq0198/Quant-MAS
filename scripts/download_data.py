@@ -6,6 +6,7 @@ import argparse
 from pathlib import Path
 
 from quant_mas.data import DataCatalog, ParquetStorage, create_market_data_fetcher, validate_ohlcv
+from quant_mas.utils.env import load_repo_dotenv
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -83,6 +84,8 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def main() -> None:
+    load_repo_dotenv(Path(__file__).resolve().parent.parent)
+
     parser = build_parser()
     args = parser.parse_args()
 

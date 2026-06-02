@@ -25,7 +25,14 @@ python -c "import quant_mas"
 
 Recommended path: `/mnt/localDisk3/weizian/Quant-MAS`
 
-**Verified (2026-06-02):** Python 3.11.15, **44 passed** on server `a6000-9961`.
+**Verified on `a6000-9961` (Python 3.11.15):**
+
+| Date | Check | Result |
+|------|--------|--------|
+| 2026-06-02 | `python -m pytest -v` | **44 passed** |
+| 2026-06-01 | Stooq download + real pipeline | **6033 rows**; `server_ma_cross_real_001` (ma_cross) |
+
+Docs: [`docs/server_commands.md`](docs/server_commands.md) · [`docs/experiment_log.md`](docs/experiment_log.md) · [`mistakes.md`](mistakes.md)
 
 Copy the server storage example and edit paths:
 
@@ -61,13 +68,23 @@ python --version
 python -m pip --version    # must NOT show python 3.9
 ```
 
-Run a small pipeline example:
+Run a small pipeline example (synthetic / skip-download):
 
 ```bash
 bash server/run_small_pipeline.sh
 ```
 
-The setup script does not download large data. The small pipeline script uses `AAPL MSFT SPY` by default and writes logs/reports to configured server paths.
+Download real market data (Stooq + API key in `.env`, see `mistakes.md` M-009):
+
+```bash
+cp .env.example .env   # set STOOQ_API_KEY
+SOURCE=stooq bash server/download_data_resilient.sh
+python scripts/run_pipeline.py --skip-download --storage-config configs/storage.server.yaml \
+  --symbols AAPL MSFT SPY --start 2018-01-01 --end 2025-12-31 \
+  --experiment-name server_ma_cross_real_001
+```
+
+The setup script does not download large data. `download_data.py` and `download_data_resilient.sh` load `.env` automatically.
 
 ## Project Principles
 

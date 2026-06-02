@@ -3,7 +3,7 @@
 > 记录各开发阶段遇到的典型问题、根因与解决方法，便于复盘和避免重复踩坑。  
 > 与 [`项目指导.md`](项目指导.md) §20 操作手册、`docs/server_commands.md` 配合使用。
 
-**最后更新**：2026-06-02  
+**最后更新**：2026-06-01  
 **维护方式**：每遇到新问题，在对应 Phase 章节末尾追加一条（含日期、步骤、现象、根因、解法）。
 
 ---
@@ -17,9 +17,9 @@
 - [Phase 1：量化核心 MVP](#phase-1量化核心-mvp)
   - [Step 1.1–1.12 本地开发与 pytest（Prompt 1–12）](#step-11112-本地开发与-pytestprompt-112)
   - [Step 1.14 服务器部署与 pytest（Prompt 14）](#step-114-服务器部署与-pytestprompt-14)
-  - [Step 1.5 真实数据 pipeline（§20.2，服务器）](#step-15-真实数据-pipeline202-服务器)
+  - [Step 1.5 真实数据 pipeline（§20.2，✅ 已完成）](#step-15-真实数据-pipeline202-已完成-2026-06-01)
 - [Phase 2：机器学习实验（进行中）](#phase-2机器学习实验进行中)
-  - [Step 2.1 真实数据下载（与 Step 1.5 延续）](#step-21-真实数据下载与-step-15-延续)
+  - [Step 2.1 真实数据下载 ✅](#step-21-真实数据下载--已完成2026-06-01)
 - [跨阶段通用规则](#跨阶段通用规则)
 - [待验证 / 未完全解决](#待验证--未完全解决)
 
@@ -148,7 +148,7 @@
 
 ---
 
-### Step 1.5 真实数据 pipeline（§20.2，服务器）
+### Step 1.5 真实数据 pipeline（§20.2，✅ 已完成 2026-06-01）
 
 > 目标：yfinance 下载 AAPL / MSFT / SPY → 合并 parquet → `run_pipeline.py --skip-download`
 
@@ -185,32 +185,14 @@ done
 
 **第二层：Stooq + API Key（推荐，绕过 Yahoo 限流）**
 
-Stooq 已不再允许无 key 下载 CSV，需先申请 API Key：
+Stooq 已不再允许无 key 下载 CSV。Key 的获取方式在 2026 年又变过一次——**不会直接显示 32 位 key**，详见 [M-009](#m-009-stooq-需要-api-key) 完整流程。
+
+简要步骤：
 
 1. 浏览器打开：https://stooq.com/q/d/?s=aapl.us&get_apikey  
-2. 完成 captcha，复制 32 位 `apikey`  
-3. 在服务器项目根目录：
-
-```bash
-cd /mnt/localDisk3/weizian/Quant-MAS
-git pull origin main
-python -m pip install -e .
-
-cp .env.example .env
-# 编辑 .env，设置 STOOQ_API_KEY=你的32位key（不要 commit .env）
-
-# 先验证单条
-python scripts/download_data.py \
-  --symbols AAPL \
-  --start 2018-01-01 --end 2019-01-01 \
-  --source stooq \
-  --storage-config configs/storage.server.yaml \
-  --filename AAPL_2018.parquet
-
-# 全量按年下载 + 合并
-SOURCE=stooq SYMBOLS="AAPL" bash server/download_data_resilient.sh
-SOURCE=stooq SYMBOLS="AAPL MSFT SPY" bash server/download_data_resilient.sh
-```
+2. 按 M-009 流程完成 Authorization → Refresh → 从底部 **CSV Download Link** 提取 `apikey=`  
+3. 写入服务器 `.env`：`STOOQ_API_KEY=...`  
+4. `SOURCE=stooq bash server/download_data_resilient.sh`
 
 **第三层：resilient 脚本（Yahoo，需冷却）**
 
@@ -245,33 +227,104 @@ python scripts/run_pipeline.py \
 
 | **相关提交** | 逐标的重试：`c9b005c` 附近；resilient 脚本：`74ca5fd` |
 | **相关文件** | `src/quant_mas/data/fetchers.py`、`scripts/download_data.py`、`server/download_data_resilient.sh`、`scripts/merge_parquet.py` |
-| **状态** | 使用 Stooq + API Key 下载（见 M-009）；Yahoo 仍限流 |
+| **状态** | ✅ 2026-06-01 服务器验证：Stooq 6033 rows + `server_ma_cross_real_001` pipeline 成功 |
 
 #### M-009 Stooq 需要 API Key
 
+> **2026 年规则更新**：Key **不会直接显示**；需 Authorization → Refresh → 从 CSV Download Link 提取 `apikey=`。
+
 | 项 | 内容 |
 |----|------|
-| **日期** | 2026-06-02 |
+| **日期** | 2026-06-02（流程更新） |
 | **阶段** | Phase 1 Step 1.5 / Phase 2 Step 2.1 |
-| **现象** | Stooq URL 返回约 370 字节文字「Get your apikey: …」，非 CSV；`pd.read_csv` 报 `ParserError` |
-| **根因** | Stooq 政策变更：CSV 下载 URL 必须带 `apikey=XXXXXXXX` 参数 |
-| **解决方法** | 1. 浏览器打开 https://stooq.com/q/d/?s=aapl.us&get_apikey ，完成 captcha<br>2. 复制 apikey 到服务器 `.env`：`STOOQ_API_KEY=...`<br>3. `git pull` 后 `SOURCE=stooq bash server/download_data_resilient.sh` |
-| **相关文件** | `src/quant_mas/data/fetchers.py`（`StooqFetcher`）、`.env.example`、`server/download_data_resilient.sh` |
-| **注意** | **不要** commit `.env`；apikey 仅放服务器本地 |
+| **现象 A** | 无 key 请求 Stooq 时，返回约 370 字节文字「Get your apikey: …」，非 CSV；`pd.read_csv` 报 `ParserError` |
+| **现象 B** | 打开 get_apikey 页面后**根本没有出现验证码**，无法进入授权流程 |
+| **根因** | Stooq 政策多次变更：① CSV 下载 URL 必须带 `apikey=XXXXXXXX`；② **2026 年起 key 不再直接展示**，需从授权后的 CSV 下载链接中提取 |
+
+##### 2026 年正确获取 API Key 流程（已验证用户路径）
+
+> **注意**：不是「打开页面 → captcha → 直接复制 Key」。当前成功用户的实际流程如下：
+
+```
+打开 get_apikey 页面
+    ↓
+出现验证码（Captcha）
+    ↓
+点击 Approve
+    ↓
+页面显示 Authorization successful
+    ↓
+Refresh page（刷新页面）
+    ↓
+页面底部出现 CSV Download Link
+    ↓
+从链接 URL 中提取 apikey= 后面的 32 位字符串
+```
+
+**get_apikey 页面地址：**
+
+https://stooq.com/q/d/?s=aapl.us&get_apikey
+
+**从 CSV Download Link 提取 key 示例：**
+
+链接形如：
+
+```text
+https://stooq.com/q/d/l/?s=aapl.us&d1=20180101&d2=20181231&i=d&apikey=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+```
+
+其中 `apikey=` 后面即为 32 位 key（复制到 `.env`，不要 commit）。
+
+**写入服务器：**
+
+```bash
+cd /mnt/localDisk3/weizian/Quant-MAS
+cp .env.example .env
+nano .env   # STOOQ_API_KEY=上面提取的32位key
+```
+
+**验证下载：**
+
+```bash
+python scripts/download_data.py \
+  --symbols AAPL \
+  --start 2018-01-01 --end 2019-01-01 \
+  --source stooq \
+  --storage-config configs/storage.server.yaml \
+  --filename AAPL_2018.parquet
+```
+
+##### 卡点：页面不出现验证码
+
+若打开 get_apikey 后**连验证码都没有**，则卡在流程第一步，常见原因与尝试：
+
+| 可能原因 | 建议操作 |
+|----------|----------|
+| 浏览器/网络环境被 Stooq 限制 | 换浏览器（Chrome / Firefox）、开无痕模式、换网络（手机热点 / VPN） |
+| 页面未完全加载或缓存异常 | 硬刷新（Ctrl+F5）、清 cookie 后重开 |
+| 服务器 IP 与浏览器环境不同 | **必须在有图形界面的浏览器中操作**；SSH 服务器无法完成 captcha |
+| Stooq 区域性/时段限制 | 隔几小时再试，或换时间段访问 |
+| 已授权但未刷新 | 若曾成功授权，直接 **Refresh** 看底部是否已有 CSV Download Link |
+
+若长期无法出现验证码，可暂用 [M-007 第四层](#第四层仍失败时) 的 **手动 CSV** 或等 Yahoo 冷却后再试 yfinance。
+
+| **相关提交** | `867ac14` — StooqFetcher + `STOOQ_API_KEY` |
+| **相关文件** | `src/quant_mas/data/fetchers.py`、`.env.example`、`server/download_data_resilient.sh` |
+| **注意** | **不要** commit `.env`；apikey 仅放服务器/本机本地 |
+| **验证记录** | EXP-20260601-004：AAPL+MSFT+SPY 2018–2025，pipeline ma_cross 通过 |
 
 ---
 
 ## Phase 2：机器学习实验（进行中）
 
-### Step 2.1 真实数据下载（与 Step 1.5 延续）
+### Step 2.1 真实数据下载 ✅ 已完成（2026-06-01）
 
-Step 2.1 与 Phase 1 Step 1.5 为同一服务器操作链（下载 → pipeline）。  
-当前阻塞点仍为 **[M-007](#m-007-yfinance-限流与网络超时)**；数据下载成功前，Step 2.2（Prompt 15 ML 训练）不应开始。
+服务器已用 **Stooq + `.env`** 完成 AAPL / MSFT / SPY 下载与 `run_pipeline.py --skip-download`。  
+实验记录：**EXP-20260601-004**（`docs/experiment_log.md`）。
 
 | 步骤 | Prompt | 潜在问题 | 说明 |
 |------|--------|----------|------|
-| 2.2 ML 训练输出 | 15 | LightGBM 未安装 | 先 `python -m pip install -r requirements-ml.txt` |
-| 2.2 ML 训练输出 | 15 | 无特征 parquet | 必须先完成 Step 2.1 pipeline 或手动 build_features |
+| 2.2 ML 训练输出 | **15** | LightGBM 未安装 | 先 `python -m pip install -r requirements-ml.txt` |
 | 2.3 ML 回测 | 16 | 模型路径不对 | 检查 `storage.server.yaml` 中 `models_dir` |
 
 *本节随 Phase 2 推进持续追加。*
@@ -289,7 +342,8 @@ Step 2.1 与 Phase 1 Step 1.5 为同一服务器操作链（下载 → pipeline�
 | 激活环境 | 直接 SSH 跑命令 | 先 `conda activate /mnt/localDisk3/weizian/conda_envs/quant-mas` |
 | 同步代码 | 只改本地不 push | 本地 pytest → git push → 服务器 git pull |
 | 安装顺序 | 一次装全部含 yfinance | 先 `requirements.txt` + `-e .`，再按需 `requirements-data.txt` / `requirements-ml.txt` |
-| 下载行情 | 三标的 + 8 年一次请求 | `download_data_resilient.sh`，单 symbol、按年、长 sleep |
+| 下载行情 | 三标的 + 8 年一次请求 | Stooq + `download_data_resilient.sh`，或 `--source stooq` |
+| Stooq key | 单独跑 download 忘记 export | 项目根 `.env` 含 `STOOQ_API_KEY`；`download_data.py` 启动时自动加载 |
 | 源码 vs 产物 | `.gitignore` 写 `data/` | 写 `/data/`、`/models/` 等根目录规则 |
 | 实验记录 | 口头说「跑过了」 | 写入 `docs/experiment_log.md`（含 metrics 路径） |
 
@@ -310,9 +364,9 @@ python -m pip install -e .
 
 | 编号 | 阶段 | 问题 | 当前状态 |
 |------|------|------|----------|
-| M-007 | Step 1.5 / 2.1 | yfinance 真实数据全量下载 | 已提供 resilient 脚本；**待服务器跑通并记入 experiment_log** |
-| — | Step 2.2 | LightGBM 真实训练 | 未开始 |
-| — | Step 2.3–2.4 | ML 回测 / Walk-forward | 未开始 |
+| M-007 | Step 2.1 | yfinance 真实数据全量下载 | Yahoo 限流；已改用 Stooq 完成（EXP-20260601-004） |
+| M-009 | Step 2.1 | Stooq API Key | ✅ 已解决，流程见 M-009 |
+| — | Step 2.2 | LightGBM 真实训练 | **当前** — Prompt 15 |
 
 ---
 
