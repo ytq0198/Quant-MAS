@@ -129,7 +129,7 @@ collect_experiment_metrics → BaselineRegistry / comparison table
 
 ## 测试与部署
 
-- **pytest**：本地 **102 passed**（2026-06-02，EXP-20260602-009）；服务器 **98 passed**（2026-06-01，M1 pull 后待验证 **102**）
+- **pytest**：本地 + 服务器均为 **102 passed**（2026-06-02，EXP-20260602-009/010）
 - **服务器**：`/mnt/localDisk3/weizian/Quant-MAS`，conda `quant-mas`，Python 3.11.15
 - **GitHub**：https://github.com/ytq0198/Quant-MAS
 
@@ -137,7 +137,7 @@ collect_experiment_metrics → BaselineRegistry / comparison table
 
 | 模块 | 内容 | 状态 |
 |------|------|------|
-| **M1** 研究基线 | BaselineRegistry、compare_experiments | ✅ 本地（EXP-20260602-009）；服务器待验证 |
+| **M1** 研究基线 | BaselineRegistry、compare_experiments | ✅ EXP-20260602-009/010 |
 | **M2** 数据扩展 | 多数据源 fetcher | 📋 待做 |
 | **M3** Memory/RAG v2 | SQLite / 向量检索 | 📋 待做 |
 | **M4** LangGraph | 实验性 DAG（不替换 Supervisor） | 📋 待做 |

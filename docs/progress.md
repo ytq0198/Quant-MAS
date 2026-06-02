@@ -1,12 +1,12 @@
 # Quant MAS 开发进度
 
-更新时间：2026-06-02（Plus M1 研究基线本地验收）
+更新时间：2026-06-02（Plus M1 本地 + 服务器验收完成）
 
 ## 当前所处阶段
 
 **Prompt 1–20 主链路 ✅ 已完成**（第零～四阶段）。
 
-**Plus v2**：**M1 研究基线 ✅ 本地验收**（102 passed，EXP-20260602-009）；服务器 pull / 比较表 **待验证**（EXP-TODO-008）。
+**Plus v2**：**M1 研究基线 ✅ 完成**（本地 + 服务器 **102 passed**，EXP-20260602-009/010）。**当前 → M2 数据扩展**。
 
 第五～六阶段见 [项目plus设计.md](../项目plus设计.md)（M4 LangGraph / M7 模拟，非实盘）。
 
@@ -20,7 +20,7 @@
 | 第二阶段扩展 | 基础风控 | ✅ | Prompt 18 |
 | 第三阶段 | Agent 增强 | ✅ | Prompt 8–10、19 |
 | 第四阶段 | Memory + RAG | ✅ | Prompt 20 |
-| **Plus M1** | 研究基线 | ✅ 本地 | BaselineRegistry、compare_experiments（EXP-20260602-009） |
+| **Plus M1** | 研究基线 | ✅ | EXP-20260602-009/010，**102 passed** |
 | **Plus M2** | 数据扩展 | 📋 待做 | 见 项目plus设计.md |
 | 第五～六阶段 | 编排 / RL 模拟 | 📋 | Plus M4 / M7 |
 
@@ -49,15 +49,13 @@
 | M1 模块代码 | ✅ | baseline / metrics_table / compare_experiments / research_protocol |
 | `python scripts/compare_experiments.py --help` | ✅ | EXP-20260602-009 |
 | `tests/test_research_baseline.py` | ✅ **4 passed** | 嵌套 metric、best baseline、CLI 输出 |
-| 全量 pytest（本地） | ✅ **102 passed** | +4（98→102），EXP-20260602-009 |
-| 全量 pytest（服务器） | 待验证 | 上次 **98 passed**（EXP-20260601-014） |
-| 服务器 `compare_experiments` + 比较表核对 | 待验证 | EXP-TODO-008 |
+| 全量 pytest（本地） | ✅ **102 passed** | EXP-20260602-009 |
+| 全量 pytest（服务器） | ✅ **102 passed**（1.64s） | EXP-20260602-010 |
+| 服务器 `compare_experiments` | ✅ **5 rows** | `oos.sharpe` **0.586**（与 EXP-20260602-008 一致） |
 
 ### 下一步
 
-1. git push → 服务器 pull → `python -m pytest -v`（预期 **102 passed**）
-2. 服务器 `compare_experiments.py` → 更新 `experiment_log.md` 比较表
-3. 进入 **M2 数据扩展**
+进入 **M2 数据扩展**（见 [项目plus设计.md](../项目plus设计.md)）
 
 ### OOS 主 baseline（不可遗忘）
 
@@ -85,7 +83,7 @@
 | 环境 | Python | 结果 | 日期 | 实验 |
 |------|--------|------|------|------|
 | 本地 Windows | 3.11+ | **102 passed** | 2026-06-02 | EXP-20260602-009 |
-| 服务器 a6000-9961 | 3.11.15 | **98 passed**（1.93s） | 2026-06-01 | EXP-20260601-014（M1 pull 后待验证） |
+| 服务器 a6000-9961 | 3.11.15 | **102 passed**（1.64s） | 2026-06-02 | EXP-20260602-010 |
 
 命令：`python -m pytest -v`（勿裸敲 `pytest` / `pip`）。
 
@@ -151,7 +149,6 @@ python scripts/compare_experiments.py --help
 
 ## 后续工作
 
-- **M1 服务器**：pull → pytest **102** → `compare_experiments.py`（EXP-TODO-008）
-- **M2 起**：见 [项目plus设计.md](../项目plus设计.md)（数据扩展 → RAG v2 → LangGraph …）
+- **M2 数据扩展**：见 [项目plus设计.md](../项目plus设计.md)
 - 科研：特征/模型调参、更多 walk-forward 窗口（**必须标注 OOS**）
 - 可选：CPU 对照 `server_lgbm_cpu_001`（EXP-TODO-006）

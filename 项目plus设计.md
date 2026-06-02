@@ -3,7 +3,7 @@
 更新时间：2026-06-01
 
 > 本文档在 **Prompt 1–20 主链路已完成**（第零～四阶段）的基础上，规划 **Quant MAS v2** 的研究型升级路线。  
-> 基线状态：本地 **102 passed**（EXP-20260602-009，Plus M1）；服务器 **98 passed**（EXP-20260601-014，M1 pull 后待验证）。报告主指标 **Walk-forward OOS sharpe 0.586**（EXP-20260602-008）。  
+> 基线状态：本地 + 服务器 **102 passed**（EXP-20260602-009/010）；报告主指标 **Walk-forward OOS sharpe 0.586**（EXP-20260602-008）。  
 > 与 `项目进度.md` / `项目指导.md` 的关系：后者记录「已完成什么」；本文档记录「接下来怎么优化、怎么给 Codex/Cursor 下指令」。
 
 ---
@@ -66,8 +66,8 @@
 ### 2.1 工程完成度
 
 - **第零～四阶段 + Prompt 13 文档收口** ✅
-- **测试**：本地 **102 passed**（EXP-20260602-009）；服务器 98 passed（待 pull）
-- **Research Layer**：BaselineRegistry、`compare_experiments.py`（Plus M1 ✅ 本地）
+- **测试**：**102 passed**（本地 + 服务器，EXP-20260602-009/010）
+- **Research Layer**：BaselineRegistry、`compare_experiments.py`（Plus M1 ✅）
 - **Agent 工具（7 个）**：data_summary / backtest / train_model / report / risk_check / ml_backtest / pipeline
 - **Memory/RAG 雏形**：ExperimentMemory 增强、TradeMemory 空壳、SimpleRetriever
 
@@ -700,7 +700,7 @@ flowchart TB
 ```
 你正在开发 Quant MAS 科研项目。
 路径：D:\scientific reasearch and work\SRTP\Quant MAS
-测试基线：本地 102 passed（Plus M1）；OOS baseline sharpe 0.586（EXP-20260602-008）。
+测试基线：102 passed（本地 + 服务器）；OOS baseline sharpe 0.586（EXP-20260602-008）。
 LLM 不允许直接下单；pytest 不联网不调真实 LLM。
 请只实现当前一个模块，完成后 python -m pytest -v 全量通过。
 详细需求见 项目plus设计.md 的 M? 章节。

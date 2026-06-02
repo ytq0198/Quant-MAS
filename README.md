@@ -21,7 +21,7 @@ python -m pytest -v
 python -c "import quant_mas"
 ```
 
-**Current test status:** local **102 passed** (2026-06-02, Plus M1); server **98 passed** (2026-06-01, re-verify after pull).
+**Current test status:** **102 passed** (local + server, 2026-06-02, Plus M1).
 
 ## Server
 
@@ -31,7 +31,8 @@ Recommended path: `/mnt/localDisk3/weizian/Quant-MAS`
 
 | Date | Check | Result |
 |------|--------|--------|
-| 2026-06-02 | Plus M1 research baseline | **102 passed** (+4 tests) | EXP-20260602-009 |
+| 2026-06-02 | Plus M1 server pytest + compare | **102 passed** (1.64s); 5-row comparison | EXP-20260602-010 |
+| 2026-06-02 | Plus M1 research baseline (local) | **102 passed** (+4 tests) | EXP-20260602-009 |
 | 2026-06-01 | Prompt 20 Memory/RAG | **98 passed** (+11 tests) | EXP-20260601-013 |
 | 2026-06-01 | `python -m pytest -v` (server) | **98 passed** (Prompt 20) |
 | 2026-06-02 | Walk-forward server | OOS sharpe **0.586**, 19 windows | EXP-20260602-008 |

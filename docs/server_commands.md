@@ -10,6 +10,7 @@ GitHub 仓库：[https://github.com/ytq0198/Quant-MAS](https://github.com/ytq019
 
 | 日期 | 项目 | 结果 | 备注 |
 |------|------|------|------|
+| 2026-06-02 | Plus M1 服务器 pytest + 比较表 | **102 passed**（1.64s）；5 rows | EXP-20260602-010 |
 | 2026-06-02 | Plus M1 research baseline (local) | **102 passed** | EXP-20260602-009 |
 | 2026-06-01 | pytest（Prompt 20 后，服务器） | **98 passed**（1.93s） | EXP-20260601-014 |
 | 2026-06-01 | pytest（Prompt 20 后，本地） | **98 passed** | EXP-20260601-013 |
