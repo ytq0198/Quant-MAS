@@ -73,6 +73,35 @@
 - 问题：无
 - 下一步：真实数据下载与 pipeline
 
+### EXP-20260601-008：Prompt 15b LightGBM GPU/CUDA 本地验证 ✅
+
+- 日期：2026-06-01
+- 阶段：Phase 2 Step 2.2b（GPU 训练支持）
+- 环境：本地 Windows，Codex 改代码后
+- 数据：synthetic / mock（无真实 GPU）
+- 模型：`LightGBMDirectionModel` + `resolve_training_device`
+- 参数：
+  - `python -m pytest tests/test_device.py -v` → **10 passed**
+  - `python -m pytest tests/test_train_model.py -v` → **5 passed**
+  - `python -m pytest -v` → **68 passed**
+  - `python scripts/train_model.py --help` → 含 `--device {auto,cpu,gpu,cuda}`
+- 验证点：auto/cuda/gpu/cpu 解析；无 GPU 安全 fallback；metrics/metadata 含 device 字段
+- 问题：无
+- 下一步：服务器 `nvidia-smi` + `--device cuda` 真实训练（EXP-TODO-005）
+
+### EXP-20260601-007：Prompt 16 MLSignalStrategy 本地验证 ✅
+
+- 日期：2026-06-01
+- 阶段：Phase 2 Step 2.3（Prompt 16）
+- 环境：本地 Windows，Codex 改代码后
+- 数据：synthetic features + mock model
+- 策略 / 模型：`MLSignalStrategy`（buy/sell threshold → target_weight）
+- 参数：`python -m pytest tests/test_ml_signal_strategy.py -v`；`python -m pytest -v`
+- 指标：**4 passed**（ML 专项）；**57 passed**（全量）
+- 验证点：pred_proba → signal；下一根 bar 成交；报告产物；禁止 future label 进特征
+- 问题：无
+- 下一步：git push → 服务器 `run_ml_backtest.py` 真实模型回测
+
 ### EXP-20260601-006：服务器真实 LightGBM 训练 ✅
 
 - 日期：2026-06-01
@@ -152,10 +181,36 @@
 
 ## 待验证实验
 
-### EXP-TODO-003：ML 信号样本外回测（Prompt 16）
+### EXP-TODO-003：ML 信号真实回测（Prompt 16 服务器）
 
 - 日期：待定
 - 数据：真实 features + `server_lgbm_001` 模型
-- 策略 / 模型：MLSignalStrategy
-- 状态：待实现 / 待验证
-- 说明：用 val/test 区间评估策略收益，而非只看分类 AUC
+- 命令：
+  ```bash
+  python scripts/run_ml_backtest.py \
+    --config configs/backtest_ml.yaml \
+    --storage-config configs/storage.server.yaml \
+    --features-path /mnt/localDisk3/weizian/datasets/features/features.parquet \
+    --model-path /mnt/localDisk3/weizian/models/lightgbm_direction_latest/model.pkl \
+    --experiment-name server_ml_backtest_001
+  ```
+- 状态：待验证
+
+### EXP-TODO-005：服务器 GPU LightGBM 训练（Prompt 15b）
+
+- 日期：待定
+- 数据：真实 features（6033 rows）
+- 命令：
+  ```bash
+  nvidia-smi
+  python scripts/train_model.py \
+    --config configs/train.gpu.yaml \
+    --storage-config configs/storage.server.yaml \
+    --device cuda \
+    --experiment-name server_lgbm_gpu_001
+  cat /mnt/localDisk3/weizian/models/lightgbm_direction_latest/metadata.json | grep device
+  ```
+- 验收：`device_resolved` 为 `cuda`（非 fallback）；对比 EXP-20260601-006 CPU 指标
+- 状态：待验证
+
+### EXP-TODO-004：Walk-forward 样本外（Prompt 17）

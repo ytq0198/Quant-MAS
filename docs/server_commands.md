@@ -12,6 +12,7 @@ GitHub 仓库：[https://github.com/ytq0198/Quant-MAS](https://github.com/ytq019
 |------|------|------|
 | 2026-06-02 | pytest | **44 passed**（Python 3.11.15，1.19s） |
 | 2026-06-01 | LightGBM 训练 | `server_lgbm_001`；test AUC 0.466 | 过拟合基线 |
+| 2026-06-01 | Prompt 16 + GPU 本地 | **68 passed**；`--device` 可用 | 无 |
 | 2026-06-01 | 真实数据 + pipeline | Stooq 6033 rows；`server_ma_cross_real_001` |
 
 ### pytest
@@ -187,7 +188,9 @@ python scripts/run_pipeline.py \
 
 Synthetic / 小数据 smoke test：`bash server/run_small_pipeline.sh`
 
-## 五、ML 训练（Prompt 15 — 当前步骤）
+## 五、ML 训练（Prompt 15 + GPU）
+
+### CPU 训练（默认 / 对照）
 
 ```bash
 conda activate /mnt/localDisk3/weizian/conda_envs/quant-mas
@@ -200,10 +203,46 @@ python scripts/train_model.py \
   --experiment-name server_lgbm_001
 ```
 
-## 六、ML 回测 / Walk-forward（待实现）
+### GPU / CUDA 训练（A6000）
+
+PyPI 默认 LightGBM wheel **可能是 CPU-only**。若 `--device cuda` 未真正使用 GPU，需按 [LightGBM 官方文档](https://lightgbm.readthedocs.io/en/latest/GPU-Tutorial.html) 安装或编译 CUDA 版。
 
 ```bash
-python scripts/run_ml_backtest.py --config configs/backtest_ml.yaml --storage-config configs/storage.server.yaml
+nvidia-smi
+
+python scripts/train_model.py \
+  --config configs/train.gpu.yaml \
+  --storage-config configs/storage.server.yaml \
+  --device cuda \
+  --experiment-name server_lgbm_gpu_001
+
+# 确认 device 字段（应为 cuda；若 fallback 则见 device_reason）
+cat /mnt/localDisk3/weizian/models/lightgbm_direction_latest/metadata.json | grep device
+cat /mnt/localDisk3/weizian/models/lightgbm_direction_latest/metrics.json | grep device
+```
+
+无 GPU 或 CUDA 不可用时，Quant MAS 自动 **fallback 到 CPU**，并在 `metrics.json` / `metadata.json` 记录 `device_fallback` 与 `device_reason`。
+
+## 六、ML 回测 / Walk-forward
+
+**ML 回测（Prompt 16 ✅，待服务器验证）**：
+
+```bash
+git pull origin main
+python -m pip install -e .
+python -m pytest -v
+
+python scripts/run_ml_backtest.py \
+  --config configs/backtest_ml.yaml \
+  --storage-config configs/storage.server.yaml \
+  --features-path /mnt/localDisk3/weizian/datasets/features/features.parquet \
+  --model-path /mnt/localDisk3/weizian/models/lightgbm_direction_latest/model.pkl \
+  --experiment-name server_ml_backtest_001
+```
+
+**Walk-forward（Prompt 17，待实现）**：
+
+```bash
 python scripts/run_walk_forward.py --config configs/walk_forward.yaml --storage-config configs/storage.server.yaml
 ```
 

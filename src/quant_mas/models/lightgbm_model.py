@@ -9,12 +9,23 @@ from typing import Any
 import pandas as pd
 
 from quant_mas.models.base import BasePredictiveModel
+from quant_mas.utils import (
+    ResolvedDevice,
+    build_lightgbm_device_params,
+    resolve_training_device,
+)
 
 
 class LightGBMDirectionModel(BasePredictiveModel):
     """Binary direction classifier backed by LightGBM."""
 
-    def __init__(self, **params: Any) -> None:
+    def __init__(
+        self,
+        device: str = "cpu",
+        resolved_device: ResolvedDevice | None = None,
+        **params: Any,
+    ) -> None:
+        configured_device = params.pop("device", device)
         self.params = {
             "objective": "binary",
             "n_estimators": 100,
@@ -26,6 +37,8 @@ class LightGBMDirectionModel(BasePredictiveModel):
         self.params.update(params)
         self.model: Any | None = None
         self.feature_columns: list[str] = []
+        self.device_requested = configured_device
+        self.resolved_device: ResolvedDevice | None = resolved_device
 
     def fit(self, features: pd.DataFrame, target: pd.Series) -> "LightGBMDirectionModel":
         try:
@@ -37,7 +50,12 @@ class LightGBMDirectionModel(BasePredictiveModel):
             ) from exc
 
         self.feature_columns = list(features.columns)
-        self.model = LGBMClassifier(**self.params)
+        self.resolved_device = resolve_training_device(self.device_requested)
+        params = {
+            **self.params,
+            **build_lightgbm_device_params(self.resolved_device),
+        }
+        self.model = LGBMClassifier(**params)
         self.model.fit(features, target.astype(int))
         return self
 
@@ -72,6 +90,19 @@ class LightGBMDirectionModel(BasePredictiveModel):
             "model_type": "lightgbm_direction",
             "params": self.params,
             "feature_columns": self.feature_columns,
+            "device_requested": self.device_metadata()["device_requested"],
+            "device_resolved": self.device_metadata()["device_resolved"],
+            "device_fallback": self.device_metadata()["device_fallback"],
+            "device_reason": self.device_metadata()["device_reason"],
+        }
+
+    def device_metadata(self) -> dict[str, Any]:
+        resolved = self.resolved_device or resolve_training_device(self.device_requested)
+        return {
+            "device_requested": resolved.requested,
+            "device_resolved": resolved.resolved,
+            "device_fallback": resolved.fallback,
+            "device_reason": resolved.reason,
         }
 
     def feature_importance(self) -> pd.DataFrame:

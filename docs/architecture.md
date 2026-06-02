@@ -92,7 +92,9 @@ run_pipeline.py     端到端 pipeline
 - Moving Average Cross 策略
 - 下一根 bar 成交的轻量回测引擎
 - 回测指标和报告保存
-- LightGBM 模型封装 + Prompt 15 完整训练产物（**本地 53 passed**；服务器真实训练待验证）
+- LightGBM 模型封装 + Prompt 15 完整训练产物（**本地 68 passed**；服务器 CPU 训练 EXP-20260601-006）
+- LightGBM GPU/CUDA 训练（Prompt 15b：`device.py`、`--device`、auto fallback）
+- MLSignalStrategy + ML 回测脚本（Prompt 16；服务器真实回测待验证）
 - 时间序列切分和 label 泄露防护
 - 统一端到端 pipeline
 
@@ -142,8 +144,10 @@ run_pipeline.py     端到端 pipeline
 
 - [x] Step 2.1 真实数据 + ma_cross pipeline
 - [x] Prompt 15：训练 artifacts + ExperimentMemory（本地 53 passed）
-- [ ] 服务器真实 LightGBM 训练
-- [ ] ML signal 回测（Prompt 16）
+- [x] 服务器真实 LightGBM 训练（EXP-20260601-006）
+- [x] Prompt 16：MLSignalStrategy + `run_ml_backtest.py`（本地 68 passed）
+- [x] Prompt 15b：GPU/CUDA 训练支持（`tests/test_device.py` 10 passed）
+- [ ] 服务器 GPU 训练（EXP-TODO-005）
 - [ ] Walk-forward（Prompt 17）
 
 ### Phase 3 Agent 增强

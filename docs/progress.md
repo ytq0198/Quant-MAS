@@ -4,7 +4,7 @@
 
 ## 当前阶段
 
-**Phase 2**：Prompt 15 全流程 ✅（本地 53 passed + 服务器真实训练 EXP-20260601-006）。**当前：Prompt 16**。
+**Phase 2**：Prompt 16 + GPU 训练支持 ✅（本地 **68 passed**）。**当前：服务器 GPU 训练 / ML 回测 + Prompt 17**。
 
 ## Prompt 任务状态
 
@@ -20,14 +20,16 @@
 - [x] Prompt 10：SupervisorAgent 和内部任务流
 - [x] 统一端到端 pipeline：`scripts/run_pipeline.py`
 - [x] 最小端到端测试：`tests/test_end_to_end_pipeline.py`
-- [x] **Prompt 15**：ML 训练完整产物（metrics、feature_importance、model.pkl、ExperimentMemory）
+- [x] **Prompt 15**：ML 训练完整产物
+- [x] **Prompt 16**：MLSignalStrategy + `run_ml_backtest.py`
+- [x] **Prompt 15b**：LightGBM GPU/CUDA 训练（`device.py`、`--device`）
 
 ## 当前 pytest 状态
 
 | 环境 | Python | 结果 | 日期 |
 |------|--------|------|------|
-| 本地 Windows | 3.11+ | **53 passed** | 2026-06-01 |
-| 服务器 Linux | 3.11.15 | **44 passed**（待 pull Prompt 15 后复测） | 2026-06-02 |
+| 本地 Windows | 3.11+ | **68 passed** | 2026-06-01 |
+| 服务器 Linux | 3.11.15 | 待 pull 后复测 | 2026-06-02 |
 
 服务器验证环境：
 
@@ -57,6 +59,7 @@ python scripts/train_model.py --help
 python scripts/generate_report.py --help
 python scripts/run_agent.py --help
 python scripts/run_pipeline.py --help
+python scripts/run_ml_backtest.py --help
 ```
 
 ## 当前已实现能力
@@ -83,7 +86,8 @@ python scripts/run_pipeline.py --help
 - [x] DataSummaryTool / BacktestTool / TrainModelTool / ReportTool
 - [x] SupervisorAgent 规则路由
 - [x] AgentEvent / ToolCallEvent / AgentFinishEvent
-- [x] 端到端 pipeline
+- [x] LightGBM GPU/CUDA 训练支持（`resolve_training_device`，auto fallback CPU）
+- [x] MLSignalStrategy + ML 信号回测（Prompt 16，mock 测试通过）
 
 ## 下一阶段目标
 
@@ -99,9 +103,11 @@ python scripts/run_pipeline.py --help
 ### Phase 2：机器学习真实实验 🔄 当前
 
 - [x] Step 2.1 真实数据 pipeline（服务器 Stooq + ma_cross 回测）
-- [x] Step 2.2 Prompt 15：本地 + 服务器真实训练（EXP-20260601-006）
-- [ ] Step 2.3 Prompt 16：ML 信号策略 + 回测（**当前**）
-- [ ] Step 2.4 Prompt 17：Walk-forward 样本外
+- [x] Step 2.3 Prompt 16：MLSignalStrategy + ML 回测（本地 57 passed）
+- [x] Step 2.2b Prompt 15b：GPU/CUDA 训练支持（本地 68 passed）
+- [ ] Step 2.3 服务器真实 ML 回测（EXP-TODO-003）
+- [ ] Step 2.2b 服务器 GPU 训练（EXP-TODO-005，`server_lgbm_gpu_001`）
+- [ ] Step 2.4 Prompt 17：Walk-forward 样本外（**当前**）
 
 ### Phase 3：Agent 增强
 

@@ -18,6 +18,7 @@ from quant_mas.models import (
     prepare_supervised_data,
     split_by_time_with_metadata,
 )
+from quant_mas.utils import resolve_training_device
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -40,6 +41,11 @@ def build_parser() -> argparse.ArgumentParser:
         "--experiment-name",
         default="lightgbm_direction_training",
         help="Experiment name recorded in experiment memory.",
+    )
+    parser.add_argument(
+        "--device",
+        choices=["auto", "cpu", "gpu", "cuda"],
+        help="Training device override. Defaults to model.device in config.",
     )
     return parser
 
@@ -67,6 +73,7 @@ def main() -> None:
         config=config,
         storage_config=Path(args.storage_config).expanduser(),
         experiment_name=args.experiment_name,
+        device=args.device,
     )
 
     print(f"Saved model artifacts to {output_dir}")
@@ -81,6 +88,7 @@ def train_direction_model(
     storage_config: str | Path,
     experiment_name: str,
     model_factory: Callable[..., BasePredictiveModel] | None = None,
+    device: str | None = None,
 ) -> dict[str, Any]:
     """Train a direction model and write Prompt 15 artifacts."""
     model_config = config.get("model", {})
@@ -105,9 +113,23 @@ def train_direction_model(
         test_ratio=split_config.get("test", 0.15),
     )
 
-    params = model_config.get("params", {})
+    params = dict(model_config.get("params", {}))
+    device_requested = device or model_config.get("device") or params.get("device") or "cpu"
+    params.pop("device", None)
+    resolved_device = resolve_training_device(device_requested)
+    print(
+        "[train] device "
+        f"requested={resolved_device.requested} "
+        f"resolved={resolved_device.resolved} "
+        f"fallback={resolved_device.fallback}"
+    )
     model_cls = model_factory or LightGBMDirectionModel
-    model = model_cls(**params)
+    model = _build_model(
+        model_cls=model_cls,
+        params=params,
+        device_requested=device_requested,
+        resolved_device=resolved_device,
+    )
     model.fit(feature_splits.train, target_splits.train)
 
     metrics = {}
@@ -145,6 +167,10 @@ def train_direction_model(
             "train_ratio": split_config.get("train", 0.7),
             "val_ratio": split_config.get("validation", 0.15),
             "test_ratio": split_config.get("test", 0.15),
+            "device_requested": resolved_device.requested,
+            "device_resolved": resolved_device.resolved,
+            "device_fallback": resolved_device.fallback,
+            "device_reason": resolved_device.reason,
         }
     )
 
@@ -173,6 +199,10 @@ def train_direction_model(
         "split_metadata": {
             name: split.__dict__ for name, split in split_metadata.items()
         },
+        "device_requested": resolved_device.requested,
+        "device_resolved": resolved_device.resolved,
+        "device_fallback": resolved_device.fallback,
+        "device_reason": resolved_device.reason,
     }
     metadata_path.write_text(
         json.dumps(metadata, indent=2, ensure_ascii=False),
@@ -211,6 +241,23 @@ def _zero_feature_importance(feature_columns: list[str]):
             "importance": [0.0] * len(feature_columns),
         }
     )
+
+
+def _build_model(
+    *,
+    model_cls: Callable[..., BasePredictiveModel],
+    params: dict[str, Any],
+    device_requested: str,
+    resolved_device,
+) -> BasePredictiveModel:
+    try:
+        return model_cls(
+            device=device_requested,
+            resolved_device=resolved_device,
+            **params,
+        )
+    except TypeError:
+        return model_cls(**params)
 
 
 if __name__ == "__main__":

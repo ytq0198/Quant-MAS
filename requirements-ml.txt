@@ -1,5 +1,10 @@
 # Optional: ML training (scripts/train_model.py)
 # Install after requirements.txt:
 #   python -m pip install -r requirements-ml.txt
+#
+# Note: the default PyPI LightGBM wheel is often CPU-only.
+# For CUDA training on NVIDIA servers, verify the installed LightGBM build
+# supports CUDA/OpenCL, or build LightGBM with CUDA support following the
+# official LightGBM documentation.
 lightgbm>=4.0
 xgboost>=2.0

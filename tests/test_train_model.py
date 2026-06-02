@@ -13,6 +13,7 @@ from quant_mas.models import (
     split_by_time,
 )
 from quant_mas.memory import ExperimentMemory
+from quant_mas.utils import ResolvedDevice
 
 
 class ThresholdModel(BasePredictiveModel):
@@ -151,7 +152,7 @@ def test_train_direction_model_writes_prompt_15_artifacts(tmp_path) -> None:
         encoding="utf-8",
     )
     config = {
-        "model": {"name": "lightgbm_direction", "params": {}},
+        "model": {"name": "lightgbm_direction", "device": "cpu", "params": {}},
         "split": {"train": 0.7, "validation": 0.15, "test": 0.15},
         "target": "future_direction",
     }
@@ -212,3 +213,67 @@ def test_train_direction_model_writes_prompt_15_artifacts(tmp_path) -> None:
     assert latest.name == "synthetic_threshold_training"
     assert latest.metrics["feature_count"] == 3
     assert "feature_importance" in latest.artifacts
+
+
+def test_train_direction_model_writes_device_fields_with_mock_resolution(
+    tmp_path,
+    monkeypatch,
+) -> None:
+    feature_path = tmp_path / "features.parquet"
+    output_dir = tmp_path / "models" / "threshold"
+    storage_config = tmp_path / "storage.yaml"
+    make_features().to_parquet(feature_path, index=False)
+    storage_config.write_text(
+        "\n".join(
+            [
+                "project_root: .",
+                "raw_data_dir: data/raw",
+                "processed_data_dir: data/processed",
+                "features_dir: data/features",
+                "models_dir: models",
+                "reports_dir: reports",
+                "logs_dir: logs",
+            ]
+        ),
+        encoding="utf-8",
+    )
+    config = {
+        "model": {"name": "lightgbm_direction", "device": "auto", "params": {}},
+        "split": {"train": 0.7, "validation": 0.15, "test": 0.15},
+        "target": "future_direction",
+    }
+
+    monkeypatch.setattr(
+        "scripts.train_model.resolve_training_device",
+        lambda requested: ResolvedDevice(
+            requested=requested,
+            resolved="cuda",
+            fallback=False,
+            reason=None,
+        ),
+    )
+
+    result = train_direction_model(
+        feature_path=feature_path,
+        output_dir=output_dir,
+        config=config,
+        storage_config=storage_config,
+        experiment_name="synthetic_cuda_training",
+        model_factory=ThresholdModel,
+        device="cuda",
+    )
+
+    metrics = pd.io.json.read_json(
+        Path(result["artifacts"]["metrics"]),
+        typ="series",
+    ).to_dict()
+    metadata = pd.io.json.read_json(
+        Path(result["artifacts"]["metadata"]),
+        typ="series",
+    ).to_dict()
+
+    assert metrics["device_requested"] == "cuda"
+    assert metrics["device_resolved"] == "cuda"
+    assert metrics["device_fallback"] is False
+    assert metadata["device_requested"] == "cuda"
+    assert metadata["device_resolved"] == "cuda"
