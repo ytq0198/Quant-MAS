@@ -28,22 +28,39 @@ def build_parser() -> argparse.ArgumentParser:
         help="Output parquet filename.",
     )
     parser.add_argument(
+        "--skip-existing",
+        action="store_true",
+        help="Skip download if output file already exists.",
+    )
+    parser.add_argument(
         "--retries",
         type=int,
-        default=5,
+        default=8,
         help="Max retries per symbol when yfinance rate-limits or fails.",
     )
     parser.add_argument(
         "--delay",
         type=float,
         default=5.0,
-        help="Seconds to wait between symbols (helps avoid rate limits).",
+        help="Seconds to wait between symbols.",
     )
     parser.add_argument(
         "--retry-backoff",
         type=float,
-        default=15.0,
-        help="Base seconds for exponential backoff between retries.",
+        default=20.0,
+        help="Base seconds for retry backoff (exponential on rate limit).",
+    )
+    parser.add_argument(
+        "--jitter-min",
+        type=float,
+        default=0.0,
+        help="Random extra sleep lower bound after each successful symbol fetch.",
+    )
+    parser.add_argument(
+        "--jitter-max",
+        type=float,
+        default=0.0,
+        help="Random extra sleep upper bound after each successful symbol fetch.",
     )
     return parser
 
@@ -59,10 +76,16 @@ def main() -> None:
     )
     output_path = output_dir / args.filename
 
+    if args.skip_existing and output_path.exists():
+        print(f"[download] skip existing {output_path}")
+        return
+
     fetcher = YFinanceFetcher(
         max_retries=args.retries,
         retry_backoff_seconds=args.retry_backoff,
         delay_between_symbols_seconds=args.delay,
+        jitter_min_seconds=args.jitter_min,
+        jitter_max_seconds=args.jitter_max,
     )
     data = fetcher.fetch(args.symbols, args.start, args.end)
     validated = validate_ohlcv(data)

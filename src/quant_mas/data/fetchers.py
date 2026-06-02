@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import random
 import time
 from abc import ABC, abstractmethod
 from collections.abc import Sequence
@@ -22,20 +23,24 @@ class MarketDataFetcher(ABC):
 class YFinanceFetcher(MarketDataFetcher):
     """Fetch OHLCV data from yfinance.
 
-    yfinance is imported lazily so tests and offline workflows do not require it.
-    Downloads one symbol at a time with retries to reduce rate-limit failures.
+    Downloads one symbol at a time with retries, jitter, and exponential backoff
+    when rate-limited.
     """
 
     def __init__(
         self,
         *,
-        max_retries: int = 5,
-        retry_backoff_seconds: float = 10.0,
-        delay_between_symbols_seconds: float = 3.0,
+        max_retries: int = 8,
+        retry_backoff_seconds: float = 20.0,
+        delay_between_symbols_seconds: float = 5.0,
+        jitter_min_seconds: float = 0.0,
+        jitter_max_seconds: float = 0.0,
     ) -> None:
         self.max_retries = max_retries
         self.retry_backoff_seconds = retry_backoff_seconds
         self.delay_between_symbols_seconds = delay_between_symbols_seconds
+        self.jitter_min_seconds = jitter_min_seconds
+        self.jitter_max_seconds = jitter_max_seconds
 
     def fetch(self, symbols: Sequence[str], start: str, end: str) -> pd.DataFrame:
         normalized_symbols = [symbol.upper() for symbol in symbols]
@@ -59,16 +64,17 @@ class YFinanceFetcher(MarketDataFetcher):
 
             try:
                 frames.append(self._download_symbol(yf, symbol, start, end))
-                print(f"[download] OK {symbol}")
+                print(f"[download] OK {symbol} {start} -> {end}")
+                self._sleep_jitter()
             except Exception as exc:
                 failures.append(f"{symbol}: {exc}")
                 print(f"[download] FAIL {symbol}: {exc}")
 
         if not frames:
             hint = (
-                "yfinance returned no data. Common causes: rate limit (wait 15–30 min), "
-                "network issues, or invalid symbols. Try fewer symbols, increase "
-                "--delay / --retries, or download one symbol at a time."
+                "yfinance rate limit or network error. Wait 15–30 min, download by year "
+                "(server/download_data_resilient.sh), increase --delay/--retries, or use "
+                "manual CSV in datasets/raw/manual/."
             )
             detail = "; ".join(failures) if failures else "no symbols succeeded"
             raise ValueError(f"No market data returned by yfinance. {detail}. {hint}")
@@ -77,6 +83,36 @@ class YFinanceFetcher(MarketDataFetcher):
             print(f"[download] warning: skipped failed symbols: {', '.join(failures)}")
 
         return validate_ohlcv(pd.concat(frames, ignore_index=True))
+
+    def _sleep_jitter(self) -> None:
+        if self.jitter_max_seconds <= 0:
+            return
+        low = max(0.0, self.jitter_min_seconds)
+        high = max(low, self.jitter_max_seconds)
+        wait = random.uniform(low, high)
+        if wait > 0:
+            print(f"[download] jitter sleep {wait:.0f}s")
+            time.sleep(wait)
+
+    @staticmethod
+    def _is_rate_limit_error(error: Exception | None) -> bool:
+        if error is None:
+            return False
+        message = str(error).lower()
+        rate_limit_tokens = (
+            "rate limit",
+            "too many requests",
+            "yfratelimiterror",
+            "429",
+            "connection closed abruptly",
+            "curl: (56)",
+        )
+        return any(token in message for token in rate_limit_tokens)
+
+    def _retry_wait_seconds(self, attempt: int, error: Exception | None) -> float:
+        if self._is_rate_limit_error(error):
+            return self.retry_backoff_seconds * (2 ** (attempt - 1))
+        return self.retry_backoff_seconds * attempt
 
     def _download_symbol(self, yf_module, symbol: str, start: str, end: str) -> pd.DataFrame:
         last_error: Exception | None = None
@@ -100,9 +136,10 @@ class YFinanceFetcher(MarketDataFetcher):
                 last_error = exc
 
             if attempt < self.max_retries:
-                wait = self.retry_backoff_seconds * attempt
+                wait = self._retry_wait_seconds(attempt, last_error)
+                reason = "rate limit" if self._is_rate_limit_error(last_error) else "retry"
                 print(
-                    f"[download] retry {symbol} in {wait:.0f}s "
+                    f"[download] {reason} {symbol} in {wait:.0f}s "
                     f"(attempt {attempt}/{self.max_retries})"
                 )
                 time.sleep(wait)
