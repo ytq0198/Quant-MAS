@@ -1,0 +1,10 @@
+# Copy to configs/storage.server.yaml and replace <USER> with your Linux username.
+# Do not commit storage.server.yaml if it contains private paths.
+
+project_root: /home/<USER>/quant-mas
+raw_data_dir: /home/<USER>/quant-mas/datasets/raw
+processed_data_dir: /home/<USER>/quant-mas/datasets/processed
+features_dir: /home/<USER>/quant-mas/datasets/features
+models_dir: /home/<USER>/quant-mas/models
+reports_dir: /home/<USER>/quant-mas/reports
+logs_dir: /home/<USER>/quant-mas/logs
