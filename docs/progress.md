@@ -32,7 +32,7 @@
 | 环境 | Python | 结果 | 日期 |
 |------|--------|------|------|
 | 本地 Windows | 3.11+ | **76 passed** | 2026-06-01 |
-| 服务器 Linux | 3.11.15 | **71 passed**（待 pull 复验） | 2026-06-02 |
+| 服务器 Linux | 3.11.15 | **76 passed** | 2026-06-01 |
 
 服务器验证环境：
 
@@ -99,7 +99,7 @@ python scripts/run_walk_forward.py --help
 ### 第零～第一阶段：量化核心 MVP ✅
 
 - [x] 在服务器 Python 3.11 环境中完整安装核心依赖
-- [x] 服务器全量 pytest 验证（**71 passed**，2026-06-02）
+- [x] 服务器全量 pytest 验证（**76 passed**，2026-06-01，EXP-20260601-010）
 - [x] Stooq 真实数据下载（AAPL / MSFT / SPY，2018–2025，6033 rows）
 - [x] 服务器真实 `run_pipeline.py`（`server_ma_cross_real_001`）
 

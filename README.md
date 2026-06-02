@@ -21,7 +21,7 @@ python -m pytest -v
 python -c "import quant_mas"
 ```
 
-**Current test status:** **71 passed** (local, 2026-06-02; server pending pull → 71).
+**Current test status:** **76 passed** (local + server, 2026-06-01).
 
 ## Server
 
@@ -31,8 +31,8 @@ Recommended path: `/mnt/localDisk3/weizian/Quant-MAS`
 
 | Date | Check | Result |
 |------|--------|--------|
+| 2026-06-01 | `python -m pytest -v` | **76 passed** (Prompt 18) |
 | 2026-06-02 | Walk-forward server | OOS sharpe **0.586**, 19 windows | EXP-20260602-008 |
-| 2026-06-02 | `python -m pytest -v` | **71 passed** |
 | 2026-06-02 | GPU LightGBM training | `server_lgbm_gpu_001`, device=cuda |
 | 2026-06-02 | ML signal backtest | `server_ml_backtest_001`, sharpe 2.78 |
 | 2026-06-01 | Stooq download + real pipeline | **6033 rows**; `server_ma_cross_real_001` |

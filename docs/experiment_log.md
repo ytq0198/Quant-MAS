@@ -49,7 +49,19 @@
   - `RiskTool` 可注册 `ToolRegistry`，返回 metadata 含 `decisions` / `violations`
 - 产物路径：代码 `src/quant_mas/risk/`、`src/quant_mas/tools/quant/risk_tool.py`
 - 问题：无（兼容保留原 `tools/quant.py` 导出）
-- 下一步：Prompt 19 Supervisor 接入 `risk_check` 路由；push 后服务器 pytest 复验
+- 下一步：Prompt 19 Supervisor 接入 `risk_check` 路由
+
+### EXP-20260601-010：服务器 Prompt 18 pull 后全量 pytest ✅
+
+- 日期：2026-06-01
+- 阶段：第二阶段扩展（Prompt 18 服务器验证）
+- 环境：a6000-9961，`git` @ `60c2ee7`，conda `/mnt/localDisk3/weizian/conda_envs/quant-mas`
+- 命令：`git pull origin main` → `python -m pip install -e .` → `python -m pytest -v`
+- 指标：
+  - 全量：**76 passed** in **1.76s**
+  - 含 `tests/test_risk.py` 5 项全部通过
+- 问题：无
+- 下一步：Codex Prompt 19（Supervisor 路由增强）
 
 ### EXP-20260602-001：最小端到端 synthetic pipeline 测试
 

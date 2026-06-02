@@ -10,6 +10,7 @@ GitHub 仓库：[https://github.com/ytq0198/Quant-MAS](https://github.com/ytq019
 
 | 日期 | 项目 | 结果 | 备注 |
 |------|------|------|------|
+| 2026-06-01 | pytest（Prompt 18 后） | **76 passed**（1.76s，EXP-20260601-010） | git @ 60c2ee7 |
 | 2026-06-02 | Walk-forward 服务器 | `server_walk_forward_001`；OOS sharpe **0.586** | Prompt 17 ✅ |
 | 2026-06-02 | pytest | **71 passed**（Prompt 17 后） |
 | 2026-06-02 | Walk-forward 本地 | **71 passed**；Prompt 17 代码 ✅ | 无 |
@@ -290,7 +291,7 @@ python scripts/run_ml_backtest.py \
 ```bash
 git pull origin main
 python -m pip install -e .
-python -m pytest -v   # 预期 71 passed
+python -m pytest -v   # 预期 76 passed
 
 python scripts/run_walk_forward.py \
   --config configs/walk_forward.yaml \
