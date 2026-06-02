@@ -4,7 +4,7 @@
 
 ## 当前阶段
 
-**Phase 2**：Prompt 15 代码已完成（本地 **53 passed**）；下一步 **服务器真实 LightGBM 训练**，然后 **Prompt 16**。
+**Phase 2**：Prompt 15 全流程 ✅（本地 53 passed + 服务器真实训练 EXP-20260601-006）。**当前：Prompt 16**。
 
 ## Prompt 任务状态
 
@@ -75,7 +75,7 @@ python scripts/run_pipeline.py --help
 - [x] 回测指标：total_return、sharpe、max_drawdown、final_equity 等
 - [x] 回测报告保存：metrics、equity curve、trades、summary
 - [x] ExperimentMemory JSON 记录
-- [x] LightGBM 模型封装 + **Prompt 15** 完整训练产物（mock 测试通过）
+- [x] LightGBM 真实训练（服务器 `server_lgbm_001`，EXP-20260601-006）
 - [x] 时间序列切分 70/15/15
 - [x] label 泄露防护
 - [x] Message / LLMClient / MockLLMClient / BaseAgent
@@ -93,19 +93,15 @@ python scripts/run_pipeline.py --help
 - [x] 服务器全量 pytest 验证（44 passed）
 - [x] Stooq 真实数据下载（AAPL / MSFT / SPY，2018–2025，6033 rows）
 - [x] 服务器真实 `run_pipeline.py`（`server_ma_cross_real_001`）
-- [ ] 在服务器验证真实 LightGBM 训练与 artifacts
+- [x] 在服务器验证真实 LightGBM 训练与 artifacts
 - [ ] 增加基础风险检查模块
 
 ### Phase 2：机器学习真实实验 🔄 当前
 
 - [x] Step 2.1 真实数据 pipeline（服务器 Stooq + ma_cross 回测）
-- [x] Step 2.2 Prompt 15：ML 训练模块增强（本地 53 passed，mock 模型）
-- [ ] Step 2.2 服务器真实 LightGBM 训练（`requirements-ml.txt`）
-- [ ] Step 2.3 Prompt 16：ML 信号策略 + 回测
+- [x] Step 2.2 Prompt 15：本地 + 服务器真实训练（EXP-20260601-006）
+- [ ] Step 2.3 Prompt 16：ML 信号策略 + 回测（**当前**）
 - [ ] Step 2.4 Prompt 17：Walk-forward 样本外
-- [ ] 安装并验证 LightGBM 真实训练
-- [ ] 输出样本外指标与特征重要性（服务器真实训练后）
-- [ ] 将模型训练结果写入 ExperimentMemory（真实实验）
 
 ### Phase 3：Agent 增强
 

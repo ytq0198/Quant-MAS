@@ -73,6 +73,31 @@
 - 问题：无
 - 下一步：真实数据下载与 pipeline
 
+### EXP-20260601-006：服务器真实 LightGBM 训练 ✅
+
+- 日期：2026-06-01
+- 阶段：Phase 2 Step 2.2（Prompt 15 服务器验证）
+- 环境：a6000-9961，`/mnt/localDisk3/weizian/conda_envs/quant-mas`
+- 数据：真实 features（6033 rows，AAPL/MSFT/SPY，来自 Step 2.1 pipeline）
+- 策略 / 模型：`LightGBMDirectionModel`，label `future_direction_5`，15 features
+- 参数：
+  - `configs/train.yaml`（n_estimators=100，70/15/15 时间切分）
+  - `--experiment-name server_lgbm_001`
+- 指标：
+  - train：accuracy **0.876**，AUC **0.965**，4170 samples（2018-01-31 — 2023-08-09）
+  - val：accuracy **0.445**，AUC **0.458**，894 samples（2023-08-10 — 2024-10-15）
+  - test：accuracy **0.455**，AUC **0.466**，894 samples（2024-10-16 — 2025-12-23）
+  - train_positive_rate：0.695 / val：0.403 / test：0.311
+- 产物路径：
+  - 模型目录：`/mnt/localDisk3/weizian/models/lightgbm_direction_latest/`
+  - metrics：`.../metrics.json`
+  - feature_importance：`.../feature_importance.csv`
+  - model：`.../model.pkl`
+  - feature_columns / metadata：同目录
+  - ExperimentMemory：`/mnt/localDisk3/weizian/reports/experiments.json`（`server_lgbm_001`）
+- 问题：**明显过拟合** — 训练集 AUC 高、val/test AUC 接近随机（~0.46）；标签正负比例随时间漂移。属 MVP 基线结果，非脚本故障。
+- 下一步：**Prompt 16** — MLSignalStrategy + 样本外 ML 回测；后续可调参 / 特征 / 类别权重
+
 ### EXP-20260601-005：Prompt 15 ML 训练模块本地验证 ✅
 
 - 日期：2026-06-01
@@ -123,20 +148,14 @@
   - summary：`.../summary.md`
   - 日志（MSFT+SPY 下载）：`/mnt/localDisk3/weizian/logs/resilient_msft_spy.log`
 - 问题：Yahoo yfinance 限流；Stooq 需 API Key（见 `mistakes.md` M-009）
-- 下一步：**Codex Prompt 15** — 真实 LightGBM 训练（`requirements-ml.txt`）
+- 下一步：**Codex Prompt 16** — ML 信号策略 + 回测
 
 ## 待验证实验
 
-### EXP-TODO-002：LightGBM 真实训练实验
+### EXP-TODO-003：ML 信号样本外回测（Prompt 16）
 
 - 日期：待定
-- 数据：真实 feature parquet（Step 2.1 raw 数据已具备）
-- 策略 / 模型：LightGBMDirectionModel + Prompt 15 artifacts
-- 状态：待验证（Prompt 15 代码已完成，待服务器训练）
-- 说明：
-  ```bash
-  python -m pip install -r requirements-ml.txt
-  python scripts/train_model.py --config configs/train.yaml \
-    --storage-config configs/storage.server.yaml \
-    --experiment-name server_lgbm_001
-  ```
+- 数据：真实 features + `server_lgbm_001` 模型
+- 策略 / 模型：MLSignalStrategy
+- 状态：待实现 / 待验证
+- 说明：用 val/test 区间评估策略收益，而非只看分类 AUC

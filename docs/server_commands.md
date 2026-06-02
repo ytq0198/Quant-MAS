@@ -11,7 +11,7 @@ GitHub 仓库：[https://github.com/ytq0198/Quant-MAS](https://github.com/ytq019
 | 日期 | 项目 | 结果 |
 |------|------|------|
 | 2026-06-02 | pytest | **44 passed**（Python 3.11.15，1.19s） |
-| 2026-06-01 | pytest（Prompt 15 后） | **53 passed**（本地，待服务器 pull 复测） |
+| 2026-06-01 | LightGBM 训练 | `server_lgbm_001`；test AUC 0.466 | 过拟合基线 |
 | 2026-06-01 | 真实数据 + pipeline | Stooq 6033 rows；`server_ma_cross_real_001` |
 
 ### pytest
