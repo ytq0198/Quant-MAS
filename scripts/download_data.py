@@ -27,6 +27,24 @@ def build_parser() -> argparse.ArgumentParser:
         default="market_data.parquet",
         help="Output parquet filename.",
     )
+    parser.add_argument(
+        "--retries",
+        type=int,
+        default=5,
+        help="Max retries per symbol when yfinance rate-limits or fails.",
+    )
+    parser.add_argument(
+        "--delay",
+        type=float,
+        default=5.0,
+        help="Seconds to wait between symbols (helps avoid rate limits).",
+    )
+    parser.add_argument(
+        "--retry-backoff",
+        type=float,
+        default=15.0,
+        help="Base seconds for exponential backoff between retries.",
+    )
     return parser
 
 
@@ -41,7 +59,11 @@ def main() -> None:
     )
     output_path = output_dir / args.filename
 
-    fetcher = YFinanceFetcher()
+    fetcher = YFinanceFetcher(
+        max_retries=args.retries,
+        retry_backoff_seconds=args.retry_backoff,
+        delay_between_symbols_seconds=args.delay,
+    )
     data = fetcher.fetch(args.symbols, args.start, args.end)
     validated = validate_ohlcv(data)
     saved_path = ParquetStorage().save(validated, output_path)

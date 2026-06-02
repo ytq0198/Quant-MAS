@@ -92,15 +92,47 @@ python -m pytest -v
 
 ## 三、下载真实行情数据
 
+**yfinance 限流说明**：若出现 `YFRateLimitError` / `Too Many Requests`，不是配置错误。请：
+- 一次只下载 **1 个标的**
+- 加大 `--delay`（如 15–30 秒）和 `--retries`（如 8）
+- 限流后 **等待 15–30 分钟** 再试
+- 先 `git pull` 获取带重试逻辑的最新代码
+
 ```bash
 cd /mnt/localDisk3/weizian/Quant-MAS
-conda activate quant-mas
+conda activate /mnt/localDisk3/weizian/conda_envs/quant-mas
+git pull origin main
 
+# 推荐：逐个标的下载（最稳）
+for sym in AAPL MSFT SPY; do
+  python scripts/download_data.py \
+    --symbols "$sym" \
+    --start 2018-01-01 --end 2025-12-31 \
+    --storage-config configs/storage.server.yaml \
+    --filename "${sym}.parquet" \
+    --delay 0 --retries 8 --retry-backoff 20
+  sleep 30
+done
+
+# 或多标的一次下（需更长 delay）
 python scripts/download_data.py \
-  --symbols AAPL MSFT SPY QQQ NVDA \
-  --start 2018-01-01 \
-  --end 2025-12-31 \
-  --storage-config configs/storage.server.yaml
+  --symbols AAPL MSFT SPY \
+  --start 2018-01-01 --end 2025-12-31 \
+  --storage-config configs/storage.server.yaml \
+  --delay 15 --retries 8 --retry-backoff 20
+```
+
+下载完成后合并为 pipeline 用的 `market_data.parquet`（若分文件保存）：
+
+```bash
+python -c "
+import pandas as pd
+from pathlib import Path
+raw = Path('/mnt/localDisk3/weizian/datasets/raw')
+frames = [pd.read_parquet(p) for p in sorted(raw.glob('*.parquet'))]
+pd.concat(frames, ignore_index=True).to_parquet(raw / 'market_data.parquet', index=False)
+print('merged', len(frames), 'files')
+"
 ```
 
 ## 四、端到端 Pipeline
