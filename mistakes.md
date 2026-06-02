@@ -3,7 +3,7 @@
 > 记录各开发阶段遇到的典型问题、根因与解决方法，便于复盘和避免重复踩坑。  
 > 与 [`项目指导.md`](项目指导.md) §20 操作手册、`docs/server_commands.md` 配合使用。
 
-**最后更新**：2026-06-02  
+**最后更新**：2026-06-02（Plus M2 EXP-DATA-001）  
 **维护方式**：每遇到新问题，在对应 Phase 章节末尾追加一条（含日期、步骤、现象、根因、解法）。
 
 ---
@@ -20,6 +20,7 @@
   - [Step 1.5 真实数据 pipeline（§20.2，✅ 已完成）](#step-15-真实数据-pipeline202-已完成-2026-06-01)
 - [Phase 2：机器学习实验（进行中）](#phase-2机器学习实验进行中)
   - [Step 2.2b GPU 训练 ✅](#step-22b-gpu-训练--已完成2026-06-02)
+- [Plus M2：多数据源扩展（EXP-DATA-001）](#plus-m2多数据源扩展exp-data-001)
 - [跨阶段通用规则](#跨阶段通用规则)
 - [待验证 / 未完全解决](#待验证--未完全解决)
 
@@ -53,6 +54,11 @@
 | [M-008](#m-008-windows-pytest-临时目录权限) | P2 | Phase 1 / 本地 pytest | PermissionError |
 | [M-009](#m-009-stooq-需要-api-key) | P1 | Phase 1 Step 1.5 / Phase 2 Step 2.1 | Stooq apikey |
 | [M-010](#m-010-lightgbm-pypi-wheel-为-cpu-only) | **P0** | Phase 2 / Step 2.2b | LightGBM CUDA build |
+| [M-011](#m-011-alpha-vantage-历史区间返回-0-行) | P1 | Plus M2 / EXP-DATA-001 | Alpha Vantage compact |
+| [M-012](#m-012-alpha-vantage-outputsizefull-免费-tier-失败) | P1 | Plus M2 / EXP-DATA-001 | outputsize=full |
+| [M-013](#m-013-finnhub-免费-tier-无-candle-权限) | P1 | Plus M2 / EXP-DATA-001 | Finnhub 403 |
+| [M-014](#m-014-把-api-key-写入-envexample-或-commit) | **P0** | Plus M2 / 安全 | .env vs .env.example |
+| [M-015](#m-015-sec-edgar-需真实-user-agent) | P1 | Plus M2 / EXP-DATA-001 | SEC User-Agent |
 
 ---
 
@@ -351,6 +357,73 @@ python scripts/download_data.py \
 
 ---
 
+## Plus M2：多数据源扩展（EXP-DATA-001）
+
+> 阶段：Plus v2 **M2**（`tests/test_data_sources.py` mock 测试 + 服务器 API smoke）  
+> 实验：**EXP-20260602-011/012**、**EXP-DATA-001**（2026-06-02）  
+> 文档：[`docs/data_sources.md`](docs/data_sources.md)、[`docs/server_commands.md`](docs/server_commands.md) §六点五
+
+### Step M2.1 服务器 API smoke
+
+#### M-011 Alpha Vantage 历史区间返回 0 行
+
+| 项 | 内容 |
+|----|------|
+| **日期** | 2026-06-02 |
+| **阶段** | Plus M2 / EXP-DATA-001 |
+| **现象** | `python scripts/download_data.py --source alpha_vantage --symbols AAPL --start 2024-01-01 --end 2024-06-01` 报错：<br>`[download] ERROR: Alpha Vantage returned no rows for AAPL` |
+| **根因** | Alpha Vantage **免费 tier** 的 `compact` 模式只返回**最近约 100 个交易日**；服务器日期为 2026 年时，返回窗口约为 2025 年底～2026 年，**过滤 2024 区间后行数为 0**。不是 API key 失效，也不是代码未拉取到数据 |
+| **解决方法** | 1. **历史 OHLCV** → 用 **Stooq**（见 [M-009](#m-009-stooq-需要-api-key)）<br>2. **Alpha Vantage smoke** → 用**近期 3 个月**，例如：<br>```bash<br>python scripts/download_data.py --source alpha_vantage \<br>  --symbols AAPL --start 2026-01-01 --end 2026-06-01 \<br>  --storage-config configs/storage.server.yaml<br>```<br>3. fetcher 已支持 `outputsize=auto` 并在空结果时提示可用日期范围（commit `7514cdc`） |
+| **验证记录** | EXP-20260602-012：AV **100 rows**（2026 H1）；Stooq **105 rows**（2024 H1） |
+| **相关文件** | `src/quant_mas/data/fetchers/alpha_vantage_fetcher.py`、`docs/data_sources.md` |
+
+#### M-012 Alpha Vantage `outputsize=full` 免费 tier 失败
+
+| 项 | 内容 |
+|----|------|
+| **日期** | 2026-06-02 |
+| **阶段** | Plus M2 / EXP-DATA-001（首次 smoke） |
+| **现象** | 使用 `outputsize=full` 时 API 无完整历史或报错；改用 `compact` + `IBM` 可拿到约 100 日 |
+| **根因** | 免费 tier 对 `full` 历史数据支持有限/不稳定；`compact` 才是免费 tier 默认可用模式 |
+| **解决方法** | 1. fetcher 默认 **`outputsize=auto`**：先尝试 `full`，失败再 `compact`<br>2. 不要指望 AV 免费 tier 替代 Stooq 做 2018–2025 长历史<br>3. 限速约 **5 次/分钟**，多 symbol 时加 `--delay 12` 或更高 |
+| **相关提交** | `70007ce`、`7514cdc` |
+
+#### M-013 Finnhub 免费 tier 无 candle 权限
+
+| 项 | 内容 |
+|----|------|
+| **日期** | 2026-06-02 |
+| **阶段** | Plus M2 / EXP-DATA-001 |
+| **现象** | HTTP **403**，响应：<br>`{"error":"You don't have access to this resource."}` |
+| **根因** | Finnhub **免费账户无权调用** `/stock/candle` OHLCV 接口；需付费计划。**不是代码 bug** |
+| **解决方法** | 1. OHLCV 继续用 **Stooq**（历史）+ **Alpha Vantage**（近期 smoke）<br>2. `configs/data_sources.yaml` 中 finnhub 标 `blocked_free_tier`<br>3. 若未来升级 Finnhub 付费，再复测 `--source finnhub` |
+| **验证记录** | EXP-DATA-001：Finnhub ❌（预期）；FRED + Stooq + AV ✅ |
+
+#### M-014 把 API Key 写入 `.env.example` 或 commit
+
+| 项 | 内容 |
+|----|------|
+| **日期** | 2026-06-02 |
+| **阶段** | Plus M2 配置 |
+| **现象** | 真实 `ALPHAVANTAGE_API_KEY`、`FRED_API_KEY` 等被粘贴进 `.env.example` 或聊天/文档，存在泄露风险 |
+| **根因** | `.env.example` 会 **commit 到 GitHub**；只有 `.env` 在 `.gitignore` 中 |
+| **解决方法** | 1. **真实 key 只放** 项目根 `.env`（本地 / 服务器各一份）<br>2. `.env.example` **只保留空占位符**，例如 `ALPHAVANTAGE_API_KEY=`<br>3. 若 key 已暴露 → 到各平台**轮换 key**<br>4. `git status` 确认 `.env` 未被 staged |
+| **预防** | `download_data.py` 通过 `load_repo_dotenv()` 读 `.env`；文档与 smoke 命令中不写真实 key |
+| **相关文件** | `.env.example`、`.gitignore`、`docs/server_commands.md` §六点五 |
+
+#### M-015 SEC EDGAR 需真实 User-Agent
+
+| 项 | 内容 |
+|----|------|
+| **日期** | 2026-06-02 |
+| **阶段** | Plus M2 / EXP-DATA-001（未测） |
+| **现象** | 使用占位符 `SEC_EDGAR_USER_AGENT=YourName your@email.com` 时，SEC 可能拒绝或限流 |
+| **根因** | SEC **强制要求**可识别的 User-Agent（真实姓名 + 联系邮箱），用于合规与联系 |
+| **解决方法** | 在服务器 `.env` 写入真实信息，例如：<br>`SEC_EDGAR_USER_AGENT=Zian Wei zian@example.edu`<br>然后：<br>```bash<br>python scripts/download_data.py --source sec_edgar --cik 0000320193 \<br>  --storage-config configs/storage.server.yaml<br>``` |
+| **状态** | EXP-DATA-001 中 **SEC 未测**；FRED / Stooq / AV 已通过 |
+
+---
+
 ## 跨阶段通用规则
 
 以下规则来自多次踩坑后的**固定习惯**，适用于所有阶段：
@@ -364,6 +437,9 @@ python scripts/download_data.py \
 | 安装顺序 | 一次装全部含 yfinance | 先 `requirements.txt` + `-e .`，再按需 `requirements-data.txt` / `requirements-ml.txt` |
 | 下载行情 | 三标的 + 8 年一次请求 | Stooq + `download_data_resilient.sh`，或 `--source stooq` |
 | Stooq key | 单独跑 download 忘记 export | 项目根 `.env` 含 `STOOQ_API_KEY`；`download_data.py` 启动时自动加载 |
+| M2 API key | 把 key 写进 `.env.example` 或 commit | 真实 key **仅** `.env`；example 只留占位符（见 [M-014](#m-014-把-api-key-写入-envexample-或-commit)） |
+| M2 OHLCV 历史 | Alpha Vantage + 2024 区间 | **Stooq** 做历史；AV 仅近期 ~100 日 smoke（见 [M-011](#m-011-alpha-vantage-历史区间返回-0-行)） |
+| M2 Finnhub | 以为 403 是代码 bug | 免费 tier 无 candle；标 blocked，换 Stooq/AV（见 [M-013](#m-013-finnhub-免费-tier-无-candle-权限)） |
 | 源码 vs 产物 | `.gitignore` 写 `data/` | 写 `/data/`、`/models/` 等根目录规则 |
 | 实验记录 | 口头说「跑过了」 | 写入 `docs/experiment_log.md`（含 metrics 路径） |
 
@@ -389,7 +465,8 @@ python -m pip install -e .
 | — | Step 2.2 | LightGBM 真实训练 | ✅ EXP-20260601-006 |
 | — | Step 2.2b | GPU/CUDA 训练 | ✅ EXP-20260602-004（见 M-010） |
 | 2.4 Walk-forward | 17 | 见 M-010 若用 GPU | ✅ EXP-20260602-008 |
-| — | Step 2.5 | 风控 Prompt 18 | **当前** |
+| — | Plus M2 | 多数据源 API smoke | ✅ EXP-DATA-001（Finnhub 免费 blocked；SEC 待测，见 M-015） |
+| — | Plus M3 | Memory/RAG v2 SQLite | **当前** |
 
 ---
 
