@@ -21,7 +21,7 @@ python -m pytest -v
 python -c "import quant_mas"
 ```
 
-**Current test status:** local **126 passed** (EXP-20260602-013, Plus M3); server **115 passed** (M2, re-verify **126** after M3 pull).
+**Current test status:** local + server **126 passed** (EXP-20260602-013/014, Plus M3).
 
 ## Server
 

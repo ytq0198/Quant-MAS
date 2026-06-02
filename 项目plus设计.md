@@ -68,7 +68,7 @@
 ### 2.1 工程完成度
 
 - **第零～四阶段 + Prompt 13 文档收口** ✅
-- **测试**：本地 **126 passed**（EXP-20260602-013）；服务器 M2 115（M3 待 pull）
+- **测试**：本地 **126 passed**（EXP-20260602-013）；服务器 **126 passed**（EXP-20260602-014，3.04s）
 - **Memory/RAG v2（M3 第一版）** ✅ 本地：MemoryStore JSON/SQLite、HybridRetriever、index/query CLI（EXP-20260602-013）
 - **M3.5 企业 RAG**：📋 待定（真 Embedding + 持久化向量 + Postgres；见 [§M3.5](#m35企业-rag-扩展待定)）
 - **Research Layer（M1）**：BaselineRegistry、`compare_experiments.py` ✅
@@ -97,7 +97,7 @@
 ```
 已完成   M1 → M2 → M3 第一版 ✅
 
-进行中   ① 服务器 M3 验收（pytest 126 + index/query smoke）
+进行中   ① ~~服务器 M3 验收~~ ✅ EXP-20260602-014
          ② M4 LangGraph（dry-run，不接 LLM）
          ③ M5 上下文 + 真实 LLM（ResearchAgent）
 
@@ -268,7 +268,7 @@
 
 ## M3：数据库与 Memory / RAG 升级
 
-> **状态：第一版 ✅ 本地（EXP-20260602-013，126 passed）** · 服务器验收进行中 · 企业扩展见 [M3.5](#m35企业-rag-扩展待定)
+> **状态：第一版 ✅ 本地 + 服务器（EXP-20260602-013/014，126 passed）** · 企业扩展见 [M3.5](#m35企业-rag-扩展待定)
 
 ### 目标
 
@@ -337,7 +337,7 @@ EMBEDDING_MODEL=...
 |------|------|
 | Codex | 本地 + mock 测试 ✅ |
 | Cursor | **服务器 pull + pytest 126 + smoke**（见下） |
-| EXP | 本地 EXP-20260602-013 ✅；服务器建议 **EXP-20260602-014** |
+| EXP | 本地 EXP-20260602-013 ✅；服务器 **EXP-20260602-014** ✅ |
 
 **服务器操作（复制执行）** — 详见 [docs/server_commands.md](docs/server_commands.md) §六点六：
 
@@ -360,10 +360,15 @@ python scripts/query_memory.py --help
 # 4. 可选 smoke（不联网，hash embedding）
 python scripts/index_documents.py --dirs docs --vector-store in_memory
 python scripts/query_memory.py --rag-query "walk-forward OOS sharpe"
-python scripts/query_memory.py --backend json --best-metric oos.sharpe
+
+# 5. 查实验 best metric（须指向服务器真实 experiments.json）
+python scripts/query_memory.py \
+  --backend json \
+  --json-path /mnt/localDisk3/weizian/reports/experiments.json \
+  --best-metric oos.sharpe
 ```
 
-通过后：在 `docs/experiment_log.md` 记录 **EXP-20260602-014**（M3 服务器），再进入 **M4**。
+**注意**：默认 `--json-path outputs/reports/experiments.json` 是仓库内空/本地路径；服务器历史实验在 `storage.server.yaml` 的 `reports_dir`（通常为 `/mnt/localDisk3/weizian/reports/experiments.json`）。RAG smoke 成功 ≠ 实验 memory 路径正确。
 
 ---
 
@@ -631,7 +636,7 @@ MODEL_CACHE_DIR=/mnt/localDisk3/weizian/models/hf
 |------|------|------------|-------------|----------|--------|
 | **M1** 研究基线 | 1 | baseline.py、compare_experiments | research_protocol、架构图 | 无 | 可选跑比较表 |
 | **M2** 数据扩展 | 2 | 多 fetcher + registry | data_sources.md、API 验证 | Stooq/AV/Finnhub/FRED/SEC | ✅ |
-| **M3** Memory/RAG 第一版 | 3 | SQLite/InMemory/索引脚本 | database_setup.md | **无（默认）** | ✅ 本地；服务器待验 |
+| **M3** Memory/RAG 第一版 | 3 | SQLite/InMemory/索引脚本 | database_setup.md | **无（默认）** | ✅ |
 | **M3.5** 企业 RAG | 3.5 | Postgres/pgvector/FAISS 后端 | codex_prompt_M3_enterprise（待写） | Embedding/DB | 按需 |
 | **M4** LangGraph | 4 | workflow + nodes | langgraph_workflow.md | 无 | dry-run / 可选 |
 | **M5** 上下文/LLM | 5 | ContextBuilder、ResearchAgent | context_engineering.md | DeepSeek/OpenAI-compatible | 可选 |

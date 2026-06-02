@@ -1,6 +1,6 @@
 # Quant MAS 实验记录
 
-更新时间：2026-06-02（Plus M3 本地验收 EXP-20260602-013）
+更新时间：2026-06-02（Plus M3 服务器 EXP-20260602-014）
 
 本文件用于记录真实实验和重要验证。不要记录未经实际运行的数据结果；尚未真实运行的项目标记为「待验证」。
 
@@ -88,6 +88,26 @@
 ```
 
 ## 当前验证记录
+
+### EXP-20260602-014：Plus M3 服务器验收 ✅
+
+- 日期：2026-06-02
+- 阶段：Plus v2 **M3**（服务器）
+- 环境：a6000-9961，conda `/mnt/localDisk3/weizian/conda_envs/quant-mas`
+- 命令与结果：
+  - `python -m pytest -v` → **126 passed** in **3.04s**
+  - `test_memory_store_v2.py` + `test_memory_rag.py` → **22 passed**
+  - `index_documents.py --dirs docs` → **132 chunks** → `outputs/rag/index.json`
+  - `query_memory.py --rag-query "walk-forward OOS sharpe"` → 命中 `experiment_log.md` 等 5 条
+  - `query_memory.py --best-metric oos.sharpe`（默认 json 路径）→ 无 metric（**预期**：默认路径非服务器 `reports/experiments.json`）
+- 正确查 OOS baseline 实验：
+  ```bash
+  python scripts/query_memory.py \
+    --json-path /mnt/localDisk3/weizian/reports/experiments.json \
+    --best-metric oos.sharpe
+  ```
+- 问题：无（路径说明见上，非 M3 bug）
+- 下一步：**M4** LangGraph
 
 ### EXP-20260602-013：Plus M3 Memory/RAG v2 本地验证 ✅
 
@@ -524,6 +544,7 @@
 | EXP-20260602-009 | 2026-06-02 | Plus M1 研究基线本地 | **102 passed**（+4 测试） |
 | EXP-20260602-010 | 2026-06-02 | Plus M1 服务器 pytest + 比较表 | **102 passed**；OOS sharpe 0.586 |
 | EXP-20260602-011 | 2026-06-02 | Plus M2 数据扩展本地 | **115 passed**（+13） |
+| EXP-20260602-014 | 2026-06-02 | Plus M3 服务器 pytest + RAG smoke | **126 passed**（3.04s） |
 | EXP-20260602-013 | 2026-06-02 | Plus M3 Memory/RAG v2 本地 | **126 passed**（+11） |
 | EXP-20260602-012 | 2026-06-02 | Plus M2 服务器 + API smoke | test_data_sources 13/13；FRED/Stooq/AV ✅ |
 | EXP-DATA-001 | 2026-06-02 | M2 API smoke（并入 012） | Finnhub 免费 blocked；SEC 未测 |

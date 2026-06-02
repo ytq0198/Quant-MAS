@@ -10,7 +10,7 @@ GitHub 仓库：[https://github.com/ytq0198/Quant-MAS](https://github.com/ytq019
 
 | 日期 | 项目 | 结果 | 备注 |
 |------|------|------|------|
-| 2026-06-02 | Plus M3 Memory/RAG v2（本地） | **126 passed** | EXP-20260602-013 |
+| 2026-06-02 | Plus M3 Memory/RAG v2（本地+服务器） | **126 passed** | EXP-20260602-013/014 |
 | 2026-06-02 | Plus M2 数据扩展（本地+服务器） | **115 passed** / test_data_sources **13/13** | EXP-20260602-011/012 |
 | 2026-06-02 | Plus M1 research baseline (local) | **102 passed** | EXP-20260602-009 |
 | 2026-06-01 | pytest（Prompt 20 后，服务器） | **98 passed**（1.93s） | EXP-20260601-014 |
@@ -389,9 +389,15 @@ python scripts/query_memory.py --help
 
 # 可选 smoke（不联网，hash embedding）
 python scripts/index_documents.py --dirs docs --vector-store in_memory
-python scripts/query_memory.py --rag-query "walk-forward OOS"
-python scripts/query_memory.py --backend json --best-metric oos.sharpe
+python scripts/query_memory.py --rag-query "walk-forward OOS sharpe"
+
+python scripts/query_memory.py \
+  --backend json \
+  --json-path /mnt/localDisk3/weizian/reports/experiments.json \
+  --best-metric oos.sharpe
 ```
+
+记录：**EXP-20260602-014**。默认 `--json-path outputs/reports/experiments.json` 非服务器 `reports_dir`。
 
 详见 [`docs/database_setup.md`](database_setup.md)。
 
