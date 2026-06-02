@@ -94,7 +94,7 @@ python scripts/run_ml_backtest.py --help
 ### Phase 1：最小量化闭环收口 ✅
 
 - [x] 在服务器 Python 3.11 环境中完整安装核心依赖
-- [x] 服务器全量 pytest 验证（44 passed）
+- [x] 服务器全量 pytest 验证（**68 passed**，2026-06-02）
 - [x] Stooq 真实数据下载（AAPL / MSFT / SPY，2018–2025，6033 rows）
 - [x] 服务器真实 `run_pipeline.py`（`server_ma_cross_real_001`）
 - [x] 在服务器验证真实 LightGBM 训练与 artifacts
@@ -116,3 +116,9 @@ python scripts/run_ml_backtest.py --help
 - [ ] 在不直接交易的前提下扩展研究和解释能力
 - [ ] 后续再评估是否引入 LangGraph / RAG / Memory 扩展
 
+## 研究解读（2026-06-02 服务器验收）
+
+- GPU 训练基础设施已验证（EXP-20260602-004，`device_resolved=cuda`）。
+- `server_lgbm_gpu_001` 的 val/test AUC 仍接近随机 → 下一步重点是 **模型与样本外验证**，而非设备链路。
+- `server_ml_backtest_001`（sharpe 2.78）证明 ML 回测闭环可用，但 **须 Prompt 17 walk-forward 复核** 后再作研究结论。
+- 可选：同一 features 上跑 `server_lgbm_cpu_001` 做 CPU/GPU metrics 对照（EXP-TODO-006）。

@@ -29,7 +29,8 @@ Quant MAS
 │   │   └── build_feature_table
 │   ├── strategies
 │   │   ├── Strategy
-│   │   └── MovingAverageCrossStrategy
+│   │   ├── MovingAverageCrossStrategy
+│   │   └── MLSignalStrategy
 │   ├── backtest
 │   │   ├── BacktestEngine
 │   │   ├── CommissionModel / SlippageModel
@@ -39,6 +40,8 @@ Quant MAS
 │   │   ├── BasePredictiveModel
 │   │   ├── LightGBMDirectionModel
 │   │   └── time-series training helpers
+│   ├── utils
+│   │   └── device.py（GPU/CUDA 解析）
 │   └── pipeline
 │       └── run_quant_pipeline
 │
@@ -69,7 +72,8 @@ download_data.py    数据下载（yfinance / Stooq）
 merge_parquet.py    合并分年 parquet
 build_features.py   特征构建
 run_backtest.py     均线策略回测
-train_model.py      模型训练
+train_model.py      模型训练（--device auto/cpu/gpu/cuda）
+run_ml_backtest.py  ML 信号回测（Prompt 16）
 generate_report.py  报告读取/生成
 run_agent.py        规则路由 Agent 工作流
 run_pipeline.py     端到端 pipeline
@@ -93,8 +97,8 @@ run_pipeline.py     端到端 pipeline
 - 下一根 bar 成交的轻量回测引擎
 - 回测指标和报告保存
 - LightGBM 模型封装 + Prompt 15 完整训练产物（**本地 68 passed**；服务器 CPU 训练 EXP-20260601-006）
-- LightGBM GPU/CUDA 训练（Prompt 15b：`device.py`、`--device`、auto fallback）
-- MLSignalStrategy + ML 回测脚本（Prompt 16；服务器真实回测待验证）
+- LightGBM GPU/CUDA 训练（Prompt 15b；服务器 EXP-20260602-004，见 M-010）
+- MLSignalStrategy + ML 回测（Prompt 16；服务器 EXP-20260602-005）
 - 时间序列切分和 label 泄露防护
 - 统一端到端 pipeline
 
@@ -134,7 +138,7 @@ run_pipeline.py     端到端 pipeline
 ### Phase 1 收口 ✅
 
 - [x] 服务器 Python 3.11 环境部署
-- [x] 全量 pytest 验证（44 passed，2026-06-02）
+- [x] 全量 pytest 验证（**68 passed**，2026-06-02）
 - [x] Stooq 真实数据下载（6033 rows，AAPL/MSFT/SPY 2018–2025）
 - [x] 服务器真实 pipeline（`server_ma_cross_real_001`）
 - [ ] 增加风险检查模块

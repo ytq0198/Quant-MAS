@@ -130,7 +130,7 @@
   - `python scripts/train_model.py --help` → 含 `--device {auto,cpu,gpu,cuda}`
 - 验证点：auto/cuda/gpu/cpu 解析；无 GPU 安全 fallback；metrics/metadata 含 device 字段
 - 问题：无
-- 下一步：服务器 `nvidia-smi` + `--device cuda` 真实训练（EXP-TODO-005）
+- 下一步：服务器验证完成 → 见 EXP-20260602-004
 
 ### EXP-20260601-007：Prompt 16 MLSignalStrategy 本地验证 ✅
 
@@ -143,7 +143,7 @@
 - 指标：**4 passed**（ML 专项）；**57 passed**（全量）
 - 验证点：pred_proba → signal；下一根 bar 成交；报告产物；禁止 future label 进特征
 - 问题：无
-- 下一步：git push → 服务器 `run_ml_backtest.py` 真实模型回测
+- 下一步：服务器验证完成 → 见 EXP-20260602-005
 
 ### EXP-20260601-006：服务器真实 LightGBM 训练 ✅
 
@@ -220,7 +220,7 @@
   - summary：`.../summary.md`
   - 日志（MSFT+SPY 下载）：`/mnt/localDisk3/weizian/logs/resilient_msft_spy.log`
 - 问题：Yahoo yfinance 限流；Stooq 需 API Key（见 `mistakes.md` M-009）
-- 下一步：**Codex Prompt 16** — ML 信号策略 + 回测
+- 下一步：Prompt 15 / 16 已完成
 
 ## 待验证实验
 
@@ -231,3 +231,16 @@
 - 状态：可选，未跑
 
 ### EXP-TODO-004：Walk-forward 样本外（Prompt 17）
+
+- 日期：待定
+- 目标：多窗口切分 → 训练 → 回测 → 汇总样本外指标
+- 状态：**当前**（Codex Prompt 17）
+
+## 实验里程碑速查
+
+| 编号 | 日期 | 内容 | 关键结果 |
+|------|------|------|----------|
+| EXP-20260601-004 | 2026-06-01 | Stooq 真实数据 + ma_cross | 6033 rows，sharpe ≈ 1.00 |
+| EXP-20260601-006 | 2026-06-01 | CPU LightGBM 训练 | test AUC 0.466 |
+| EXP-20260602-004 | 2026-06-02 | GPU LightGBM 训练 | device=cuda，test AUC 0.479 |
+| EXP-20260602-005 | 2026-06-02 | ML 信号回测 | sharpe 2.78（待 walk-forward 复核） |

@@ -21,6 +21,8 @@ python -m pytest -v
 python -c "import quant_mas"
 ```
 
+**Current test status:** **68 passed** (local Windows + server Linux, 2026-06-02).
+
 ## Server
 
 Recommended path: `/mnt/localDisk3/weizian/Quant-MAS`
@@ -29,10 +31,13 @@ Recommended path: `/mnt/localDisk3/weizian/Quant-MAS`
 
 | Date | Check | Result |
 |------|--------|--------|
-| 2026-06-02 | `python -m pytest -v` | **44 passed** |
-| 2026-06-01 | Stooq download + real pipeline | **6033 rows**; `server_ma_cross_real_001` (ma_cross) |
+| 2026-06-02 | `python -m pytest -v` | **68 passed** |
+| 2026-06-02 | GPU LightGBM training | `server_lgbm_gpu_001`, device=cuda |
+| 2026-06-02 | ML signal backtest | `server_ml_backtest_001`, sharpe 2.78 |
+| 2026-06-01 | Stooq download + real pipeline | **6033 rows**; `server_ma_cross_real_001` |
+| 2026-06-01 | CPU LightGBM training | `server_lgbm_001`, test AUC 0.466 |
 
-Docs: [`docs/server_commands.md`](docs/server_commands.md) · [`docs/experiment_log.md`](docs/experiment_log.md) · [`mistakes.md`](mistakes.md)
+Docs: [`docs/server_commands.md`](docs/server_commands.md) · [`docs/progress.md`](docs/progress.md) · [`docs/experiment_log.md`](docs/experiment_log.md) · [`mistakes.md`](mistakes.md)
 
 Copy the server storage example and edit paths:
 
@@ -60,6 +65,8 @@ python -m pip install -r requirements-ml.txt
 python -m pytest -v
 ```
 
+**GPU training:** PyPI LightGBM may be CPU-only. Before first `--device cuda` run, build CUDA LightGBM — see [`docs/server_commands.md`](docs/server_commands.md) §五 and [`mistakes.md`](mistakes.md) M-010.
+
 Verify the active interpreter (both must be 3.11):
 
 ```bash
@@ -82,6 +89,18 @@ SOURCE=stooq bash server/download_data_resilient.sh
 python scripts/run_pipeline.py --skip-download --storage-config configs/storage.server.yaml \
   --symbols AAPL MSFT SPY --start 2018-01-01 --end 2025-12-31 \
   --experiment-name server_ma_cross_real_001
+```
+
+Train and ML backtest:
+
+```bash
+python scripts/train_model.py --config configs/train.gpu.yaml \
+  --storage-config configs/storage.server.yaml --device cuda \
+  --experiment-name server_lgbm_gpu_001
+
+python scripts/run_ml_backtest.py --config configs/backtest_ml.yaml \
+  --storage-config configs/storage.server.yaml \
+  --experiment-name server_ml_backtest_001
 ```
 
 The setup script does not download large data. `download_data.py` and `download_data_resilient.sh` load `.env` automatically.
