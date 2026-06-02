@@ -36,7 +36,9 @@ python -m pip --version       # 必须也是 3.11，不能是 3.9
 # 6. 若 setup 失败，手动安装（不要用 bare pip）
 python -m pip install --upgrade pip setuptools wheel
 python -m pip install -r requirements.txt
-python -m pip install -e ".[data,ml]"
+python -m pip install -e .
+python -m pip install -r requirements-data.txt   # 下载行情数据需要
+python -m pip install -r requirements-ml.txt     # ML 训练需要
 python -m pytest -v
 ```
 
@@ -64,7 +66,9 @@ cd /mnt/localDisk3/weizian/Quant-MAS
 git pull origin main
 conda activate /mnt/localDisk3/weizian/conda_envs/quant-mas
 python -m pip install -r requirements.txt
-python -m pip install -e ".[data,ml]"
+python -m pip install -e .
+python -m pip install -r requirements-data.txt
+python -m pip install -r requirements-ml.txt
 python -m pytest -v
 ```
 

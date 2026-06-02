@@ -72,7 +72,9 @@ echo "[setup] pip: $("${PYTHON}" -m pip --version)"
 cd "${REPO_DIR}"
 PIP install --upgrade pip setuptools wheel
 PIP install -r requirements.txt
-PIP install -e ".[data,ml]"
+PIP install -e .
+PIP install -r requirements-data.txt
+PIP install -r requirements-ml.txt
 
 echo ""
 echo "[setup] done."

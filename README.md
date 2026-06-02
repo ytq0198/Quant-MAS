@@ -45,7 +45,9 @@ Run tests (**always use `python -m pytest` and `python -m pip`, not bare `pip`**
 ```bash
 conda activate /mnt/localDisk3/weizian/conda_envs/quant-mas
 python -m pip install -r requirements.txt
-python -m pip install -e ".[data,ml]"
+python -m pip install -e .
+python -m pip install -r requirements-data.txt
+python -m pip install -r requirements-ml.txt
 python -m pytest -v
 ```
 
