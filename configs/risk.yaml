@@ -1,5 +1,6 @@
 risk:
   max_position_weight: 0.2
+  max_total_exposure: 1.0
   max_drawdown: 0.2
+  allow_short: false
   require_human_approval: true
-

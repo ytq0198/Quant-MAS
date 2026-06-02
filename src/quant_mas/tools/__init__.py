@@ -5,6 +5,7 @@ from quant_mas.tools.quant import (
     BacktestTool,
     DataSummaryTool,
     ReportTool,
+    RiskTool,
     TrainModelTool,
 )
 from quant_mas.tools.registry import ToolRegistry
@@ -14,8 +15,8 @@ __all__ = [
     "BaseTool",
     "DataSummaryTool",
     "ReportTool",
+    "RiskTool",
     "ToolRegistry",
     "ToolResult",
     "TrainModelTool",
 ]
-

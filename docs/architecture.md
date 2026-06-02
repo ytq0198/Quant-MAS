@@ -1,6 +1,6 @@
 # Quant MAS 架构
 
-更新时间：2026-06-02
+更新时间：2026-06-01
 
 Quant MAS 当前采用“确定性量化引擎 + 轻量 Agent 编排”的架构。Agent 不替代回测、训练、风控和执行，也不允许直接实盘下单。
 
@@ -43,6 +43,10 @@ Quant MAS
 │   │   └── time-series training helpers
 │   ├── utils
 │   │   └── device.py（GPU/CUDA 解析）
+│   ├── risk（Prompt 18）
+│   │   ├── RiskLimits / RiskDecision
+│   │   ├── exposure（持仓 / 总敞口）
+│   │   └── drawdown_guard
 │   └── pipeline
 │       └── run_quant_pipeline
 │
@@ -52,7 +56,8 @@ Quant MAS
 │   ├── DataSummaryTool
 │   ├── BacktestTool
 │   ├── TrainModelTool
-│   └── ReportTool
+│   ├── ReportTool
+│   └── RiskTool（risk_check）
 │
 ├── Agent Layer
 │   ├── Message
@@ -102,6 +107,7 @@ run_pipeline.py     端到端 pipeline
 - LightGBM GPU/CUDA 训练（Prompt 15b；服务器 EXP-20260602-004，见 M-010）
 - MLSignalStrategy + ML 回测（Prompt 16；服务器 EXP-20260602-005）
 - Walk-forward 样本外（Prompt 17；服务器 EXP-20260602-008，OOS sharpe 0.586）
+- 基础风控层（Prompt 18）：RiskLimits、持仓限制裁剪/拒绝、回撤守卫
 - 时间序列切分和 label 泄露防护
 - 统一端到端 pipeline
 
@@ -113,6 +119,7 @@ run_pipeline.py     端到端 pipeline
 - `BacktestTool`
 - `TrainModelTool`
 - `ReportTool`
+- `RiskTool`（`risk_check`；Prompt 18）
 
 工具返回摘要、指标和路径，不返回完整 DataFrame。
 
@@ -138,29 +145,26 @@ run_pipeline.py     端到端 pipeline
 
 ## 后续计划
 
-### Phase 1 收口 ✅
+### 第一～二阶段 ✅
 
 - [x] 服务器 Python 3.11 环境部署
-- [x] 全量 pytest 验证（**68 passed**，2026-06-02）
+- [x] 全量 pytest 验证（**76 passed** 含风控，2026-06-01）
 - [x] Stooq 真实数据下载（6033 rows，AAPL/MSFT/SPY 2018–2025）
 - [x] 服务器真实 pipeline（`server_ma_cross_real_001`）
-- [ ] 增加风险检查模块
-- [ ] 完善报告格式
+- [x] Prompt 15–17：ML 训练、ML 回测、walk-forward OOS
 
-### Phase 2 机器学习实验 🔄 当前
+### 第二阶段扩展 ✅
 
-- [x] Step 2.1 真实数据 + ma_cross pipeline
-- [x] Prompt 15：训练 artifacts + ExperimentMemory（本地 53 passed）
-- [x] 服务器真实 LightGBM 训练（EXP-20260601-006）
-- [x] Prompt 16：MLSignalStrategy + `run_ml_backtest.py`（服务器 EXP-20260602-005）
-- [x] Prompt 15b：GPU/CUDA 训练（服务器 EXP-20260602-004）
-- [x] Prompt 17：Walk-forward（本地 + 服务器 EXP-20260602-008）
-- [ ] Prompt 18：基础风控层（**当前**）
+- [x] Prompt 18：基础风控层（RiskLimits / RiskTool，EXP-20260601-009）
 
-### Phase 3 Agent 增强
+### 第三阶段 🔄 当前
 
-- 增强任务解析
-- 增强报告 Agent
-- 增加实验审计事件
-- 后续评估 RAG / Memory / LangGraph
+- [ ] Prompt 19：增强 SupervisorAgent 路由
+- 增强报告 Agent、实验审计事件
+
+### 第四～六阶段
+
+- **第四阶段**：Memory + RAG（Prompt 20）
+- **第五阶段**：LangGraph 编排（暂缓）
+- **第六阶段**：Paper Trading（暂缓）
 

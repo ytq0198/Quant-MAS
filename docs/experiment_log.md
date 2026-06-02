@@ -1,6 +1,6 @@
 # Quant MAS 实验记录
 
-更新时间：2026-06-02
+更新时间：2026-06-01
 
 本文件用于记录真实实验和重要验证。不要记录未经实际运行的数据结果；尚未真实运行的项目标记为“待验证”。
 
@@ -31,6 +31,25 @@
 ```
 
 ## 当前验证记录
+
+### EXP-20260601-009：Prompt 18 基础风控层本地验证 ✅
+
+- 日期：2026-06-01
+- 阶段：第二阶段扩展（Prompt 18）
+- 数据：synthetic `target_weight` parquet（pytest `tmp_path`）
+- 模块：`RiskLimits`、`RiskDecision`、`check_position_limits`、`check_drawdown`、`RiskTool`
+- 配置：`configs/risk.yaml`（`max_position_weight`、`max_total_exposure`、`allow_short`）
+- 指标：
+  - `tests/test_risk.py`：**5 passed**
+  - 全量 `python -m pytest -v`：**76 passed**
+- 验收：
+  - 超限时 `clip=True` → status=`clipped`，`adjusted_targets` 可审计
+  - `clip=False` → status=`rejected`
+  - 回撤超限 → `max_drawdown_exceeded`
+  - `RiskTool` 可注册 `ToolRegistry`，返回 metadata 含 `decisions` / `violations`
+- 产物路径：代码 `src/quant_mas/risk/`、`src/quant_mas/tools/quant/risk_tool.py`
+- 问题：无（兼容保留原 `tools/quant.py` 导出）
+- 下一步：Prompt 19 Supervisor 接入 `risk_check` 路由；push 后服务器 pytest 复验
 
 ### EXP-20260602-001：最小端到端 synthetic pipeline 测试
 

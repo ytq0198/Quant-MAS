@@ -1,10 +1,12 @@
 # Quant MAS 开发进度
 
-更新时间：2026-06-02
+更新时间：2026-06-01
 
-## 当前阶段
+## 当前所处阶段
 
-**Phase 2**：Prompt 17 本地 + 服务器 ✅。**当前：Prompt 18 基础风控层**。
+**第二阶段** ✅ · **第二阶段扩展** ✅（Prompt 18，EXP-20260601-009）。
+
+**当前：第三阶段 Prompt 19**（Supervisor 路由增强）。
 
 ## Prompt 任务状态
 
@@ -23,13 +25,14 @@
 - [x] **Prompt 15**：ML 训练完整产物
 - [x] **Prompt 16**：MLSignalStrategy + `run_ml_backtest.py`
 - [x] **Prompt 17**：Walk-forward 样本外（`walk_forward.py`、`run_walk_forward.py`）
+- [x] **Prompt 18**：基础风控层（RiskLimits / RiskTool / `tests/test_risk.py`）
 
 ## 当前 pytest 状态
 
 | 环境 | Python | 结果 | 日期 |
 |------|--------|------|------|
-| 本地 Windows | 3.11+ | **71 passed** | 2026-06-02 |
-| 服务器 Linux | 3.11.15 | **71 passed** | 2026-06-02 |
+| 本地 Windows | 3.11+ | **76 passed** | 2026-06-01 |
+| 服务器 Linux | 3.11.15 | **71 passed**（待 pull 复验） | 2026-06-02 |
 
 服务器验证环境：
 
@@ -89,37 +92,43 @@ python scripts/run_walk_forward.py --help
 - [x] AgentEvent / ToolCallEvent / AgentFinishEvent
 - [x] LightGBM GPU/CUDA 训练支持（服务器 `server_lgbm_gpu_001`，EXP-20260602-004）
 - [x] Walk-forward 样本外（服务器 `server_walk_forward_001`，EXP-20260602-008，OOS sharpe 0.586）
+- [x] RiskLimits / RiskDecision / exposure / drawdown_guard / RiskTool（Prompt 18）
 
-## 下一阶段目标
+## 分阶段目标
 
-### Phase 1：最小量化闭环收口 ✅
+### 第零～第一阶段：量化核心 MVP ✅
 
 - [x] 在服务器 Python 3.11 环境中完整安装核心依赖
 - [x] 服务器全量 pytest 验证（**71 passed**，2026-06-02）
 - [x] Stooq 真实数据下载（AAPL / MSFT / SPY，2018–2025，6033 rows）
 - [x] 服务器真实 `run_pipeline.py`（`server_ma_cross_real_001`）
-- [x] 在服务器验证真实 LightGBM 训练与 artifacts
-- [ ] 增加基础风险检查模块
 
-### Phase 2：机器学习真实实验 🔄 当前
+### 第二阶段：机器学习真实实验 ✅
 
 - [x] Step 2.1 真实数据 pipeline（服务器 Stooq + ma_cross 回测）
 - [x] Step 2.2b Prompt 15b：GPU/CUDA 服务器训练（EXP-20260602-004）
 - [x] Step 2.4 Prompt 17：Walk-forward（本地 EXP-20260602-007 + 服务器 EXP-20260602-008）
-- [ ] Step 2.5 / Prompt 18：基础风控层（**当前**）
-- [ ] 可选：CPU 对照 `server_lgbm_cpu_001`（EXP-TODO-006）
 
-### Phase 3：Agent 增强
+### 第二阶段扩展：基础风控 ✅
 
-- [ ] 增强 SupervisorAgent 的任务解析能力
+- [x] Prompt 18：RiskLimits、RiskDecision、RiskTool、`configs/risk.yaml`
+- [x] `tests/test_risk.py` 5 passed；全量 76 passed（EXP-20260601-009）
+
+### 第三阶段：Agent 增强 🔄 当前
+
+- [ ] Prompt 19：增强 SupervisorAgent 路由（ML 回测、风控、pipeline）
 - [ ] 增加 Agent 事件审计报告
 - [ ] 将 ReportAgent 与真实报告产物对接
-- [ ] 在不直接交易的前提下扩展研究和解释能力
-- [ ] 后续再评估是否引入 LangGraph / RAG / Memory 扩展
+
+### 第四～六阶段：后续
+
+- [ ] **第四阶段** Prompt 20：Memory + RAG 雏形
+- [ ] **第五阶段** LangGraph 编排（暂缓）
+- [ ] **第六阶段** Paper Trading（暂缓，不做实盘）
 
 ## 研究解读（2026-06-02）
 
-- **Phase 2 ML 链路已全部跑通**（训练 → ML 回测 → walk-forward OOS）。
+- **第二阶段 ML 链路已全部跑通**（训练 → ML 回测 → walk-forward OOS）。
 - 单段 ML 回测 sharpe **2.78**（EXP-20260602-005）≫ walk-forward OOS sharpe **0.586**（EXP-20260602-008）→ 报告应 **以 OOS 为准**。
-- OOS auc_mean **0.472** 与 GPU 训练 val/test AUC ≈ 0.46–0.48 一致；下一步 **Prompt 18 风控**，模型调参留作后续研究。
+- 下一步 **Prompt 19** Supervisor 路由；模型调参留作后续研究。
 - 可选 CPU 对照：`server_lgbm_cpu_001`（EXP-TODO-006）。
