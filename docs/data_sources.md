@@ -12,10 +12,10 @@
 | `stooq` | ohlcv | `STOOQ_API_KEY` | **verified** | 服务器 EXP-20260601-004 |
 | `yfinance` | ohlcv | — | planned | 易限流，备用 |
 | `auto` | ohlcv | `STOOQ_API_KEY` | planned | yfinance → Stooq fallback |
-| `alpha_vantage` | ohlcv | `ALPHAVANTAGE_API_KEY` | planned（代码 ✅） | 免费版限速 |
-| `finnhub` | ohlcv | `FINNHUB_API_KEY` | planned（代码 ✅） | candle API |
-| `fred` | macro | `FRED_API_KEY` | planned（代码 ✅） | 宏观序列，非 OHLCV |
-| `sec_edgar` | filings | `SEC_EDGAR_USER_AGENT` | planned（代码 ✅） | JSON，非 OHLCV |
+| `fred` | macro | `FRED_API_KEY` | **verified** | EXP-DATA-001：DGS10 262 rows |
+| `alpha_vantage` | ohlcv | `ALPHAVANTAGE_API_KEY` | failed（待排查） | 服务器：missing daily time series |
+| `finnhub` | ohlcv | `FINNHUB_API_KEY` | failed（待排查） | 服务器：HTTP 403 |
+| `sec_edgar` | filings | `SEC_EDGAR_USER_AGENT` | 待验证 | 需真实 User-Agent |
 
 **pytest**：`tests/test_data_sources.py` 全部 mock HTTP，不联网。  
 **真实 API**：仅服务器手工 smoke test（见 EXP-DATA-001，待验证）。
