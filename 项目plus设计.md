@@ -1,9 +1,10 @@
 # Quant MAS Plus 设计（v2 研究与扩展规划）
 
-更新时间：2026-06-01
+更新时间：2026-06-02
 
 > 本文档在 **Prompt 1–20 主链路已完成**（第零～四阶段）的基础上，规划 **Quant MAS v2** 的研究型升级路线。  
-> 基线状态：本地 **126 passed**（EXP-20260602-013）；服务器 **115 passed**（M2，M3 pull 后预期 **126**）。  
+> 基线状态：本地 **126 passed**（EXP-20260602-013，M3 第一版 ✅）；服务器 M2 **115**（**M3 pull 后预期 126**）。  
+> **当前执行**：服务器 M3 验收 → **M4 LangGraph** → M5 → 按需 **M3.5 企业 RAG 扩展**。  
 > 与 `项目进度.md` / `项目指导.md` 的关系：后者记录「已完成什么」；本文档记录「接下来怎么优化、怎么给 Codex/Cursor 下指令」。
 
 ---
@@ -16,6 +17,7 @@
 4. [M1：研究基线与实验规范](#m1研究基线与实验规范)
 5. [M2：数据源扩展](#m2数据源扩展)
 6. [M3：数据库与 Memory / RAG 升级](#m3数据库与-memory--rag-升级)
+6b. [M3.5：企业 RAG 扩展（待定）](#m35企业-rag-扩展待定)
 7. [M4：LangGraph 工作流编排](#m4langgraph-工作流编排)
 8. [M5：上下文工程与真实 LLM 接入](#m5上下文工程与真实-llm-接入)
 9. [M6：金融文本大模型 / 开源模型微调](#m6金融文本大模型--开源模型微调)
@@ -36,7 +38,7 @@
 |------|-------------|-------------|
 | 目标 | 可运行、可测试、可回测、可记录 | 可比较、可扩展、可写论文 |
 | Agent | 规则路由 Supervisor + MockLLM | + ResearchAgent、可选真实 LLM（仅解释/报告） |
-| Memory/RAG | JSON + 关键词 SimpleRetriever | + SQLite / 向量库 / 可选图库 |
+| Memory/RAG | JSON + 关键词 SimpleRetriever | **M3 第一版** ✅：SQLite/InMemory/Hash；**M3.5** 扩展：Postgres/pgvector/真 Embedding |
 | ML | LightGBM 结构化 baseline | 保留 baseline + 文本信号 + 可选 LoRA |
 | 编排 | 单步 Supervisor 路由 | + LangGraph 实验性 DAG |
 | 交易 | 回测 + 风控，**不做实盘** | 仍 **不做实盘**；RL 仅模拟环境 |
@@ -67,11 +69,11 @@
 
 - **第零～四阶段 + Prompt 13 文档收口** ✅
 - **测试**：本地 **126 passed**（EXP-20260602-013）；服务器 M2 115（M3 待 pull）
-- **Memory/RAG v2（M3）**：MemoryStore JSON/SQLite、HybridRetriever、index/query CLI ✅ 本地
+- **Memory/RAG v2（M3 第一版）** ✅ 本地：MemoryStore JSON/SQLite、HybridRetriever、index/query CLI（EXP-20260602-013）
+- **M3.5 企业 RAG**：📋 待定（真 Embedding + 持久化向量 + Postgres；见 [§M3.5](#m35企业-rag-扩展待定)）
 - **Research Layer（M1）**：BaselineRegistry、`compare_experiments.py` ✅
-- **Data Layer（M2）**：fetchers 子包、DataSourceRegistry、FRED/SEC 等 ✅ 本地
+- **Data Layer（M2）**：fetchers 子包、DataSourceRegistry；服务器 EXP-DATA-001 ✅
 - **Agent 工具（7 个）**：data_summary / backtest / train_model / report / risk_check / ml_backtest / pipeline
-- **Memory/RAG**：Prompt 20 雏形 + **Plus M3 v2**（MemoryStore、HybridRetriever、index/query CLI）✅ 本地
 
 ### 2.2 研究基线实验（服务器真实数据）
 
@@ -90,9 +92,27 @@
 
 ## 3. v2 八条主线与优先级
 
+### 3.1 当前推荐执行顺序（2026-06-02 更新）
+
 ```
-优先级 1（先做）  M1 研究基线  →  M2 数据扩展  →  M3 Memory/RAG v2
+已完成   M1 → M2 → M3 第一版 ✅
+
+进行中   ① 服务器 M3 验收（pytest 126 + index/query smoke）
+         ② M4 LangGraph（dry-run，不接 LLM）
+         ③ M5 上下文 + 真实 LLM（ResearchAgent）
+
+按需扩展 M3.5 企业 RAG（真 Embedding / pgvector / Postgres / Neo4j）
+         ↑ 触发条件见 §M3.5，不阻塞 M4/M5
+
+后续     M6 文本大模型 → M7 RL/GRPO → M8 MCP/A2A
+```
+
+### 3.2 原八条主线（模块编号不变）
+
+```
+优先级 1（先做）  M1 研究基线  →  M2 数据扩展  →  M3 Memory/RAG 第一版 ✅
 优先级 2          M4 LangGraph  →  M5 上下文/LLM
+优先级 2.5（按需） M3.5 企业 RAG 扩展（不替换 M3 接口，只加后端）
 优先级 3          M6 文本大模型微调
 优先级 4          M7 RL / GRPO
 最后              M8 MCP / A2A
@@ -102,8 +122,9 @@
 
 - 没有 **M1 统一比较**，后面模型/Agent 实验无法写论文。
 - 没有 **M2 数据**，文本/RAG/RL 缺输入。
-- **M3** 在 SimpleRetriever 上升级，成本低、收益高。
-- **LangGraph / LLM** 应在工具与数据稳定后再接，避免「空编排」。
+- **M3 第一版** 在 SimpleRetriever 上加了可插拔接口，**零外部 API** 即可 pytest 全绿。
+- **M3.5** 在同一接口上换「真后端」，适合论文写「生产级 RAG」时再开，**不必现在接** Postgres/Milvus/Embedding API。
+- **LangGraph / LLM** 应在 M3 骨架稳定后再接；M5 接 LLM 后 RAG 真语义检索价值更大。
 - **大模型做价格预测** 风险高；优先 **文本信号 + 结构化 ML 融合**。
 - **RL** 依赖稳定环境与 OOS reward；**MCP** 安全风险大，最后做 adapter。
 
@@ -247,54 +268,134 @@
 
 ## M3：数据库与 Memory / RAG 升级
 
+> **状态：第一版 ✅ 本地（EXP-20260602-013，126 passed）** · 服务器验收进行中 · 企业扩展见 [M3.5](#m35企业-rag-扩展待定)
+
 ### 目标
 
-三库结构（渐进式）：
+三库结构（**渐进式：先做第一版，再扩展**）：
 
-| 层级 | 用途 | v2 第一版 | 扩展 |
-|------|------|-----------|------|
-| 元数据 | 实验、指标、artifact | JSON → **SQLite** | PostgreSQL |
-| 向量 | 文档/报告 embedding | **InMemory / FAISS** | pgvector / Milvus |
-| 图 | 策略-特征-实验关系 | 接口预留 | Neo4j |
+| 层级 | 用途 | **M3 第一版（已实现）** | M3.5 扩展（待定） |
+|------|------|------------------------|-------------------|
+| 元数据 | 实验、指标、artifact | JSON + **SQLite 文件** | PostgreSQL |
+| 向量 | 文档/报告 embedding | **InMemory** + HashEmbedding | 真 Embedding + FAISS / pgvector |
+| 图 | 策略-特征-实验关系 | env 占位 | Neo4j |
+| 检索 | 文档 / 实验 | SimpleRetriever + **HybridRetriever** | + BM25 / Rerank / 元数据过滤 |
 
-保留现有 SimpleRetriever，新增可插拔后端。
+**第一版原则**：pytest **不联网**；外部 Postgres / Embedding API **不进默认测试**。接口已可插拔，扩展时只加后端实现。
+
+### M3 第一版已交付（EXP-20260602-013）
+
+| 组件 | 路径 |
+|------|------|
+| MemoryStore | `memory/store_base.py`、`json_store.py`、`sqlite_store.py`、`factory.py` |
+| RAG | `embedding_client.py`（Hash + OpenAI 骨架）、`in_memory_vector_store.py`、`hybrid_retriever.py` |
+| CLI | `scripts/index_documents.py`、`scripts/query_memory.py` |
+| 配置 | `configs/memory.yaml` |
+| 文档 | [docs/database_setup.md](docs/database_setup.md)、[docs/codex_prompt_M3.md](docs/codex_prompt_M3.md) |
+| 测试 | `tests/test_memory_store_v2.py`（11 项）；`test_memory_rag.py` 未破坏 |
+
+默认配置（**无需任何外部 API**）：
+
+```yaml
+memory_backend: json
+vector_store: in_memory
+embedding_provider: hash
+```
 
 ### 需要连接的 API / 服务
 
-```env
-# 默认（pytest 必需）
-# 无外部依赖
+**M3 第一版验收：无。**
 
-# 可选扩展
+以下 env 为 **M3.5 扩展预留**，当前代码中 Postgres/Neo4j 后端**尚未实现**，填了也不会自动生效：
+
+```env
 POSTGRES_DSN=postgresql://...
-VECTOR_STORE=faiss          # 或 pgvector
+VECTOR_STORE=faiss          # 或 pgvector（M3.5）
 NEO4J_URI=bolt://...
-NEO4J_USER=...
-NEO4J_PASSWORD=...
-EMBEDDING_PROVIDER=local    # 或 openai_compatible
+EMBEDDING_PROVIDER=hash     # M3 默认；M3.5 可改 openai_compatible / local
 EMBEDDING_BASE_URL=...
 EMBEDDING_API_KEY=...
 EMBEDDING_MODEL=...
 ```
 
-### 给 Codex 的提示词
+### 给 Codex 的提示词（第一版 — 已完成）
 
-> **完整版**（含验收清单、兼容性要求）：[docs/codex_prompt_M3.md](docs/codex_prompt_M3.md)
+> **完整版**：[docs/codex_prompt_M3.md](docs/codex_prompt_M3.md) · 状态：**✅ 已完成**
 
-```
-请为 Quant MAS v2 实现可插拔 Memory / RAG 存储后端。
-（详见 docs/codex_prompt_M3.md — 复制「固定前缀」+「M3 主任务」整段）
-```
-
-### 给 Cursor 的提示词
+### 给 Cursor 的提示词（第一版 — 已完成）
 
 ```
-1. 检查服务器是否有 Docker。
-2. 新增 docs/database_setup.md：可选 Postgres+pgvector、Neo4j 启动说明（占位符密码）。
-3. 无 Docker 则记录「默认 SQLite + InMemoryVectorStore」。
-4. docs/architecture.md 补充 Memory/RAG v2 分层。
-5. 不运行删数据命令；不提交密码。
+1. docs/database_setup.md ✅
+2. docs/architecture.md Memory/RAG v2 分层 ✅
+3. 服务器 M3 验收 — 见下方「运行位置与验收」
+4. 不提交 .env / 密码
 ```
+
+### 运行位置与验收
+
+| 项目 | 说明 |
+|------|------|
+| Codex | 本地 + mock 测试 ✅ |
+| Cursor | **服务器 pull + pytest 126 + smoke**（见下） |
+| EXP | 本地 EXP-20260602-013 ✅；服务器建议 **EXP-20260602-014** |
+
+**服务器操作（复制执行）** — 详见 [docs/server_commands.md](docs/server_commands.md) §六点六：
+
+```bash
+cd /mnt/localDisk3/weizian/Quant-MAS
+git pull origin main
+conda activate /mnt/localDisk3/weizian/conda_envs/quant-mas
+python -m pip install -e .
+
+# 1. 全量测试（预期 126 passed）
+python -m pytest -v
+
+# 2. M3 专项
+python -m pytest tests/test_memory_store_v2.py tests/test_memory_rag.py -v
+
+# 3. CLI
+python scripts/index_documents.py --help
+python scripts/query_memory.py --help
+
+# 4. 可选 smoke（不联网，hash embedding）
+python scripts/index_documents.py --dirs docs --vector-store in_memory
+python scripts/query_memory.py --rag-query "walk-forward OOS sharpe"
+python scripts/query_memory.py --backend json --best-metric oos.sharpe
+```
+
+通过后：在 `docs/experiment_log.md` 记录 **EXP-20260602-014**（M3 服务器），再进入 **M4**。
+
+---
+
+## M3.5：企业 RAG 扩展（待定）
+
+> **不阻塞 M4/M5**。在 M3 第一版接口上**加后端**，不推翻现有 pytest。
+
+### 何时启动 M3.5
+
+满足任一即可考虑开 Codex 任务：
+
+1. M5 要接真实 LLM，需要**语义检索**（Hash 向量不够用）
+2. 文档/报告索引量大，InMemory 不够用
+3. 论文需要写「生产级 RAG / 三库架构」完整实现
+
+### 目标（扩展列落地）
+
+| 阶段 | 内容 | 外部依赖 |
+|------|------|----------|
+| M3.5a | 真 Embedding + FAISS 磁盘持久化 | Embedding API 或 **服务器 GPU 本地模型**（bge/e5） |
+| M3.5b | PostgreSQL + pgvector（元数据 + 向量同库） | Docker Postgres |
+| M3.5c | Hybrid 增强：BM25、metadata filter、可选 rerank | 可选 cross-encoder |
+| M3.5d | Neo4j 知识图（策略–特征–实验–文档） | Docker Neo4j |
+
+### 与 M5 的关系
+
+- **M5 ContextBuilder** 从 Memory/RAG 拉上下文 → M3.5 真检索在 M5 前或并行最有价值
+- pytest 仍用 Hash + mock；真实 API 仅 **integration 脚本 + 服务器 smoke**
+
+### Codex 任务（待写）
+
+完成后新增 `docs/codex_prompt_M3_enterprise.md`，验收：mock pytest 全绿 + `scripts/smoke_rag_enterprise.py`（可选，服务器手工）。
 
 ---
 
@@ -530,7 +631,8 @@ MODEL_CACHE_DIR=/mnt/localDisk3/weizian/models/hf
 |------|------|------------|-------------|----------|--------|
 | **M1** 研究基线 | 1 | baseline.py、compare_experiments | research_protocol、架构图 | 无 | 可选跑比较表 |
 | **M2** 数据扩展 | 2 | 多 fetcher + registry | data_sources.md、API 验证 | Stooq/AV/Finnhub/FRED/SEC | ✅ |
-| **M3** Memory/RAG v2 | 3 | SQLite/InMemory/索引脚本 | database_setup.md | Embedding 可选 | ✅ 本地 |
+| **M3** Memory/RAG 第一版 | 3 | SQLite/InMemory/索引脚本 | database_setup.md | **无（默认）** | ✅ 本地；服务器待验 |
+| **M3.5** 企业 RAG | 3.5 | Postgres/pgvector/FAISS 后端 | codex_prompt_M3_enterprise（待写） | Embedding/DB | 按需 |
 | **M4** LangGraph | 4 | workflow + nodes | langgraph_workflow.md | 无 | dry-run / 可选 |
 | **M5** 上下文/LLM | 5 | ContextBuilder、ResearchAgent | context_engineering.md | DeepSeek/OpenAI-compatible | 可选 |
 | **M6** 文本大模型 | 6 | FinBERT/LoRA 骨架 | text_model_plan、GPU 实验 | HF_TOKEN | ✅ |
@@ -555,11 +657,18 @@ FINNHUB_API_KEY=
 FRED_API_KEY=
 SEC_EDGAR_USER_AGENT=YourName your@email.com
 
-# === M3 Embedding（可选）===
-EMBEDDING_PROVIDER=local
+# === M3 第一版默认（pytest，无外部 API）===
+EMBEDDING_PROVIDER=hash
+VECTOR_STORE=in_memory
+
+# === M3.5 扩展（可选，不进 pytest）===
 EMBEDDING_BASE_URL=
 EMBEDDING_API_KEY=
 EMBEDDING_MODEL=
+POSTGRES_DSN=
+NEO4J_URI=
+NEO4J_USER=
+NEO4J_PASSWORD=
 
 # === M5 LLM（可选）===
 LLM_PROVIDER=deepseek
@@ -567,16 +676,10 @@ LLM_BASE_URL=https://api.deepseek.com
 LLM_API_KEY=
 LLM_MODEL=deepseek-chat
 
-# === M6  Hugging Face（可选）===
+# === M6 Hugging Face（可选）===
 HF_TOKEN=
 MODEL_CACHE_DIR=/mnt/localDisk3/weizian/models/hf
 WANDB_API_KEY=
-
-# === M3 扩展数据库（可选，不进 pytest）===
-POSTGRES_DSN=
-NEO4J_URI=
-NEO4J_USER=
-NEO4J_PASSWORD=
 ```
 
 ### 13.2 API 申请入口（备忘）
@@ -693,4 +796,4 @@ LLM 不允许直接下单；pytest 不联网不调真实 LLM。
 
 ---
 
-*文档版本：2026-06-01 · Quant MAS Plus v2 设计初稿*
+*文档版本：2026-06-02 · Quant MAS Plus v2（M3 第一版 ✅，M3.5 待定，下一步 M4）*
