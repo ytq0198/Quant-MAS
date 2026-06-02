@@ -1,0 +1,8 @@
+model:
+  name: lightgbm_direction
+split:
+  train: 0.7
+  validation: 0.15
+  test: 0.15
+target: future_direction
+

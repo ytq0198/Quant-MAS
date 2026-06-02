@@ -1,0 +1,14 @@
+price_column: close
+windows:
+  moving_average:
+    - 5
+    - 20
+  volatility:
+    - 20
+  volume:
+    - 20
+rsi_window: 14
+return_periods:
+  - 1
+label:
+  horizon: 5

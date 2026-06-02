@@ -1,0 +1,7 @@
+project_root: ..
+raw_data_dir: data/raw
+processed_data_dir: data/processed
+features_dir: data/features
+models_dir: models
+reports_dir: outputs/reports
+logs_dir: logs

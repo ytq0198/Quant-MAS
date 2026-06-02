@@ -1,0 +1,6 @@
+agent:
+  max_steps: 8
+  allow_live_trading: false
+llm:
+  provider: mock
+
