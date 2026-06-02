@@ -40,20 +40,21 @@ pip install -r requirements.txt
 pip install -e .
 ```
 
-Run tests (**always use `python -m pytest`, not bare `pytest`**):
+Run tests (**always use `python -m pytest` and `python -m pip`, not bare `pip`**):
 
 ```bash
-conda activate quant-mas
+conda activate /mnt/localDisk3/weizian/conda_envs/quant-mas
+python -m pip install -r requirements.txt
+python -m pip install -e ".[data,ml]"
 python -m pytest -v
-# or
-bash server/run_server_tests.sh
 ```
 
-Verify the active interpreter:
+Verify the active interpreter (both must be 3.11):
 
 ```bash
-which python    # should be quant-mas env (e.g. .../conda_envs/quant-mas/bin/python)
-python --version   # should be 3.11.x
+which python
+python --version
+python -m pip --version    # must NOT show python 3.9
 ```
 
 Run a small pipeline example:

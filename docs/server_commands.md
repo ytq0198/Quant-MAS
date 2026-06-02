@@ -30,17 +30,23 @@ CONDA_ENV_PREFIX=/mnt/localDisk3/weizian/conda_envs/quant-mas bash server/setup_
 
 # 5. 激活并验证
 conda activate /mnt/localDisk3/weizian/conda_envs/quant-mas
-python --version          # 必须显示 Python 3.11.x
-which python              # 必须指向 .../conda_envs/quant-mas/bin/python
+python --version              # 必须 3.11.x
+python -m pip --version       # 必须也是 3.11，不能是 3.9
+
+# 6. 若 setup 失败，手动安装（不要用 bare pip）
+python -m pip install --upgrade pip setuptools wheel
+python -m pip install -r requirements.txt
+python -m pip install -e ".[data,ml]"
 python -m pytest -v
 ```
 
-> **常见错误**：提示 `Python 3.9.13 not in '>=3.11'` 说明当前 env 是 3.9 创建的，需删除后重建：
+> **常见错误 A**：`Python 3.9.13 not in '>=3.11'` → 环境是 3.9，需 `rm -rf .../conda_envs/quant-mas` 后重建。
+>
+> **常见错误 B**：`python` 是 3.11 但 `pip` 来自 `~/.local` 的 3.9 → **永远用 `python -m pip`**，不要直接敲 `pip`：
 >
 > ```bash
-> conda deactivate
-> rm -rf /mnt/localDisk3/weizian/conda_envs/quant-mas
-> CONDA_ENV_PREFIX=/mnt/localDisk3/weizian/conda_envs/quant-mas bash server/setup_server.sh
+> conda activate /mnt/localDisk3/weizian/conda_envs/quant-mas
+> python -m pip install -e ".[data,ml]"
 > ```
 
 自检：
@@ -57,8 +63,8 @@ which pytest      # 应在同一 conda env 内
 cd /mnt/localDisk3/weizian/Quant-MAS
 git pull origin main
 conda activate /mnt/localDisk3/weizian/conda_envs/quant-mas
-pip install -r requirements.txt
-pip install -e ".[data,ml]"
+python -m pip install -r requirements.txt
+python -m pip install -e ".[data,ml]"
 python -m pytest -v
 ```
 
