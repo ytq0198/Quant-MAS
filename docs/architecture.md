@@ -101,7 +101,7 @@ run_pipeline.py     端到端 pipeline
 - LightGBM 模型封装 + Prompt 15 完整训练产物（**本地 68 passed**；服务器 CPU 训练 EXP-20260601-006）
 - LightGBM GPU/CUDA 训练（Prompt 15b；服务器 EXP-20260602-004，见 M-010）
 - MLSignalStrategy + ML 回测（Prompt 16；服务器 EXP-20260602-005）
-- Walk-forward 样本外（Prompt 17；`build_walk_forward_windows`、OOS 回测；本地 71 passed）
+- Walk-forward 样本外（Prompt 17；服务器 EXP-20260602-008，OOS sharpe 0.586）
 - 时间序列切分和 label 泄露防护
 - 统一端到端 pipeline
 
@@ -154,8 +154,7 @@ run_pipeline.py     端到端 pipeline
 - [x] 服务器真实 LightGBM 训练（EXP-20260601-006）
 - [x] Prompt 16：MLSignalStrategy + `run_ml_backtest.py`（服务器 EXP-20260602-005）
 - [x] Prompt 15b：GPU/CUDA 训练（服务器 EXP-20260602-004）
-- [x] Prompt 17：Walk-forward + `save_walk_forward_report`（本地 71 passed）
-- [ ] 服务器 walk-forward 真实实验（EXP-TODO-007）
+- [x] Prompt 17：Walk-forward（本地 + 服务器 EXP-20260602-008）
 - [ ] Prompt 18：基础风控层（**当前**）
 
 ### Phase 3 Agent 增强

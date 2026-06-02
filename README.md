@@ -31,8 +31,8 @@ Recommended path: `/mnt/localDisk3/weizian/Quant-MAS`
 
 | Date | Check | Result |
 |------|--------|--------|
-| 2026-06-02 | `python -m pytest -v` | **71 passed**（含 Prompt 17） |
-| 2026-06-02 | Walk-forward local | Prompt 17 ✅，3 tests |
+| 2026-06-02 | Walk-forward server | OOS sharpe **0.586**, 19 windows | EXP-20260602-008 |
+| 2026-06-02 | `python -m pytest -v` | **71 passed** |
 | 2026-06-02 | GPU LightGBM training | `server_lgbm_gpu_001`, device=cuda |
 | 2026-06-02 | ML signal backtest | `server_ml_backtest_001`, sharpe 2.78 |
 | 2026-06-01 | Stooq download + real pipeline | **6033 rows**; `server_ma_cross_real_001` |

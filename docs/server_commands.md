@@ -10,8 +10,9 @@ GitHub 仓库：[https://github.com/ytq0198/Quant-MAS](https://github.com/ytq019
 
 | 日期 | 项目 | 结果 | 备注 |
 |------|------|------|------|
-| 2026-06-02 | Walk-forward 本地 | **71 passed**；Prompt 17 ✅ | 无 |
-| 2026-06-02 | pytest | **68 passed**（CUDA LightGBM 重装后；Prompt 17 前） |
+| 2026-06-02 | Walk-forward 服务器 | `server_walk_forward_001`；OOS sharpe **0.586** | Prompt 17 ✅ |
+| 2026-06-02 | pytest | **71 passed**（Prompt 17 后） |
+| 2026-06-02 | Walk-forward 本地 | **71 passed**；Prompt 17 代码 ✅ | 无 |
 | 2026-06-02 | GPU 训练 | `server_lgbm_gpu_001`；device=cuda；test AUC 0.479 | 见 M-010 |
 | 2026-06-02 | ML 回测 | `server_ml_backtest_001`；sharpe **2.78** | Prompt 16 ✅ |
 | 2026-06-02 | pytest（旧） | **44 passed**（Python 3.11.15，1.19s） |
@@ -282,7 +283,9 @@ python scripts/run_ml_backtest.py \
 
 产物示例（2026-06-02）：sharpe **2.78**，max_drawdown **-0.246**，2011 bars；报告 `outputs/reports/ml_backtest_latest/summary.md`。
 
-**Walk-forward（Prompt 17 ✅ 本地，待服务器 EXP-TODO-007）**：
+**Walk-forward（Prompt 17 ✅，EXP-20260602-008）**：
+
+已验证（2026-06-02）：19 窗口，约 17s，OOS sharpe **0.586**，total_return **0.443**，auc_mean **0.472**。
 
 ```bash
 git pull origin main

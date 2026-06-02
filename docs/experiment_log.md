@@ -56,6 +56,43 @@
 - 问题：仅为 smoke test，不代表真实市场表现
 - 下一步：用 sample parquet 或真实小规模数据验证
 
+### EXP-20260602-008：服务器 Walk-forward 真实实验 ✅（Prompt 17）
+
+- 日期：2026-06-02
+- 阶段：Phase 2 Step 2.4（Prompt 17 服务器验证）
+- 环境：a6000-9961，CUDA LightGBM，`git` @ `1f4df61`
+- 数据：`/mnt/localDisk3/weizian/datasets/features/features.parquet`（6033 rows，865K）
+- 配置：`walk_forward.yaml` — train 504 / val 126 / test 126 / oos 63 / step 63
+- 参数：`--experiment-name server_walk_forward_001`；`device_requested=auto`，`device_resolved=cuda`，`device_fallback=false`
+- 运行：约 **17s**，**19 个窗口**
+- OOS 汇总（`metrics.json` → `oos` 块，**主记录指标**）：
+  - sharpe：**0.586**
+  - total_return：**0.443**（≈ +44%）
+  - annualized_return：**0.080**
+  - max_drawdown：**-0.255**
+  - final_equity：**144,261**
+  - bars：**1197**
+  - auc_mean：**0.472**；accuracy_mean：**0.479**
+  - window_count：**19**
+- 与单段 ML 回测对比（EXP-20260602-005，**非 OOS，勿混用**）：
+
+  | 指标 | Walk-forward OOS | server_ml_backtest_001 |
+  |------|------------------|------------------------|
+  | sharpe | **0.586** | 2.78 |
+  | total_return | 0.443 | 68.27 |
+  | annualized_return | 0.080 | 0.701 |
+  | max_drawdown | -0.255 | -0.246 |
+  | bars | 1197 | 2011 |
+
+- 解读：单段 sharpe 2.78 **不能代表样本外**；OOS sharpe ≈ 0.59、收益 ≈ +44% 与 val/test AUC ≈ 0.47–0.49 一致，更接近真实泛化。各窗 `oos_sharpe` 有盈有亏（如 window 5/7 为负）属滚动 OOS 正常；`backtest_sharpe_mean` ≈ 0.86 为分窗均值，**报告以拼接 OOS `oos.sharpe` 为准**。
+- 产物路径：
+  - 报告：`/mnt/localDisk3/weizian/Quant-MAS/outputs/reports/walk_forward_latest/`
+  - metrics / windows / oos_equity / oos_trades / summary
+  - 日志：`/mnt/localDisk3/weizian/logs/walk_forward_server_001.log`
+- 前置：`python -m pytest -v` → **71 passed**（1.65s）
+- 问题：无
+- 下一步：**Prompt 18** 风控层；可选 CPU 对照（EXP-TODO-006）
+
 ### EXP-20260602-007：Prompt 17 Walk-forward 本地验证 ✅
 
 - 日期：2026-06-02
@@ -90,7 +127,7 @@
   - 报告：`outputs/reports/ml_backtest_latest/summary.md`
   - 日志：`/mnt/localDisk3/weizian/logs/ml_backtest_server_001.log`
 - 问题：无（链路验证通过；收益数值需后续 walk-forward 样本外复核）
-- 下一步：walk-forward 本地 ✅（EXP-20260602-007）；服务器 OOS 待 EXP-TODO-007
+- 下一步：walk-forward 服务器 ✅ → 见 EXP-20260602-008
 
 ### EXP-20260602-004：服务器 GPU LightGBM 训练 ✅（Prompt 15b）
 
@@ -246,24 +283,6 @@
 - 命令：`train_model.py --device cpu --experiment-name server_lgbm_cpu_001`
 - 状态：可选，未跑
 
-### EXP-TODO-007：服务器 Walk-forward 真实实验（Prompt 17）
-
-- 日期：待定
-- 数据：真实 features（6033 rows）+ GPU 模型配置
-- 命令：
-  ```bash
-  python scripts/run_walk_forward.py \
-    --config configs/walk_forward.yaml \
-    --storage-config configs/storage.server.yaml \
-    --features-path /mnt/localDisk3/weizian/datasets/features/features.parquet \
-    --experiment-name server_walk_forward_001
-  ```
-- 状态：待验证（本地代码 ✅ EXP-20260602-007）
-
-### EXP-TODO-004：Walk-forward 样本外（Prompt 17）
-
-- 状态：本地代码 ✅（EXP-20260602-007）；服务器见 EXP-TODO-007
-
 ## 实验里程碑速查
 
 | 编号 | 日期 | 内容 | 关键结果 |
@@ -271,5 +290,6 @@
 | EXP-20260601-004 | 2026-06-01 | Stooq 真实数据 + ma_cross | 6033 rows，sharpe ≈ 1.00 |
 | EXP-20260601-006 | 2026-06-01 | CPU LightGBM 训练 | test AUC 0.466 |
 | EXP-20260602-004 | 2026-06-02 | GPU LightGBM 训练 | device=cuda，test AUC 0.479 |
-| EXP-20260602-007 | 2026-06-02 | Walk-forward 本地 | 71 passed，3 walk-forward tests |
-| EXP-20260602-005 | 2026-06-02 | ML 信号回测 | sharpe 2.78（单段；OOS 见 walk-forward） |
+| EXP-20260602-005 | 2026-06-02 | ML 信号回测（单段） | sharpe 2.78（in-sample 风格） |
+| EXP-20260602-007 | 2026-06-02 | Walk-forward 本地 | 71 passed |
+| EXP-20260602-008 | 2026-06-02 | Walk-forward 服务器 | **OOS sharpe 0.586**，+44%，19 窗 |

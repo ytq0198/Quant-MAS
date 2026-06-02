@@ -388,7 +388,7 @@ python -m pip install -e .
 | M-009 | Step 2.1 | Stooq API Key | ✅ 已解决，流程见 M-009 |
 | — | Step 2.2 | LightGBM 真实训练 | ✅ EXP-20260601-006 |
 | — | Step 2.2b | GPU/CUDA 训练 | ✅ EXP-20260602-004（见 M-010） |
-| 2.4 Walk-forward | 17 | 见 M-010 若用 GPU 训练 | 本地 ✅；服务器 EXP-TODO-007 |
+| 2.4 Walk-forward | 17 | 见 M-010 若用 GPU | ✅ EXP-20260602-008 |
 | — | Step 2.5 | 风控 Prompt 18 | **当前** |
 
 ---
