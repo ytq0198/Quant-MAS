@@ -1,6 +1,6 @@
 # Quant MAS 实验记录
 
-更新时间：2026-06-02（Plus M1 服务器验收 EXP-20260602-010）
+更新时间：2026-06-02（Plus M2 本地验收 EXP-20260602-011）
 
 本文件用于记录真实实验和重要验证。不要记录未经实际运行的数据结果；尚未真实运行的项目标记为「待验证」。
 
@@ -88,6 +88,20 @@
 ```
 
 ## 当前验证记录
+
+### EXP-20260602-011：Plus M2 多数据源扩展本地验证 ✅
+
+- 日期：2026-06-02
+- 阶段：Plus v2 **M2**
+- 模块：`src/quant_mas/data/fetchers/` 子包、DataSourceRegistry、AlphaVantage/Finnhub/FRED/SEC fetcher、`configs/data_sources.yaml`
+- CLI：`download_data.py` — alpha_vantage / finnhub / fred / sec_edgar；`--series-id`；`--cik`
+- 指标：
+  - `tests/test_data_sources.py` → **12 passed**
+  - `tests/test_stooq_fetcher.py` → **6 passed**
+  - 全量 → **114 passed**（+12，102→114）
+- 验收：mock HTTP，不联网；`.env.example` 占位符无真实 key
+- 问题：无
+- 下一步：push → 服务器 pytest 114 → EXP-DATA-001 API smoke → **M3**
 
 ### EXP-20260602-010：Plus M1 服务器验证 ✅
 
@@ -456,6 +470,17 @@
 
 ## 待验证实验
 
+### EXP-DATA-001：M2 服务器真实 API smoke
+
+- 前提：M2 代码 pull + pytest **114 passed**
+- 命令示例（有 key 时）：
+  ```bash
+  python scripts/download_data.py --source fred --series-id DGS10 \
+    --start 2024-01-01 --end 2024-12-31 --storage-config configs/storage.server.yaml
+  ```
+- 无 key 的源：在 `docs/data_sources.md` 标「待验证」
+- 状态：**待验证**
+
 ### EXP-TODO-006：CPU 对照训练（可选）
 
 - 目的：与 EXP-20260601-006 / EXP-20260602-004 在同一 features 上对比 CPU vs GPU metrics
@@ -472,7 +497,8 @@
 | EXP-20260602-005 | 2026-06-02 | ML 信号回测（单段） | sharpe 2.78（in-sample，勿混用） |
 | EXP-20260602-008 | 2026-06-02 | Walk-forward 服务器 | **OOS sharpe 0.586**，19 窗 |
 | EXP-20260602-009 | 2026-06-02 | Plus M1 研究基线本地 | **102 passed**（+4 测试） |
-| EXP-20260602-010 | 2026-06-02 | Plus M1 服务器 pytest + 比较表 | **102 passed**（1.64s）；5 rows；OOS sharpe 0.586 |
+| EXP-20260602-010 | 2026-06-02 | Plus M1 服务器 pytest + 比较表 | **102 passed**；OOS sharpe 0.586 |
+| EXP-20260602-011 | 2026-06-02 | Plus M2 数据扩展本地 | **114 passed**（+12） |
 | EXP-20260601-009 | 2026-06-01 | Prompt 18 风控本地 | 76 passed |
 | EXP-20260601-010 | 2026-06-01 | Prompt 18 服务器 pytest | 76 passed |
 | EXP-20260601-011 | 2026-06-01 | Prompt 19 Supervisor 本地 | 87 passed |

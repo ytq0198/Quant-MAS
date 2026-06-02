@@ -1,0 +1,42 @@
+sources:
+  - name: yfinance
+    kind: ohlcv
+    env_vars: []
+    rate_limit_notes: Unofficial Yahoo Finance access; rate limits can be unpredictable.
+    status: planned
+  - name: stooq
+    kind: ohlcv
+    env_vars:
+      - STOOQ_API_KEY
+    rate_limit_notes: Daily CSV export; server path verified for Quant MAS.
+    status: verified
+  - name: auto
+    kind: ohlcv
+    env_vars:
+      - STOOQ_API_KEY
+    rate_limit_notes: Tries yfinance first, then falls back to Stooq.
+    status: planned
+  - name: alpha_vantage
+    kind: ohlcv
+    env_vars:
+      - ALPHAVANTAGE_API_KEY
+    rate_limit_notes: Free tier is rate limited; use delay between symbols.
+    status: planned
+  - name: finnhub
+    kind: ohlcv
+    env_vars:
+      - FINNHUB_API_KEY
+    rate_limit_notes: API token required; candle endpoint has provider limits.
+    status: planned
+  - name: fred
+    kind: macro
+    env_vars:
+      - FRED_API_KEY
+    rate_limit_notes: Macro series endpoint; not OHLCV.
+    status: planned
+  - name: sec_edgar
+    kind: filings
+    env_vars:
+      - SEC_EDGAR_USER_AGENT
+    rate_limit_notes: SEC requires a descriptive User-Agent with email contact.
+    status: planned

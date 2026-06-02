@@ -1,12 +1,8 @@
 # Quant MAS 开发进度
 
-更新时间：2026-06-02（Plus M1 本地 + 服务器验收完成）
+更新时间：2026-06-02（Plus M2 本地验收）
 
-## 当前所处阶段
-
-**Prompt 1–20 主链路 ✅ 已完成**（第零～四阶段）。
-
-**Plus v2**：**M1 研究基线 ✅ 完成**（本地 + 服务器 **102 passed**，EXP-20260602-009/010）。**当前 → M2 数据扩展**。
+**Plus v2**：**M1 ✅** · **M2 ✅ 本地**（**114 passed**，EXP-20260602-011）→ **M3**
 
 第五～六阶段见 [项目plus设计.md](../项目plus设计.md)（M4 LangGraph / M7 模拟，非实盘）。
 
@@ -21,7 +17,8 @@
 | 第三阶段 | Agent 增强 | ✅ | Prompt 8–10、19 |
 | 第四阶段 | Memory + RAG | ✅ | Prompt 20 |
 | **Plus M1** | 研究基线 | ✅ | EXP-20260602-009/010，**102 passed** |
-| **Plus M2** | 数据扩展 | 📋 待做 | 见 项目plus设计.md |
+| **Plus M2** | 数据扩展 | ✅ 本地 | EXP-20260602-011，**114 passed** |
+| **Plus M3** | Memory/RAG v2 | 📋 | 见 项目plus设计.md |
 | 第五～六阶段 | 编排 / RL 模拟 | 📋 | Plus M4 / M7 |
 
 ## Quant MAS v2：M1 研究基线
@@ -55,7 +52,7 @@
 
 ### 下一步
 
-进入 **M2 数据扩展**（见 [项目plus设计.md](../项目plus设计.md)）
+M1 已完成；进入 **M3**（M2 本地 ✅，见下节）。
 
 ### OOS 主 baseline（不可遗忘）
 
@@ -65,6 +62,26 @@
 | EXP-20260602-005 | sharpe 2.78（单段 ML） | ⚠️ in-sample，**禁止**与 OOS 混比 |
 | EXP-20260601-004 | ma_cross sharpe ≈ 1.00 | 传统策略参考 |
 | EXP-20260601-006 | test AUC 0.466 | ML 训练参考 |
+
+## Quant MAS v2：M2 数据扩展
+
+> 设计见 [项目plus设计.md §M2](../项目plus设计.md#m2数据源扩展)；用法见 [docs/data_sources.md](data_sources.md)。
+
+| 组件 | 路径 |
+|------|------|
+| Fetcher 子包 | `src/quant_mas/data/fetchers/` |
+| Registry | `DataSourceRegistry` |
+| 新源 | Alpha Vantage、Finnhub、FRED、SEC EDGAR |
+| 配置 | `configs/data_sources.yaml` |
+| 测试 | `tests/test_data_sources.py`（**12 passed**） |
+
+| 项目 | 状态 |
+|------|------|
+| 全量 pytest（本地） | ✅ **114 passed**（EXP-20260602-011） |
+| 全量 pytest（服务器） | 待 pull 验证 114 |
+| API smoke（EXP-DATA-001） | 待验证（需 key） |
+
+`download_data.py` 新增：`--source alpha_vantage|finnhub|fred|sec_edgar`、`--series-id`、`--cik`。
 
 ## Prompt 任务状态
 
@@ -76,14 +93,15 @@
 - [x] Prompt 18：基础风控
 - [x] Prompt 19：Supervisor 7 类路由
 - [x] Prompt 20：Memory + RAG
-- [x] **Plus M1**：研究基线与实验规范（EXP-20260602-009，**102 passed**）
+- [x] **Plus M1**：研究基线与实验规范（EXP-20260602-009/010）
+- [x] **Plus M2**：多数据源扩展（EXP-20260602-011，**114 passed**）
 
 ## 当前 pytest 状态
 
 | 环境 | Python | 结果 | 日期 | 实验 |
 |------|--------|------|------|------|
-| 本地 Windows | 3.11+ | **102 passed** | 2026-06-02 | EXP-20260602-009 |
-| 服务器 a6000-9961 | 3.11.15 | **102 passed**（1.64s） | 2026-06-02 | EXP-20260602-010 |
+| 本地 Windows | 3.11+ | **114 passed** | 2026-06-02 | EXP-20260602-011 |
+| 服务器 a6000-9961 | 3.11.15 | **102 passed**（1.64s） | 2026-06-02 | EXP-20260602-010（M2 待验证） |
 
 命令：`python -m pytest -v`（勿裸敲 `pytest` / `pip`）。
 
@@ -106,7 +124,7 @@ python scripts/compare_experiments.py --help
 
 ### Quant Engine
 
-- 数据：Parquet、Stooq/yfinance、OHLCV 校验
+- 数据：Parquet、Stooq/yfinance/auto、**Alpha Vantage / Finnhub / FRED / SEC**（Plus M2）、OHLCV 校验
 - 特征：技术指标、future label、按 symbol 分组
 - 策略 / 回测：MA Cross、MLSignalStrategy、walk-forward OOS
 - 模型：LightGBM（CPU + GPU/CUDA）
@@ -149,6 +167,7 @@ python scripts/compare_experiments.py --help
 
 ## 后续工作
 
-- **M2 数据扩展**：见 [项目plus设计.md](../项目plus设计.md)
+- **M3 Memory/RAG v2**：见 [项目plus设计.md](../项目plus设计.md)
+- **M2 服务器**：pull → pytest 114 → EXP-DATA-001（有 key 时）
 - 科研：特征/模型调参、更多 walk-forward 窗口（**必须标注 OOS**）
 - 可选：CPU 对照 `server_lgbm_cpu_001`（EXP-TODO-006）
