@@ -10,8 +10,8 @@ GitHub 仓库：[https://github.com/ytq0198/Quant-MAS](https://github.com/ytq019
 
 | 日期 | 项目 | 结果 | 备注 |
 |------|------|------|------|
+| 2026-06-01 | pytest（Prompt 19 后，服务器） | **87 passed**（1.90s） | EXP-20260601-012 |
 | 2026-06-01 | pytest（Prompt 19 后，本地） | **87 passed** | EXP-20260601-011 |
-| 2026-06-01 | pytest（Prompt 18 后，服务器） | **76 passed**（1.76s） | EXP-20260601-010 |
 | 2026-06-02 | Walk-forward 服务器 | `server_walk_forward_001`；OOS sharpe **0.586** | Prompt 17 ✅ |
 | 2026-06-02 | pytest | **71 passed**（Prompt 17 后） |
 | 2026-06-02 | Walk-forward 本地 | **71 passed**；Prompt 17 代码 ✅ | 无 |

@@ -32,6 +32,16 @@
 
 ## 当前验证记录
 
+### EXP-20260601-012：服务器 Prompt 19 pull 后全量 pytest ✅
+
+- 日期：2026-06-01
+- 阶段：第三阶段（Prompt 19 服务器验证）
+- 环境：a6000-9961，`git` @ `edbd71a`，conda `/mnt/localDisk3/weizian/conda_envs/quant-mas`
+- 命令：`git pull` → `python -m pip install -e .` → `python -m pytest -v`
+- 指标：全量 **87 passed** in **1.90s**
+- 问题：无
+- 下一步：Codex Prompt 20（Memory + RAG）
+
 ### EXP-20260601-011：Prompt 19 Supervisor 路由本地验证 ✅
 
 - 日期：2026-06-01
@@ -45,7 +55,7 @@
   - kwargs 别名映射（data_path、tool_config、risk_config 等）
   - `run_agent.py --help` 正常
 - 问题：无
-- 下一步：Prompt 20 Memory/RAG；push 后服务器 pytest 复验
+- 下一步：Prompt 20 Memory/RAG
 
 ### EXP-20260601-009：Prompt 18 基础风控层本地验证 ✅
 
