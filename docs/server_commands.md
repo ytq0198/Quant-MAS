@@ -92,7 +92,30 @@ python -m pytest -v
 
 ## 三、下载真实行情数据
 
-**yfinance 限流**：出现 `YFRateLimitError` 时不是配置错误。推荐用 **按年拆分 + 长间隔** 脚本。
+**yfinance 限流**：出现 `YFRateLimitError` 时不是配置错误。推荐改用 **Stooq + API Key**。
+
+### 0. 申请 Stooq API Key（一次性）
+
+1. 浏览器打开：https://stooq.com/q/d/?s=aapl.us&get_apikey  
+2. 完成 captcha，复制 32 位 apikey  
+3. 在服务器项目根目录：
+
+```bash
+cd /mnt/localDisk3/weizian/Quant-MAS
+cp .env.example .env
+nano .env   # 设置 STOOQ_API_KEY=你的key（勿 commit）
+```
+
+验证：
+
+```bash
+python scripts/download_data.py \
+  --symbols AAPL \
+  --start 2018-01-01 --end 2019-01-01 \
+  --source stooq \
+  --storage-config configs/storage.server.yaml \
+  --filename AAPL_2018.parquet
+```
 
 ### 方式 A：一键 resilient 脚本（推荐）
 
@@ -102,19 +125,19 @@ conda activate /mnt/localDisk3/weizian/conda_envs/quant-mas
 git pull origin main
 python -m pip install -e .
 
-# 默认：AAPL MSFT SPY，2018–2025，每次请求后 sleep 60s，带 jitter 30–60s
-bash server/download_data_resilient.sh
+# 需已在 .env 中设置 STOOQ_API_KEY
+SOURCE=stooq SYMBOLS="AAPL" bash server/download_data_resilient.sh
+SOURCE=stooq SYMBOLS="AAPL MSFT SPY" bash server/download_data_resilient.sh
 
-# 若仍限流，加长间隔（例如 90s）并先只下一个标的试：
-SYMBOLS="AAPL" SLEEP_SECONDS=90 bash server/download_data_resilient.sh
+# Yahoo 限流后若坚持用 yfinance，需等 30–60 分钟：
+# INITIAL_COOLDOWN_SECONDS=1800 SOURCE=yfinance SYMBOLS="AAPL" bash server/download_data_resilient.sh
 ```
 
 脚本会：
-1. 每个标的 **按年** 单独下载（`AAPL_2018.parquet` …）
-2. 已存在文件 **自动跳过**（中断可续传）
-3. 每次成功后 **随机 jitter** + 固定 sleep
-4. 限流时 **指数退避**（20s → 40s → 80s …）
-5. 最后合并为 `datasets/raw/market_data.parquet`
+1. 自动 `source .env` 读取 `STOOQ_API_KEY`
+2. 每个标的 **按年** 单独下载（`AAPL_2018.parquet` …）
+3. 已存在文件 **自动跳过**（中断可续传）
+4. 最后合并为 `datasets/raw/market_data.parquet`
 
 ### 方式 B：手动单条下载
 
@@ -122,12 +145,11 @@ SYMBOLS="AAPL" SLEEP_SECONDS=90 bash server/download_data_resilient.sh
 python scripts/download_data.py \
   --symbols AAPL \
   --start 2018-01-01 --end 2019-01-01 \
+  --source stooq \
   --storage-config configs/storage.server.yaml \
   --filename AAPL_2018.parquet \
-  --skip-existing \
-  --retries 8 --retry-backoff 20 \
-  --jitter-min 30 --jitter-max 60
-sleep 90
+  --skip-existing
+sleep 30
 ```
 
 合并：

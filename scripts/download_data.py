@@ -5,7 +5,7 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-from quant_mas.data import DataCatalog, ParquetStorage, YFinanceFetcher, validate_ohlcv
+from quant_mas.data import DataCatalog, ParquetStorage, create_market_data_fetcher, validate_ohlcv
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -48,7 +48,24 @@ def build_parser() -> argparse.ArgumentParser:
         "--retry-backoff",
         type=float,
         default=20.0,
-        help="Base seconds for retry backoff (exponential on rate limit).",
+        help="Base seconds for non-rate-limit retries.",
+    )
+    parser.add_argument(
+        "--rate-limit-backoff",
+        type=float,
+        default=120.0,
+        help="Base seconds for rate-limit backoff (doubles each attempt, max 900s).",
+    )
+    parser.add_argument(
+        "--source",
+        choices=("yfinance", "stooq", "auto"),
+        default="auto",
+        help="Data source: yfinance, stooq (needs STOOQ_API_KEY), or auto.",
+    )
+    parser.add_argument(
+        "--stooq-api-key",
+        default=None,
+        help="Stooq API key (overrides STOOQ_API_KEY env var).",
     )
     parser.add_argument(
         "--jitter-min",
@@ -80,12 +97,15 @@ def main() -> None:
         print(f"[download] skip existing {output_path}")
         return
 
-    fetcher = YFinanceFetcher(
+    fetcher = create_market_data_fetcher(
+        args.source,
         max_retries=args.retries,
         retry_backoff_seconds=args.retry_backoff,
+        rate_limit_backoff_seconds=args.rate_limit_backoff,
         delay_between_symbols_seconds=args.delay,
         jitter_min_seconds=args.jitter_min,
         jitter_max_seconds=args.jitter_max,
+        stooq_api_key=args.stooq_api_key,
     )
     data = fetcher.fetch(args.symbols, args.start, args.end)
     validated = validate_ohlcv(data)
