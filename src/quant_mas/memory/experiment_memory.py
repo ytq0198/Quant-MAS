@@ -72,6 +72,70 @@ class ExperimentMemory:
             raise ValueError("No experiments recorded")
         return records[-1]
 
+    def get(self, experiment_id: str) -> ExperimentRecord:
+        """Return one experiment by id."""
+        for record in self.list():
+            if record.experiment_id == experiment_id:
+                return record
+        raise ValueError(f"Experiment not found: {experiment_id}")
+
+    def search_by_name(
+        self,
+        keyword: str,
+        *,
+        case_sensitive: bool = False,
+    ) -> list[ExperimentRecord]:
+        """Search experiments by substring match on name."""
+        if not keyword:
+            return []
+        needle = keyword if case_sensitive else keyword.lower()
+        results = []
+        for record in self.list():
+            haystack = record.name if case_sensitive else record.name.lower()
+            if needle in haystack:
+                results.append(record)
+        return results
+
+    def sort_by_metric(
+        self,
+        metric: str,
+        *,
+        descending: bool = True,
+    ) -> list[ExperimentRecord]:
+        """Sort records by a metric value, keeping missing metrics last."""
+        records = self.list()
+        present = [
+            record
+            for record in records
+            if _resolve_metric(record.metrics, metric) is not None
+        ]
+        missing = [
+            record
+            for record in records
+            if _resolve_metric(record.metrics, metric) is None
+        ]
+        present.sort(
+            key=lambda record: _resolve_metric(record.metrics, metric),
+            reverse=descending,
+        )
+        return present + missing
+
+    def list_artifact_paths(self, experiment_id: str) -> dict[str, str]:
+        """Return artifact paths for one experiment."""
+        return dict(self.get(experiment_id).artifacts)
+
+    def find_best(
+        self,
+        metric: str,
+        *,
+        descending: bool = True,
+    ) -> ExperimentRecord:
+        """Return the best experiment by metric."""
+        sorted_records = self.sort_by_metric(metric, descending=descending)
+        if not sorted_records or _resolve_metric(sorted_records[0].metrics, metric) is None:
+            raise ValueError(f"No experiments contain metric: {metric}")
+        return sorted_records[0]
+
     def _write(self, records: list[ExperimentRecord]) -> None:
         payload = [record.__dict__ for record in records]
         self.path.write_text(
@@ -88,3 +152,12 @@ def _json_safe(value: Any) -> Any:
     if isinstance(value, (list, tuple)):
         return [_json_safe(item) for item in value]
     return value
+
+
+def _resolve_metric(metrics: dict[str, Any], metric: str) -> Any:
+    current: Any = metrics
+    for part in metric.split("."):
+        if not isinstance(current, dict) or part not in current:
+            return None
+        current = current[part]
+    return current

@@ -70,7 +70,12 @@ Quant MAS
 │   └── AgentEvent / ToolCallEvent / AgentFinishEvent
 │
 └── Memory Layer
-    └── ExperimentMemory
+    ├── ExperimentMemory（增强：搜索/排序/artifact）
+    └── TradeMemory（JSONL 空壳）
+
+└── RAG Layer（Prompt 20）
+    ├── document_loader
+    └── simple_retriever（关键词检索）
 ```
 
 ## 当前 CLI 入口
@@ -144,15 +149,23 @@ run_pipeline.py     端到端 pipeline
 
 已实现：
 
-- `ExperimentMemory`
+- `ExperimentMemory`：add / list / latest / **get / search_by_name / sort_by_metric / find_best**
+- `TradeMemory`：JSONL append-only 空壳（Prompt 20）
 - JSON 记录实验元数据、指标、参数和产物路径
+
+### RAG Layer（Prompt 20）
+
+已实现：
+
+- `Document` + `document_loader`（md/txt/json）
+- `SimpleRetriever` 关键词检索（无向量库、无 LLM）
 
 ## 后续计划
 
 ### 第一～二阶段 ✅
 
 - [x] 服务器 Python 3.11 环境部署
-- [x] 全量 pytest 验证（**87 passed** 含 Prompt 19，2026-06-01）
+- [x] 全量 pytest 验证（**98 passed** 含 Prompt 20，2026-06-01）
 - [x] Stooq 真实数据下载（6033 rows，AAPL/MSFT/SPY 2018–2025）
 - [x] 服务器真实 pipeline（`server_ma_cross_real_001`）
 - [x] Prompt 15–17：ML 训练、ML 回测、walk-forward OOS
@@ -165,11 +178,11 @@ run_pipeline.py     端到端 pipeline
 
 - [x] Prompt 19：Supervisor 7 类路由 + MLBacktestTool + PipelineTool
 
-### 第四阶段 🔄 当前
+### 第四阶段 ✅
 
-- [ ] Prompt 20：Memory + RAG
+- [x] Prompt 20：Memory + RAG（ExperimentMemory 增强、TradeMemory、SimpleRetriever）
 
-### 第五～六阶段
+### 第五～六阶段 ⏸
 
 - **第五阶段**：LangGraph 编排（暂缓）
 - **第六阶段**：Paper Trading（暂缓）

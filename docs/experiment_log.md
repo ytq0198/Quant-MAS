@@ -32,6 +32,19 @@
 
 ## 当前验证记录
 
+### EXP-20260601-013：Prompt 20 Memory/RAG 本地验证 ✅
+
+- 日期：2026-06-01
+- 阶段：第四阶段（Prompt 20）
+- 模块：ExperimentMemory 增强、TradeMemory、document_loader、SimpleRetriever
+- 指标：
+  - `tests/test_memory_rag.py`：**11 passed**
+  - `tests/test_experiment_memory.py`：**2 passed**
+  - 全量：**98 passed**（+11）
+- 验收：嵌套 metric（如 `oos.sharpe`）排序；docs 关键词检索；无 LLM/向量库
+- 问题：无
+- 下一步：push 后服务器 pytest；Prompt 13 文档收口
+
 ### EXP-20260601-012：服务器 Prompt 19 pull 后全量 pytest ✅
 
 - 日期：2026-06-01
