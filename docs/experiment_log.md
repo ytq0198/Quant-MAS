@@ -32,6 +32,16 @@
 
 ## 当前验证记录
 
+### EXP-20260601-014：服务器 Prompt 20 pull 后全量 pytest ✅
+
+- 日期：2026-06-01
+- 阶段：第四阶段（Prompt 20 服务器验证）
+- 环境：a6000-9961，`git` @ `d41ba54`，conda `/mnt/localDisk3/weizian/conda_envs/quant-mas`
+- 命令：`git pull` → `python -m pip install -e .` → `python -m pytest -v`
+- 指标：全量 **98 passed** in **1.93s**（含 `test_memory_rag.py` 11 项）
+- 问题：无
+- 下一步：Prompt 13 文档收口；科研实验 / 论文材料
+
 ### EXP-20260601-013：Prompt 20 Memory/RAG 本地验证 ✅
 
 - 日期：2026-06-01
@@ -43,7 +53,7 @@
   - 全量：**98 passed**（+11）
 - 验收：嵌套 metric（如 `oos.sharpe`）排序；docs 关键词检索；无 LLM/向量库
 - 问题：无
-- 下一步：push 后服务器 pytest；Prompt 13 文档收口
+- 下一步：push 后服务器 pytest
 
 ### EXP-20260601-012：服务器 Prompt 19 pull 后全量 pytest ✅
 
