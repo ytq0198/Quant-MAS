@@ -1,8 +1,8 @@
 # Quant MAS 架构
 
-更新时间：2026-06-01（Prompt 13 文档收口）
+更新时间：2026-06-02（Plus M1 Research Layer）
 
-Quant MAS 采用「确定性量化引擎 + 轻量 Agent 编排 + Memory/RAG」架构。Agent 不替代回测、训练、风控和执行，也不允许直接实盘下单。
+Quant MAS 采用「确定性量化引擎 + 轻量 Agent 编排 + Memory/RAG + **Research 基线层**」架构。Agent 不替代回测、训练、风控和执行，也不允许直接实盘下单。
 
 ## 核心边界
 
@@ -11,6 +11,7 @@ Quant MAS 采用「确定性量化引擎 + 轻量 Agent 编排 + Memory/RAG」�
 - **Agent Layer**：规则路由、编排、报告和解释（当前不调用真实 LLM）。
 - **Memory Layer**：实验元数据、产物路径；TradeMemory 空壳（Paper Trading 预留）。
 - **RAG Layer**：关键词文档检索（无向量库）。
+- **Research Layer（Plus M1）**：实验基线注册、指标汇总、跨实验比较；**后续实验须与 EXP-20260602-008 OOS baseline 对比**。
 - LLM Agent **不允许**直接实盘下单。
 - 所有交易信号须经过回测、风控、审计和人工确认。
 
@@ -39,8 +40,14 @@ Quant MAS
 ├── Memory Layer
 │   ExperimentMemory（增强）, TradeMemory（JSONL 空壳）
 │
-└── RAG Layer
-    document_loader, simple_retriever（关键词检索）
+├── RAG Layer
+│   document_loader, simple_retriever（关键词检索）
+│
+└── Research Layer（Plus M1）
+    baseline.py          BaselineRun, BaselineRegistry
+    metrics_table.py     collect_experiment_metrics, build_comparison_table
+    compare_experiments.py   CLI → comparison.csv / comparison.md
+    research_protocol.md     实验规范与 OOS 主指标定义
 ```
 
 ## CLI 入口
@@ -53,6 +60,7 @@ run_backtest.py       均线策略回测
 train_model.py        模型训练（--device auto/cpu/gpu/cuda）
 run_ml_backtest.py    ML 信号回测
 run_walk_forward.py   Walk-forward 样本外
+compare_experiments.py  实验比较表（ExperimentMemory → CSV/MD）
 generate_report.py    报告读取/生成
 run_agent.py          Supervisor 规则路由
 run_pipeline.py       端到端 pipeline
@@ -91,16 +99,48 @@ SupervisorAgent 7 类路由（更具体规则优先，如 ml_backtest 先于 bac
 ### Memory / RAG
 
 - **ExperimentMemory**：add / list / latest / get / search_by_name / sort_by_metric / find_best
-- **TradeMemory**：append-only JSONL（第五～六阶段预留）
+- **TradeMemory**：append-only JSONL（Plus M7 模拟预留）
 - **SimpleRetriever**：从 docs/、outputs/reports/ 关键词检索
+
+### Research Layer（Plus M1）
+
+| 组件 | 职责 |
+|------|------|
+| **BaselineRegistry** | 注册命名 baseline（`BaselineRun`）；`compare_runs()`、`get_best("oos.sharpe")` |
+| **MetricsTable** | 从 `ExperimentRecord` 抽取指标 → `build_comparison_table()` |
+| **compare_experiments.py** | CLI：读 ExperimentMemory → 写 `outputs/research/comparison.csv` 与 `comparison.md` |
+| **research_protocol.md** | 必填实验字段；**论文主指标 = Walk-forward OOS** |
+
+**数据流：**
+
+```text
+run_* / train_* / walk_forward
+        ↓
+ExperimentMemory（metrics 含嵌套 oos.*）
+        ↓
+collect_experiment_metrics → BaselineRegistry / comparison table
+        ↓
+与 EXP-20260602-008（OOS sharpe 0.586）对照 → docs/experiment_log.md
+```
+
+**比较族（family）**：`ma_cross` | `lightgbm` | `ml_backtest` | `walk_forward` | `other`
+
+**OOS 主 baseline**：EXP-20260602-008，`oos.sharpe = 0.586`。单段 ML 回测（ml_backtest family）**不可**替代 OOS 结论。
 
 ## 测试与部署
 
-- **pytest**：**98 passed**（本地 + 服务器，2026-06-01）
+- **pytest**：本地 **102 passed**（2026-06-02，EXP-20260602-009）；服务器 **98 passed**（2026-06-01，M1 pull 后待验证 **102**）
 - **服务器**：`/mnt/localDisk3/weizian/Quant-MAS`，conda `quant-mas`，Python 3.11.15
 - **GitHub**：https://github.com/ytq0198/Quant-MAS
 
-## 后续计划（暂缓）
+## 后续计划（Plus v2）
 
-- **第五阶段**：LangGraph 流程编排
-- **第六阶段**：Paper Trading（仍不做实盘）
+| 模块 | 内容 | 状态 |
+|------|------|------|
+| **M1** 研究基线 | BaselineRegistry、compare_experiments | ✅ 本地（EXP-20260602-009）；服务器待验证 |
+| **M2** 数据扩展 | 多数据源 fetcher | 📋 待做 |
+| **M3** Memory/RAG v2 | SQLite / 向量检索 | 📋 待做 |
+| **M4** LangGraph | 实验性 DAG（不替换 Supervisor） | 📋 待做 |
+| **M5–M8** | LLM、文本模型、RL、MCP | 📋 待做 |
+
+详见 [项目plus设计.md](../项目plus设计.md)。

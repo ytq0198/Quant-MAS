@@ -1,8 +1,60 @@
 # Quant MAS 实验记录
 
-更新时间：2026-06-01
+更新时间：2026-06-02（Plus M1 本地验收 EXP-20260602-009）
 
-本文件用于记录真实实验和重要验证。不要记录未经实际运行的数据结果；尚未真实运行的项目标记为“待验证”。
+本文件用于记录真实实验和重要验证。不要记录未经实际运行的数据结果；尚未真实运行的项目标记为「待验证」。
+
+## OOS 主 baseline（全文引用）
+
+**EXP-20260602-008** 为 Walk-forward 样本外主 baseline。**后续所有研究结论必须与此对比**；单段 ML 回测（如 EXP-20260602-005 sharpe 2.78）**不得**作为论文主指标。
+
+| 字段 | 值 | 来源 |
+|------|-----|------|
+| 实验编号 | EXP-20260602-008 | 已验证 |
+| 是否 OOS | **是**（19 窗 walk-forward） | 已验证 |
+| **oos.sharpe** | **0.586** | 已验证 |
+| oos.total_return | 0.443 | 已验证 |
+| oos.max_drawdown | -0.255 | 已验证 |
+| oos.auc_mean | 0.472 | 已验证 |
+| 产物 | `outputs/reports/walk_forward_latest/` | 服务器 |
+
+## 实验比较表
+
+> 由 `scripts/compare_experiments.py` 从 ExperimentMemory 自动生成；下表为**手工维护的快照**，与 CLI 输出应对齐。  
+> **规则**：缺失指标留空，**禁止猜测**；未跑过的实验标「待验证」。
+
+### 比较表模板（复制用于新快照）
+
+```markdown
+### 快照：COMP-YYYYMMDD-001
+
+- 生成方式：`python scripts/compare_experiments.py --output-dir outputs/research`
+- Memory 路径：（填写 experiments.json 路径）
+- 对照 baseline：**EXP-20260602-008**（OOS sharpe **0.586**）
+- 主指标列：`oos.sharpe`（论文结论唯一依据）
+
+| run_id / name | family | is_oos | sharpe | oos.sharpe | total_return | oos.total_return | max_drawdown | test_auc | vs OOS baseline | 备注 |
+|---------------|--------|--------|--------|------------|--------------|------------------|--------------|----------|-----------------|------|
+| （填写） | ma_cross / lightgbm / ml_backtest / walk_forward / other | 是/否 | | | | | | | ↑/↓/≈ / 待验证 | |
+```
+
+### 当前快照：COMP-20260602-001（手工整理，CLI 输出待验证）
+
+对照 baseline：**EXP-20260602-008**，`oos.sharpe = 0.586`。
+
+| run_id / name | family | is_oos | sharpe | oos.sharpe | total_return | oos.total_return | max_drawdown | test_auc | vs OOS baseline | 备注 |
+|---------------|--------|--------|--------|------------|--------------|------------------|--------------|----------|-----------------|------|
+| server_ma_cross_real_001 | ma_cross | 否 | ≈ 1.00 | — | ≈ 2.02 | — | ≈ -0.21 | — | 不可直接比 OOS | EXP-20260601-004 |
+| server_lgbm_001 | lightgbm | 否 | — | — | — | — | — | 0.466 | 不可直接比 OOS | EXP-20260601-006，test split |
+| server_ml_backtest_001 | ml_backtest | **否** | **2.78** | — | 68.27 | — | -0.246 | — | ⚠️ in-sample，**禁止**作主结论 | EXP-20260602-005 |
+| server_walk_forward_001 | walk_forward | **是** | — | **0.586** | — | 0.443 | — | — | **baseline** | EXP-20260602-008 |
+| （RAG/LLM/RL 等） | other | 待验证 | 待验证 | 待验证 | 待验证 | 待验证 | 待验证 | 待验证 | 待验证 | Plus M3+ 实验未跑 |
+
+**说明：**
+
+- 仅 **walk_forward** 且 **is_oos = 是** 的行可用于论文主结论。
+- `compare_experiments.py` 在服务器真实 memory 上的 CSV/Markdown 输出：**待验证**（EXP-TODO-008）。
+- 新实验完成后：更新本表 → 在「vs OOS baseline」列写明相对 0.586 的 ↑/↓/≈（需同一 metric 路径）。
 
 ## 实验记录模板
 
@@ -31,6 +83,23 @@
 ```
 
 ## 当前验证记录
+
+### EXP-20260602-009：Plus M1 研究基线本地验证 ✅
+
+- 日期：2026-06-02
+- 阶段：Plus v2 **M1**（研究基线与实验规范）
+- 模块：
+  - `src/quant_mas/research/baseline.py` — `BaselineRun`、`BaselineRegistry`（`add_baseline`、`list_baselines`、`compare_runs`、`get_best("oos.sharpe")`）
+  - `src/quant_mas/research/metrics_table.py` — `collect_experiment_metrics`、`build_comparison_table`（嵌套 `oos.sharpe`）
+  - `scripts/compare_experiments.py` — ExperimentMemory → `comparison.csv` / `comparison.md`
+  - `docs/research_protocol.md` — 实验规范；论文主指标 = Walk-forward OOS
+- 指标：
+  - `python scripts/compare_experiments.py --help` → 正常
+  - `python -m pytest tests/test_research_baseline.py -v` → **4 passed**
+  - 全量 `python -m pytest -v` → **102 passed**（+4，基线 98→102）
+- 验收：synthetic 测试覆盖嵌套 metric、best baseline、CLI 核心输出；不联网、不调 LLM
+- 问题：无
+- 下一步：push → 服务器 pytest + `compare_experiments.py`（EXP-TODO-008）→ **M2**
 
 ### EXP-20260601-015：Prompt 13 文档收口 ✅
 
@@ -365,6 +434,21 @@
 
 ## 待验证实验
 
+### EXP-TODO-008：M1 compare_experiments 服务器验证
+
+- 目的：对真实 `experiments.json` 运行 `compare_experiments.py`，核对与上表一致
+- 命令：
+  ```bash
+  cd /mnt/localDisk3/weizian/Quant-MAS
+  git pull origin main
+  conda activate /mnt/localDisk3/weizian/conda_envs/quant-mas
+  python -m pip install -e .
+  python -m pytest tests/test_research_baseline.py -v
+  python scripts/compare_experiments.py --output-dir outputs/research
+  ```
+- 验收：`comparison.csv` / `comparison.md` 含 walk_forward 行且 `oos.sharpe` = 0.586
+- 状态：**待验证**
+
 ### EXP-TODO-006：CPU 对照训练（可选）
 
 - 目的：与 EXP-20260601-006 / EXP-20260602-004 在同一 features 上对比 CPU vs GPU metrics
@@ -380,6 +464,7 @@
 | EXP-20260602-004 | 2026-06-02 | GPU LightGBM 训练 | device=cuda，test AUC 0.479 |
 | EXP-20260602-005 | 2026-06-02 | ML 信号回测（单段） | sharpe 2.78（in-sample，勿混用） |
 | EXP-20260602-008 | 2026-06-02 | Walk-forward 服务器 | **OOS sharpe 0.586**，19 窗 |
+| EXP-20260602-009 | 2026-06-02 | Plus M1 研究基线本地 | **102 passed**（+4 测试） |
 | EXP-20260601-009 | 2026-06-01 | Prompt 18 风控本地 | 76 passed |
 | EXP-20260601-010 | 2026-06-01 | Prompt 18 服务器 pytest | 76 passed |
 | EXP-20260601-011 | 2026-06-01 | Prompt 19 Supervisor 本地 | 87 passed |
@@ -387,3 +472,4 @@
 | EXP-20260601-013 | 2026-06-01 | Prompt 20 Memory/RAG 本地 | 98 passed |
 | EXP-20260601-014 | 2026-06-01 | Prompt 20 服务器 pytest | 98 passed（1.93s） |
 | EXP-20260601-015 | 2026-06-01 | Prompt 13 文档收口 | 三份 docs 与主文档对齐 |
+| EXP-TODO-008 | — | M1 compare_experiments 服务器 | 待验证 |
