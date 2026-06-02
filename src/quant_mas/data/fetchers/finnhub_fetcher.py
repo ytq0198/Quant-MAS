@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import time
+import urllib.error
 import urllib.parse
 import urllib.request
 from collections.abc import Sequence
@@ -61,8 +62,14 @@ class FinnhubFetcher(MarketDataFetcher):
             }
         )
         url = f"https://finnhub.io/api/v1/stock/candle?{params}"
-        with urllib.request.urlopen(url, timeout=self.request_timeout_seconds) as response:
-            payload = json.loads(response.read().decode("utf-8"))
+        try:
+            with urllib.request.urlopen(url, timeout=self.request_timeout_seconds) as response:
+                payload = json.loads(response.read().decode("utf-8"))
+        except urllib.error.HTTPError as exc:
+            body = exc.read().decode("utf-8", errors="replace")[:300]
+            raise RuntimeError(
+                f"Finnhub HTTP {exc.code} for {symbol}: {body}"
+            ) from exc
         return _parse_finnhub_candle(payload, symbol)
 
 

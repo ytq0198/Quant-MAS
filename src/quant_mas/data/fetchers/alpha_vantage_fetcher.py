@@ -24,16 +24,21 @@ def resolve_alpha_vantage_api_key(explicit: str | None = None) -> str:
 
 
 class AlphaVantageFetcher(MarketDataFetcher):
-    """Fetch daily OHLCV from Alpha Vantage TIME_SERIES_DAILY."""
+    """Fetch daily OHLCV from Alpha Vantage TIME_SERIES_DAILY.
+
+    Free tier: use ``outputsize=compact`` (default). ``full`` may fail on free keys.
+    """
 
     def __init__(
         self,
         *,
         api_key: str | None = None,
+        outputsize: str = "compact",
         request_timeout_seconds: float = 60.0,
         delay_between_symbols_seconds: float = 12.0,
     ) -> None:
         self.api_key = resolve_alpha_vantage_api_key(api_key)
+        self.outputsize = outputsize
         self.request_timeout_seconds = request_timeout_seconds
         self.delay_between_symbols_seconds = delay_between_symbols_seconds
 
@@ -50,7 +55,7 @@ class AlphaVantageFetcher(MarketDataFetcher):
             {
                 "function": "TIME_SERIES_DAILY",
                 "symbol": symbol,
-                "outputsize": "full",
+                "outputsize": self.outputsize,
                 "apikey": self.api_key,
             }
         )
@@ -68,7 +73,12 @@ def _parse_alpha_vantage_daily(
 ) -> pd.DataFrame:
     series = payload.get("Time Series (Daily)") or payload.get("Time Series (Daily Adjusted)")
     if not isinstance(series, dict):
-        message = payload.get("Note") or payload.get("Error Message") or "missing daily time series"
+        message = (
+            payload.get("Note")
+            or payload.get("Error Message")
+            or payload.get("Information")
+            or "missing daily time series"
+        )
         raise ValueError(f"Alpha Vantage response error for {symbol}: {message}")
     rows = []
     start_ts = pd.Timestamp(start)

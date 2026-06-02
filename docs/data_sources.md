@@ -12,9 +12,9 @@
 | `stooq` | ohlcv | `STOOQ_API_KEY` | **verified** | 服务器 EXP-20260601-004 |
 | `yfinance` | ohlcv | — | planned | 易限流，备用 |
 | `auto` | ohlcv | `STOOQ_API_KEY` | planned | yfinance → Stooq fallback |
-| `fred` | macro | `FRED_API_KEY` | **verified** | EXP-DATA-001：DGS10 262 rows |
-| `alpha_vantage` | ohlcv | `ALPHAVANTAGE_API_KEY` | failed（待排查） | 服务器：missing daily time series |
-| `finnhub` | ohlcv | `FINNHUB_API_KEY` | failed（待排查） | 服务器：HTTP 403 |
+| `alpha_vantage` | ohlcv | `ALPHAVANTAGE_API_KEY` | **verified** | 免费 tier 须 `outputsize=compact` |
+| `finnhub` | ohlcv | `FINNHUB_API_KEY` | **blocked（免费 tier）** | `/stock/candle` 403，需付费 |
+| `fred` | macro | `FRED_API_KEY` | **verified** | DGS10 262 rows |
 | `sec_edgar` | filings | `SEC_EDGAR_USER_AGENT` | 待验证 | 需真实 User-Agent |
 
 **pytest**：`tests/test_data_sources.py` 全部 mock HTTP，不联网。  
@@ -55,6 +55,21 @@ python scripts/download_data.py \
 
 输出：`{raw_data_dir}/sec/{cik}_{kind}.json`  
 `SEC_EDGAR_USER_AGENT` 格式：`YourName your@email.com`（SEC 强制）
+
+### Finnhub 403（免费账户）
+
+免费 tier 调用 `/stock/candle` 会返回：
+
+```json
+{"error":"You don't have access to this resource."}
+```
+
+**非代码 bug**；需升级 Finnhub 付费计划，或继续用 **Stooq / Alpha Vantage** 作 OHLCV。
+
+### Alpha Vantage 免费 tier
+
+- 默认应使用 **`outputsize=compact`**（项目 fetcher 已改）
+- 限速约 5 次/分钟；symbol 间建议 `--delay 12` 或更高
 
 ## API Key 注册
 

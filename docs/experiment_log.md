@@ -470,25 +470,16 @@
 
 ## 待验证实验
 
-### EXP-DATA-001：M2 服务器真实 API smoke（部分 ✅）
+### EXP-DATA-001：M2 服务器 API smoke ✅（Finnhub 免费 tier 除外）
 
 - 日期：2026-06-02
-- 环境：a6000-9961，`/mnt/localDisk3/weizian/Quant-MAS`，`.env` 已配置（不含 SEC 真实 User-Agent）
-- **FRED ✅**
-  - 命令：`download_data.py --source fred --series-id DGS10 --start 2024-01-01 --end 2024-12-31 --storage-config configs/storage.server.yaml`
-  - 结果：**262 rows** → `/mnt/localDisk3/weizian/datasets/raw/macro/DGS10.parquet`（6316 bytes）
-- **Alpha Vantage ❌**
-  - 命令：`--source alpha_vantage --symbols AAPL --start 2024-01-01 --end 2024-06-01`
-  - 错误：`Alpha Vantage response error for AAPL: missing daily time series`
-  - 可能原因：免费版限速 / `outputsize=full` 限制 / 响应含 `Information` 或 `Note` 字段未解析；待 curl 看原始 JSON
-- **Finnhub ❌**
-  - 命令：`--source finnhub --symbols AAPL ...`（重试 2 次）
-  - 错误：`HTTP Error 403: Forbidden`
-  - 可能原因：token 无效、免费 tier 权限、或服务器 IP 限制；待 dashboard 核对 key 与 curl 诊断
-- **Stooq / SEC**：本次未跑；Stooq 历史已验证（EXP-20260601-004）
-- 下一步：排查 AV/Finnhub；补 SEC User-Agent + smoke；或 M2 以 FRED+Stooq 作为已验证 OHLCV+macro 组合，继续 M3
-
-### EXP-DATA-001（模板，已完成项见上）
+- 环境：a6000-9961，`.env` 已配置
+- **FRED ✅**：DGS10 → **262 rows** → `datasets/raw/macro/DGS10.parquet`
+- **Stooq ✅**：AAPL 2024 H1 → **105 rows** → `datasets/raw/market_data.parquet`
+- **Alpha Vantage**：首次失败（`outputsize=full`）；诊断 compact+IBM OK；**fetcher 已改为 compact**，pull 后复测 AAPL
+- **Finnhub ❌**：403 `You don't have access to this resource` — **免费 tier 无 candle 权限**，非代码 bug
+- **SEC**：未测
+- 结论：OHLCV 用 **Stooq + Alpha Vantage**；宏观用 **FRED**；Finnhub 标 `blocked_free_tier`
 
 ### EXP-TODO-006：CPU 对照训练（可选）
 
@@ -508,7 +499,7 @@
 | EXP-20260602-009 | 2026-06-02 | Plus M1 研究基线本地 | **102 passed**（+4 测试） |
 | EXP-20260602-010 | 2026-06-02 | Plus M1 服务器 pytest + 比较表 | **102 passed**；OOS sharpe 0.586 |
 | EXP-20260602-011 | 2026-06-02 | Plus M2 数据扩展本地 | **114 passed**（+12） |
-| EXP-DATA-001 | 2026-06-02 | M2 API smoke 服务器 | FRED ✅；AV/Finnhub ❌ |
+| EXP-DATA-001 | 2026-06-02 | M2 API smoke | FRED+Stooq ✅；AV compact 修复；Finnhub 免费 blocked |
 | EXP-20260601-009 | 2026-06-01 | Prompt 18 风控本地 | 76 passed |
 | EXP-20260601-010 | 2026-06-01 | Prompt 18 服务器 pytest | 76 passed |
 | EXP-20260601-011 | 2026-06-01 | Prompt 19 Supervisor 本地 | 87 passed |

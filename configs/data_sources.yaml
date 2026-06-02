@@ -20,20 +20,20 @@ sources:
     kind: ohlcv
     env_vars:
       - ALPHAVANTAGE_API_KEY
-    rate_limit_notes: Free tier is rate limited; use delay between symbols.
-    status: planned
+    rate_limit_notes: Free tier use outputsize=compact; 5 calls/min. Server verified IBM/AAPL after compact fix.
+    status: verified
   - name: finnhub
     kind: ohlcv
     env_vars:
       - FINNHUB_API_KEY
-    rate_limit_notes: API token required; candle endpoint has provider limits.
-    status: planned
+    rate_limit_notes: Free tier returns 403 on /stock/candle — "You don't have access to this resource." Paid plan required.
+    status: blocked_free_tier
   - name: fred
     kind: macro
     env_vars:
       - FRED_API_KEY
     rate_limit_notes: Macro series endpoint; not OHLCV.
-    status: planned
+    status: verified
   - name: sec_edgar
     kind: filings
     env_vars:
