@@ -10,7 +10,7 @@ GitHub 仓库：[https://github.com/ytq0198/Quant-MAS](https://github.com/ytq019
 
 ```bash
 # 1. 创建目录并克隆
-mkdir -p /mnt/localDisk3/weizian
+mkdir -p /mnt/localDisk3/weizian/conda_envs
 cd /mnt/localDisk3/weizian
 git clone https://github.com/ytq0198/Quant-MAS.git
 cd Quant-MAS
@@ -21,26 +21,34 @@ mkdir -p /mnt/localDisk3/weizian/{models,reports,logs}
 
 # 3. 配置服务器路径
 cp configs/storage.server.yaml.example configs/storage.server.yaml
-# 如需修改路径，编辑 configs/storage.server.yaml
 
-# 4. 安装环境
-bash server/setup_server.sh
-conda activate quant-mas
-pip install -r requirements.txt
-pip install -e .
+# 4. 创建 Python 3.11 环境（必须用 3.11，不能用 3.9）
+# 若已有错误版本的 env，先删除：
+# rm -rf /mnt/localDisk3/weizian/conda_envs/quant-mas
 
-# 5. 验证（必须用 python -m pytest）
+CONDA_ENV_PREFIX=/mnt/localDisk3/weizian/conda_envs/quant-mas bash server/setup_server.sh
+
+# 5. 激活并验证
+conda activate /mnt/localDisk3/weizian/conda_envs/quant-mas
+python --version          # 必须显示 Python 3.11.x
+which python              # 必须指向 .../conda_envs/quant-mas/bin/python
 python -m pytest -v
-# 或
-bash server/run_server_tests.sh
 ```
+
+> **常见错误**：提示 `Python 3.9.13 not in '>=3.11'` 说明当前 env 是 3.9 创建的，需删除后重建：
+>
+> ```bash
+> conda deactivate
+> rm -rf /mnt/localDisk3/weizian/conda_envs/quant-mas
+> CONDA_ENV_PREFIX=/mnt/localDisk3/weizian/conda_envs/quant-mas bash server/setup_server.sh
+> ```
 
 自检：
 
 ```bash
-which python      # 应指向 quant-mas 环境
-python --version  # 应为 3.11.x
-which pytest      # 应在 quant-mas 环境内
+which python      # 应指向 /mnt/localDisk3/weizian/conda_envs/quant-mas/bin/python
+python --version  # 必须为 3.11.x（不能是 3.9）
+which pytest      # 应在同一 conda env 内
 ```
 
 ## 二、日常同步代码
@@ -48,9 +56,9 @@ which pytest      # 应在 quant-mas 环境内
 ```bash
 cd /mnt/localDisk3/weizian/Quant-MAS
 git pull origin main
-conda activate quant-mas
+conda activate /mnt/localDisk3/weizian/conda_envs/quant-mas
 pip install -r requirements.txt
-pip install -e .
+pip install -e ".[data,ml]"
 python -m pytest -v
 ```
 
