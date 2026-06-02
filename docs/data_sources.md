@@ -1,6 +1,6 @@
 # Quant MAS 数据源说明（Plus M2）
 
-更新时间：2026-06-02
+更新时间：2026-06-02（EXP-DATA-001 ✅）
 
 > 机器可读配置：`configs/data_sources.yaml`  
 > CLI：`python scripts/download_data.py --help`
@@ -9,16 +9,16 @@
 
 | source | kind | 环境变量 | 状态 | 说明 |
 |--------|------|----------|------|------|
-| `stooq` | ohlcv | `STOOQ_API_KEY` | **verified** | 服务器 EXP-20260601-004 |
+| `stooq` | ohlcv | `STOOQ_API_KEY` | **verified** | 服务器 EXP-DATA-001：105 rows（2024 H1） |
 | `yfinance` | ohlcv | — | planned | 易限流，备用 |
 | `auto` | ohlcv | `STOOQ_API_KEY` | planned | yfinance → Stooq fallback |
-| `alpha_vantage` | ohlcv | `ALPHAVANTAGE_API_KEY` | **verified** | 免费 tier 须 `outputsize=compact` |
+| `alpha_vantage` | ohlcv | `ALPHAVANTAGE_API_KEY` | **verified** | 近期 ~100 日；`outputsize=auto` |
 | `finnhub` | ohlcv | `FINNHUB_API_KEY` | **blocked（免费 tier）** | `/stock/candle` 403，需付费 |
-| `fred` | macro | `FRED_API_KEY` | **verified** | DGS10 262 rows |
+| `fred` | macro | `FRED_API_KEY` | **verified** | DGS10 262 rows（EXP-DATA-001） |
 | `sec_edgar` | filings | `SEC_EDGAR_USER_AGENT` | 待验证 | 需真实 User-Agent |
 
-**pytest**：`tests/test_data_sources.py` 全部 mock HTTP，不联网。  
-**真实 API**：仅服务器手工 smoke test（见 EXP-DATA-001，待验证）。
+**pytest**：`tests/test_data_sources.py` 全部 mock HTTP，不联网（**13 passed**）。  
+**真实 API**：服务器 EXP-DATA-001 ✅（2026-06-02，见 EXP-20260602-012）。
 
 ## OHLCV 源（输出 parquet）
 

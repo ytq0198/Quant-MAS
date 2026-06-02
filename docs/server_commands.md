@@ -10,7 +10,7 @@ GitHub 仓库：[https://github.com/ytq0198/Quant-MAS](https://github.com/ytq019
 
 | 日期 | 项目 | 结果 | 备注 |
 |------|------|------|------|
-| 2026-06-02 | Plus M2 数据扩展（本地） | **114 passed** | EXP-20260602-011 |
+| 2026-06-02 | Plus M2 数据扩展（本地+服务器） | **115 passed** / test_data_sources **13/13** | EXP-20260602-011/012 |
 | 2026-06-02 | Plus M1 research baseline (local) | **102 passed** | EXP-20260602-009 |
 | 2026-06-01 | pytest（Prompt 20 后，服务器） | **98 passed**（1.93s） | EXP-20260601-014 |
 | 2026-06-01 | pytest（Prompt 20 后，本地） | **98 passed** | EXP-20260601-013 |
@@ -294,7 +294,7 @@ python scripts/run_ml_backtest.py \
 ```bash
 git pull origin main
 python -m pip install -e .
-python -m pytest -v   # 预期 114 passed（Plus M2 后）
+python -m pytest -v   # 预期 115 passed（Plus M2 后）
 
 python scripts/run_walk_forward.py \
   --config configs/walk_forward.yaml \
@@ -305,16 +305,20 @@ python scripts/run_walk_forward.py \
 
 产物：`metrics.json`（含 train/val/test/oos）、`windows.csv`、`oos_equity_curve.csv`、`oos_trades.csv`、`summary.md`。
 
-## 六点五、Plus M2 数据 API smoke（EXP-DATA-001）
+## 六点五、Plus M2 数据 API smoke（EXP-DATA-001）✅
 
 > **切勿**把真实 key 写入 `.env.example` 或 commit 到 GitHub。只在服务器 **`/mnt/localDisk3/weizian/Quant-MAS/.env`** 配置（该文件已在 `.gitignore`）。
+
+**已通过**（2026-06-02，EXP-20260602-012）：FRED DGS10 262 行、Stooq 105 行、Alpha Vantage 100 行。Finnhub 免费 tier 403（预期）。SEC 未测。
+
+复现命令：
 
 ```bash
 cd /mnt/localDisk3/weizian/Quant-MAS
 git pull origin main
 conda activate /mnt/localDisk3/weizian/conda_envs/quant-mas
 python -m pip install -e .
-python -m pytest -v   # 预期 114 passed
+python -m pytest tests/test_data_sources.py -v   # 预期 13 passed
 
 # 首次：从模板创建 .env，用 nano/vim 填入 key（不要 paste 到 .env.example）
 cp .env.example .env
@@ -342,9 +346,9 @@ python scripts/download_data.py --source fred --series-id DGS10 \
   --storage-config configs/storage.server.yaml
 ls -la /mnt/localDisk3/weizian/datasets/raw/macro/
 
-# 2. Alpha Vantage OHLCV（注意免费限速）
+# 2. Alpha Vantage OHLCV（免费 tier 仅 ~100 近期交易日，勿用 2024 区间）
 python scripts/download_data.py --source alpha_vantage \
-  --symbols AAPL --start 2024-01-01 --end 2024-06-01 \
+  --symbols AAPL --start 2026-01-01 --end 2026-06-01 \
   --storage-config configs/storage.server.yaml
 
 # 3. Finnhub OHLCV
@@ -366,7 +370,7 @@ python scripts/download_data.py --source sec_edgar --cik 0000320193 \
 ls -la /mnt/localDisk3/weizian/datasets/raw/sec/
 ```
 
-通过后：在 `docs/experiment_log.md` 记 **EXP-DATA-001**，并更新 `docs/data_sources.md` 对应源 `status: verified`。
+通过后：记录见 `docs/experiment_log.md` **EXP-20260602-012** / **EXP-DATA-001**。
 
 ## 七、删除旧部署（如曾在 ~/quant-mas 建过）
 

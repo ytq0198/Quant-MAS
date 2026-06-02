@@ -1,8 +1,8 @@
 # Quant MAS 开发进度
 
-更新时间：2026-06-02（Plus M2 本地验收）
+更新时间：2026-06-02（Plus M2 本地+服务器验收 ✅）
 
-**Plus v2**：**M1 ✅** · **M2 ✅ 本地**（**114 passed**，EXP-20260602-011）→ **M3**
+**Plus v2**：**M1 ✅** · **M2 ✅**（**115 passed**，EXP-20260602-011/012，EXP-DATA-001）→ **M3**
 
 第五～六阶段见 [项目plus设计.md](../项目plus设计.md)（M4 LangGraph / M7 模拟，非实盘）。
 
@@ -17,7 +17,7 @@
 | 第三阶段 | Agent 增强 | ✅ | Prompt 8–10、19 |
 | 第四阶段 | Memory + RAG | ✅ | Prompt 20 |
 | **Plus M1** | 研究基线 | ✅ | EXP-20260602-009/010，**102 passed** |
-| **Plus M2** | 数据扩展 | ✅ 本地 | EXP-20260602-011，**114 passed** |
+| **Plus M2** | 数据扩展 | ✅ | EXP-20260602-011/012，EXP-DATA-001 |
 | **Plus M3** | Memory/RAG v2 | 📋 | 见 项目plus设计.md |
 | 第五～六阶段 | 编排 / RL 模拟 | 📋 | Plus M4 / M7 |
 
@@ -73,13 +73,13 @@ M1 已完成；进入 **M3**（M2 本地 ✅，见下节）。
 | Registry | `DataSourceRegistry` |
 | 新源 | Alpha Vantage、Finnhub、FRED、SEC EDGAR |
 | 配置 | `configs/data_sources.yaml` |
-| 测试 | `tests/test_data_sources.py`（**12 passed**） |
+| 测试 | `tests/test_data_sources.py`（**13 passed**） |
 
 | 项目 | 状态 |
 |------|------|
-| 全量 pytest（本地） | ✅ **114 passed**（EXP-20260602-011） |
-| 全量 pytest（服务器） | 待 pull 验证 114 |
-| API smoke（EXP-DATA-001） | 待验证（需 key） |
+| 全量 pytest（本地） | ✅ **115 passed**（EXP-20260602-011） |
+| test_data_sources（服务器） | ✅ **13 passed**（EXP-20260602-012） |
+| API smoke（EXP-DATA-001） | ✅ FRED + Stooq + Alpha Vantage；Finnhub 免费 blocked |
 
 `download_data.py` 新增：`--source alpha_vantage|finnhub|fred|sec_edgar`、`--series-id`、`--cik`。
 
@@ -94,14 +94,14 @@ M1 已完成；进入 **M3**（M2 本地 ✅，见下节）。
 - [x] Prompt 19：Supervisor 7 类路由
 - [x] Prompt 20：Memory + RAG
 - [x] **Plus M1**：研究基线与实验规范（EXP-20260602-009/010）
-- [x] **Plus M2**：多数据源扩展（EXP-20260602-011，**114 passed**）
+- [x] **Plus M2**：多数据源扩展（EXP-20260602-011/012，EXP-DATA-001）
 
 ## 当前 pytest 状态
 
 | 环境 | Python | 结果 | 日期 | 实验 |
 |------|--------|------|------|------|
-| 本地 Windows | 3.11+ | **114 passed** | 2026-06-02 | EXP-20260602-011 |
-| 服务器 a6000-9961 | 3.11.15 | **102 passed**（1.64s） | 2026-06-02 | EXP-20260602-010（M2 待验证） |
+| 本地 Windows | 3.11+ | **115 passed** | 2026-06-02 | EXP-20260602-011 |
+| 服务器 a6000-9961 | 3.11.15 | **test_data_sources 13/13** | 2026-06-02 | EXP-20260602-012 + EXP-DATA-001 |
 
 命令：`python -m pytest -v`（勿裸敲 `pytest` / `pip`）。
 
@@ -167,7 +167,6 @@ python scripts/compare_experiments.py --help
 
 ## 后续工作
 
-- **M3 Memory/RAG v2**：见 [项目plus设计.md](../项目plus设计.md)
-- **M2 服务器**：pull → pytest 114 → EXP-DATA-001（有 key 时）
+- **M3 Memory/RAG v2**：见 [codex_prompt_M3.md](codex_prompt_M3.md) · [项目plus设计.md](../项目plus设计.md)
 - 科研：特征/模型调参、更多 walk-forward 窗口（**必须标注 OOS**）
-- 可选：CPU 对照 `server_lgbm_cpu_001`（EXP-TODO-006）
+- 可选：SEC smoke、CPU 对照 `server_lgbm_cpu_001`（EXP-TODO-006）

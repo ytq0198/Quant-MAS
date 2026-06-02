@@ -1,6 +1,6 @@
 # Quant MAS 实验记录
 
-更新时间：2026-06-02（Plus M2 本地验收 EXP-20260602-011）
+更新时间：2026-06-02（Plus M2 服务器验收 EXP-20260602-012 + EXP-DATA-001 ✅）
 
 本文件用于记录真实实验和重要验证。不要记录未经实际运行的数据结果；尚未真实运行的项目标记为「待验证」。
 
@@ -89,6 +89,25 @@
 
 ## 当前验证记录
 
+### EXP-20260602-012：Plus M2 服务器验收 + EXP-DATA-001 ✅
+
+- 日期：2026-06-02
+- 阶段：Plus v2 **M2**（服务器）
+- 环境：a6000-9961，`git` @ `7514cdc`，conda `/mnt/localDisk3/weizian/conda_envs/quant-mas`
+- 命令：
+  - `python -m pytest tests/test_data_sources.py -v` → **13 passed** in 0.52s
+  - Alpha Vantage：`AAPL 2026-01-01..2026-06-01` → **100 rows** → `datasets/raw/market_data.parquet`
+  - Stooq：`AAPL 2024-01-01..2024-06-01` → **105 rows**
+- EXP-DATA-001 汇总：
+  - **FRED ✅**：DGS10 → 262 rows → `datasets/raw/macro/DGS10.parquet`
+  - **Stooq ✅**：105 rows（2024 H1）
+  - **Alpha Vantage ✅**：100 rows（近期窗口；`outputsize=auto` + 日期提示已修复）
+  - **Finnhub ❌**：403 免费 tier 无 candle 权限（非代码 bug）
+  - **SEC**：未测（需真实 `SEC_EDGAR_USER_AGENT`）
+- 结论：OHLCV 用 **Stooq（历史）+ Alpha Vantage（近期）**；宏观用 **FRED**
+- 问题：无
+- 下一步：**M3** Memory/RAG v2（见 `docs/codex_prompt_M3.md`）
+
 ### EXP-20260602-011：Plus M2 多数据源扩展本地验证 ✅
 
 - 日期：2026-06-02
@@ -96,12 +115,12 @@
 - 模块：`src/quant_mas/data/fetchers/` 子包、DataSourceRegistry、AlphaVantage/Finnhub/FRED/SEC fetcher、`configs/data_sources.yaml`
 - CLI：`download_data.py` — alpha_vantage / finnhub / fred / sec_edgar；`--series-id`；`--cik`
 - 指标：
-  - `tests/test_data_sources.py` → **12 passed**
+  - `tests/test_data_sources.py` → **13 passed**
   - `tests/test_stooq_fetcher.py` → **6 passed**
-  - 全量 → **114 passed**（+12，102→114）
+  - 全量 → **115 passed**（+13，102→115）
 - 验收：mock HTTP，不联网；`.env.example` 占位符无真实 key
 - 问题：无
-- 下一步：push → 服务器 pytest 114 → EXP-DATA-001 API smoke → **M3**
+- 下一步：push → 服务器 ✅ 见 EXP-20260602-012 → **M3**
 
 ### EXP-20260602-010：Plus M1 服务器验证 ✅
 
@@ -470,17 +489,6 @@
 
 ## 待验证实验
 
-### EXP-DATA-001：M2 服务器 API smoke ✅（Finnhub 免费 tier 除外）
-
-- 日期：2026-06-02
-- 环境：a6000-9961，`.env` 已配置
-- **FRED ✅**：DGS10 → **262 rows** → `datasets/raw/macro/DGS10.parquet`
-- **Stooq ✅**：AAPL 2024 H1 → **105 rows** → `datasets/raw/market_data.parquet`
-- **Alpha Vantage**：首次失败（`outputsize=full`）；诊断 compact+IBM OK；**fetcher 已改为 compact**，pull 后复测 AAPL
-- **Finnhub ❌**：403 `You don't have access to this resource` — **免费 tier 无 candle 权限**，非代码 bug
-- **SEC**：未测
-- 结论：OHLCV 用 **Stooq + Alpha Vantage**；宏观用 **FRED**；Finnhub 标 `blocked_free_tier`
-
 ### EXP-TODO-006：CPU 对照训练（可选）
 
 - 目的：与 EXP-20260601-006 / EXP-20260602-004 在同一 features 上对比 CPU vs GPU metrics
@@ -498,8 +506,9 @@
 | EXP-20260602-008 | 2026-06-02 | Walk-forward 服务器 | **OOS sharpe 0.586**，19 窗 |
 | EXP-20260602-009 | 2026-06-02 | Plus M1 研究基线本地 | **102 passed**（+4 测试） |
 | EXP-20260602-010 | 2026-06-02 | Plus M1 服务器 pytest + 比较表 | **102 passed**；OOS sharpe 0.586 |
-| EXP-20260602-011 | 2026-06-02 | Plus M2 数据扩展本地 | **114 passed**（+12） |
-| EXP-DATA-001 | 2026-06-02 | M2 API smoke | FRED+Stooq ✅；AV compact 修复；Finnhub 免费 blocked |
+| EXP-20260602-011 | 2026-06-02 | Plus M2 数据扩展本地 | **115 passed**（+13） |
+| EXP-20260602-012 | 2026-06-02 | Plus M2 服务器 + API smoke | test_data_sources 13/13；FRED/Stooq/AV ✅ |
+| EXP-DATA-001 | 2026-06-02 | M2 API smoke（并入 012） | Finnhub 免费 blocked；SEC 未测 |
 | EXP-20260601-009 | 2026-06-01 | Prompt 18 风控本地 | 76 passed |
 | EXP-20260601-010 | 2026-06-01 | Prompt 18 服务器 pytest | 76 passed |
 | EXP-20260601-011 | 2026-06-01 | Prompt 19 Supervisor 本地 | 87 passed |

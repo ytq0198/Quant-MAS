@@ -3,7 +3,7 @@
 更新时间：2026-06-01
 
 > 本文档在 **Prompt 1–20 主链路已完成**（第零～四阶段）的基础上，规划 **Quant MAS v2** 的研究型升级路线。  
-> 基线状态：本地 **114 passed**（EXP-20260602-011）；服务器 **102 passed**（M2 pull 后待验证 114）。  
+> 基线状态：本地 **115 passed**（EXP-20260602-011）；服务器 **EXP-20260602-012**（test_data_sources 13/13，EXP-DATA-001 ✅）。  
 > 与 `项目进度.md` / `项目指导.md` 的关系：后者记录「已完成什么」；本文档记录「接下来怎么优化、怎么给 Codex/Cursor 下指令」。
 
 ---
@@ -66,7 +66,7 @@
 ### 2.1 工程完成度
 
 - **第零～四阶段 + Prompt 13 文档收口** ✅
-- **测试**：本地 **114 passed**（EXP-20260602-011）；服务器 102（M2 pull 后待验证）
+- **测试**：本地 **115 passed**（EXP-20260602-011）；服务器 EXP-20260602-012 + EXP-DATA-001 ✅
 - **Research Layer（M1）**：BaselineRegistry、`compare_experiments.py` ✅
 - **Data Layer（M2）**：fetchers 子包、DataSourceRegistry、FRED/SEC 等 ✅ 本地
 - **Agent 工具（7 个）**：data_summary / backtest / train_model / report / risk_check / ml_backtest / pipeline
@@ -278,28 +278,11 @@ EMBEDDING_MODEL=...
 
 ### 给 Codex 的提示词
 
+> **完整版**（含验收清单、兼容性要求）：[docs/codex_prompt_M3.md](docs/codex_prompt_M3.md)
+
 ```
 请为 Quant MAS v2 实现可插拔 Memory / RAG 存储后端。
-
-当前已有 ExperimentMemory、TradeMemory、document_loader、SimpleRetriever。
-
-需要实现：
-
-1. src/quant_mas/memory/store_base.py — MemoryStore 抽象
-2. src/quant_mas/memory/json_store.py — 兼容现有 JSON
-3. src/quant_mas/memory/sqlite_store.py — experiments 表，metric 排序
-4. src/quant_mas/rag/embedding_client.py — HashEmbeddingClient（测试）+ OpenAICompatible 骨架
-5. src/quant_mas/rag/vector_store_base.py / in_memory_vector_store.py / faiss_store.py（可选）
-6. scripts/index_documents.py — docs/ + outputs/reports/ 切块索引
-7. scripts/query_memory.py — 实验 + 文档联合查询
-8. tests/test_memory_store_v2.py
-
-要求：pytest 不依赖 Postgres/Neo4j/FAISS 安装；保留 SimpleRetriever；全量 pytest 通过。
-
-验收：
-1. pytest tests/test_memory_store_v2.py
-2. python scripts/index_documents.py --help
-3. python scripts/query_memory.py --help
+（详见 docs/codex_prompt_M3.md — 复制「固定前缀」+「M3 主任务」整段）
 ```
 
 ### 给 Cursor 的提示词
@@ -701,10 +684,10 @@ flowchart TB
 ```
 你正在开发 Quant MAS 科研项目。
 路径：D:\scientific reasearch and work\SRTP\Quant MAS
-测试基线：本地 114 passed（Plus M2）；OOS baseline sharpe 0.586（EXP-20260602-008）。
+测试基线：本地 115 passed（Plus M2）；OOS baseline sharpe 0.586（EXP-20260602-008）。
 LLM 不允许直接下单；pytest 不联网不调真实 LLM。
 请只实现当前一个模块，完成后 python -m pytest -v 全量通过。
-详细需求见 项目plus设计.md 的 M? 章节。
+详细需求见 docs/codex_prompt_M3.md 或本文档 M3 章节。
 ```
 
 ---

@@ -129,7 +129,7 @@ collect_experiment_metrics → BaselineRegistry / comparison table
 
 ## 测试与部署
 
-- **pytest**：本地 **114 passed**（EXP-20260602-011）；服务器 102（M2 pull 后待验证 **114**）
+- **pytest**：本地 **115 passed**（EXP-20260602-011）；服务器 test_data_sources **13/13**（EXP-20260602-012）
 - **服务器**：`/mnt/localDisk3/weizian/Quant-MAS`，conda `quant-mas`，Python 3.11.15
 - **GitHub**：https://github.com/ytq0198/Quant-MAS
 
@@ -138,8 +138,8 @@ collect_experiment_metrics → BaselineRegistry / comparison table
 | 模块 | 内容 | 状态 |
 |------|------|------|
 | **M1** 研究基线 | BaselineRegistry、compare_experiments | ✅ EXP-20260602-009/010 |
-| **M2** 数据扩展 | 多数据源 fetcher + registry | ✅ 本地（EXP-20260602-011）；API smoke 待验证 |
-| **M3** Memory/RAG v2 | SQLite / 向量检索 | 📋 待做 |
+| **M2** 数据扩展 | 多数据源 fetcher + registry | ✅ EXP-20260602-011/012，EXP-DATA-001 |
+| **M3** Memory/RAG v2 | SQLite / 向量检索 | 📋 待做（[codex_prompt_M3.md](codex_prompt_M3.md)） |
 | **M4** LangGraph | 实验性 DAG（不替换 Supervisor） | 📋 待做 |
 | **M5–M8** | LLM、文本模型、RL、MCP | 📋 待做 |
 
