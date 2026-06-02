@@ -3,7 +3,7 @@
 更新时间：2026-06-01
 
 > 本文档在 **Prompt 1–20 主链路已完成**（第零～四阶段）的基础上，规划 **Quant MAS v2** 的研究型升级路线。  
-> 基线状态：本地 **115 passed**（EXP-20260602-011）；服务器 **EXP-20260602-012**（test_data_sources 13/13，EXP-DATA-001 ✅）。  
+> 基线状态：本地 **126 passed**（EXP-20260602-013）；服务器 **115 passed**（M2，M3 pull 后预期 **126**）。  
 > 与 `项目进度.md` / `项目指导.md` 的关系：后者记录「已完成什么」；本文档记录「接下来怎么优化、怎么给 Codex/Cursor 下指令」。
 
 ---
@@ -66,11 +66,12 @@
 ### 2.1 工程完成度
 
 - **第零～四阶段 + Prompt 13 文档收口** ✅
-- **测试**：本地 **115 passed**（EXP-20260602-011）；服务器 EXP-20260602-012 + EXP-DATA-001 ✅
+- **测试**：本地 **126 passed**（EXP-20260602-013）；服务器 M2 115（M3 待 pull）
+- **Memory/RAG v2（M3）**：MemoryStore JSON/SQLite、HybridRetriever、index/query CLI ✅ 本地
 - **Research Layer（M1）**：BaselineRegistry、`compare_experiments.py` ✅
 - **Data Layer（M2）**：fetchers 子包、DataSourceRegistry、FRED/SEC 等 ✅ 本地
 - **Agent 工具（7 个）**：data_summary / backtest / train_model / report / risk_check / ml_backtest / pipeline
-- **Memory/RAG 雏形**：ExperimentMemory 增强、TradeMemory 空壳、SimpleRetriever
+- **Memory/RAG**：Prompt 20 雏形 + **Plus M3 v2**（MemoryStore、HybridRetriever、index/query CLI）✅ 本地
 
 ### 2.2 研究基线实验（服务器真实数据）
 
@@ -529,7 +530,7 @@ MODEL_CACHE_DIR=/mnt/localDisk3/weizian/models/hf
 |------|------|------------|-------------|----------|--------|
 | **M1** 研究基线 | 1 | baseline.py、compare_experiments | research_protocol、架构图 | 无 | 可选跑比较表 |
 | **M2** 数据扩展 | 2 | 多 fetcher + registry | data_sources.md、API 验证 | Stooq/AV/Finnhub/FRED/SEC | ✅ |
-| **M3** Memory/RAG v2 | 3 | SQLite/InMemory/索引脚本 | database_setup.md | Embedding 可选 | ✅ |
+| **M3** Memory/RAG v2 | 3 | SQLite/InMemory/索引脚本 | database_setup.md | Embedding 可选 | ✅ 本地 |
 | **M4** LangGraph | 4 | workflow + nodes | langgraph_workflow.md | 无 | dry-run / 可选 |
 | **M5** 上下文/LLM | 5 | ContextBuilder、ResearchAgent | context_engineering.md | DeepSeek/OpenAI-compatible | 可选 |
 | **M6** 文本大模型 | 6 | FinBERT/LoRA 骨架 | text_model_plan、GPU 实验 | HF_TOKEN | ✅ |
@@ -684,10 +685,10 @@ flowchart TB
 ```
 你正在开发 Quant MAS 科研项目。
 路径：D:\scientific reasearch and work\SRTP\Quant MAS
-测试基线：本地 115 passed（Plus M2）；OOS baseline sharpe 0.586（EXP-20260602-008）。
+测试基线：本地 126 passed（Plus M3）；OOS baseline sharpe 0.586（EXP-20260602-008）。
 LLM 不允许直接下单；pytest 不联网不调真实 LLM。
 请只实现当前一个模块，完成后 python -m pytest -v 全量通过。
-详细需求见 docs/codex_prompt_M3.md 或本文档 M3 章节。
+详细需求见 项目plus设计.md 的 M4 章节。
 ```
 
 ---

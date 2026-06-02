@@ -1,0 +1,5 @@
+memory_backend: json
+json_path: outputs/reports/experiments.json
+sqlite_path: null
+vector_store: in_memory
+embedding_provider: hash

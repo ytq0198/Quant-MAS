@@ -10,6 +10,7 @@ GitHub 仓库：[https://github.com/ytq0198/Quant-MAS](https://github.com/ytq019
 
 | 日期 | 项目 | 结果 | 备注 |
 |------|------|------|------|
+| 2026-06-02 | Plus M3 Memory/RAG v2（本地） | **126 passed** | EXP-20260602-013 |
 | 2026-06-02 | Plus M2 数据扩展（本地+服务器） | **115 passed** / test_data_sources **13/13** | EXP-20260602-011/012 |
 | 2026-06-02 | Plus M1 research baseline (local) | **102 passed** | EXP-20260602-009 |
 | 2026-06-01 | pytest（Prompt 20 后，服务器） | **98 passed**（1.93s） | EXP-20260601-014 |
@@ -294,7 +295,7 @@ python scripts/run_ml_backtest.py \
 ```bash
 git pull origin main
 python -m pip install -e .
-python -m pytest -v   # 预期 115 passed（Plus M2 后）
+python -m pytest -v   # 预期 126 passed（Plus M3 后）
 
 python scripts/run_walk_forward.py \
   --config configs/walk_forward.yaml \
@@ -371,6 +372,28 @@ ls -la /mnt/localDisk3/weizian/datasets/raw/sec/
 ```
 
 通过后：记录见 `docs/experiment_log.md` **EXP-20260602-012** / **EXP-DATA-001**。
+
+## 六点六、Plus M3 Memory/RAG（EXP-20260602-013）
+
+M3 pull 后全量验收：
+
+```bash
+cd /mnt/localDisk3/weizian/Quant-MAS
+git pull origin main
+conda activate /mnt/localDisk3/weizian/conda_envs/quant-mas
+python -m pip install -e .
+python -m pytest -v   # 预期 126 passed
+
+python scripts/index_documents.py --help
+python scripts/query_memory.py --help
+
+# 可选 smoke（不联网，hash embedding）
+python scripts/index_documents.py --dirs docs --vector-store in_memory
+python scripts/query_memory.py --rag-query "walk-forward OOS"
+python scripts/query_memory.py --backend json --best-metric oos.sharpe
+```
+
+详见 [`docs/database_setup.md`](database_setup.md)。
 
 ## 七、删除旧部署（如曾在 ~/quant-mas 建过）
 

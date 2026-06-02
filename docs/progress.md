@@ -1,8 +1,8 @@
 # Quant MAS 开发进度
 
-更新时间：2026-06-02（Plus M2 本地+服务器验收 ✅）
+更新时间：2026-06-02（Plus M3 本地验收 ✅）
 
-**Plus v2**：**M1 ✅** · **M2 ✅**（**115 passed**，EXP-20260602-011/012，EXP-DATA-001）→ **M3**
+**Plus v2**：**M1 ✅** · **M2 ✅** · **M3 ✅ 本地**（**126 passed**，EXP-20260602-013）→ **M4**
 
 第五～六阶段见 [项目plus设计.md](../项目plus设计.md)（M4 LangGraph / M7 模拟，非实盘）。
 
@@ -18,7 +18,8 @@
 | 第四阶段 | Memory + RAG | ✅ | Prompt 20 |
 | **Plus M1** | 研究基线 | ✅ | EXP-20260602-009/010，**102 passed** |
 | **Plus M2** | 数据扩展 | ✅ | EXP-20260602-011/012，EXP-DATA-001 |
-| **Plus M3** | Memory/RAG v2 | 📋 | 见 项目plus设计.md |
+| **Plus M3** | Memory/RAG v2 | ✅ 本地 | EXP-20260602-013，**126 passed** |
+| **Plus M4** | LangGraph 编排 | 📋 | 见 项目plus设计.md |
 | 第五～六阶段 | 编排 / RL 模拟 | 📋 | Plus M4 / M7 |
 
 ## Quant MAS v2：M1 研究基线
@@ -52,7 +53,7 @@
 
 ### 下一步
 
-M1 已完成；进入 **M3**（M2 本地 ✅，见下节）。
+M1/M2 已完成；**M3 本地 ✅**（见下两节）；下一步 **M4**。
 
 ### OOS 主 baseline（不可遗忘）
 
@@ -83,6 +84,25 @@ M1 已完成；进入 **M3**（M2 本地 ✅，见下节）。
 
 `download_data.py` 新增：`--source alpha_vantage|finnhub|fred|sec_edgar`、`--series-id`、`--cik`。
 
+## Quant MAS v2：M3 Memory/RAG v2
+
+> 设计见 [项目plus设计.md §M3](../项目plus设计.md#m3数据库与-memory--rag-升级)；部署见 [database_setup.md](database_setup.md)。
+
+| 组件 | 路径 |
+|------|------|
+| MemoryStore | `memory/store_base.py`、`json_store.py`、`sqlite_store.py`、`factory.py` |
+| RAG | `rag/embedding_client.py`、`in_memory_vector_store.py`、`hybrid_retriever.py` |
+| 配置 | `configs/memory.yaml` |
+| CLI | `index_documents.py`、`query_memory.py` |
+| 测试 | `tests/test_memory_store_v2.py`（**11 passed**） |
+
+| 项目 | 状态 |
+|------|------|
+| 全量 pytest（本地） | ✅ **126 passed**（EXP-20260602-013） |
+| test_memory_rag（Prompt 20） | ✅ **11 passed**（未破坏） |
+| 全量 pytest（服务器） | 待 pull 验证 **126** |
+| index/query CLI `--help` | ✅ |
+
 ## Prompt 任务状态
 
 - [x] Prompt 1–10：骨架 → Agent Core
@@ -95,13 +115,14 @@ M1 已完成；进入 **M3**（M2 本地 ✅，见下节）。
 - [x] Prompt 20：Memory + RAG
 - [x] **Plus M1**：研究基线与实验规范（EXP-20260602-009/010）
 - [x] **Plus M2**：多数据源扩展（EXP-20260602-011/012，EXP-DATA-001）
+- [x] **Plus M3**：Memory/RAG v2（EXP-20260602-013，**126 passed**）
 
 ## 当前 pytest 状态
 
 | 环境 | Python | 结果 | 日期 | 实验 |
 |------|--------|------|------|------|
-| 本地 Windows | 3.11+ | **115 passed** | 2026-06-02 | EXP-20260602-011 |
-| 服务器 a6000-9961 | 3.11.15 | **test_data_sources 13/13** | 2026-06-02 | EXP-20260602-012 + EXP-DATA-001 |
+| 本地 Windows | 3.11+ | **126 passed** | 2026-06-02 | EXP-20260602-013 |
+| 服务器 a6000-9961 | 3.11.15 | **115 passed**（M2） | 2026-06-02 | M3 pull 后预期 126 |
 
 命令：`python -m pytest -v`（勿裸敲 `pytest` / `pip`）。
 
@@ -118,6 +139,8 @@ python scripts/run_pipeline.py --help
 python scripts/run_ml_backtest.py --help
 python scripts/run_walk_forward.py --help
 python scripts/compare_experiments.py --help
+python scripts/index_documents.py --help
+python scripts/query_memory.py --help
 ```
 
 ## 当前已实现能力
@@ -167,6 +190,7 @@ python scripts/compare_experiments.py --help
 
 ## 后续工作
 
-- **M3 Memory/RAG v2**：见 [codex_prompt_M3.md](codex_prompt_M3.md) · [项目plus设计.md](../项目plus设计.md)
+- **M4 LangGraph**：见 [项目plus设计.md §M4](../项目plus设计.md#m4langgraph-工作流编排)
+- **M3 服务器**：pull → pytest **126**
 - 科研：特征/模型调参、更多 walk-forward 窗口（**必须标注 OOS**）
 - 可选：SEC smoke、CPU 对照 `server_lgbm_cpu_001`（EXP-TODO-006）

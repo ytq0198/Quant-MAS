@@ -466,7 +466,8 @@ python -m pip install -e .
 | — | Step 2.2b | GPU/CUDA 训练 | ✅ EXP-20260602-004（见 M-010） |
 | 2.4 Walk-forward | 17 | 见 M-010 若用 GPU | ✅ EXP-20260602-008 |
 | — | Plus M2 | 多数据源 API smoke | ✅ EXP-DATA-001（Finnhub 免费 blocked；SEC 待测，见 M-015） |
-| — | Plus M3 | Memory/RAG v2 SQLite | **当前** |
+| — | Plus M3 | Memory/RAG v2 SQLite | ✅ 本地 EXP-20260602-013；服务器待 pull |
+| — | Plus M4 | LangGraph workflow | **当前** |
 
 ---
 

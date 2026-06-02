@@ -1,6 +1,6 @@
 # Quant MAS 实验记录
 
-更新时间：2026-06-02（Plus M2 服务器验收 EXP-20260602-012 + EXP-DATA-001 ✅）
+更新时间：2026-06-02（Plus M3 本地验收 EXP-20260602-013）
 
 本文件用于记录真实实验和重要验证。不要记录未经实际运行的数据结果；尚未真实运行的项目标记为「待验证」。
 
@@ -52,7 +52,7 @@
 | server_lgbm_gpu_001 | lightgbm | — | — | — | — | — | 0.479 | 不可直接比 OOS | EXP-20260602-004 |
 | server_ml_backtest_001 | ml_backtest | **2.781** | — | 68.27 | — | -0.246 | — | ⚠️ in-sample | EXP-20260602-005 |
 | server_walk_forward_001 | walk_forward | — | **0.586** | — | 0.443 | — | — | **baseline** | EXP-20260602-008 |
-| （RAG/LLM/RL 等） | other | 待验证 | 待验证 | 待验证 | 待验证 | 待验证 | 待验证 | 待验证 | Plus M3+ |
+| （RAG/LLM/RL 等） | other | 待验证 | 待验证 | 待验证 | 待验证 | 待验证 | 待验证 | 待验证 | Plus M4+ |
 
 **说明：**
 
@@ -88,6 +88,23 @@
 ```
 
 ## 当前验证记录
+
+### EXP-20260602-013：Plus M3 Memory/RAG v2 本地验证 ✅
+
+- 日期：2026-06-02
+- 阶段：Plus v2 **M3**
+- 模块：
+  - Memory：`store_base`、`JsonMemoryStore`、`SqliteMemoryStore`、`factory`、`configs/memory.yaml`
+  - RAG：`HashEmbeddingClient`、`InMemoryVectorStore`、`HybridRetriever`、`chunking`
+  - CLI：`index_documents.py`、`query_memory.py`
+  - 文档：`docs/database_setup.md`
+- 指标：
+  - `tests/test_memory_store_v2.py` → **11 passed**
+  - `tests/test_memory_rag.py` → **11 passed**（Prompt 20 兼容）
+  - 全量 → **126 passed**（+11，115→126）
+- 验收：`index_documents.py --help`、`query_memory.py --help` 正常
+- 问题：无
+- 下一步：push → 服务器 pytest 126 → **M4**
 
 ### EXP-20260602-012：Plus M2 服务器验收 + EXP-DATA-001 ✅
 
@@ -507,6 +524,7 @@
 | EXP-20260602-009 | 2026-06-02 | Plus M1 研究基线本地 | **102 passed**（+4 测试） |
 | EXP-20260602-010 | 2026-06-02 | Plus M1 服务器 pytest + 比较表 | **102 passed**；OOS sharpe 0.586 |
 | EXP-20260602-011 | 2026-06-02 | Plus M2 数据扩展本地 | **115 passed**（+13） |
+| EXP-20260602-013 | 2026-06-02 | Plus M3 Memory/RAG v2 本地 | **126 passed**（+11） |
 | EXP-20260602-012 | 2026-06-02 | Plus M2 服务器 + API smoke | test_data_sources 13/13；FRED/Stooq/AV ✅ |
 | EXP-DATA-001 | 2026-06-02 | M2 API smoke（并入 012） | Finnhub 免费 blocked；SEC 未测 |
 | EXP-20260601-009 | 2026-06-01 | Prompt 18 风控本地 | 76 passed |
