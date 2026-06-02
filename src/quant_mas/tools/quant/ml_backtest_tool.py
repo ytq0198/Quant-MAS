@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from pathlib import Path
 from typing import Any
+import importlib.util
 
 from quant_mas.models import BasePredictiveModel
 from quant_mas.tools.base import BaseTool, ToolResult
@@ -20,8 +21,7 @@ class MLBacktestTool(BaseTool):
         self.model = model
 
     def run(self, **kwargs: Any) -> ToolResult:
-        from scripts.run_ml_backtest import run_ml_backtest
-
+        run_ml_backtest = _load_run_ml_backtest()
         config_path = Path(kwargs.get("config_path", "configs/backtest_ml.yaml")).expanduser()
         storage_config = Path(kwargs.get("storage_config", "configs/storage.yaml")).expanduser()
         config = _load_yaml(config_path)
@@ -60,3 +60,18 @@ def _load_yaml(path: Path) -> dict[str, Any]:
 
 def _optional_path(value: str | Path | None) -> Path | None:
     return Path(value).expanduser() if value is not None else None
+
+
+def _load_run_ml_backtest():
+    try:
+        from scripts.run_ml_backtest import run_ml_backtest
+
+        return run_ml_backtest
+    except ModuleNotFoundError:
+        script_path = Path(__file__).resolve().parents[4] / "scripts" / "run_ml_backtest.py"
+        spec = importlib.util.spec_from_file_location("_quant_mas_run_ml_backtest", script_path)
+        if spec is None or spec.loader is None:
+            raise ImportError(f"Unable to load run_ml_backtest from {script_path}")
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        return module.run_ml_backtest

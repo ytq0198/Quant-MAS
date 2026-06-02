@@ -1,9 +1,10 @@
 # Plus M4：LangGraph 工作流编排 — Codex 提示词
 
-更新时间：2026-06-02
+**状态：✅ 已完成（EXP-20260602-015，136 passed / 1 skipped，2026-06-02）**
 
-> **用法**：先粘贴 [§10.1 总背景](../项目指导.md#101-总背景提示词)（或下方「固定前缀」），再粘贴「M4 主任务」整段交给 Codex。  
-> **设计依据**：[项目plus设计.md §M4](../项目plus设计.md#m4langgraph-工作流编排)
+更新时间：2026-06-02  
+
+> 运行说明：[langgraph_workflow.md](langgraph_workflow.md) · 设计：[项目plus设计.md §M4](../项目plus设计.md#m4langgraph-工作流编排)
 
 ---
 

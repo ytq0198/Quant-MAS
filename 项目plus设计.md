@@ -4,7 +4,7 @@
 
 > 本文档在 **Prompt 1–20 主链路已完成**（第零～四阶段）的基础上，规划 **Quant MAS v2** 的研究型升级路线。  
 > 基线状态：本地 **126 passed**（EXP-20260602-013，M3 第一版 ✅）；服务器 M2 **115**（**M3 pull 后预期 126**）。  
-> **当前执行**：服务器 M3 验收 → **M4 LangGraph** → M5 → 按需 **M3.5 企业 RAG 扩展**。  
+> **当前执行**：M4 本地 ✅（EXP-20260602-015）→ 服务器 M4 验收 → **M5**。  
 > 与 `项目进度.md` / `项目指导.md` 的关系：后者记录「已完成什么」；本文档记录「接下来怎么优化、怎么给 Codex/Cursor 下指令」。
 
 ---
@@ -68,7 +68,8 @@
 ### 2.1 工程完成度
 
 - **第零～四阶段 + Prompt 13 文档收口** ✅
-- **测试**：本地 **126 passed**（EXP-20260602-013）；服务器 **126 passed**（EXP-20260602-014，3.04s）
+- **测试**：本地 **136+1 skip**（EXP-20260602-015）；服务器 **126**（M4 pull 后预期 136+1 skip）
+- **Orchestration（M4）** ✅ 本地：ResearchWorkflow、sequential + 可选 langgraph（EXP-20260602-015）
 - **Memory/RAG v2（M3 第一版）** ✅ 本地：MemoryStore JSON/SQLite、HybridRetriever、index/query CLI（EXP-20260602-013）
 - **M3.5 企业 RAG**：📋 待定（真 Embedding + 持久化向量 + Postgres；见 [§M3.5](#m35企业-rag-扩展待定)）
 - **Research Layer（M1）**：BaselineRegistry、`compare_experiments.py` ✅
@@ -95,11 +96,10 @@
 ### 3.1 当前推荐执行顺序（2026-06-02 更新）
 
 ```
-已完成   M1 → M2 → M3 第一版 ✅
+已完成   M1 → M2 → M3 → **M4 ✅**（EXP-20260602-015）
 
-进行中   ① ~~服务器 M3 验收~~ ✅ EXP-20260602-014
-         ② M4 LangGraph（dry-run，不接 LLM）
-         ③ M5 上下文 + 真实 LLM（ResearchAgent）
+进行中   ① 服务器 M4 pull + pytest 136+1 skip
+         ② **M5** 上下文/LLM
 
 按需扩展 M3.5 企业 RAG（真 Embedding / pgvector / Postgres / Neo4j）
          ↑ 触发条件见 §M3.5，不阻塞 M4/M5
@@ -111,7 +111,7 @@
 
 ```
 优先级 1（先做）  M1 研究基线  →  M2 数据扩展  →  M3 Memory/RAG 第一版 ✅
-优先级 2          M4 LangGraph  →  M5 上下文/LLM
+优先级 2          M4 LangGraph ✅  →  M5 上下文/LLM
 优先级 2.5（按需） M3.5 企业 RAG 扩展（不替换 M3 接口，只加后端）
 优先级 3          M6 文本大模型微调
 优先级 4          M7 RL / GRPO
@@ -406,6 +406,8 @@ python scripts/query_memory.py \
 
 ## M4：LangGraph 工作流编排
 
+> **状态：✅ 本地（EXP-20260602-015）** · [langgraph_workflow.md](docs/langgraph_workflow.md) · [codex_prompt_M4.md](docs/codex_prompt_M4.md)
+
 ### 目标
 
 **实验性** DAG，**不替换** SupervisorAgent：
@@ -431,7 +433,7 @@ python scripts/query_memory.py \
 |------|------|
 | Codex | 本地 + dry-run mock 测试 |
 | Cursor | langgraph_workflow.md、EXP 记录 |
-| 服务器 | pull → pytest 126+ → `run_langgraph_workflow.py --dry-run` |
+| 服务器 | pull → pytest **136+1 skip** → dry-run ✅ EXP-20260602-016 待记 |
 
 ### 给 Cursor 的提示词
 
@@ -632,7 +634,7 @@ MODEL_CACHE_DIR=/mnt/localDisk3/weizian/models/hf
 | **M2** 数据扩展 | 2 | 多 fetcher + registry | data_sources.md、API 验证 | Stooq/AV/Finnhub/FRED/SEC | ✅ |
 | **M3** Memory/RAG 第一版 | 3 | SQLite/InMemory/索引脚本 | database_setup.md | **无（默认）** | ✅ |
 | **M3.5** 企业 RAG | 3.5 | Postgres/pgvector/FAISS 后端 | codex_prompt_M3_enterprise（待写） | Embedding/DB | 按需 |
-| **M4** LangGraph | 4 | workflow + nodes | langgraph_workflow.md | 无 | dry-run / 可选 |
+| **M4** LangGraph | 4 | workflow + nodes | langgraph_workflow.md | 无 | ✅ 本地 |
 | **M5** 上下文/LLM | 5 | ContextBuilder、ResearchAgent | context_engineering.md | DeepSeek/OpenAI-compatible | 可选 |
 | **M6** 文本大模型 | 6 | FinBERT/LoRA 骨架 | text_model_plan、GPU 实验 | HF_TOKEN | ✅ |
 | **M7** RL/GRPO | 7 | TradingEnv、GRPO ranking | rl_plan.md | W&B 可选 | ✅ |

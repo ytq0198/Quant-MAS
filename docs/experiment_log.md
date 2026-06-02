@@ -89,6 +89,19 @@
 
 ## 当前验证记录
 
+### EXP-20260602-015：Plus M4 LangGraph 本地验证 ✅
+
+- 日期：2026-06-02
+- 阶段：Plus v2 **M4**
+- 模块：`src/quant_mas/orchestration/`、6 节点 DAG、sequential + 可选 langgraph、`run_langgraph_workflow.py`
+- 指标：
+  - `test_langgraph_workflow.py` → **10 passed, 1 skipped**（无 langgraph）
+  - `test_supervisor_agent.py` → **17 passed**
+  - 全量 → **136 passed, 1 skipped**（+10，126→136）
+- 验收：`--dry-run --backend sequential` 6 节点完成；Supervisor **未替换**
+- 问题：无
+- 下一步：push → 服务器 → **M5**
+
 ### EXP-20260602-014：Plus M3 服务器验收 ✅
 
 - 日期：2026-06-02
@@ -544,6 +557,7 @@
 | EXP-20260602-009 | 2026-06-02 | Plus M1 研究基线本地 | **102 passed**（+4 测试） |
 | EXP-20260602-010 | 2026-06-02 | Plus M1 服务器 pytest + 比较表 | **102 passed**；OOS sharpe 0.586 |
 | EXP-20260602-011 | 2026-06-02 | Plus M2 数据扩展本地 | **115 passed**（+13） |
+| EXP-20260602-015 | 2026-06-02 | Plus M4 LangGraph 本地 | **136+1 skip**（+10） |
 | EXP-20260602-014 | 2026-06-02 | Plus M3 服务器 pytest + RAG smoke | **126 passed**（3.04s） |
 | EXP-20260602-013 | 2026-06-02 | Plus M3 Memory/RAG v2 本地 | **126 passed**（+11） |
 | EXP-20260602-012 | 2026-06-02 | Plus M2 服务器 + API smoke | test_data_sources 13/13；FRED/Stooq/AV ✅ |

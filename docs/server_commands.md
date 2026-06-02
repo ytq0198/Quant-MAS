@@ -10,6 +10,7 @@ GitHub 仓库：[https://github.com/ytq0198/Quant-MAS](https://github.com/ytq019
 
 | 日期 | 项目 | 结果 | 备注 |
 |------|------|------|------|
+| 2026-06-02 | Plus M4 LangGraph（本地） | **136+1 skip** | EXP-20260602-015 |
 | 2026-06-02 | Plus M3 Memory/RAG v2（本地+服务器） | **126 passed** | EXP-20260602-013/014 |
 | 2026-06-02 | Plus M2 数据扩展（本地+服务器） | **115 passed** / test_data_sources **13/13** | EXP-20260602-011/012 |
 | 2026-06-02 | Plus M1 research baseline (local) | **102 passed** | EXP-20260602-009 |
@@ -399,7 +400,22 @@ python scripts/query_memory.py \
 
 记录：**EXP-20260602-014**。默认 `--json-path outputs/reports/experiments.json` 非服务器 `reports_dir`。
 
-详见 [`docs/database_setup.md`](database_setup.md)。
+## 六点七、Plus M4 LangGraph（EXP-20260602-015/016）
+
+```bash
+cd /mnt/localDisk3/weizian/Quant-MAS
+git pull origin main
+conda activate /mnt/localDisk3/weizian/conda_envs/quant-mas
+python -m pip install -e .
+python -m pytest -v   # 预期 136 passed, 1 skipped
+
+python scripts/run_langgraph_workflow.py --help
+python scripts/run_langgraph_workflow.py --dry-run --backend sequential
+# 可选：python -m pip install -e ".[orchestration]"
+# python scripts/run_langgraph_workflow.py --dry-run --backend langgraph
+```
+
+详见 [`docs/langgraph_workflow.md`](langgraph_workflow.md)。
 
 ## 七、删除旧部署（如曾在 ~/quant-mas 建过）
 

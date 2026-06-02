@@ -30,6 +30,9 @@ ml = [
     "lightgbm>=4.0",
     "xgboost>=2.0",
 ]
+orchestration = [
+    "langgraph>=0.2.0",
+]
 
 [tool.setuptools.packages.find]
 where = ["src"]

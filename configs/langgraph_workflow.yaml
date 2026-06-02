@@ -1,0 +1,17 @@
+workflow:
+  name: research_ml_workflow
+  stop_on_error: true
+  default_dry_run: true
+paths:
+  storage_config: configs/storage.yaml
+  features_config: configs/features.yaml
+  train_config: configs/train.yaml
+  ml_backtest_config: configs/backtest_ml.yaml
+  risk_config: configs/risk.yaml
+nodes:
+  - data_check
+  - feature_build
+  - train_model
+  - ml_backtest
+  - risk_check
+  - report

@@ -2,7 +2,7 @@
 
 更新时间：2026-06-02（Plus M3 本地验收 ✅）
 
-**Plus v2**：**M1 ✅** · **M2 ✅** · **M3 ✅ 本地**（**126 passed**，EXP-20260602-013）→ **M4**
+**Plus v2**：**M1–M4 ✅**（M4：**136+1 skip**，EXP-20260602-015）→ **M5**
 
 第五～六阶段见 [项目plus设计.md](../项目plus设计.md)（M4 LangGraph / M7 模拟，非实盘）。
 
@@ -19,7 +19,8 @@
 | **Plus M1** | 研究基线 | ✅ | EXP-20260602-009/010，**102 passed** |
 | **Plus M2** | 数据扩展 | ✅ | EXP-20260602-011/012，EXP-DATA-001 |
 | **Plus M3** | Memory/RAG v2 | ✅ 本地 | EXP-20260602-013，**126 passed** |
-| **Plus M4** | LangGraph 编排 | 📋 | 见 项目plus设计.md |
+| **Plus M4** | LangGraph 编排 | ✅ 本地 | EXP-20260602-015 |
+| **Plus M5** | 上下文/LLM | 📋 | 见 项目plus设计.md |
 | 第五～六阶段 | 编排 / RL 模拟 | 📋 | Plus M4 / M7 |
 
 ## Quant MAS v2：M1 研究基线
@@ -115,14 +116,25 @@ M1/M2 已完成；**M3 本地 ✅**（见下两节）；下一步 **M4**。
 - [x] Prompt 20：Memory + RAG
 - [x] **Plus M1**：研究基线与实验规范（EXP-20260602-009/010）
 - [x] **Plus M2**：多数据源扩展（EXP-20260602-011/012，EXP-DATA-001）
-- [x] **Plus M3**：Memory/RAG v2（EXP-20260602-013，**126 passed**）
+- [x] **Plus M3**：Memory/RAG v2（EXP-20260602-013/014）
+- [x] **Plus M4**：LangGraph ResearchWorkflow（EXP-20260602-015，**136+1 skip**）
+
+## Quant MAS v2：M4 LangGraph
+
+> [langgraph_workflow.md](langgraph_workflow.md)
+
+| 项目 | 状态 |
+|------|------|
+| sequential dry-run 6 节点 | ✅ |
+| test_langgraph_workflow | ✅ 10 passed, 1 skipped |
+| 全量 pytest（本地） | ✅ **136+1 skip** |
 
 ## 当前 pytest 状态
 
 | 环境 | Python | 结果 | 日期 | 实验 |
 |------|--------|------|------|------|
-| 本地 Windows | 3.11+ | **126 passed** | 2026-06-02 | EXP-20260602-013 |
-| 服务器 a6000-9961 | 3.11.15 | **115 passed**（M2） | 2026-06-02 | M3 pull 后预期 126 |
+| 本地 Windows | 3.11+ | **136+1 skip** | 2026-06-02 | EXP-20260602-015 |
+| 服务器 a6000-9961 | 3.11.15 | **126 passed**（M3） | 2026-06-02 | M4 待 pull |
 
 命令：`python -m pytest -v`（勿裸敲 `pytest` / `pip`）。
 
@@ -190,7 +202,7 @@ python scripts/query_memory.py --help
 
 ## 后续工作
 
-- **M4 LangGraph**：见 [项目plus设计.md §M4](../项目plus设计.md#m4langgraph-工作流编排)
-- **M3 服务器**：pull → pytest **126**
+- **M5 上下文/LLM**：见 [项目plus设计.md §M5](../项目plus设计.md#m5上下文工程与真实-llm-接入)
+- **M4 服务器**：pull → pytest **136+1 skip** → dry-run workflow
 - 科研：特征/模型调参、更多 walk-forward 窗口（**必须标注 OOS**）
 - 可选：SEC smoke、CPU 对照 `server_lgbm_cpu_001`（EXP-TODO-006）

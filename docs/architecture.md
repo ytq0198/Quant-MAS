@@ -37,6 +37,11 @@ Quant MAS
 │   Message, MockLLMClient, BaseAgent, ReportAgent
 │   SupervisorAgent（规则路由）, AgentEvent 系列
 │
+├── Orchestration Layer（Plus M4）
+│   ResearchWorkflow — sequential / 可选 LangGraph
+│   QuantWorkflowState, 6 节点 DAG（dry-run 默认）
+│   run_langgraph_workflow.py（**不替换** Supervisor）
+│
 ├── Memory Layer（Plus M3）
 │   MemoryStore 抽象 → JsonMemoryStore | SqliteMemoryStore
 │   ExperimentMemory（兼容）, TradeMemory（JSONL 空壳）
@@ -69,6 +74,7 @@ index_documents.py      文档切块 + 向量索引（Plus M3）
 query_memory.py         实验查询 + RAG 检索（Plus M3）
 generate_report.py    报告读取/生成
 run_agent.py          Supervisor 规则路由
+run_langgraph_workflow.py  ResearchWorkflow DAG（Plus M4，dry-run）
 run_pipeline.py       端到端 pipeline
 ```
 
@@ -135,7 +141,7 @@ collect_experiment_metrics → BaselineRegistry / comparison table
 
 ## 测试与部署
 
-- **pytest**：本地 **126 passed**（EXP-20260602-013）；服务器 M2 **115**（M3 pull 后预期 **126**）
+- **pytest**：本地 **136 passed, 1 skipped**（EXP-20260602-015）；服务器 **126**（M4 pull 后预期 136+1 skip）
 - **服务器**：`/mnt/localDisk3/weizian/Quant-MAS`，conda `quant-mas`，Python 3.11.15
 - **GitHub**：https://github.com/ytq0198/Quant-MAS
 
@@ -146,7 +152,7 @@ collect_experiment_metrics → BaselineRegistry / comparison table
 | **M1** 研究基线 | BaselineRegistry、compare_experiments | ✅ EXP-20260602-009/010 |
 | **M2** 数据扩展 | 多数据源 fetcher + registry | ✅ EXP-20260602-011/012，EXP-DATA-001 |
 | **M3** Memory/RAG v2 | SQLite / 向量 / HybridRetriever | ✅ 本地（EXP-20260602-013） |
-| **M4** LangGraph | 实验性 DAG（不替换 Supervisor） | 📋 待做 |
-| **M5–M8** | LLM、文本模型、RL、MCP | 📋 待做 |
+| **M4** LangGraph | ResearchWorkflow DAG | ✅ 本地（EXP-20260602-015） |
+| **M5** 上下文/LLM | ContextBuilder、ResearchAgent | 📋 待做 |
 
 详见 [项目plus设计.md](../项目plus设计.md)。
