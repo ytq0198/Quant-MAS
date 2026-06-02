@@ -305,6 +305,69 @@ python scripts/run_walk_forward.py \
 
 产物：`metrics.json`（含 train/val/test/oos）、`windows.csv`、`oos_equity_curve.csv`、`oos_trades.csv`、`summary.md`。
 
+## 六点五、Plus M2 数据 API smoke（EXP-DATA-001）
+
+> **切勿**把真实 key 写入 `.env.example` 或 commit 到 GitHub。只在服务器 **`/mnt/localDisk3/weizian/Quant-MAS/.env`** 配置（该文件已在 `.gitignore`）。
+
+```bash
+cd /mnt/localDisk3/weizian/Quant-MAS
+git pull origin main
+conda activate /mnt/localDisk3/weizian/conda_envs/quant-mas
+python -m pip install -e .
+python -m pytest -v   # 预期 114 passed
+
+# 首次：从模板创建 .env，用 nano/vim 填入 key（不要 paste 到 .env.example）
+cp .env.example .env
+nano .env
+```
+
+`.env` 需包含（示例，值用你自己的）：
+
+```env
+STOOQ_API_KEY=...
+ALPHAVANTAGE_API_KEY=...
+FINNHUB_API_KEY=...
+FRED_API_KEY=...
+SEC_EDGAR_USER_AGENT=YourName your@email.com   # SEC 必填；其余 M2 源已填 key 时可先测 FRED/AV/Finnhub
+```
+
+`download_data.py` 会通过 `load_repo_dotenv()` 自动加载项目根目录 `.env`。
+
+**建议 smoke 顺序**（有 key 的源）：
+
+```bash
+# 1. FRED 宏观（最稳）
+python scripts/download_data.py --source fred --series-id DGS10 \
+  --start 2024-01-01 --end 2024-12-31 \
+  --storage-config configs/storage.server.yaml
+ls -la /mnt/localDisk3/weizian/datasets/raw/macro/
+
+# 2. Alpha Vantage OHLCV（注意免费限速）
+python scripts/download_data.py --source alpha_vantage \
+  --symbols AAPL --start 2024-01-01 --end 2024-06-01 \
+  --storage-config configs/storage.server.yaml
+
+# 3. Finnhub OHLCV
+python scripts/download_data.py --source finnhub \
+  --symbols AAPL --start 2024-01-01 --end 2024-06-01 \
+  --storage-config configs/storage.server.yaml
+
+# 4. Stooq（已有 key，对照）
+python scripts/download_data.py --source stooq \
+  --symbols AAPL --start 2024-01-01 --end 2024-06-01 \
+  --storage-config configs/storage.server.yaml
+```
+
+SEC（需先改 `.env` 里 `SEC_EDGAR_USER_AGENT` 为真实姓名+邮箱）：
+
+```bash
+python scripts/download_data.py --source sec_edgar --cik 0000320193 \
+  --storage-config configs/storage.server.yaml
+ls -la /mnt/localDisk3/weizian/datasets/raw/sec/
+```
+
+通过后：在 `docs/experiment_log.md` 记 **EXP-DATA-001**，并更新 `docs/data_sources.md` 对应源 `status: verified`。
+
 ## 七、删除旧部署（如曾在 ~/quant-mas 建过）
 
 ```bash
