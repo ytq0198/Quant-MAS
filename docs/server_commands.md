@@ -2,46 +2,62 @@
 
 GitHub 仓库：[https://github.com/ytq0198/Quant-MAS](https://github.com/ytq0198/Quant-MAS)
 
-## 一、首次部署（Prompt 14）
+**推荐服务器路径**：`/mnt/localDisk3/weizian/Quant-MAS`
+
+> **重要**：必须先 `conda activate quant-mas`，再用 `python -m pytest`，不要直接敲 `pytest`（否则会用到系统 Python 3.9）。
+
+## 一、首次部署
 
 ```bash
 # 1. 创建目录并克隆
-mkdir -p ~/quant-mas
-cd ~/quant-mas
-git clone https://github.com/ytq0198/Quant-MAS.git repo
-cd repo
+mkdir -p /mnt/localDisk3/weizian
+cd /mnt/localDisk3/weizian
+git clone https://github.com/ytq0198/Quant-MAS.git
+cd Quant-MAS
 
 # 2. 创建数据目录
-mkdir -p ~/quant-mas/datasets/{raw,processed,features}
-mkdir -p ~/quant-mas/{models,reports,logs}
+mkdir -p /mnt/localDisk3/weizian/datasets/{raw,processed,features}
+mkdir -p /mnt/localDisk3/weizian/{models,reports,logs}
 
-# 3. 配置服务器路径（把 <USER> 换成你的用户名）
+# 3. 配置服务器路径
 cp configs/storage.server.yaml.example configs/storage.server.yaml
-# 编辑 configs/storage.server.yaml
+# 如需修改路径，编辑 configs/storage.server.yaml
 
 # 4. 安装环境
 bash server/setup_server.sh
 conda activate quant-mas
+pip install -r requirements.txt
+pip install -e .
 
-# 5. 验证
+# 5. 验证（必须用 python -m pytest）
+python -m pytest -v
+# 或
 bash server/run_server_tests.sh
+```
+
+自检：
+
+```bash
+which python      # 应指向 quant-mas 环境
+python --version  # 应为 3.11.x
+which pytest      # 应在 quant-mas 环境内
 ```
 
 ## 二、日常同步代码
 
 ```bash
-cd ~/quant-mas/repo
+cd /mnt/localDisk3/weizian/Quant-MAS
 git pull origin main
 conda activate quant-mas
 pip install -r requirements.txt
 pip install -e .
-pytest
+python -m pytest -v
 ```
 
 ## 三、下载真实行情数据
 
 ```bash
-cd ~/quant-mas/repo
+cd /mnt/localDisk3/weizian/Quant-MAS
 conda activate quant-mas
 
 python scripts/download_data.py \
@@ -51,12 +67,10 @@ python scripts/download_data.py \
   --storage-config configs/storage.server.yaml
 ```
 
-数据保存到 `~/quant-mas/datasets/raw/market_data.parquet`（由 storage 配置决定）。
-
-## 四、端到端 Pipeline（Prompt 11，真实数据）
+## 四、端到端 Pipeline
 
 ```bash
-cd ~/quant-mas/repo
+cd /mnt/localDisk3/weizian/Quant-MAS
 conda activate quant-mas
 
 python scripts/run_pipeline.py \
@@ -67,38 +81,13 @@ python scripts/run_pipeline.py \
   --experiment-name server_ma_cross_001
 ```
 
-或使用快捷脚本：
+或：`bash server/run_small_pipeline.sh`
 
-```bash
-bash server/run_small_pipeline.sh
-```
-
-## 五、分步运行（调试用）
+## 五、ML 训练
 
 ```bash
 conda activate quant-mas
-cd ~/quant-mas/repo
-STORAGE=configs/storage.server.yaml
-
-# 特征
-python scripts/build_features.py \
-  --storage-config $STORAGE
-
-# 回测
-python scripts/run_backtest.py \
-  --config configs/backtest.yaml \
-  --storage-config $STORAGE
-
-# 报告
-python scripts/generate_report.py --latest \
-  --storage-config $STORAGE
-```
-
-## 六、ML 训练（Prompt 15）
-
-```bash
-conda activate quant-mas
-cd ~/quant-mas/repo
+cd /mnt/localDisk3/weizian/Quant-MAS
 
 python scripts/train_model.py \
   --config configs/train.yaml \
@@ -106,46 +95,27 @@ python scripts/train_model.py \
   --experiment-name server_lgbm_001
 ```
 
-产物：`~/quant-mas/models/` 下的 metrics.json、feature_importance.csv、model 文件。
-
-## 七、ML 信号回测（Prompt 16，待实现）
+## 六、ML 回测 / Walk-forward（待实现）
 
 ```bash
-python scripts/run_ml_backtest.py \
-  --config configs/backtest_ml.yaml \
-  --storage-config configs/storage.server.yaml
+python scripts/run_ml_backtest.py --config configs/backtest_ml.yaml --storage-config configs/storage.server.yaml
+python scripts/run_walk_forward.py --config configs/walk_forward.yaml --storage-config configs/storage.server.yaml
 ```
 
-## 八、Walk-forward 样本外评估（Prompt 17，待实现）
+## 七、删除旧部署（如曾在 ~/quant-mas 建过）
 
 ```bash
-python scripts/run_walk_forward.py \
-  --config configs/walk_forward.yaml \
-  --storage-config configs/storage.server.yaml
+rm -rf ~/quant-mas
+# conda 环境可选删除：conda env remove -n quant-mas -y
 ```
 
-## 九、查看实验结果
+## 八、本地 ↔ 服务器工作流
 
-```bash
-# 报告目录
-ls ~/quant-mas/reports/
-
-# 实验记忆
-cat ~/quant-mas/reports/experiments.json
-
-# 训练日志
-tail -f ~/quant-mas/logs/server_pytest.log
-```
-
-## 十、本地 ↔ 服务器工作流
-
-| 操作 | 本地 Windows | 服务器 Linux |
-|------|-------------|--------------|
+| 操作 | 本地 Windows | 服务器 |
+|------|-------------|--------|
 | 写代码 | Codex | — |
-| 单元测试 | `pytest` | `bash server/run_server_tests.sh` |
-| 推送代码 | `git push` | — |
-| 拉取代码 | — | `git pull` |
-| 真实训练/回测 | 小数据可选 | **推荐** |
+| 测试 | `python -m pytest -v` | `conda activate quant-mas && python -m pytest -v` |
+| 推送/拉取 | `git push` | `git pull` |
 
 本地推送：
 

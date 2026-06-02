@@ -17,9 +17,52 @@ LLM agents are planned for research, planning, explanation, reporting, and tool 
 
 ```powershell
 pip install -e .
-pytest
+python -m pytest -v
 python -c "import quant_mas"
 ```
+
+## Server
+
+Recommended path: `/mnt/localDisk3/weizian/Quant-MAS`
+
+Copy the server storage example and edit paths:
+
+```bash
+cp configs/storage.server.yaml.example configs/storage.server.yaml
+```
+
+Set up a Python 3.11 conda environment:
+
+```bash
+bash server/setup_server.sh
+conda activate quant-mas   # required — do not use system Python 3.9
+pip install -r requirements.txt
+pip install -e .
+```
+
+Run tests (**always use `python -m pytest`, not bare `pytest`**):
+
+```bash
+conda activate quant-mas
+python -m pytest -v
+# or
+bash server/run_server_tests.sh
+```
+
+Verify the active interpreter:
+
+```bash
+which python    # should be quant-mas env (e.g. .../conda_envs/quant-mas/bin/python)
+python --version   # should be 3.11.x
+```
+
+Run a small pipeline example:
+
+```bash
+bash server/run_small_pipeline.sh
+```
+
+The setup script does not download large data. The small pipeline script uses `AAPL MSFT SPY` by default and writes logs/reports to configured server paths.
 
 ## Project Principles
 
@@ -27,4 +70,3 @@ python -c "import quant_mas"
 - Agent Layer owns research, planning, explanation, reporting, and orchestration.
 - All trading signals must pass backtesting, risk checks, audit, and human confirmation before any live action.
 - Tests must not rely on real network requests or real LLM APIs.
-
