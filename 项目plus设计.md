@@ -418,26 +418,20 @@ python scripts/query_memory.py \
 
 ### 给 Codex 的提示词
 
+> **完整版**（含节点映射、sequential fallback、验收清单）：[docs/codex_prompt_M4.md](docs/codex_prompt_M4.md)
+
 ```
-请为 Quant MAS v2 增加实验性 LangGraph 编排层，不替换 SupervisorAgent。
-
-ResearchWorkflow 节点：DataCheck → FeatureBuild → TrainModel → MLBacktest → RiskCheck → Report
-
-需要实现：
-
-1. src/quant_mas/orchestration/langgraph_state.py — QuantWorkflowState
-2. src/quant_mas/orchestration/nodes.py — 每节点只调现有 Tool
-3. src/quant_mas/orchestration/langgraph_workflow.py — build/run
-4. scripts/run_langgraph_workflow.py — --dry-run
-5. configs/langgraph_workflow.yaml
-6. tests/test_langgraph_workflow.py — 无 langgraph 时 skip；验证节点顺序与 state.errors
-
-要求：不接 broker、不调 LLM、工具调用记事件、全量 pytest 通过。
-
-验收：
-1. python scripts/run_langgraph_workflow.py --help
-2. pytest tests/test_langgraph_workflow.py
+请为 Quant MAS v2 增加实验性 LangGraph 编排层（Plus M4）。
+（详见 docs/codex_prompt_M4.md — 复制「固定前缀」+「M4 主任务」整段）
 ```
+
+### 运行位置与验收
+
+| 项目 | 说明 |
+|------|------|
+| Codex | 本地 + dry-run mock 测试 |
+| Cursor | langgraph_workflow.md、EXP 记录 |
+| 服务器 | pull → pytest 126+ → `run_langgraph_workflow.py --dry-run` |
 
 ### 给 Cursor 的提示词
 
