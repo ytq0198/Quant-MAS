@@ -32,6 +32,15 @@
 
 ## 当前验证记录
 
+### EXP-20260601-015：Prompt 13 文档收口 ✅
+
+- 日期：2026-06-01
+- 阶段：第一阶段（Prompt 13，主链路完成后统一整理）
+- 内容：同步 `docs/progress.md`、`docs/architecture.md`、`docs/experiment_log.md` 与 `项目进度.md` / `项目指导.md`
+- 验收：测试基线统一为 **98 passed**；阶段表与 EXP 里程碑一致；无虚构实验
+- 问题：无
+- 下一步：科研实验 / 论文材料；可选 EXP-TODO-006
+
 ### EXP-20260601-014：服务器 Prompt 20 pull 后全量 pytest ✅
 
 - 日期：2026-06-01
@@ -40,7 +49,7 @@
 - 命令：`git pull` → `python -m pip install -e .` → `python -m pytest -v`
 - 指标：全量 **98 passed** in **1.93s**（含 `test_memory_rag.py` 11 项）
 - 问题：无
-- 下一步：Prompt 13 文档收口；科研实验 / 论文材料
+- 下一步：文档收口（已完成 EXP-20260601-015）
 
 ### EXP-20260601-013：Prompt 20 Memory/RAG 本地验证 ✅
 
@@ -53,7 +62,7 @@
   - 全量：**98 passed**（+11）
 - 验收：嵌套 metric（如 `oos.sharpe`）排序；docs 关键词检索；无 LLM/向量库
 - 问题：无
-- 下一步：push 后服务器 pytest
+- 下一步：服务器 pytest（已完成 EXP-20260601-014）
 
 ### EXP-20260601-012：服务器 Prompt 19 pull 后全量 pytest ✅
 
@@ -369,6 +378,12 @@
 | EXP-20260601-004 | 2026-06-01 | Stooq 真实数据 + ma_cross | 6033 rows，sharpe ≈ 1.00 |
 | EXP-20260601-006 | 2026-06-01 | CPU LightGBM 训练 | test AUC 0.466 |
 | EXP-20260602-004 | 2026-06-02 | GPU LightGBM 训练 | device=cuda，test AUC 0.479 |
-| EXP-20260602-005 | 2026-06-02 | ML 信号回测（单段） | sharpe 2.78（in-sample 风格） |
-| EXP-20260602-007 | 2026-06-02 | Walk-forward 本地 | 71 passed |
-| EXP-20260602-008 | 2026-06-02 | Walk-forward 服务器 | **OOS sharpe 0.586**，+44%，19 窗 |
+| EXP-20260602-005 | 2026-06-02 | ML 信号回测（单段） | sharpe 2.78（in-sample，勿混用） |
+| EXP-20260602-008 | 2026-06-02 | Walk-forward 服务器 | **OOS sharpe 0.586**，19 窗 |
+| EXP-20260601-009 | 2026-06-01 | Prompt 18 风控本地 | 76 passed |
+| EXP-20260601-010 | 2026-06-01 | Prompt 18 服务器 pytest | 76 passed |
+| EXP-20260601-011 | 2026-06-01 | Prompt 19 Supervisor 本地 | 87 passed |
+| EXP-20260601-012 | 2026-06-01 | Prompt 19 服务器 pytest | 87 passed |
+| EXP-20260601-013 | 2026-06-01 | Prompt 20 Memory/RAG 本地 | 98 passed |
+| EXP-20260601-014 | 2026-06-01 | Prompt 20 服务器 pytest | 98 passed（1.93s） |
+| EXP-20260601-015 | 2026-06-01 | Prompt 13 文档收口 | 三份 docs 与主文档对齐 |
