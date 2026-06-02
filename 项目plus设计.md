@@ -789,10 +789,10 @@ flowchart TB
 ```
 你正在开发 Quant MAS 科研项目。
 路径：D:\scientific reasearch and work\SRTP\Quant MAS
-测试基线：本地 126 passed（Plus M3）；OOS baseline sharpe 0.586（EXP-20260602-008）。
+测试基线：本地 136+1 skip（Plus M4）；OOS baseline sharpe 0.586（EXP-20260602-008）。
 LLM 不允许直接下单；pytest 不联网不调真实 LLM。
 请只实现当前一个模块，完成后 python -m pytest -v 全量通过。
-详细需求见 项目plus设计.md 的 M4 章节。
+详细需求见 项目plus设计.md 的 M5 章节。
 ```
 
 ---
