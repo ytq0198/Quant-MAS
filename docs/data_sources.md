@@ -68,8 +68,15 @@ python scripts/download_data.py \
 
 ### Alpha Vantage 免费 tier
 
-- 默认应使用 **`outputsize=compact`**（项目 fetcher 已改）
-- 限速约 5 次/分钟；symbol 间建议 `--delay 12` 或更高
+- 默认 **`outputsize=auto`**：先 `full`，再 `compact`
+- **`compact` 仅含最近 ~100 个交易日** — 请求 2024 年区间会得到 0 行（不是 key 坏了）
+- **历史 OHLCV** 请用 **Stooq**；AV smoke 请用**最近 3 个月**，例如：
+
+```bash
+python scripts/download_data.py --source alpha_vantage \
+  --symbols AAPL --start 2026-01-01 --end 2026-06-01 \
+  --storage-config configs/storage.server.yaml
+```
 
 ## API Key 注册
 

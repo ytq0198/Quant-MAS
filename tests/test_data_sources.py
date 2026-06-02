@@ -81,6 +81,31 @@ def test_alpha_vantage_fetcher_parses_daily_ohlcv(monkeypatch: pytest.MonkeyPatc
     assert float(result.loc[0, "close"]) == 10.5
 
 
+def test_alpha_vantage_auto_reports_available_range_when_filter_empty(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    payload = {
+        "Time Series (Daily)": {
+            "2026-05-01": {
+                "1. open": "10.0",
+                "2. high": "11.0",
+                "3. low": "9.0",
+                "4. close": "10.5",
+                "5. volume": "1000",
+            }
+        }
+    }
+    monkeypatch.setattr(
+        "urllib.request.urlopen",
+        lambda url, timeout=60.0: FakeResponse(payload),
+    )
+
+    with pytest.raises(ValueError, match="2026-05-01"):
+        AlphaVantageFetcher(
+            api_key="key", outputsize="compact", delay_between_symbols_seconds=0
+        ).fetch(["AAPL"], "2024-01-01", "2024-06-01")
+
+
 def test_finnhub_fetcher_parses_candle_ohlcv(monkeypatch: pytest.MonkeyPatch) -> None:
     timestamp = int(pd.Timestamp("2026-01-02").timestamp())
     payload = {
