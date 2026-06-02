@@ -4,8 +4,25 @@ GitHub 仓库：[https://github.com/ytq0198/Quant-MAS](https://github.com/ytq019
 
 **推荐服务器路径**：`/mnt/localDisk3/weizian/Quant-MAS`
 
-> **重要**：必须先 `conda activate quant-mas`，再用 `python -m pytest`，不要直接敲 `pytest`（否则会用到系统 Python 3.9）。
+> **重要**：必须先 `conda activate quant-mas`，再用 `python -m pytest` 和 `python -m pip`，不要裸敲 `pytest` / `pip`。
 
+## 验证记录（2026-06-02）
+
+| 项目 | 值 |
+|------|-----|
+| 主机 | a6000-9961 |
+| 项目路径 | `/mnt/localDisk3/weizian/Quant-MAS` |
+| Conda 环境 | `/mnt/localDisk3/weizian/conda_envs/quant-mas` |
+| Python | 3.11.15 |
+| pytest | **44 passed in 1.19s** |
+
+验证命令：
+
+```bash
+conda activate /mnt/localDisk3/weizian/conda_envs/quant-mas
+cd /mnt/localDisk3/weizian/Quant-MAS
+python -m pytest -v
+```
 ## 一、首次部署
 
 ```bash

@@ -56,6 +56,23 @@
 - 问题：仅为 smoke test，不代表真实市场表现
 - 下一步：用 sample parquet 或真实小规模数据验证
 
+### EXP-20260602-003：服务器全量 pytest 验证
+
+- 日期：2026-06-02
+- 阶段：Phase 1 服务器部署验证
+- 环境：
+  - 主机：a6000-9961
+  - 路径：`/mnt/localDisk3/weizian/Quant-MAS`
+  - Conda：`/mnt/localDisk3/weizian/conda_envs/quant-mas`
+  - Python：3.11.15
+- 数据：synthetic（pytest 内置，不联网）
+- 策略 / 模型：全模块单元 / 集成测试
+- 参数：`python -m pytest -v`
+- 指标：**44 passed in 1.19s**
+- 产物路径：无（测试不产生持久产物）
+- 问题：无
+- 下一步：安装 `requirements-data.txt` 和 `requirements-ml.txt`，跑真实数据实验
+
 ## 待验证实验
 
 ### EXP-TODO-001：真实数据下载验证

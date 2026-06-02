@@ -25,6 +25,8 @@ python -c "import quant_mas"
 
 Recommended path: `/mnt/localDisk3/weizian/Quant-MAS`
 
+**Verified (2026-06-02):** Python 3.11.15, **44 passed** on server `a6000-9961`.
+
 Copy the server storage example and edit paths:
 
 ```bash

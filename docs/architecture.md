@@ -129,10 +129,12 @@ run_pipeline.py     端到端 pipeline
 
 ### Phase 1 收口
 
-- 用真实或 sample parquet 验证完整 pipeline
-- 增加风险检查模块
-- 完善报告格式
-- 更新 README 和运行手册
+- [x] 服务器 Python 3.11 环境部署
+- [x] 全量 pytest 验证（44 passed，2026-06-02）
+- [ ] 安装 data/ml 可选依赖
+- [ ] 用真实或 sample parquet 验证完整 pipeline
+- [ ] 增加风险检查模块
+- [ ] 完善报告格式
 
 ### Phase 2 机器学习实验
 

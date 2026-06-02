@@ -23,11 +23,18 @@ Phase 1 收口中：当前已经完成最小量化闭环的主要工程模块，
 
 ## 当前 pytest 状态
 
-最近一次本地验证：
+| 环境 | Python | 结果 | 日期 |
+|------|--------|------|------|
+| 本地 Windows | 3.11+ | **44 passed** | 2026-06-02 |
+| 服务器 Linux | 3.11.15 | **44 passed**（1.19s） | 2026-06-02 |
+
+服务器验证环境：
 
 ```text
-pytest
-44 passed
+主机：a6000-9961
+项目路径：/mnt/localDisk3/weizian/Quant-MAS
+Conda 环境：/mnt/localDisk3/weizian/conda_envs/quant-mas
+命令：python -m pytest -v
 ```
 
 说明：
@@ -36,6 +43,8 @@ pytest
 - 测试不访问真实网络。
 - 测试不调用真实 LLM API。
 - 测试不要求真实 LightGBM。
+- 服务器上必须使用 `python -m pytest`，不能裸敲 `pytest`（否则会误用 Python 3.9）。
+- 服务器上必须使用 `python -m pip`，不能裸敲 `pip`。
 
 ## 当前可用 CLI
 
@@ -78,11 +87,13 @@ python scripts/run_pipeline.py --help
 
 ### Phase 1：最小量化闭环收口
 
-- [ ] 在服务器或稳定 Python 3.11 环境中完整安装依赖
-- [ ] 用小规模真实或 sample 数据验证 `run_pipeline.py`
+- [x] 在服务器 Python 3.11 环境中完整安装核心依赖
+- [x] 服务器全量 pytest 验证（44 passed）
+- [ ] 安装 `requirements-data.txt`（yfinance）并验证真实数据下载
+- [ ] 安装 `requirements-ml.txt`（lightgbm）并验证真实训练
+- [ ] 用小规模真实数据验证 `run_pipeline.py`
 - [ ] 整理一份真实 pipeline 运行报告
 - [ ] 增加基础风险检查模块
-- [ ] 完善 README 的运行示例
 
 ### Phase 2：机器学习真实实验
 
