@@ -21,7 +21,7 @@ python -m pytest -v
 python -c "import quant_mas"
 ```
 
-**Current test status:** local **137 passed, 1 skipped** (138 items; EXP-20260602-015, Plus M4); with orchestration **138 passed**; server langgraph backend ✅ (EXP-20260602-016 @ `c0fa5e3`).
+**Current test status:** local **150 passed, 1 warning** (EXP-20260602-017, Plus M5); server M5 re-verify after pull.
 
 ## Server
 
@@ -31,6 +31,7 @@ Recommended path: `/mnt/localDisk3/weizian/Quant-MAS`
 
 | Date | Check | Result |
 |------|--------|--------|
+| 2026-06-03 | Plus M5 context/LLM (local) | **150+1 warning** (+12 tests) | EXP-20260602-017 |
 | 2026-06-03 | Plus M4 LangGraph server (langgraph backend) | langgraph dry-run ✅ | EXP-20260602-016 |
 | 2026-06-02 | Plus M4 LangGraph workflow (local) | **137+1 skip** (138 items) | EXP-20260602-015 |
 | 2026-06-02 | Plus M3 Memory/RAG v2 (local+server) | **126 passed** | EXP-20260602-013/014 |

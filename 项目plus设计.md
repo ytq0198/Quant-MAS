@@ -4,7 +4,7 @@
 
 > 本文档在 **Prompt 1–20 主链路已完成**（第零～四阶段）的基础上，规划 **Quant MAS v2** 的研究型升级路线。  
 > 基线状态：本地 **137+1 skip**（138 项；EXP-20260602-015）；服务器 M4 langgraph ✅（EXP-20260602-016 @ `c0fa5e3`）。  
-> **当前执行**：M4 本地+服务器 ✅ → **M5**。  
+> **当前执行**：M5 本地 ✅（EXP-20260602-017）→ 服务器 M5 验收 → **M6**。  
 > 与 `项目进度.md` / `项目指导.md` 的关系：后者记录「已完成什么」；本文档记录「接下来怎么优化、怎么给 Codex/Cursor 下指令」。
 
 ---
@@ -68,8 +68,8 @@
 ### 2.1 工程完成度
 
 - **第零～四阶段 + Prompt 13 文档收口** ✅
-- **测试**：本地 **137+1 skip**（138 项）；含 orchestration **138 passed**；服务器 langgraph dry-run ✅（EXP-20260602-016）
-- **Orchestration（M4）** ✅：ResearchWorkflow、sequential + langgraph（EXP-20260602-015/016）
+- **测试**：本地 **150 passed, 1 warning**（EXP-20260602-017）；服务器 M5 待 pull
+- **Context/LLM（M5）** ✅ 本地：ContextBuilder、ResearchAgent、resolve_llm_client（EXP-20260602-017）
 - **Memory/RAG v2（M3 第一版）** ✅ 本地：MemoryStore JSON/SQLite、HybridRetriever、index/query CLI（EXP-20260602-013）
 - **M3.5 企业 RAG**：📋 待定（真 Embedding + 持久化向量 + Postgres；见 [§M3.5](#m35企业-rag-扩展待定)）
 - **Research Layer（M1）**：BaselineRegistry、`compare_experiments.py` ✅
@@ -96,9 +96,10 @@
 ### 3.1 当前推荐执行顺序（2026-06-03 更新）
 
 ```
-已完成   M1 → M2 → M3 → **M4 ✅**（EXP-20260602-015/016）
+已完成   M1 → M2 → M3 → M4 → **M5 ✅**（EXP-20260602-017）
 
-进行中   **M5** 上下文/LLM
+进行中   ① 服务器 M5 pull + pytest 150+1 warning
+         ② **M6** 文本大模型
 
 按需扩展 M3.5 企业 RAG（真 Embedding / pgvector / Postgres / Neo4j）
          ↑ 触发条件见 §M3.5，不阻塞 M5
@@ -110,7 +111,7 @@
 
 ```
 优先级 1（先做）  M1 研究基线  →  M2 数据扩展  →  M3 Memory/RAG 第一版 ✅
-优先级 2          M4 LangGraph ✅  →  M5 上下文/LLM
+优先级 2          M4 LangGraph ✅  →  M5 上下文/LLM ✅  →  M6 文本大模型
 优先级 2.5（按需） M3.5 企业 RAG 扩展（不替换 M3 接口，只加后端）
 优先级 3          M6 文本大模型微调
 优先级 4          M7 RL / GRPO
@@ -451,6 +452,8 @@ python scripts/query_memory.py \
 
 ## M5：上下文工程与真实 LLM 接入
 
+> **状态：✅ 本地（EXP-20260602-017）** · [context_engineering.md](docs/context_engineering.md) · [codex_prompt_M5.md](docs/codex_prompt_M5.md)
+
 ### 目标
 
 ResearchAgent / ReportAgent 可接真实 LLM，**仅**用于研究解释、报告摘要、实验建议 — **不**用于生成订单。
@@ -622,7 +625,7 @@ MODEL_CACHE_DIR=/mnt/localDisk3/weizian/models/hf
 | **M3** Memory/RAG 第一版 | 3 | SQLite/InMemory/索引脚本 | database_setup.md | **无（默认）** | ✅ |
 | **M3.5** 企业 RAG | 3.5 | Postgres/pgvector/FAISS 后端 | codex_prompt_M3_enterprise（待写） | Embedding/DB | 按需 |
 | **M4** LangGraph | 4 | workflow + nodes | langgraph_workflow.md | 无 | ✅ |
-| **M5** 上下文/LLM | 5 | ContextBuilder、ResearchAgent | [codex_prompt_M5.md](docs/codex_prompt_M5.md) | DeepSeek/OpenAI-compatible | 待做 |
+| **M5** 上下文/LLM | 5 | ContextBuilder、ResearchAgent | [context_engineering.md](docs/context_engineering.md) | DeepSeek/OpenAI-compatible | ✅ 本地 |
 | **M6** 文本大模型 | 6 | FinBERT/LoRA 骨架 | text_model_plan、GPU 实验 | HF_TOKEN | ✅ |
 | **M7** RL/GRPO | 7 | TradingEnv、GRPO ranking | rl_plan.md | W&B 可选 | ✅ |
 | **M8** MCP/A2A | 8 | protocol adapter | protocols.md | 暂不接 | ❌ |
@@ -776,7 +779,7 @@ flowchart TB
 ```
 你正在开发 Quant MAS 科研项目。
 路径：D:\scientific reasearch and work\SRTP\Quant MAS
-测试基线：本地 137+1 skip（138 项；Plus M4）；含 orchestration 138 passed；OOS baseline sharpe 0.586（EXP-20260602-008）。
+测试基线：本地 150+1 warning（Plus M5）；OOS baseline sharpe 0.586（EXP-20260602-008）。
 LLM 不允许直接下单；pytest 不联网不调真实 LLM。
 请只实现当前一个模块，完成后 python -m pytest -v 全量通过。
 详细需求见 docs/codex_prompt_M5.md 的 M5 章节。
@@ -784,4 +787,4 @@ LLM 不允许直接下单；pytest 不联网不调真实 LLM。
 
 ---
 
-*文档版本：2026-06-03 · Quant MAS Plus v2（M4 ✅，下一步 M5）*
+*文档版本：2026-06-03 · Quant MAS Plus v2（M5 ✅ 本地，下一步 M6）*

@@ -2,7 +2,7 @@
 
 更新时间：2026-06-03（Plus M4 服务器 ✅ EXP-20260602-016）
 
-**Plus v2**：**M1–M4 ✅**（M4 本地+服务器；**137+1 skip** / 含 orchestration **138 passed**）→ **M5**
+**Plus v2**：**M1–M5 ✅**（M5 本地 **150+1 warning**，EXP-20260602-017）→ **M6**
 
 第五～六阶段见 [项目plus设计.md](../项目plus设计.md)（M4 LangGraph / M7 模拟，非实盘）。
 
@@ -20,7 +20,8 @@
 | **Plus M2** | 数据扩展 | ✅ | EXP-20260602-011/012，EXP-DATA-001 |
 | **Plus M3** | Memory/RAG v2 | ✅ 本地 | EXP-20260602-013，**126 passed** |
 | **Plus M4** | LangGraph 编排 | ✅ | EXP-20260602-015/016 |
-| **Plus M5** | 上下文/LLM | 📋 | 见 项目plus设计.md |
+| **Plus M5** | 上下文/LLM | ✅ 本地 | EXP-20260602-017 |
+| **Plus M6** | 文本大模型 | 📋 | 见 项目plus设计.md |
 | 第五～六阶段 | 编排 / RL 模拟 | 📋 | Plus M4 / M7 |
 
 ## Quant MAS v2：M1 研究基线
@@ -131,12 +132,27 @@ M1/M2 已完成；**M3 本地 ✅**（见下两节）；下一步 **M4**。
 | 全量 pytest（本地） | ✅ **137+1 skip** / **138 passed**（含 orchestration） |
 | 全量 pytest（服务器） | ✅ langgraph invoke + dry-run（EXP-016 @ `c0fa5e3`） |
 
+- [x] **Plus M5**：Context + ResearchAgent + 可选 LLM（EXP-20260602-017，**150+1 warning**）
+
+## Quant MAS v2：M5 上下文/LLM
+
+> [context_engineering.md](context_engineering.md)
+
+| 项目 | 状态 |
+|------|------|
+| ContextBuilder + compression | ✅ |
+| ResearchAgent / ReportResult | ✅ |
+| resolve_llm_client（默认 Mock） | ✅ |
+| test_context_engineering | ✅ 12 passed, 1 warning |
+| 全量 pytest（本地） | ✅ **150 passed, 1 warning** |
+| 服务器 | 📋 待 pull |
+
 ## 当前 pytest 状态
 
 | 环境 | Python | 结果 | 日期 | 实验 |
 |------|--------|------|------|------|
-| 本地 Windows | 3.11+ | **137+1 skip** / **138 passed**（orchestration） | 2026-06-03 | EXP-20260602-015/016 |
-| 服务器 a6000-9961 | 3.11.15 | langgraph backend ✅ | 2026-06-03 | EXP-20260602-016 @ `c0fa5e3` |
+| 本地 Windows | 3.11+ | **150 passed, 1 warning** | 2026-06-03 | EXP-20260602-017 |
+| 服务器 a6000-9961 | 3.11.15 | M4 langgraph ✅ | 2026-06-03 | M5 待 pull |
 
 命令：`python -m pytest -v`（勿裸敲 `pytest` / `pip`）。
 
@@ -204,6 +220,6 @@ python scripts/query_memory.py --help
 
 ## 后续工作
 
-- **M5 上下文/LLM**：见 [codex_prompt_M5.md](codex_prompt_M5.md) · [项目plus设计.md §M5](../项目plus设计.md#m5上下文工程与真实-llm-接入)
+- **M6 文本大模型**：见 [项目plus设计.md §M6](../项目plus设计.md#m6金融文本大模型--开源模型微调)
 - 科研：特征/模型调参、更多 walk-forward 窗口（**必须标注 OOS**）
 - 可选：SEC smoke、CPU 对照 `server_lgbm_cpu_001`（EXP-TODO-006）

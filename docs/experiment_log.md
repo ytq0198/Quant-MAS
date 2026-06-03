@@ -1,6 +1,6 @@
 # Quant MAS 实验记录
 
-更新时间：2026-06-03（Plus M4 服务器 EXP-20260602-016）
+更新时间：2026-06-03（Plus M5 本地 EXP-20260602-017）
 
 本文件用于记录真实实验和重要验证。不要记录未经实际运行的数据结果；尚未真实运行的项目标记为「待验证」。
 
@@ -88,6 +88,28 @@
 ```
 
 ## 当前验证记录
+
+### EXP-20260602-017：Plus M5 上下文/LLM 本地验证 ✅
+
+- 日期：2026-06-03
+- 阶段：Plus v2 **M5**
+- 模块：
+  - Context：`context_schema.py`、`context_builder.py`、`compression.py`
+  - LLM：`OpenAICompatibleLLMClient`、`resolve_llm_client`
+  - Agent：`ResearchAgent`；`ReportAgent` + `ReportResult`
+  - CLI：`run_research_agent.py`；`generate_report.py --use-llm`
+  - 配置：`configs/context.yaml`、`configs/llm.yaml`；`.env.example` LLM_* 占位符
+- 指标：
+  - `test_context_engineering.py` → **12 passed, 1 warning**（无 key 回退 Mock，预期）
+  - `test_agent_core.py` → **6 passed**
+  - `test_supervisor_agent.py` → **17 passed**
+  - 全量 → **150 passed, 1 warning**（+12，138→150）
+- 验收：
+  - `run_research_agent.py --task "Summarize OOS baseline vs latest ML run"` Mock JSON 正常
+  - `generate_report.py --help` / `--latest` 行为保持
+  - Supervisor **未替换**；metrics 不被 LLM 覆盖
+- 问题：无
+- 下一步：push → 服务器 pytest → 可选 EXP-LLM-001（真实 LLM smoke）
 
 ### EXP-20260602-016：Plus M4 服务器 LangGraph 验收 ✅
 
@@ -573,6 +595,7 @@
 | EXP-20260602-009 | 2026-06-02 | Plus M1 研究基线本地 | **102 passed**（+4 测试） |
 | EXP-20260602-010 | 2026-06-02 | Plus M1 服务器 pytest + 比较表 | **102 passed**；OOS sharpe 0.586 |
 | EXP-20260602-011 | 2026-06-02 | Plus M2 数据扩展本地 | **115 passed**（+13） |
+| EXP-20260602-017 | 2026-06-03 | Plus M5 上下文/LLM 本地 | **150+1 warning**（+12） |
 | EXP-20260602-016 | 2026-06-03 | Plus M4 服务器 langgraph backend | langgraph dry-run ✅；commit `c0fa5e3` |
 | EXP-20260602-015 | 2026-06-02 | Plus M4 LangGraph 本地 | **137+1 skip**（138 项；+11 workflow 测试） |
 | EXP-20260602-014 | 2026-06-02 | Plus M3 服务器 pytest + RAG smoke | **126 passed**（3.04s） |

@@ -1,0 +1,13 @@
+context:
+  max_rag_chunks: 5
+  max_snippet_chars: 400
+  max_bundle_chars: 8000
+  metric_keys:
+    - oos.sharpe
+    - oos.total_return
+    - oos.max_drawdown
+    - sharpe
+    - total_return
+    - max_drawdown
+    - test_auc
+  baseline_experiment_hint: EXP-20260602-008
