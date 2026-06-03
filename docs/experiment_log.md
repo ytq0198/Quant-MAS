@@ -1,6 +1,6 @@
 # Quant MAS 实验记录
 
-更新时间：2026-06-03（v3 M10 服务器 ✅ EXP-LLM-002 local_vllm smoke；EXP-026 DB smoke 待 Docker）
+更新时间：2026-06-03（v3 M9 ✅ EXP-026 Postgres/pgvector smoke · M10 ✅ EXP-LLM-002）
 
 本文件用于记录真实实验和重要验证。不要记录未经实际运行的数据结果；尚未真实运行的项目标记为「待验证」。
 
@@ -178,6 +178,20 @@
 
 ## 当前验证记录
 
+### EXP-20260602-026：v3 M9 服务器 Postgres/pgvector 真实 DB smoke ✅
+
+- 日期：2026-06-03
+- 阶段：**v3 M9** — Docker Postgres + pgvector 真实联调（非 mock）
+- 环境：a6000-9961；conda `quant-mas`；代码 @ **`02bdb8a`**（psycopg3 cursor 修复）；infra `/mnt/localDisk3/weizian/infra/quant-mas-db/`
+- 前置：`weizian` 加入 **docker 组** → `setup.sh` 启动 `quant-mas-postgres`；`POSTGRES_DSN` 在 `.env`
+- 命令与结果：
+  - `python scripts/seed_postgres_from_json.py --json-path /mnt/localDisk3/weizian/reports/experiments.json` → **imported=6**
+  - `python scripts/query_memory.py --backend postgres --best-metric oos.sharpe` → **`server_walk_forward_001`**，`oos.sharpe` **0.586**（与 EXP-20260602-008 OOS baseline 一致）
+  - `python scripts/index_documents.py --vector-store pgvector --dirs docs --embedding-dimensions 64` → **documents=24, chunks=443**
+- 修复：首次 seed 后 `find_best` 报 `Connection has no fetchall` → **`_psycopg_compat.py`**（psycopg3 从 cursor 取行）
+- 问题：无（6 条实验已入库，无需重复 seed；重复跑用 `--skip-existing`）
+- 下一步：EXP-TEXT-WF-002；M11 竞争学习
+
 ### EXP-LLM-002：v3 M10 服务器 local_vLLM + ResearchAgent smoke ✅
 
 - 日期：2026-06-03
@@ -198,7 +212,7 @@
   - Qwen 常把 JSON 包在 markdown fence → 顶层 `hypothesis` 可能 fallback；实质内容在 `evidence_summary`
   - LLM 叙事非权威；论文主指标仍为 **OOS 0.586**
 - 问题：无（FlashInfer/CUDA12 已通过 `VLLM_USE_FLASHINFER_SAMPLER=0` 规避；GPU OOM 因重复起第二个 vLLM，kill 旧进程即可）
-- 下一步：EXP-026 Postgres smoke；EXP-TEXT-WF-002
+- 下一步：~~EXP-026 Postgres smoke~~ ✅；EXP-TEXT-WF-002
 
 ### EXP-20260602-028：v3 M9/M10 服务器 pytest 验收 ✅
 
@@ -209,7 +223,7 @@
   - `python -m pytest -v` → **212 passed** in **11.39s**
   - 含 `test_memory_enterprise.py` **12/12**、`test_context_engineering.py` **17/17**（全 mock，不联网）
 - 问题：无
-- 下一步：EXP-026 真实 Postgres smoke（待 Docker 权限）；~~EXP-LLM-002~~ ✅
+- 下一步：~~EXP-026 真实 Postgres smoke~~ ✅；~~EXP-LLM-002~~ ✅
 
 ### EXP-20260602-027：v3 M10 LLM 生产化本地验证 ✅
 
@@ -230,16 +244,10 @@
 - 问题：无
 - 下一步：~~服务器 pytest **212**~~ ✅ EXP-028；~~vLLM smoke EXP-LLM-002~~ ✅
 
-### EXP-20260602-026：v3 M9 服务器 Postgres/pgvector 真实 DB smoke 📋 阻塞中
+### EXP-20260602-026（历史探测，已由上方 ✅ 条目取代）
 
-- 日期：2026-06-01（探测 + 更新）
-- 阶段：**v3 M9** 真实 Postgres/pgvector 联调（**pytest 部分已由 EXP-028 完成**）
-- 环境：a6000-9961；infra `/mnt/localDisk3/weizian/infra/quant-mas-db/` 已备；`.env` POSTGRES_DSN 已配置
-- 仍阻塞：
-  1. **weizian 不在 docker 组** → 无法 `docker compose up`；**5432 未监听**
-  2. 未跑 `query_memory.py --backend postgres` / `index_documents.py --vector-store pgvector` 真实 smoke
-- ~~git / pytest~~：✅ **212 passed**（EXP-028 @ `3fd32e0`）
-- 下一步：管理员 docker 组 → `setup.sh` → 完成 EXP-026 DB smoke
+- 日期：2026-06-01（探测）；**2026-06-03 验收完成**
+- 曾阻塞：weizian 不在 docker 组 → 2026-06-03 解除
 
 ### EXP-20260602-025：v3 M9 企业数据与数据库本地验证 ✅
 
@@ -262,7 +270,7 @@
   - 全量 `python -m pytest -v` → **207 passed**（195→207，+12）
 - 安全边界：企业后端测试全 mock，不联网；`DATABASE_URL` / Neo4j 凭据仅环境变量，不入 git
 - 问题：无
-- 下一步：服务器 Postgres 真实连接 + index/query（EXP-20260602-026）；M10 LLM / vLLM
+- 下一步：~~服务器 Postgres 真实连接 + index/query~~ ✅ EXP-026；~~M10 LLM / vLLM~~ ✅
 
 ### EXP-20260602-024：Plus M8 MCP/A2A 协议层服务器验收 ✅
 
@@ -961,7 +969,7 @@
 | EXP-20260602-011 | 2026-06-02 | Plus M2 数据扩展本地 | **115 passed**（+13） |
 | EXP-20260602-028 | 2026-06-01 | v3 M9/M10 服务器 pytest | **212 passed**（11.39s）@ `3fd32e0` |
 | EXP-20260602-027 | 2026-06-01 | v3 M10 LLM 本地 | **212 passed**（+5）；context **17/17** |
-| EXP-20260602-026 | 2026-06-01 | v3 M9 服务器 DB | 📋 阻塞：docker 权限 + 待 pull |
+| EXP-20260602-026 | 2026-06-03 | v3 M9 服务器 DB | ✅ Postgres query + pgvector **443 chunks**；OOS **0.586** @ `02bdb8a` |
 | EXP-20260602-025 | 2026-06-01 | v3 M9 企业 DB 本地 | **207 passed**（+12）；enterprise **12/12** |
 | EXP-20260602-024 | 2026-06-01 | Plus M8 MCP/A2A 服务器 | **195 passed**（12.41s）；export_agent_cards ✅ |
 | EXP-20260602-023 | 2026-06-01 | Plus M8 MCP/A2A 本地 | **195 passed**（+15）；protocols **15/15** |

@@ -631,7 +631,7 @@ docker exec quant-mas-postgres psql -U quant_mas -d quant_mas \
 
 - pytest 默认 mock，**不依赖**真实 Postgres / vLLM
 - `--best-metric oos.sharpe` 需要 Postgres 里已有实验记录 → 先跑 **seed**（默认 JSON 路径是仓库内空路径，须指向服务器 `reports/experiments.json`）
-- 记录：**EXP-025** 本地 207；**EXP-027/028** 212；**EXP-LLM-002** ✅；**EXP-026** 完成后再更新 `experiment_log.md`
+- 记录：**EXP-025** 本地 207；**EXP-027/028** 212；**EXP-LLM-002** ✅；**EXP-026** ✅（2026-06-03：6 exp, 443 chunks, OOS 0.586 @ `02bdb8a`）
 
 详见 [`docs/database_setup.md`](database_setup.md) §M9 · [`docs/context_engineering.md`](context_engineering.md) M10。
 

@@ -49,7 +49,7 @@
 
 **Plus v2 status / 当前进度**：**M1–M8 ✅**（Plus v2 收官）· **v3 M9/M10 ✅** 本地+服务器（**212 pytest** · **EXP-LLM-002** local_vllm smoke）
 
-**v3 next / 下一步**：EXP-026 Postgres 真实 DB smoke（待 Docker）· M11–M13 见 [`项目v3设计.md`](项目v3设计.md)
+**v3 next / 下一步**：M11–M13 见 [`项目v3设计.md`](项目v3设计.md) · EXP-TEXT-WF-002
 
 ---
 
@@ -86,7 +86,7 @@ Details: [docs/architecture.md](docs/architecture.md) · [docs/index.md](docs/in
 | **ML** | LightGBM direction model, MLSignalStrategy, **walk-forward OOS** evaluation | 方向模型、ML 信号策略、样本外 walk-forward |
 | **MAS Agent** | `ToolRegistry`, **SupervisorAgent** (rule routing), **ReportAgent**, **ResearchAgent** | 工具注册、监督路由、报告与研究智能体 |
 | **Memory / RAG** | JSON & SQLite experiment memory, hybrid retrieval, index/query CLI | 实验记忆、混合检索、文档索引 |
-| **Enterprise DB (v3 M9)** | Postgres memory, **pgvector**, Neo4j graph skeleton; `json \| sqlite \| postgres` factory | 企业级持久化（pytest mock；真实 DB 见 EXP-026） |
+| **Enterprise DB (v3 M9)** | Postgres memory, **pgvector**, Neo4j graph skeleton; `json \| sqlite \| postgres` factory | 企业级持久化；服务器 **EXP-026** ✅（443 pgvector chunks） |
 | **LangGraph** | Optional 6-node ResearchWorkflow DAG + sequential fallback | 可选工作流编排（`[orchestration]` extra） |
 | **Context / LLM (v3 M10)** | ContextBuilder, `mock \| openai_compatible \| **local_vllm**`; server **Qwen2.5-7B** via vLLM (EXP-LLM-002) | 上下文工程；pytest 默认 Mock；a6000 本地推理见 `docs/server_commands.md` §6.13 |
 | **RL Simulation (M7)** | TradingEnv, buy-and-hold / random / ML-copy baselines; GRPO-style ranking | RL 模拟骨架；`simulation.*` 不与 OOS 混比 |
@@ -255,6 +255,7 @@ print(result.content)
 |------|-------|-------|
 | **pytest** | **212 passed** | EXP-027/028（本地+服务器） |
 | **local vLLM smoke** | ResearchAgent `local_vllm` | EXP-LLM-002（Qwen2.5-7B @ a6000） |
+| **Postgres/pgvector smoke** | `query_memory` + `index_documents` | EXP-026（6 experiments, **443 chunks**） |
 | **OOS baseline** | **sharpe 0.586** | EXP-20260602-008, 19 walk-forward windows |
 | **OOS + FinBERT text** | **sharpe 0.563** | EXP-TEXT-WF-001 · exploratory (200/6033 text coverage) |
 | Single-segment ML backtest | sharpe 2.78 | ⚠️ in-sample — **not** paper metric |
@@ -339,9 +340,8 @@ Quant-MAS/
 - [x] Text signal layer — mock / FinBERT / LoRA skeleton (M6)
 - [x] **M7** RL simulation / GRPO-style ranking skeleton ✅
 - [x] **M8** MCP / A2A protocol adapter ✅
-- [x] **M9** Enterprise DB — Postgres memory, pgvector, Neo4j skeleton; `json \| sqlite \| postgres` factory ✅
+- [x] **M9** Enterprise DB — Postgres memory, pgvector, Neo4j skeleton; **EXP-026** server smoke ✅
 - [x] **M10** LLM production — `local_vllm`, ResearchAgent smoke **EXP-LLM-002** (Qwen2.5-7B @ a6000) ✅
-- [ ] **EXP-026** Real Postgres/pgvector smoke (server Docker)
 - [ ] **M11** Competitive learning / strategy population (Elo, autocurriculum)
 - [ ] **M12** RL training experiments (GRPO/PPO/MARL GPU smoke)
 - [ ] **M13** Enterprise orchestration — multi-experiment DAG scheduler, audit log

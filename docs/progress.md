@@ -2,7 +2,7 @@
 
 更新时间：2026-06-03（**v3 M9/M10 本地+服务器 ✅** EXP-027/028/LLM-002，212 passed）
 
-**Plus v2**：M1–M8 ✅ · **v3 M9/M10** ✅ 双端 → EXP-026 DB smoke / ~~EXP-LLM-002~~ ✅
+**Plus v2**：M1–M8 ✅ · **v3 M9/M10** ✅ 双端（EXP-026 DB + EXP-LLM-002）
 
 第五～六阶段见 [项目plus设计.md](../项目plus设计.md)（M7 RL 模拟 / M8 协议扩展，非实盘）。
 
@@ -296,7 +296,7 @@ python scripts/export_agent_cards.py --help
 | test_protocols | ✅ **15 passed** |
 | 全量 pytest（本地） | ✅ **195 passed** |
 | 全量 pytest（服务器） | ✅ **212 passed**（11.39s，EXP-028 @ `3fd32e0`） |
-| 服务器 Postgres 真实连接 | 📋 EXP-026（Docker 权限） |
+| 服务器 Postgres 真实连接 | ✅ EXP-026（6 exp, 443 chunks, OOS 0.586） |
 
 ## Quant MAS v3：M9 企业 DB
 
@@ -311,7 +311,7 @@ python scripts/export_agent_cards.py --help
 | query_memory / index_documents CLI | ✅ |
 | test_memory_enterprise | ✅ **12 passed** |
 | 全量 pytest（本地+服务器） | ✅ **212 passed**（EXP-028，11.39s） |
-| 服务器 Postgres 真实连接 | 📋 EXP-026 |
+| 服务器 Postgres 真实连接 | ✅ EXP-026 |
 
 ## Quant MAS v3：M10 LLM
 
@@ -346,6 +346,6 @@ python scripts/export_agent_cards.py --help
 ## 后续工作（v2 之后）
 
 - ~~**M10 本地/服务器 pytest**~~ ✅ EXP-027/028（212）
-- **M9 服务器 DB smoke**：📋 EXP-026 — Docker 权限 + `setup.sh`
+- **M9 服务器 DB smoke**：✅ EXP-026（2026-06-03）
 - ~~**EXP-LLM-002**~~ ✅（2026-06-03，local_vllm + ResearchAgent）
 - **EXP-TEXT-WF-002**

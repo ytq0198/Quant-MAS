@@ -60,7 +60,7 @@ M9 adds optional enterprise storage backends:
 
 These backends are optional. Tests use mock connections and do not require real Postgres, pgvector, or Neo4j services.
 
-**Local validation**: EXP-20260602-025 — `test_memory_enterprise.py` **12 passed**; full suite **207 passed** (2026-06-01). Server Postgres smoke: EXP-20260602-026（待做）.
+**Local validation**: EXP-20260602-025 — `test_memory_enterprise.py` **12 passed**; full suite **207 passed** (2026-06-01). **Server smoke**: EXP-20260602-026 ✅ — 6 experiments, **443 pgvector chunks**, `oos.sharpe` **0.586** (2026-06-03).
 
 Copy the example config:
 
