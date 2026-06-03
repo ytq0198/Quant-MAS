@@ -47,7 +47,9 @@
 > Quant Engine computes. Agent Layer explains, orchestrates, and reports.  
 > Quant Engine 做计算；Agent Layer 做编排、解释与报告。
 
-**Plus v2 status / 当前进度**：M1–M8 ✅ · **v3 M9/M10** ✅ 本地+服务器（**212 pytest** + **EXP-LLM-002** vLLM smoke）
+**Plus v2 status / 当前进度**：**M1–M8 ✅**（Plus v2 收官）· **v3 M9/M10 ✅** 本地+服务器（**212 pytest** · **EXP-LLM-002** local_vllm smoke）
+
+**v3 next / 下一步**：EXP-026 Postgres 真实 DB smoke（待 Docker）· M11–M13 见 [`项目v3设计.md`](项目v3设计.md)
 
 ---
 
@@ -84,10 +86,13 @@ Details: [docs/architecture.md](docs/architecture.md) · [docs/index.md](docs/in
 | **ML** | LightGBM direction model, MLSignalStrategy, **walk-forward OOS** evaluation | 方向模型、ML 信号策略、样本外 walk-forward |
 | **MAS Agent** | `ToolRegistry`, **SupervisorAgent** (rule routing), **ReportAgent**, **ResearchAgent** | 工具注册、监督路由、报告与研究智能体 |
 | **Memory / RAG** | JSON & SQLite experiment memory, hybrid retrieval, index/query CLI | 实验记忆、混合检索、文档索引 |
+| **Enterprise DB (v3 M9)** | Postgres memory, **pgvector**, Neo4j graph skeleton; `json \| sqlite \| postgres` factory | 企业级持久化（pytest mock；真实 DB 见 EXP-026） |
 | **LangGraph** | Optional 6-node ResearchWorkflow DAG + sequential fallback | 可选工作流编排（`[orchestration]` extra） |
-| **Context / LLM** | ContextBuilder, OpenAI-compatible client (default **Mock** in tests) | 上下文工程；pytest 默认 Mock |
-| **Text Signals** | Mock / FinBERT / LoRA **skeleton**, merge into feature tables (M6) | 文本情绪特征骨架，不替代 LightGBM |
-| **Research Protocol** | Baseline registry, `compare_experiments.py`, OOS metric discipline | 实验基线对比；论文主指标用 OOS |
+| **Context / LLM (v3 M10)** | ContextBuilder, `mock \| openai_compatible \| **local_vllm**`; server **Qwen2.5-7B** via vLLM (EXP-LLM-002) | 上下文工程；pytest 默认 Mock；a6000 本地推理见 `docs/server_commands.md` §6.13 |
+| **RL Simulation (M7)** | TradingEnv, buy-and-hold / random / ML-copy baselines; GRPO-style ranking | RL 模拟骨架；`simulation.*` 不与 OOS 混比 |
+| **Protocol (M8)** | MCP/A2A internal adapter, AgentCard export, policy deny shell/broker/secrets | 协议层 adapter；不接外部 MCP server |
+| **Text Signals (M6)** | Mock / FinBERT / LoRA **skeleton**, merge into feature tables | 文本情绪特征骨架，不替代 LightGBM |
+| **Research Protocol (M1)** | Baseline registry, `compare_experiments.py`, OOS metric discipline | 实验基线对比；论文主指标用 OOS |
 
 ---
 
@@ -112,7 +117,7 @@ python -m pip install -e ".[llm]"                 # HTTP LLM client
 python -m pip install -e ".[text]"                # FinBERT / LoRA (server manual)
 ```
 
-**Verified baseline / 已验证基线**：**212 passed**（本地+服务器，EXP-027/028）· tests use synthetic data, mocks, and local files only（不联网、不调真实 LLM、不下载 HF 权重）。
+**Verified baseline / 已验证基线**：**212 passed**（本地+服务器，EXP-027/028）· pytest 默认 synthetic/mock（不联网、不调真实 LLM/DB）· 服务器 **local_vllm** smoke：**EXP-LLM-002**
 
 ---
 
@@ -165,11 +170,19 @@ python scripts/run_agent.py \
   --data-path data/features/features.parquet
 ```
 
-### ResearchAgent (mock-safe) / 研究解释（默认 Mock）
+### ResearchAgent (mock-safe / local vLLM) / 研究解释
 
 ```bash
+# Default: Mock LLM (CI-safe)
 python scripts/run_research_agent.py \
-  --task "Summarize OOS baseline vs latest ML run"
+  --task "Summarize OOS baseline EXP-20260602-008 (oos.sharpe ≈ 0.586)"
+
+# Server: requires vLLM on :8000 (see docs/server_commands.md §6.13)
+export VLLM_BASE_URL=http://127.0.0.1:8000
+export VLLM_MODEL=Qwen/Qwen2.5-7B-Instruct
+python scripts/run_research_agent.py \
+  --provider local_vllm --use-llm \
+  --task "Interpret walk-forward OOS baseline only; list three research risks."
 ```
 
 ### Mock text signals / 文本信号（mock）
@@ -241,6 +254,7 @@ print(result.content)
 | Item | Value | Notes |
 |------|-------|-------|
 | **pytest** | **212 passed** | EXP-027/028（本地+服务器） |
+| **local vLLM smoke** | ResearchAgent `local_vllm` | EXP-LLM-002（Qwen2.5-7B @ a6000） |
 | **OOS baseline** | **sharpe 0.586** | EXP-20260602-008, 19 walk-forward windows |
 | **OOS + FinBERT text** | **sharpe 0.563** | EXP-TEXT-WF-001 · exploratory (200/6033 text coverage) |
 | Single-segment ML backtest | sharpe 2.78 | ⚠️ in-sample — **not** paper metric |
@@ -254,11 +268,11 @@ print(result.content)
 
 **English**
 
-> Built **Quant MAS**, a Python 3.11 multi-agent quantitative research platform with deterministic quant pipelines, walk-forward OOS evaluation (baseline sharpe 0.586), Memory/RAG, optional LangGraph, text signals, RL simulation, MCP-style protocol adapter, and mock-safe LLM ResearchAgent. Maintained **195 passing pytest** cases with strict safeguards preventing LLM agents from direct live trading.
+> Built **Quant MAS**, a Python 3.11 multi-agent quantitative research platform with deterministic quant pipelines, walk-forward OOS evaluation (baseline sharpe 0.586), Memory/RAG, optional LangGraph, enterprise DB backends (Postgres/pgvector), **local vLLM ResearchAgent** (EXP-LLM-002), text signals, RL simulation, MCP-style protocol adapter, and mock-safe LLM defaults. Maintained **212 passing pytest** cases with strict safeguards preventing LLM agents from direct live trading.
 
 **中文**
 
-> 基于 Python 3.11 构建 **Quant MAS** 多智能体量化研究平台，完成 Walk-forward OOS、风控、Agent 编排、Memory/RAG、文本信号、RL 模拟与 **MCP/A2A 协议层（M8）**；维护 **195 项 pytest** 通过，明确 LLM Agent 不直接参与实盘下单。
+> 基于 Python 3.11 构建 **Quant MAS** 多智能体量化研究平台，完成 Walk-forward OOS、风控、Agent 编排、Memory/RAG、**v3 企业 DB（Postgres/pgvector）**、**本地 vLLM 研究解释（M10）**、文本信号、RL 模拟与 **MCP/A2A 协议层（M8）**；维护 **212 项 pytest** 通过，明确 LLM Agent 不直接参与实盘下单。
 
 ---
 
@@ -275,16 +289,19 @@ Quant-MAS/
 │   ├── risk/                 # limits, drawdown guard
 │   ├── agents/               # supervisor, report, research
 │   ├── tools/                # 7 quant tools
-│   ├── memory/               # experiment + sqlite stores
-│   ├── rag/                  # retriever, vector store
+│   ├── memory/               # experiment memory: json | sqlite | postgres (M9)
+│   ├── rag/                  # retriever, in-memory + pgvector (M9)
 │   ├── context/              # ContextBuilder (M5)
+│   ├── core/                 # llm.py — mock | openai_compatible | local_vllm (M10)
 │   ├── text/                 # text signals (M6)
+│   ├── rl/                   # TradingEnv, GRPO ranking (M7)
+│   ├── protocols/            # MCP/A2A adapter (M8)
 │   ├── orchestration/        # LangGraph workflow (M4)
 │   └── research/             # baseline registry (M1)
 ├── scripts/                  # CLI entrypoints
-├── configs/                  # YAML configs
-├── tests/                    # 195 pytest cases
-├── docs/                     # architecture, progress, experiment log
+├── configs/                  # YAML configs (+ llm.server.yaml.example)
+├── tests/                    # 212 pytest cases
+├── docs/                     # architecture, progress, experiment log, server_commands
 ├── architecture.png          # architecture diagram
 ├── CONTRIBUTING.md
 ├── LICENSE
@@ -298,10 +315,14 @@ Quant-MAS/
 | Doc | Description |
 |-----|-------------|
 | [docs/index.md](docs/index.md) | Documentation hub (bilingual) |
-| [docs/progress.md](docs/progress.md) | M1–M8 progress & pytest status |
-| [docs/experiment_log.md](docs/experiment_log.md) | Verified experiments |
+| [docs/progress.md](docs/progress.md) | Plus v2 M1–M8 + v3 M9/M10 progress |
+| [项目进度.md](项目进度.md) | 中文进度总览（Plus v2 收官 + v3） |
+| [项目v3设计.md](项目v3设计.md) | v3 roadmap M9–M13 |
+| [docs/experiment_log.md](docs/experiment_log.md) | Verified experiments (EXP-LLM-002, OOS 0.586, …) |
 | [docs/research_protocol.md](docs/research_protocol.md) | OOS metric rules |
-| [docs/server_commands.md](docs/server_commands.md) | Server deployment |
+| [docs/server_commands.md](docs/server_commands.md) | Server deploy, vLLM §6.13, Postgres §6.12 |
+| [docs/database_setup.md](docs/database_setup.md) | M9 Postgres / pgvector / Neo4j |
+| [docs/context_engineering.md](docs/context_engineering.md) | LLM providers & ResearchAgent |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | How to contribute |
 
 ---
@@ -318,8 +339,16 @@ Quant-MAS/
 - [x] Text signal layer — mock / FinBERT / LoRA skeleton (M6)
 - [x] **M7** RL simulation / GRPO-style ranking skeleton ✅
 - [x] **M8** MCP / A2A protocol adapter ✅
-- [ ] FinBERT server smoke + text-enhanced walk-forward ablation
+- [x] **M9** Enterprise DB — Postgres memory, pgvector, Neo4j skeleton; `json \| sqlite \| postgres` factory ✅
+- [x] **M10** LLM production — `local_vllm`, ResearchAgent smoke **EXP-LLM-002** (Qwen2.5-7B @ a6000) ✅
+- [ ] **EXP-026** Real Postgres/pgvector smoke (server Docker)
+- [ ] **M11** Competitive learning / strategy population (Elo, autocurriculum)
+- [ ] **M12** RL training experiments (GRPO/PPO/MARL GPU smoke)
+- [ ] **M13** Enterprise orchestration — multi-experiment DAG scheduler, audit log
+- [ ] FinBERT server smoke + text-enhanced walk-forward ablation (EXP-TEXT-WF-002)
 - [ ] Optional paper-trading sandbox (simulation only)
+
+See [项目v3设计.md](项目v3设计.md) for full v3 scope.
 
 ---
 
