@@ -1,6 +1,6 @@
 # 金融文本模型计划（Plus M6）
 
-更新时间：2026-06-03（M6 第一版本地 ✅ EXP-20260602-019）
+更新时间：2026-06-03（M6 本地+服务器 ✅ EXP-019/020）
 
 > Codex 任务：[codex_prompt_M6.md](codex_prompt_M6.md) · 设计：[项目plus设计.md §M6](../项目plus设计.md#m6金融文本大模型--开源模型微调)
 
@@ -29,7 +29,7 @@ FinancialTextRecord → sentiment/classifier → TextSignalRecord
 | 配置 | `configs/text_model.yaml` |
 | 测试 | `tests/test_text_signals.py`（**11 passed**） |
 
-**pytest 基线**：全量 **161 passed**（EXP-20260602-019）；核心安装不含 `torch` / `transformers`。
+**pytest 基线**：全量 **161 passed**（本地 EXP-019；服务器 EXP-020，9.20s @ `b9de2f2`）。
 
 ## 可选依赖
 
@@ -39,14 +39,14 @@ pip install -e ".[text]"   # transformers, peft, accelerate, torch
 
 仅服务器手工 FinBERT / LoRA 训练时需要；CI 与默认 pytest **不安装**。
 
-## 服务器验收（待做）
+## 服务器验收（✅ EXP-20260602-020）
 
 ```bash
 cd /mnt/localDisk3/weizian/Quant-MAS
-git pull origin main
+git pull origin main   # b9de2f2
 conda activate /mnt/localDisk3/weizian/conda_envs/quant-mas
 python -m pip install -e .
-python -m pytest -v                    # 预期 161 passed
+python -m pytest -v                    # 161 passed（9.20s）
 
 # 可选 FinBERT smoke（EXP-TEXT-001）：
 python -m pip install -e ".[text]"

@@ -21,7 +21,7 @@ python -m pytest -v
 python -c "import quant_mas"
 ```
 
-**Current test status:** local **161 passed** (EXP-20260602-019, Plus M6); M5 server **150 passed**. **Next:** M6 server pull + optional FinBERT smoke.
+**Current test status:** local + server **161 passed** (EXP-20260602-019/020, Plus M6). **Next:** optional EXP-TEXT-001 or M7.
 
 ## Server
 
@@ -31,6 +31,7 @@ Recommended path: `/mnt/localDisk3/weizian/Quant-MAS`
 
 | Date | Check | Result |
 |------|--------|--------|
+| 2026-06-03 | Plus M6 text signals (server) | **161 passed** (9.20s) | EXP-20260602-020 |
 | 2026-06-03 | Plus M6 text signals (local) | **161 passed** (+11 tests) | EXP-20260602-019 |
 | 2026-06-03 | Plus M5 context/LLM (server) | **150 passed** (7.24s); DeepSeek smoke | EXP-20260602-018 / EXP-LLM-001 |
 | 2026-06-03 | Plus M5 context/LLM (local) | **150+1 warning** (+12 tests) | EXP-20260602-017 |

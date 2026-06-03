@@ -4,7 +4,7 @@
 
 > 本文档在 **Prompt 1–20 主链路已完成**（第零～四阶段）的基础上，规划 **Quant MAS v2** 的研究型升级路线。  
 > 基线状态：本地 **137+1 skip**（138 项；EXP-20260602-015）；服务器 M4 langgraph ✅（EXP-20260602-016 @ `c0fa5e3`）。  
-> **当前执行**：M1–M6 本地 ✅（EXP-20260602-019）→ **M6 服务器 + EXP-TEXT-001**。  
+> **当前执行**：M1–M6 ✅（EXP-019/020，161 passed）→ 可选 EXP-TEXT-001 / **M7**。  
 > 与 `项目进度.md` / `项目指导.md` 的关系：后者记录「已完成什么」；本文档记录「接下来怎么优化、怎么给 Codex/Cursor 下指令」。
 
 ---
@@ -69,7 +69,7 @@
 ### 2.1 工程完成度
 
 - **第零～四阶段 + Prompt 13 文档收口** ✅
-- **测试**：本地 **161 passed**（EXP-20260602-019）；M5 服务器 **150 passed**（EXP-20260602-018）
+- **测试**：本地+服务器 **161 passed**（EXP-20260602-019/020，9.20s）
 - **Context/LLM（M5 第一版）** ✅：ContextBuilder、ResearchAgent、resolve_llm_client；**DeepSeek 云端** smoke ✅（EXP-LLM-001）
 - **Text Signal（M6 第一版）** ✅ 本地：text schema、mock classifier、text_signals merge、train_text_model CLI（EXP-20260602-019）
 - **M5.5 本地 vLLM**：📋 待定（a6000 上 vLLM OpenAI 兼容端点；见 [§M5.5](#m55服务器本地-vllm-进阶待定)）
@@ -99,11 +99,11 @@
 ### 3.1 当前推荐执行顺序（2026-06-03 更新）
 
 ```
-已完成   M1 → M2 → M3 → M4 → M5 ✅ → **M6 本地 ✅**（EXP-20260602-019，161 passed）
+已完成   M1 → M2 → M3 → M4 → M5 ✅ → **M6 ✅**（EXP-019/020，161 passed）
 
-进行中   ① 服务器 M6 pull + pytest **161**
-         ② 可选 EXP-TEXT-001 FinBERT smoke（`pip install -e ".[text]"`）
-         ③ text signal + walk-forward vs OOS **0.586**
+进行中   ① 可选 EXP-TEXT-001 FinBERT smoke
+         ② text signal + walk-forward vs OOS **0.586**
+         ③ **M7** RL/GRPO
 
 按需扩展 M3.5 企业 RAG（真 Embedding / pgvector / Postgres / Neo4j）
          ↑ 触发条件见 §M3.5，不阻塞 M6
@@ -581,7 +581,7 @@ LLM_FALLBACK_MODEL=deepseek-chat
 
 ## M6：金融文本大模型 / 开源模型微调
 
-> **状态：✅ 本地（EXP-20260602-019）** · [text_model_plan.md](docs/text_model_plan.md) · [codex_prompt_M6.md](docs/codex_prompt_M6.md)
+> **状态：✅ 本地+服务器（EXP-20260602-019/020）** · [text_model_plan.md](docs/text_model_plan.md)
 
 ### 目标
 
@@ -710,7 +710,7 @@ MODEL_CACHE_DIR=/mnt/localDisk3/weizian/models/hf
 | **M4** LangGraph | 4 | workflow + nodes | langgraph_workflow.md | 无 | ✅ |
 | **M5** 上下文/LLM | 5 | ContextBuilder、ResearchAgent | [context_engineering.md](docs/context_engineering.md) | **DeepSeek 云端** | ✅ 本地+服务器 |
 | **M5.5** 本地 vLLM | 5.5 | provider 扩展、smoke 脚本 | vllm_server_setup（待写） | vLLM @ a6000 | 📋 待定 |
-| **M6** 文本大模型 | 6 | FinBERT/LoRA + text_signals | [text_model_plan.md](docs/text_model_plan.md) | HF_TOKEN | ✅ 本地 |
+| **M6** 文本大模型 | 6 | FinBERT/LoRA + text_signals | [text_model_plan.md](docs/text_model_plan.md) | HF_TOKEN | ✅ |
 | **M7** RL/GRPO | 7 | TradingEnv、GRPO ranking | rl_plan.md | W&B 可选 | ✅ |
 | **M8** MCP/A2A | 8 | protocol adapter | protocols.md | 暂不接 | ❌ |
 
@@ -881,4 +881,4 @@ LLM/文本模型不允许直接下单；pytest 不联网、不加载真实 FinBE
 
 ---
 
-*文档版本：2026-06-03 · Quant MAS Plus v2（M6 本地 ✅；服务器 M6 + EXP-TEXT-001 待做）*
+*文档版本：2026-06-03 · Quant MAS Plus v2（M1–M6 ✅；下一步 EXP-TEXT-001 / M7）*

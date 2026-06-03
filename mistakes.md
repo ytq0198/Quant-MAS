@@ -509,7 +509,7 @@ python -m pip install -e .
 | — | Plus M3 | Memory/RAG v2 SQLite | ✅ EXP-20260602-013/014 |
 | — | Plus M4 | LangGraph workflow | ✅ EXP-20260602-015/016（含 langgraph backend 修复 M-016） |
 | — | Plus M5 | 上下文/LLM | ✅ EXP-017/018；DeepSeek EXP-LLM-001 |
-| — | Plus M6 | 文本信号 | ✅ EXP-20260602-019 本地 **161 passed**；服务器待 pull |
+| — | Plus M6 | 文本信号 | ✅ EXP-019/020 本地+服务器 **161 passed** |
 
 ---
 

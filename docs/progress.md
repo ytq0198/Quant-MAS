@@ -2,7 +2,7 @@
 
 更新时间：2026-06-03（Plus M6 本地 ✅ EXP-20260602-019）
 
-**Plus v2**：**M1–M6 本地 ✅**（M6 **161 passed**，+11）；M5 服务器 **150 passed** → **M6 服务器待 pull**
+**Plus v2**：**M1–M6 ✅**（本地+服务器 **161 passed**，EXP-019/020）→ 可选 EXP-TEXT-001 / M7
 
 第五～六阶段见 [项目plus设计.md](../项目plus设计.md)（M4 LangGraph / M7 模拟，非实盘）。
 
@@ -21,7 +21,7 @@
 | **Plus M3** | Memory/RAG v2 | ✅ 本地 | EXP-20260602-013，**126 passed** |
 | **Plus M4** | LangGraph 编排 | ✅ | EXP-20260602-015/016 |
 | **Plus M5** | 上下文/LLM | ✅ | EXP-20260602-017/018，EXP-LLM-001，**150 passed** |
-| **Plus M6** | 文本大模型 | ✅ 本地 | EXP-20260602-019，**161 passed** |
+| **Plus M6** | 文本大模型 | ✅ | EXP-20260602-019/020，**161 passed** |
 | 第五～六阶段 | 编排 / RL 模拟 | 📋 | Plus M4 / M7 |
 
 ## Quant MAS v2：M1 研究基线
@@ -153,8 +153,7 @@ M1/M2 已完成；**M3 本地 ✅**（见下两节）；下一步 **M4**。
 | 环境 | Python | 结果 | 日期 | 实验 |
 |------|--------|------|------|------|
 | 本地 Windows | 3.11+ | **161 passed** | 2026-06-03 | EXP-20260602-019 |
-| 本地 Windows（M5） | 3.11+ | **150 passed, 1 warning** | 2026-06-03 | EXP-20260602-017 |
-| 服务器 a6000-9961 | 3.11.15 | **150 passed**（7.24s） | 2026-06-03 | EXP-20260602-018 |
+| 服务器 a6000-9961 | 3.11.15 | **161 passed**（9.20s） | 2026-06-03 | EXP-20260602-020 |
 
 命令：`python -m pytest -v`（勿裸敲 `pytest` / `pip`）。
 
@@ -231,11 +230,11 @@ python scripts/query_memory.py --help
 | train_text_model.py（mock dry-run） | ✅ |
 | test_text_signals | ✅ **11 passed** |
 | 全量 pytest（本地） | ✅ **161 passed** |
-| 服务器 pytest | 📋 待 pull |
+| 全量 pytest（服务器） | ✅ **161 passed**（9.20s，EXP-020 @ `b9de2f2`） |
 | EXP-TEXT-001 FinBERT smoke | 📋 待验证 |
 
 ## 后续工作
 
-- **M6 服务器**：pull → pytest **161**；可选 `pip install -e ".[text]"` + FinBERT smoke
-- **M6 科研**：text signal + walk-forward，与 **EXP-20260602-008** 对比
+- **M6 科研**：可选 EXP-TEXT-001 FinBERT smoke；text signal + walk-forward vs **0.586**
+- **M7 RL/GRPO**：见 [项目plus设计.md §M7](../项目plus设计.md#m7强化学习--grpo-实验)
 - 可选：SEC smoke、CPU 对照 `server_lgbm_cpu_001`（EXP-TODO-006）

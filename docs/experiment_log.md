@@ -1,6 +1,6 @@
 # Quant MAS 实验记录
 
-更新时间：2026-06-03（Plus M6 本地 EXP-20260602-019）
+更新时间：2026-06-03（Plus M6 服务器 EXP-20260602-020）
 
 本文件用于记录真实实验和重要验证。不要记录未经实际运行的数据结果；尚未真实运行的项目标记为「待验证」。
 
@@ -89,6 +89,18 @@
 
 ## 当前验证记录
 
+### EXP-20260602-020：Plus M6 服务器 pytest ✅
+
+- 日期：2026-06-03
+- 阶段：Plus v2 **M6**（服务器）
+- 环境：a6000-9961，conda `/mnt/localDisk3/weizian/conda_envs/quant-mas`，Python 3.11.15，git **`b9de2f2`**
+- 命令与结果：
+  - `git pull origin main` → M6 代码
+  - `python -m pip install -e .`
+  - `python -m pytest -v` → **161 passed** in **9.20s**
+- 问题：无
+- 下一步：可选 **EXP-TEXT-001** FinBERT smoke（`pip install -e ".[text]"`）；text signal + walk-forward vs **EXP-20260602-008**（OOS sharpe **0.586**）
+
 ### EXP-20260602-019：Plus M6 金融文本信号本地验证 ✅
 
 - 日期：2026-06-03
@@ -107,7 +119,7 @@
   - `python scripts/train_text_model.py --mode mock --config configs/text_model.yaml --dry-run ...` → 写 `signals.parquet` + `metadata.json`
   - 全量 `python -m pytest -v` → **161 passed**（150→161，+11）
 - 问题：无
-- 下一步：push → 服务器 pytest **161**；可选 **EXP-TEXT-001** FinBERT smoke（`pip install -e ".[text]"`）；文本 signal 并入 features 后 walk-forward 与 **EXP-20260602-008** 对比
+- 下一步：~~push → 服务器~~ ✅ EXP-020 → 可选 EXP-TEXT-001 / walk-forward
 
 ### EXP-LLM-001：DeepSeek 云端 ResearchAgent smoke ✅
 
@@ -648,6 +660,7 @@
 | EXP-20260602-009 | 2026-06-02 | Plus M1 研究基线本地 | **102 passed**（+4 测试） |
 | EXP-20260602-010 | 2026-06-02 | Plus M1 服务器 pytest + 比较表 | **102 passed**；OOS sharpe 0.586 |
 | EXP-20260602-011 | 2026-06-02 | Plus M2 数据扩展本地 | **115 passed**（+13） |
+| EXP-20260602-020 | 2026-06-03 | Plus M6 服务器 pytest | **161 passed**（9.20s） |
 | EXP-20260602-019 | 2026-06-03 | Plus M6 文本信号本地 | **161 passed**（+11）；test_text_signals **11/11** |
 | EXP-LLM-001 | 2026-06-03 | DeepSeek ResearchAgent smoke | openai_compatible；OOS sharpe **0.586** |
 | EXP-20260602-018 | 2026-06-03 | Plus M5 服务器 pytest | **150 passed**（7.24s） |
