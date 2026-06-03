@@ -1,8 +1,8 @@
 # Quant MAS 架构
 
-更新时间：2026-06-03（Plus M6 Text Signal Layer）
+更新时间：2026-06-01（Plus M7 RL Simulation Layer）
 
-Quant MAS 采用「确定性量化引擎 + **Text Signal Layer（M6）** + 轻量 Agent 编排 + Context Layer（M5） + Memory/RAG v2 + Research 基线层」架构。Agent 不替代回测、训练、风控和执行，也不允许直接实盘下单。
+Quant MAS 采用「确定性量化引擎 + **Text Signal Layer（M6）** + **RL Simulation Layer（M7）** + 轻量 Agent 编排 + Context Layer（M5） + Memory/RAG v2 + Research 基线层」架构。Agent 不替代回测、训练、风控和执行，也不允许直接实盘下单。
 
 ## 核心边界
 
@@ -10,6 +10,7 @@ Quant MAS 采用「确定性量化引擎 + **Text Signal Layer（M6）** + 轻�
 - **Tool Layer**：将引擎能力封装为 Agent 可调用工具。
 - **Agent Layer**：规则路由、编排、报告和解释；**M5** 可选真实 LLM（默认 Mock，仅研究/报告）。
 - **Text Signal Layer（Plus M6）**：`FinancialTextRecord` → sentiment signal → `merge_text_signals_into_features`；**不替代** LightGBM，pytest 用 Mock 分类器。
+- **RL Simulation Layer（Plus M7）**：`TradingEnv` + baseline policies + GRPO-style ranking；**simulation only**，metrics 为 `simulation.*`，**不替代** walk-forward OOS。
 - **Context Layer（Plus M5）**：`ContextBuilder` → `AgentContextBundle`；事实 metrics 与 LLM 叙事分离。
 - **Memory Layer（Plus M3）**：可插拔 `MemoryStore`（JSON / SQLite）；`ExperimentMemory` 仍可用
 - **RAG Layer（Plus M3）**：`SimpleRetriever`（关键词）+ `HybridRetriever`（关键词 + 向量）；`HashEmbeddingClient` / `InMemoryVectorStore` 默认
@@ -49,6 +50,10 @@ Quant MAS
 ├── Text Layer（Plus M6）
 │   text/             data_schema, dataset, mock_classifier, finbert_baseline, lora_finetune
 │   train_text_model.py  --mode mock|finbert_baseline|lora
+│
+├── RL Simulation Layer（Plus M7）
+│   rl/               env_schema, trading_env, reward, baseline_policy, grpo_experiment, mock_data
+│   run_rl_baseline.py   --policy random|buy_hold|ml_copy（simulation_only）
 │
 ├── Context Layer（Plus M5）
 │   context_schema, context_builder, compression
@@ -94,6 +99,7 @@ generate_report.py    报告读取/生成（--use-llm 可选，M5）
 run_research_agent.py  ResearchAgent + ContextBuilder（M5）
 run_agent.py          Supervisor 规则路由
 run_langgraph_workflow.py  ResearchWorkflow DAG（Plus M4，dry-run）
+run_rl_baseline.py      RL 模拟 baseline rollouts（Plus M7，--dry-run）
 run_pipeline.py       端到端 pipeline
 ```
 
@@ -160,7 +166,7 @@ collect_experiment_metrics → BaselineRegistry / comparison table
 
 ## 测试与部署
 
-- **pytest**：本地+服务器 **161 passed**（EXP-20260602-019/020）
+- **pytest**：本地 **180 passed**（EXP-20260602-021）；服务器 **161**（M7 待 pull）
 - **服务器**：`/mnt/localDisk3/weizian/Quant-MAS`，conda `quant-mas`，Python 3.11.15
 - **GitHub**：https://github.com/ytq0198/Quant-MAS
 
@@ -173,6 +179,7 @@ collect_experiment_metrics → BaselineRegistry / comparison table
 | **M3** Memory/RAG v2 | SQLite / 向量 / HybridRetriever | ✅ 本地（EXP-20260602-013） |
 | **M4** LangGraph | ResearchWorkflow DAG | ✅ EXP-20260602-015/016 |
 | **M5** 上下文/LLM | ContextBuilder、ResearchAgent | ✅ 本地+服务器（EXP-017/018，EXP-LLM-001） |
-| **M6** 文本大模型 | FinBERT/LoRA + text_signals merge | ✅ EXP-019/020 + **EXP-TEXT-001/WF-001**（OOS **0.563** vs **0.586**） |
+| **M6** 文本大模型 | FinBERT/LoRA + text_signals merge | ✅ EXP-019/020 + **EXP-TEXT-001/WF-001** |
+| **M7** RL/GRPO 模拟 | TradingEnv + GRPO ranking | ✅ 本地（EXP-20260602-021，**180 passed**） |
 
 详见 [项目plus设计.md](../项目plus设计.md)。

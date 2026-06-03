@@ -1,7 +1,7 @@
 # Quant MAS Documentation / 项目文档
 
 **Research-first multi-agent quantitative platform · 多智能体量化研究平台**  
-**Release**: [v0.1.0](https://github.com/ytq0198/Quant-MAS/releases/tag/v0.1.0) · **Tests**: 161 passed · **GitHub**: [ytq0198/Quant-MAS](https://github.com/ytq0198/Quant-MAS)
+**Release**: [v0.1.0](https://github.com/ytq0198/Quant-MAS/releases/tag/v0.1.0) · **Tests**: 180 passed · **GitHub**: [ytq0198/Quant-MAS](https://github.com/ytq0198/Quant-MAS)
 
 > Documentation hub for students, researchers, and contributors.  
 > 面向学生、科研者与贡献者的文档入口，与 [README](../README.md) 结构对应。
@@ -37,7 +37,7 @@ Quant MAS combines a **deterministic Quant Engine** with a **lightweight Agent L
 
 LLM agents **must not** place live orders. Signals require backtesting, risk checks, audit, and human confirmation.
 
-**Plus v2**：M1–M6 ✅ · M7 RL / M8 MCP 📋 planned · 详见 [progress.md](progress.md)
+**Plus v2**：M1–M7 ✅（本地）· M8 MCP 📋 · 详见 [progress.md](progress.md)
 
 ---
 
@@ -80,7 +80,7 @@ Deep dive: [architecture.md](architecture.md) · [项目plus设计.md](../项目
 | Context / LLM | ContextBuilder, mock-safe LLM client | 上下文与可选 LLM | ✅ |
 | Text Signals | Mock / FinBERT / LoRA skeleton | 文本特征骨架 | ✅ M6 |
 | Research | Baseline registry, compare CLI | 实验基线与对比 | ✅ M1 |
-| RL / MCP | Simulation & protocol adapters | 强化学习 / 协议 | 📋 M7/M8 |
+| RL / MCP | Simulation & protocol adapters | 强化学习 / 协议 | ✅ M7 本地 · 📋 M8 |
 
 ---
 
@@ -158,12 +158,13 @@ Memory/RAG feeds **ResearchAgent** context — it does not execute trades.
 
 | Metric | Value | Experiment |
 |--------|-------|------------|
-| pytest | **161 passed** | EXP-019/020 |
+| pytest | **180 passed** | EXP-021（本地）；服务器 161 待 pull |
 | **OOS sharpe (baseline)** | **0.586** | EXP-20260602-008 |
 | **OOS + FinBERT text** | **0.563** | EXP-TEXT-WF-001 · exploratory (200/6033 coverage) |
 | Single-segment ML sharpe | 2.78 | ⚠️ in-sample only |
 | DeepSeek ResearchAgent smoke | verified | EXP-LLM-001 |
 | FinBERT text smoke (server) | 200 signals | EXP-TEXT-001 · ModelScope local path |
+| RL simulation (local) | TradingEnv + GRPO ranking | EXP-20260602-021 · `simulation.*` metrics |
 
 ⚠️ Single-run backtest ≠ paper evidence. Always compare via `compare_experiments.py`.
 
@@ -175,7 +176,7 @@ Memory/RAG feeds **ResearchAgent** context — it does not execute trades.
 
 1. [README](../README.md) — overview & Quick Start  
 2. [architecture.md](architecture.md) — layers & CLI map  
-3. `python -m pytest -v` — 161 tests  
+3. `python -m pytest -v` — 180 tests  
 4. `run_pipeline.py --skip-download` — local demo  
 5. Features → backtest → walk-forward  
 6. ExperimentMemory & RAG  
@@ -215,6 +216,7 @@ python scripts/run_research_agent.py --task "Summarize OOS baseline vs latest ML
 python scripts/compare_experiments.py --output-dir outputs/research
 
 python scripts/train_text_model.py --mode mock --config configs/text_model.yaml --dry-run
+python scripts/run_rl_baseline.py --config configs/rl.yaml --policy random --dry-run
 ```
 
 Server: [server_commands.md](server_commands.md)
@@ -232,13 +234,14 @@ Server: [server_commands.md](server_commands.md)
 | [context_engineering.md](context_engineering.md) | M5 LLM 接入 |
 | [langgraph_workflow.md](langgraph_workflow.md) | M4 工作流 |
 | [text_model_plan.md](text_model_plan.md) | M6 文本模型 |
+| [rl_plan.md](rl_plan.md) | M7 RL 模拟 |
 | [data_sources.md](data_sources.md) | M2 数据源 |
 | [server_commands.md](server_commands.md) | 服务器命令 |
 | [repo_polish_checklist.md](repo_polish_checklist.md) | 仓库整理清单 |
 | [RELEASE_v0.1.0.md](RELEASE_v0.1.0.md) | v0.1.0 发布说明 |
 | [CONTRIBUTING.md](../CONTRIBUTING.md) | 贡献指南 |
 
-Codex prompts: `codex_prompt_M4.md` … `codex_prompt_M6.md`
+Codex prompts: `codex_prompt_M4.md` … `codex_prompt_M7.md`
 
 ---
 

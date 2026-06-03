@@ -1,6 +1,6 @@
 # Quant MAS 实验记录
 
-更新时间：2026-06-03（EXP-TEXT-001 / EXP-TEXT-WF-001 服务器 text+walk-forward）
+更新时间：2026-06-01（Plus M7 本地 EXP-20260602-021；M6 EXP-TEXT-WF-001）
 
 本文件用于记录真实实验和重要验证。不要记录未经实际运行的数据结果；尚未真实运行的项目标记为「待验证」。
 
@@ -177,6 +177,25 @@
 ```
 
 ## 当前验证记录
+
+### EXP-20260602-021：Plus M7 RL 模拟本地验证 ✅
+
+- 日期：2026-06-01
+- 阶段：Plus **M7** — TradingEnv + baseline policies + GRPO-style ranking（simulation only）
+- 环境：本地 Windows，Codex 按 [codex_prompt_M7.md](codex_prompt_M7.md) 实现
+- 新增模块：
+  - `src/quant_mas/rl/` — `TradingEnvConfig` / `RewardConfig` / `StepResult`、`TradingEnv`、`baseline_policy`、`reward`、`grpo_experiment`、`mock_data`
+  - `scripts/run_rl_baseline.py` — `--policy random|buy_hold|ml_copy`，`--dry-run`
+  - `configs/rl.yaml`；`pyproject.toml` 可选依赖 `[rl]`（gymnasium）
+- 命令与结果：
+  - `python -m pytest tests/test_trading_env.py -v` → **13 passed**
+  - `python -m pytest tests/test_grpo_experiment.py -v` → **6 passed**
+  - `python scripts/run_rl_baseline.py --help` → 正常
+  - `python scripts/run_rl_baseline.py --config configs/rl.yaml --policy random --dry-run` → 正常
+  - 全量 `python -m pytest -v` → **180 passed**（161→180，+19）
+- 安全边界：不接 broker；metrics 命名 `simulation.*`；**不替代** walk-forward OOS **0.586**
+- 问题：无
+- 下一步：服务器 pytest + dry-run（EXP-20260602-022）；**M8** MCP 或 EXP-TEXT-WF-002
 
 ### EXP-TEXT-WF-001：FinBERT text + Walk-forward OOS（服务器）✅
 
@@ -806,6 +825,7 @@
 | EXP-20260602-009 | 2026-06-02 | Plus M1 研究基线本地 | **102 passed**（+4 测试） |
 | EXP-20260602-010 | 2026-06-02 | Plus M1 服务器 pytest + 比较表 | **102 passed**；OOS sharpe 0.586 |
 | EXP-20260602-011 | 2026-06-02 | Plus M2 数据扩展本地 | **115 passed**（+13） |
+| EXP-20260602-021 | 2026-06-01 | Plus M7 RL 模拟本地 | **180 passed**（+19）；trading_env **13/13** |
 | EXP-TEXT-WF-001 | 2026-06-03 | FinBERT + walk-forward OOS | oos.sharpe **0.563** vs baseline **0.586** |
 | EXP-TEXT-001 | 2026-06-03 | FinBERT smoke（ModelScope） | 200 signals → signals_finbert.parquet |
 | EXP-20260602-020 | 2026-06-03 | Plus M6 服务器 pytest | **161 passed**（9.20s / 22.14s 含 `[text]`） |

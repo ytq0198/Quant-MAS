@@ -4,7 +4,7 @@
 
 > 本文档在 **Prompt 1–20 主链路已完成**（第零～四阶段）的基础上，规划 **Quant MAS v2** 的研究型升级路线。  
 > 基线状态：本地 **137+1 skip**（138 项；EXP-20260602-015）；服务器 M4 langgraph ✅（EXP-20260602-016 @ `c0fa5e3`）。  
-> **当前执行**：M1–M6 ✅（含 EXP-TEXT-001 / EXP-TEXT-WF-001）→ **M7** / 扩大 text 覆盖（EXP-TEXT-WF-002）。  
+> **当前执行**：M1–M7 ✅（M7 本地 EXP-20260602-021）→ **M8** / 服务器 M7 验收。  
 > 与 `项目进度.md` / `项目指导.md` 的关系：后者记录「已完成什么」；本文档记录「接下来怎么优化、怎么给 Codex/Cursor 下指令」。
 
 ---
@@ -101,9 +101,9 @@
 ```
 已完成   M1 → M2 → M3 → M4 → M5 ✅ → **M6 ✅**（EXP-019/020 + **EXP-TEXT-001/WF-001**，161 passed）
 
-进行中   ① 扩大 text JSONL 覆盖 → EXP-TEXT-WF-002
-         ② **M7** RL/GRPO 骨架
-         ③ 可选 EXP-TEXT-002 LoRA 小样本
+进行中   ① 服务器 M7 pull + pytest **180**
+         ② **M8** MCP/A2A 骨架
+         ③ 可选 EXP-TEXT-WF-002 / EXP-RL-003
 
 按需扩展 M3.5 企业 RAG（真 Embedding / pgvector / Postgres / Neo4j）
          ↑ 触发条件见 §M3.5，不阻塞 M6

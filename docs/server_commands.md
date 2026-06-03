@@ -10,6 +10,7 @@ GitHub 仓库：[https://github.com/ytq0198/Quant-MAS](https://github.com/ytq019
 
 | 日期 | 项目 | 结果 | 备注 |
 |------|------|------|------|
+| 2026-06-01 | Plus M7 RL 模拟（本地） | **180 passed**（+19） | EXP-20260602-021 |
 | 2026-06-03 | EXP-TEXT-WF-001 text + walk-forward | oos.sharpe **0.563** vs **0.586** | EXP-TEXT-001 |
 | 2026-06-03 | Plus M6 文本信号（服务器） | **161 passed**（22.14s） | EXP-20260602-020 |
 | 2026-06-03 | Plus M6 文本信号（本地） | **161 passed** | EXP-20260602-019 |
@@ -497,6 +498,31 @@ python scripts/compare_experiments.py \
 记录：**EXP-20260602-020**（pytest 161）；**EXP-TEXT-001**；**EXP-TEXT-WF-001**。
 
 详见 [`docs/text_model_plan.md`](text_model_plan.md)。
+
+## 六点十、Plus M7 RL 模拟（EXP-20260602-021 / 服务器待 EXP-022）📋
+
+```bash
+cd /mnt/localDisk3/weizian/Quant-MAS
+git pull origin main
+conda activate /mnt/localDisk3/weizian/conda_envs/quant-mas
+python -m pip install -e .
+python -m pytest -v   # 预期 180 passed
+
+python scripts/run_rl_baseline.py --help
+python scripts/run_rl_baseline.py --config configs/rl.yaml --policy random --dry-run \
+  --output-dir /mnt/localDisk3/weizian/reports/rl_baseline_001
+
+# 可选 policies: buy_hold | ml_copy（ml_copy 需 --signals-path）
+python scripts/run_rl_baseline.py --config configs/rl.yaml --policy buy_hold --dry-run
+```
+
+**说明**：
+
+- **simulation only** — 不接 broker；metrics 为 `simulation.*`，**不得**与 walk-forward `oos.sharpe` **0.586** 混比
+- 可选：`pip install -e ".[rl]"` 安装 gymnasium wrapper（核心 pytest 不依赖）
+- 记录：**EXP-20260602-021**（本地 180 passed）；服务器验收 → **EXP-20260602-022**
+
+详见 [`docs/rl_plan.md`](rl_plan.md)。
 
 ## 七、删除旧部署（如曾在 ~/quant-mas 建过）
 

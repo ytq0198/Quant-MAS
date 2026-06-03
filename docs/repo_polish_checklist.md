@@ -13,7 +13,7 @@
 | 检查项 | 状态 | 说明 |
 |--------|------|------|
 | 双语标题与一句话定位 | ✅ 已完成 | 英 + 中首段 |
-| 徽章（Python / Tests / Status / License / GitHub） | ✅ 已完成 | Tests=161 passed |
+| 徽章（Python / Tests / Status / License / GitHub） | ✅ 已完成 | Tests=180 passed（本地） |
 | 安全声明（非实盘、LLM 不下单） | ✅ 已完成 | blockquote 双语 |
 | Quick Start | ✅ 已完成 | clone → pip → pytest |
 | CLI Examples | ✅ 已完成 | pipeline / train / ml backtest / ResearchAgent / text mock |
@@ -79,7 +79,7 @@ financial-machine-learning
 resume-project
 ```
 
-**说明**：`reinforcement-learning` 适用于 **M7 规划**；当前 **M7 代码未实现**，Topic 可保留以反映路线图，但 README/文案须写明 RL 为 **planned**。
+**说明**：`reinforcement-learning` Topic 可用；M7 **TradingEnv 骨架已实现**（simulation only），M8 仍为 roadmap。
 
 ### 3.2 Release v0.1.0（建议）
 
@@ -148,7 +148,7 @@ Release notes 草稿见本文档 §6。
 | L3 | `docs/screenshots/` CLI 输出截图 |
 | L4 | 英文版 `README.zh-CN.md` 拆分（当前 README 已 inline 双语） |
 | L5 | EXP-TEXT-001 / EXP-TEXT-WF-001 写入 experiment_log | ✅ |
-| L6 | M7/M8 的 `codex_prompt_M7.md` |
+| L6 | M7 的 `codex_prompt_M7.md` + `rl_plan.md` | ✅ |
 
 ### 4.4 明确未实现（文案中不得写成已完成）
 
@@ -170,7 +170,8 @@ Release notes 草稿见本文档 §6。
 | LLM Agent | ✅ ResearchAgent/ReportAgent；默认 Mock；可选云端 API |
 | 文本情绪特征 | ✅ mock + FinBERT 服务器 smoke（EXP-TEXT-001）；WF OOS **0.563** vs **0.586**（exploratory） |
 | LangGraph | ✅ 可选依赖 `[orchestration]` |
-| RL / MCP | 📋 设计文档已有，**代码未实现** |
+| RL simulation | ✅ M7 TradingEnv + GRPO ranking（本地 180 pytest） |
+| RL / MCP | M7 ✅ 本地 skeleton · M8 📋 未实现 |
 
 ---
 
@@ -297,7 +298,7 @@ Python 写的多智能体量化**研究**平台（不是实盘 bot）。
 Quant Engine 做计算，Agent 做编排/解释，Memory+RAG 查实验，walk-forward 做 OOS。
 
 个人用来整理 SRTP/实习材料，README 有 resume 描述可直接改。  
-M1–M6 代码已落地，M7 RL / M8 MCP 还在文档里规划。
+M1–M7 代码已落地（M7 simulation only），M8 MCP 还在规划。
 
 求 Star，欢迎 Issue/PR。仅科研教育，非投资建议。
 
