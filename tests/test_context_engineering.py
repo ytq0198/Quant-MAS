@@ -270,6 +270,7 @@ def test_resolve_local_vllm_with_mock_http(monkeypatch) -> None:
     monkeypatch.setenv("VLLM_BASE_URL", "http://127.0.0.1:8000")
     monkeypatch.setenv("VLLM_MODEL", "local-test-model")
     monkeypatch.delenv("VLLM_API_KEY", raising=False)
+    monkeypatch.delenv("LLM_TIMEOUT_SECONDS", raising=False)  # server .env may set 60 (M-017)
     monkeypatch.setattr("quant_mas.core.llm.request.urlopen", fake_urlopen)
 
     client = resolve_llm_client(use_llm=True, provider="local_vllm")
