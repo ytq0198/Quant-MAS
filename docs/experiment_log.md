@@ -1,6 +1,6 @@
 # Quant MAS 实验记录
 
-更新时间：2026-06-03（v3 M11 ✅ EXP-20260602-029，**225 passed** · M9/M10 服务器 ✅）
+更新时间：2026-06-03（v3 M11 ✅ 本地+服务器 **225 passed** · EXP-POP-002）
 
 本文件用于记录真实实验和重要验证。不要记录未经实际运行的数据结果；尚未真实运行的项目标记为「待验证」。
 
@@ -178,6 +178,22 @@
 
 ## 当前验证记录
 
+### EXP-POP-002：v3 M11 服务器 pytest + competitive mock dry-run ✅
+
+- 日期：2026-06-03
+- 阶段：**v3 M11** 服务器 pull @ **`64a5b2a`**（含 M-017 `LLM_TIMEOUT_SECONDS` 测试隔离）
+- 环境：a6000-9961；conda `quant-mas`；Python **3.11.15**
+- 命令与结果：
+  - `python -m pytest -v` → **225 passed** in **17.32s**
+  - `python scripts/run_competitive_experiment.py --config configs/competitive.yaml --mode mock --dry-run` → ✅
+    - `simulation_only: true`；2 agents × 3 windows
+    - `population.top_agent`: `mean_rev_1`（Elo 平局 1500，tie-break `agent_id`）
+    - `simulation.sharpe` ≈ **7.15**（**simulation.*** 短窗 mock，**≠** OOS **0.586**）
+    - 输出无 `oos.sharpe`；`dry_run: true`，无 memory/artifacts
+- 说明：三窗均为 momentum vs mean_reversion **draw**（同 synthetic 路径下 reward 相同）；符合 mock smoke 预期
+- 问题：首次 pull 曾 **224 passed**（`test_resolve_local_vllm_with_mock_http` 受 `.env` `LLM_TIMEOUT_SECONDS=60` 影响）→ **`64a5b2a`** 修复
+- 下一步：M12 RL 训练 loop；EXP-TEXT-WF-002
+
 ### EXP-20260602-029：v3 M11 竞争学习 / 策略种群本地验证 ✅
 
 - 日期：2026-06-03
@@ -197,14 +213,14 @@
   - 全量 `python -m pytest -v` → **225 passed**（212→225，+13）
 - 指标边界：只写 `population.*` / `simulation.*`；**不写** `oos.sharpe`；Population Elo ≠ 论文 OOS **0.586**
 - 问题：无
-- 下一步：服务器 pytest + competitive dry-run（**EXP-POP-002**）；M12 RL 训练 loop
+- 下一步：~~服务器 pytest + competitive dry-run~~ ✅ EXP-POP-002；M12 RL 训练 loop
 
 ### EXP-POP-001：competitive mock dry-run 本地 smoke ✅
 
 - 日期：2026-06-03
 - 命令：`run_competitive_experiment.py --mode mock --dry-run`
 - 结果：stdout summary；`simulation_only: true`；无 broker / LLM / DB / 网络
-- 下一步：服务器 **EXP-POP-002**
+- 下一步：~~服务器 **EXP-POP-002**~~ ✅
 
 ### EXP-20260602-026：v3 M9 服务器 Postgres/pgvector 真实 DB smoke ✅
 
@@ -995,6 +1011,7 @@
 | EXP-20260602-009 | 2026-06-02 | Plus M1 研究基线本地 | **102 passed**（+4 测试） |
 | EXP-20260602-010 | 2026-06-02 | Plus M1 服务器 pytest + 比较表 | **102 passed**；OOS sharpe 0.586 |
 | EXP-20260602-011 | 2026-06-02 | Plus M2 数据扩展本地 | **115 passed**（+13） |
+| EXP-POP-002 | 2026-06-03 | v3 M11 服务器 | **225 passed**（17.32s）+ competitive dry-run @ `64a5b2a` |
 | EXP-20260602-029 | 2026-06-03 | v3 M11 竞争学习本地 | **225 passed**（+13）；population **13/13** |
 | EXP-POP-001 | 2026-06-03 | competitive mock dry-run | ✅ 本地；simulation_only |
 | EXP-20260602-028 | 2026-06-01 | v3 M9/M10 服务器 pytest | **212 passed**（11.39s）@ `3fd32e0` |

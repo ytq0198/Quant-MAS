@@ -718,7 +718,7 @@ python scripts/run_research_agent.py \
 
 记录：**EXP-LLM-002** ✅（2026-06-03，Qwen2.5-7B-Instruct @ GPU 0，vLLM 0.22.0）。
 
-## 六点十四、v3 M11 竞争学习（EXP-029 / EXP-POP-002）📋
+## 六点十四、v3 M11 竞争学习（EXP-029 / EXP-POP-002）✅
 
 ### 6.14.1 拉代码 + pytest
 
@@ -748,7 +748,7 @@ python scripts/run_competitive_experiment.py \
 
 - `--dry-run` 仅 stdout，不写 ExperimentMemory / artifacts
 - 指标为 `population.*` / `simulation.*`；**不得**与 OOS **0.586** 混比
-- 记录：**EXP-20260602-029** 本地 225；**EXP-POP-002** 服务器待做
+- 记录：**EXP-20260602-029** 本地 225；**EXP-POP-002** ✅ 服务器 **225 passed**（17.32s）+ dry-run（2026-06-03 @ `64a5b2a`）
 
 详见 [`docs/competitive_learning.md`](competitive_learning.md)。
 

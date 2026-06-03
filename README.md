@@ -47,9 +47,9 @@
 > Quant Engine computes. Agent Layer explains, orchestrates, and reports.  
 > Quant Engine 做计算；Agent Layer 做编排、解释与报告。
 
-**Plus v2 status / 当前进度**：**M1–M8 ✅** · **v3 M9–M11 ✅** 本地（**225 pytest** · EXP-026 + EXP-LLM-002 + EXP-029）
+**Plus v2**：M1–M8 ✅ · **v3 M9–M11** ✅ 双端（225 pytest · EXP-POP-002）
 
-**v3 next / 下一步**：M12 RL 训练 · M13 编排 · EXP-TEXT-WF-002 · 服务器 **EXP-POP-002**
+**v3 next / 下一步**：M12 RL 训练 · M13 编排 · EXP-TEXT-WF-002
 
 ---
 
@@ -118,7 +118,7 @@ python -m pip install -e ".[llm]"                 # HTTP LLM client
 python -m pip install -e ".[text]"                # FinBERT / LoRA (server manual)
 ```
 
-**Verified baseline / 已验证基线**：**225 passed**（EXP-029）· pytest 默认 synthetic/mock · 服务器 **212**（EXP-028）待 pull M11
+**Verified baseline / 已验证基线**：**225 passed**（本地+服务器，EXP-029 / EXP-POP-002）
 
 ---
 
@@ -254,8 +254,8 @@ print(result.content)
 
 | Item | Value | Notes |
 |------|-------|-------|
-| **pytest** | **225 passed** | EXP-029 本地（212→225）；服务器 212 待 pull |
-| **competitive learning** | Population + Elo mock | EXP-POP-001（`run_competitive_experiment.py --dry-run`） |
+| **pytest** | **225 passed** | EXP-029 本地 · EXP-POP-002 服务器（17.32s） |
+| **competitive learning** | Population + Elo mock | EXP-POP-001/002 dry-run ✅ |
 | **local vLLM smoke** | ResearchAgent `local_vllm` | EXP-LLM-002（Qwen2.5-7B @ a6000） |
 | **Postgres/pgvector smoke** | `query_memory` + `index_documents` | EXP-026（6 experiments, **443 chunks**） |
 | **OOS baseline** | **sharpe 0.586** | EXP-20260602-008, 19 walk-forward windows |
