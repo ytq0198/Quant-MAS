@@ -77,6 +77,13 @@ NEO4J_USER=neo4j
 NEO4J_PASSWORD=change-me
 ```
 
+Seed Postgres from existing JSON (server smoke, EXP-026):
+
+```bash
+python scripts/seed_postgres_from_json.py \
+  --json-path /mnt/localDisk3/weizian/reports/experiments.json
+```
+
 Query experiment memory from Postgres:
 
 ```bash

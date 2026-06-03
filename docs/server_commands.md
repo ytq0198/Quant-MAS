@@ -553,78 +553,85 @@ python scripts/export_agent_cards.py --config configs/protocols.yaml \
 
 详见 [`docs/protocols.md`](protocols.md)。
 
-## 六点十二、v3 M9 企业 DB（EXP-025 / EXP-026）📋
+## 六点十二、v3 M9 企业 DB（EXP-025 / EXP-026）
 
-### 6.12.1 服务器现状（2026-06-01 探测）
+### 6.12.1 前置条件
 
-| 项 | 状态 |
+| 项 | 要求 |
 |----|------|
-| OS | Ubuntu 22.04.5 |
-| Docker | 28.1.1 + Compose v2.35.1 已装 |
-| 用户 weizian | **不在 docker 组**，无 sudo 免密 → 无法自启容器 |
-| 5432 | 未监听（Postgres 未起） |
-| Quant-MAS | **`0794bd6`（M8，195 pytest）** — M9 在 **`06a6a5d`** 待 pull |
-| infra | `/mnt/localDisk3/weizian/infra/quant-mas-db/`（compose + setup.sh + .env） |
-| Python 驱动 | psycopg 3.3.4、neo4j 6.2.0 ✅ |
+| Docker | weizian 在 **docker 组**（`groups` 含 `docker`；若刚加组须 **重新 SSH 登录**） |
+| infra | `/mnt/localDisk3/weizian/infra/quant-mas-db/`（compose + `setup.sh` + `.env`） |
+| 凭据 | `POSTGRES_DSN` 在 `Quant-MAS/.env`（与 infra `.env` 一致，**勿 commit**） |
+| 代码 | `origin/main` ≥ M10（**212 pytest**，含 `seed_postgres_from_json.py`） |
+| Python | conda `quant-mas`；`psycopg[binary]>=3.1` |
 
-### 6.12.2 阻塞解除（找管理员，二选一）
-
-**推荐 A — 加入 docker 组（长期）**
+### 6.12.2 启动 Postgres + pgvector
 
 ```bash
-# 管理员执行一次
-sudo usermod -aG docker weizian
-# weizian 必须退出 SSH 重新登录后生效
-groups   # 应含 docker
-```
+# 0) 确认 docker 组（必须重新登录后才生效）
+groups | tr ' ' '\n' | grep -x docker && echo "docker OK"
 
-**B — 管理员代启 Postgres（一次性）**
-
-```bash
-cd /mnt/localDisk3/weizian/infra/quant-mas-db
-sudo docker compose up -d postgres
-sudo docker exec quant-mas-postgres psql -U quant_mas -d quant_mas \
-  -c "CREATE EXTENSION IF NOT EXISTS vector;"
-```
-
-weizian 获得 docker 权限并重新登录后：
-
-```bash
+# 1) 一键启动（推荐）
 bash /mnt/localDisk3/weizian/infra/quant-mas-db/setup.sh
-# 可选 Neo4j：
-# cd /mnt/localDisk3/weizian/infra/quant-mas-db && docker compose --profile neo4j up -d neo4j
+
+# 或手动：
+# cd /mnt/localDisk3/weizian/infra/quant-mas-db
+# docker compose up -d postgres
+# docker exec quant-mas-postgres psql -U quant_mas -d quant_mas \
+#   -c "CREATE EXTENSION IF NOT EXISTS vector;"
+
+# 2) 验收容器与端口
+docker ps --filter name=quant-mas-postgres
+ss -ltn | grep 5432 || true
+docker exec quant-mas-postgres psql -U quant_mas -d quant_mas -c "SELECT extname FROM pg_extension WHERE extname='vector';"
 ```
 
-密码仅在 `infra/quant-mas-db/.env` 与 `Quant-MAS/.env`（**勿 commit**）。
+可选 Neo4j：`cd /mnt/localDisk3/weizian/infra/quant-mas-db && docker compose --profile neo4j up -d neo4j`
 
-### 6.12.3 拉 M9 代码并验收（EXP-026）
+### 6.12.3 拉代码 + pytest（与 DB 无关）
 
 ```bash
 cd /mnt/localDisk3/weizian/Quant-MAS
-git status
-git checkout -- docs/experiment_log.md 2>/dev/null || true   # 若有本地文档改动
 git fetch origin main
-git log -1 --oneline origin/main   # 目标：M10 后含 212 pytest 的 commit
-git merge --ff-only origin/main
+git merge --ff-only origin/main   # 目标：d10a641+（212 pytest + seed 脚本）
 
 conda activate /mnt/localDisk3/weizian/conda_envs/quant-mas
 python -m pip install -e .
-python -m pip install "psycopg[binary]>=3.1" neo4j   # 若未装
-python -m pytest -v   # 预期 212 passed（M9+M10）
+python -m pip install "psycopg[binary]>=3.1" neo4j
+python -m pytest -v   # 预期 212 passed
+```
 
-python -m pytest tests/test_memory_enterprise.py -v   # 12 passed
-python -m pytest tests/test_context_engineering.py -v # 17 passed
+### 6.12.4 EXP-026 真实 DB smoke
 
-# 真实 DB smoke（Postgres 已起且 POSTGRES_DSN 在 .env）
+```bash
+cd /mnt/localDisk3/weizian/Quant-MAS
+conda activate /mnt/localDisk3/weizian/conda_envs/quant-mas
+set -a && source .env && set +a   # 加载 POSTGRES_DSN
+
+# A) 从服务器 experiments.json 导入 Postgres（空库首次；重复跑加 --skip-existing）
+python scripts/seed_postgres_from_json.py \
+  --json-path /mnt/localDisk3/weizian/reports/experiments.json
+
+# B) 查 best OOS（论文主指标 walk-forward OOS，非单段 ML）
 python scripts/query_memory.py --backend postgres --best-metric oos.sharpe
+# 预期：含 oos.sharpe ≈ 0.586 的 baseline 实验名
+
+# C) pgvector 索引 docs
 python scripts/index_documents.py --vector-store pgvector --dirs docs --embedding-dimensions 64
+# 预期：[index] documents=… chunks=…（通常 100+ chunks）
+
+# D) SQL 抽查（可选）
+docker exec quant-mas-postgres psql -U quant_mas -d quant_mas \
+  -c "SELECT COUNT(*) FROM experiments;"
+docker exec quant-mas-postgres psql -U quant_mas -d quant_mas \
+  -c "SELECT COUNT(*) FROM rag_vectors;"
 ```
 
 **说明**：
 
-- pytest 默认 mock，**不依赖**真实 Postgres / vLLM；**212** 与 DB 是否启动无关
-- 环境变量名：**`POSTGRES_DSN`**；vLLM：**`VLLM_BASE_URL`**
-- 记录：**EXP-025** 本地 207；**EXP-027/028** 212；**EXP-026** DB smoke 待 Docker；**EXP-LLM-002** ✅
+- pytest 默认 mock，**不依赖**真实 Postgres / vLLM
+- `--best-metric oos.sharpe` 需要 Postgres 里已有实验记录 → 先跑 **seed**（默认 JSON 路径是仓库内空路径，须指向服务器 `reports/experiments.json`）
+- 记录：**EXP-025** 本地 207；**EXP-027/028** 212；**EXP-LLM-002** ✅；**EXP-026** 完成后再更新 `experiment_log.md`
 
 详见 [`docs/database_setup.md`](database_setup.md) §M9 · [`docs/context_engineering.md`](context_engineering.md) M10。
 
