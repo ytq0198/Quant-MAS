@@ -93,6 +93,7 @@ Paper baseline remains EXP-20260602-008 oos.sharpe 0.586.
 | --- | --- | --- |
 | **EXP-20260602-030** | Local | **237 passed**; loop tests **12/12** |
 | **EXP-POP-003** | Server a6000-9961 @ `aa841d4` | **237 passed** (41.83s); 3-gen `--dry-run` OK |
+| **EXP-POP-004** | Server @ `7ab510f` | **248 passed** (55.15s); M11.6 export dry-run OK |
 
 Server dry-run observed deterministic mutation (e.g. `mean_rev_1_g1_1` scale 1.01 → `mean_rev_1_g1_1_g2_2` scale 1.03), Elo draws at 1500 on mock data, and `simulation.sharpe_mean` ≈ 7.15 — **not** walk-forward OOS **0.586**.
 

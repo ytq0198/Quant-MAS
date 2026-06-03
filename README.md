@@ -120,7 +120,7 @@ python -m pip install -e ".[llm]"                 # HTTP LLM client
 python -m pip install -e ".[text]"                # FinBERT / LoRA (server manual)
 ```
 
-**Verified baseline / 已验证基线**：**237 passed**（本地+服务器，EXP-030 / EXP-POP-003）
+**Verified baseline / 已验证基线**：**248 passed**（本地+服务器，EXP-031 / EXP-POP-004 @ `7ab510f`）
 
 ---
 
@@ -194,6 +194,16 @@ python scripts/run_research_agent.py \
 python scripts/train_text_model.py \
   --mode mock \
   --config configs/text_model.yaml \
+  --dry-run
+```
+
+### Export population candidates (M11.6) / 导出种群候选
+
+```bash
+python scripts/export_population_candidates.py \
+  --population-config configs/population_training.yaml \
+  --top-k 2 \
+  --run-backtest-smoke \
   --dry-run
 ```
 
@@ -300,13 +310,13 @@ Quant-MAS/
 │   ├── context/              # ContextBuilder (M5)
 │   ├── core/                 # llm.py — mock | openai_compatible | local_vllm (M10)
 │   ├── text/                 # text signals (M6)
-│   ├── rl/                   # TradingEnv (M7), competitive runner (M11)
+│   ├── rl/                   # TradingEnv (M7), population training, candidate bridge (M11–M11.6)
 │   ├── protocols/            # MCP/A2A adapter (M8)
 │   ├── orchestration/        # LangGraph workflow (M4)
-│   └── research/             # baseline registry (M1)
+│   └── research/             # baseline registry (M1), StrategyCandidate (M11.6)
 ├── scripts/                  # CLI entrypoints
 ├── configs/                  # YAML configs (+ llm.server.yaml.example)
-├── tests/                    # 237 pytest cases
+├── tests/                    # 248 pytest cases
 ├── docs/                     # architecture, progress, experiment log, server_commands
 ├── architecture.png          # architecture diagram
 ├── CONTRIBUTING.md

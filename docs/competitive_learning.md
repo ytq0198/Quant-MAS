@@ -85,3 +85,11 @@ M12 can reuse:
 - Elo utilities in `quant_mas.rl.elo_rating`
 
 M11.5 adds the multi-generation loop; see [population_training.md](population_training.md).
+
+M11.6 exports Top-K winners to `StrategyCandidate` records and optional backtest smoke; see [strategy_candidate_bridge.md](strategy_candidate_bridge.md).
+
+Full chain (dual-end verified @ **248 pytest**, EXP-031/POP-004):
+
+```text
+M11 competitive eval → M11.5 population training → M11.6 candidate export + backtest smoke
+```

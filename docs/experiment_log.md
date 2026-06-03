@@ -228,7 +228,7 @@
     - `best_agent`: `mean_rev_1`；Elo 平局 **1500**（mock draw）；`simulation.sharpe_mean` ≈ **7.15**（**≠** OOS **0.586**）
     - 无 `oos.*`；无 memory/artifacts
 - 问题：无
-- 下一步：~~M11.6 候选桥~~ ✅ EXP-031；服务器 EXP-POP-004；M12 RL 训练；EXP-TEXT-WF-002
+- 下一步：~~M11.6 候选桥~~ ✅ EXP-031/POP-004；M12 RL 训练；EXP-TEXT-WF-002
 
 ### EXP-20260602-030：v3 M11.5 种群训练闭环本地验证 ✅
 
@@ -249,7 +249,7 @@
   - 全量 `python -m pytest -v` → **237 passed**（225→237，+12）
 - 边界：无 broker / LLM / 网络 / GPU；dry-run 不写 memory/artifacts；非 dry-run 写 generation metrics + ExperimentMemory；**无** `oos.*`
 - 问题：无
-- 下一步：~~服务器 pull + pytest~~ ✅ EXP-POP-003；M12 RL 训练
+- 下一步：~~服务器 pull + pytest~~ ✅ EXP-POP-003；~~M11.6~~ ✅ EXP-POP-004；M12 RL 训练
 
 ### EXP-POP-002：v3 M11 服务器 pytest + competitive mock dry-run ✅
 
