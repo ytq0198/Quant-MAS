@@ -47,9 +47,9 @@
 > Quant Engine computes. Agent Layer explains, orchestrates, and reports.  
 > Quant Engine 做计算；Agent Layer 做编排、解释与报告。
 
-**Plus v2 status / 当前进度**：**M1–M8 ✅** · **v3 M9–M11.6 ✅** 本地（**248 pytest** · M11–M11.5 双端 **237**）
+**Plus v2 status / 当前进度**：**M1–M8 ✅** · **v3 M9–M11.6 ✅** 双端（**248 pytest**）
 
-**v3 next / 下一步**：M12 RL 训练 · 服务器 **EXP-POP-004** · EXP-TEXT-WF-002
+**v3 next / 下一步**：M12 RL 训练 · EXP-TEXT-WF-002
 
 ---
 
@@ -256,8 +256,8 @@ print(result.content)
 
 | Item | Value | Notes |
 |------|-------|-------|
-| **pytest** | **248 passed** | EXP-031 本地（+11）；M11.5 双端 237（EXP-030/POP-003） |
-| **candidate bridge (M11.6)** | Top-K export + backtest smoke | EXP-20260602-031 ✅ |
+| **pytest** | **248 passed** | EXP-031 / EXP-POP-004 双端（55.15s 服务器） |
+| **candidate bridge (M11.6)** | Top-K export + backtest smoke | EXP-POP-004 ✅ |
 | **population training** | 3-gen loop dry-run | EXP-POP-003 ✅ |
 | **local vLLM smoke** | ResearchAgent `local_vllm` | EXP-LLM-002（Qwen2.5-7B @ a6000） |
 | **Postgres/pgvector smoke** | `query_memory` + `index_documents` | EXP-026（6 experiments, **443 chunks**） |
@@ -352,7 +352,7 @@ Quant-MAS/
 - [x] **M10** LLM production — `local_vllm`, ResearchAgent smoke **EXP-LLM-002** (Qwen2.5-7B @ a6000) ✅
 - [x] **M11** Competitive learning — StrategyAgent, PopulationManager, Elo **EXP-029/POP-002** ✅
 - [x] **M11.5** Population training loop — multi-generation **EXP-030/POP-003** ✅
-- [x] **M11.6** Strategy candidate bridge — Top-K export + backtest smoke **EXP-031** ✅
+- [x] **M11.6** Strategy candidate bridge — Top-K export + backtest smoke **EXP-031/POP-004** ✅
 - [ ] **M12** RL training experiments (GRPO/PPO/MARL GPU smoke)
 - [ ] **M13** Enterprise orchestration — multi-experiment DAG scheduler, audit log
 - [ ] FinBERT server smoke + text-enhanced walk-forward ablation (EXP-TEXT-WF-002)

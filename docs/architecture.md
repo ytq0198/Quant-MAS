@@ -173,7 +173,7 @@ collect_experiment_metrics → BaselineRegistry / comparison table
 
 ## 测试与部署
 
-- **pytest**：本地 **248 passed**（EXP-031）；M11.5 双端 **237**（EXP-030/POP-003）
+- **pytest**：本地+服务器 **248 passed**（EXP-031 / EXP-POP-004）
 - **服务器**：`/mnt/localDisk3/weizian/Quant-MAS`，conda `quant-mas`，Python 3.11.15
 - **GitHub**：https://github.com/ytq0198/Quant-MAS
 
@@ -193,6 +193,6 @@ collect_experiment_metrics → BaselineRegistry / comparison table
 | **M10** LLM 生产化 | local_vllm + ResearchAgent | ✅ EXP-027/028/LLM-002 |
 | **M11** 竞争学习 | StrategyAgent + Population + Elo | ✅ EXP-029/POP-002 |
 | **M11.5** 种群训练 | PopulationTrainingLoop | ✅ EXP-030/POP-003（237 双端） |
-| **M11.6** 候选验证桥 | StrategyCandidate → backtest smoke | ✅ EXP-031（248 本地） |
+| **M11.6** 候选验证桥 | StrategyCandidate → backtest smoke | ✅ EXP-031/POP-004（248 双端） |
 
 详见 [项目plus设计.md](../项目plus设计.md)、[competitive_learning.md](competitive_learning.md)。**Plus v2 系统结构定稿**见 [`项目进度.md`](../项目进度.md) §Plus v2 收官。

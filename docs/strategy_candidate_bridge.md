@@ -79,7 +79,7 @@ Population Elo is a search signal. It is not the final research claim.
 | Experiment | Environment | Result |
 | --- | --- | --- |
 | **EXP-20260602-031** | Local | **248 passed**; bridge tests **11/11** |
-| **EXP-POP-004** | Server a6000-9961 | 📋 pending pull + pytest + export dry-run |
+| **EXP-POP-004** | Server a6000-9961 @ `7ab510f` | ✅ **248 passed** (55.15s); bridge **11/11** (2.48s); export dry-run OK |
 
 Local acceptance:
 

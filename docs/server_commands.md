@@ -10,6 +10,7 @@ GitHub 仓库：[https://github.com/ytq0198/Quant-MAS](https://github.com/ytq019
 
 | 日期 | 项目 | 结果 | 备注 |
 |------|------|------|------|
+| 2026-06-03 | v3 M11.6 服务器 pytest + candidate export | **248 passed**（55.15s）+ dry-run ✅ | EXP-POP-004 @ `7ab510f` |
 | 2026-06-03 | v3 M11.6 候选验证桥（本地） | **248 passed**；bridge **11/11** ✅ | EXP-20260602-031 |
 | 2026-06-03 | v3 M11.5 服务器 pytest + population training | **237 passed**（41.83s）+ 3-gen dry-run ✅ | EXP-POP-003 @ `aa841d4` |
 | 2026-06-03 | v3 M11 服务器 pytest + competitive mock | **225 passed**（17.32s）+ dry-run ✅ | EXP-POP-002 @ `64a5b2a` |
@@ -786,7 +787,7 @@ python scripts/run_population_training.py \
 
 详见 [`docs/population_training.md`](population_training.md)。
 
-## 六点十六、v3 M11.6 候选验证桥（EXP-031 / EXP-POP-004）📋
+## 六点十六、v3 M11.6 候选验证桥（EXP-031 / EXP-POP-004）✅
 
 ### 6.16.1 拉代码 + pytest
 
@@ -818,7 +819,7 @@ python scripts/export_population_candidates.py \
 - `--dry-run` 仅 stdout，不写 ExperimentMemory / artifacts
 - 指标为 `population.*` / `simulation.*` / `backtest.*`；**不得**写或混比 `oos.*`（论文主指标 **0.586**）
 - `--run-walk-forward` 第一版为 stub，不产出 OOS 数字
-- 记录：**EXP-20260602-031** 本地 248；**EXP-POP-004** 服务器待做
+- 记录：**EXP-20260602-031** 本地 248；**EXP-POP-004** ✅ 服务器 **248 passed**（55.15s，bridge 2.48s）+ export dry-run（2026-06-03 @ `7ab510f`）
 
 详见 [`docs/strategy_candidate_bridge.md`](strategy_candidate_bridge.md)。
 
