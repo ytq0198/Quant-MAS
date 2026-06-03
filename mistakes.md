@@ -61,6 +61,7 @@
 | [M-014](#m-014-把-api-key-写入-envexample-或-commit) | **P0** | Plus M2 / 安全 | .env vs .env.example |
 | [M-015](#m-015-sec-edgar-需真实-user-agent) | P1 | Plus M2 / EXP-DATA-001 | SEC User-Agent |
 | [M-016](#m-016-langgraph-建边-zipstrict-长度不匹配) | **P0** | Plus M4 / langgraph backend | zip() strict |
+| [M-017](#m-017-服务器-env-导致-pytest-llm-用例失败) | P1 | Plus M5 / 服务器 pytest | load_repo_dotenv |
 
 ---
 
@@ -448,6 +449,18 @@ python scripts/download_data.py \
 | **验证记录** | EXP-20260602-016：a6000-9961 @ `c0fa5e3`，langgraph invoke 测试通过；dry-run 6 节点、`errors: []` |
 | **预防** | 用 `strict=True` 配对「相邻元素」时，左边取 `seq[:-1]`、右边取 `seq[1:]`，不要对全长 `seq` 与 `seq[1:]` 做 strict zip |
 
+#### M-017 服务器 `.env` 导致 pytest LLM 用例失败
+
+| 项 | 内容 |
+|----|------|
+| **日期** | 2026-06-03 |
+| **阶段** | Plus M5 / 服务器（已配置 DeepSeek `.env`） |
+| **现象** | 配置 `LLM_API_KEY` 后 `python -m pytest -v` 失败：<br>`test_resolve_llm_client_defaults_to_mock` 期望无 key 时回退 Mock，实际得到 `OpenAICompatibleLLMClient` |
+| **根因** | `resolve_llm_client()` 内调用 `load_repo_dotenv()`，会从项目根 `.env` **重新写入** `LLM_API_KEY`；测试里 `monkeypatch.delenv("LLM_API_KEY")` 之后仍被 `.env` 覆盖 |
+| **解决方法** | 1. 拉取修复：`tests/test_context_engineering.py` 对该用例 `monkeypatch` 禁用 `load_repo_dotenv`<br>2. **CLI smoke** 与 **pytest** 分离：有 `.env` 时 CLI 可走 DeepSeek；pytest 仍 mock 隔离<br>3. 配置 `.env` 后若 `--use-llm` 仍显示 `"llm_provider": "mock"` → 检查 `.env` 是否在仓库根、变量名是否为 `LLM_API_KEY` |
+| **相关提交** | （test 修复 commit 待 push） |
+| **DeepSeek smoke 正确命令** | 见 [context_engineering.md](docs/context_engineering.md) 服务器节 |
+
 ---
 
 ## 跨阶段通用规则
@@ -495,7 +508,7 @@ python -m pip install -e .
 | — | Plus M2 | 多数据源 API smoke | ✅ EXP-DATA-001（Finnhub 免费 blocked；SEC 待测，见 M-015） |
 | — | Plus M3 | Memory/RAG v2 SQLite | ✅ EXP-20260602-013/014 |
 | — | Plus M4 | LangGraph workflow | ✅ EXP-20260602-015/016（含 langgraph backend 修复 M-016） |
-| — | Plus M5 | 上下文/LLM | **当前** |
+| — | Plus M5 | 上下文/LLM | ✅ EXP-20260602-017 本地；服务器 DeepSeek + pytest 见 M-017 |
 
 ---
 

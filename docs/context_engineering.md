@@ -82,17 +82,33 @@ python scripts/generate_report.py --latest --use-llm    # 有 key 时用真实 L
 
 三者并存；Supervisor **未被替换**。
 
-## 服务器 smoke（可选，不写入 pytest）
+## 服务器 smoke（DeepSeek 云端，不写入 pytest）
 
 ```bash
 cd /mnt/localDisk3/weizian/Quant-MAS
 git pull origin main
 conda activate /mnt/localDisk3/weizian/conda_envs/quant-mas
-python -m pip install -e .
-python -m pytest tests/test_context_engineering.py -v
-python scripts/run_research_agent.py --task "Explain walk-forward OOS sharpe baseline"
-# 有 key 时：--use-llm → 记 EXP-LLM-001（勿提交 key）
+python -m pip install -e ".[llm]"
+
+# .env 示例（勿 commit）
+# LLM_PROVIDER=openai_compatible
+# LLM_BASE_URL=https://api.deepseek.com
+# LLM_API_KEY=sk-...
+# LLM_MODEL=deepseek-chat
+
+python -m pytest -v   # 150 passed（有 .env 时也须全绿，见 mistakes.md M-017）
+
+python scripts/run_research_agent.py \
+  --storage-config configs/storage.server.yaml \
+  --json-path /mnt/localDisk3/weizian/reports/experiments.json \
+  --task "Explain walk-forward OOS sharpe baseline and compare to latest ML run" \
+  --use-llm
 ```
+
+成功时 JSON 中 `"llm_provider"` 应为 **`openai_compatible`**（不是 `mock`）。  
+`baseline: null` 通常是因为默认 `experiments.json` 路径不对；务必用 `--storage-config storage.server.yaml` 或 `--json-path` 指向服务器真实 memory。
+
+记录 **EXP-LLM-001**（输出摘要、latency；**不写 key**）。本地 vLLM 见 [项目plus设计.md §M5.5](../项目plus设计.md#m55服务器本地-vllm-进阶待定)。
 
 ## 相关文档
 

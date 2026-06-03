@@ -6,6 +6,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+import pytest
+
 from quant_mas.agents import ReportAgent, ResearchAgent
 from quant_mas.context import (
     AgentContextBundle,
@@ -170,9 +172,14 @@ def test_context_builder_summarizes_workflow_state(tmp_path: Path) -> None:
 
 def test_resolve_llm_client_defaults_to_mock(monkeypatch) -> None:
     monkeypatch.delenv("LLM_API_KEY", raising=False)
+    monkeypatch.setenv("LLM_PROVIDER", "openai_compatible")
+    # Server .env would repopulate LLM_API_KEY after delenv; keep this test offline-safe.
+    monkeypatch.setattr("quant_mas.core.llm.load_repo_dotenv", lambda *args, **kwargs: False)
 
     assert isinstance(resolve_llm_client(use_llm=False), MockLLMClient)
-    assert isinstance(resolve_llm_client(use_llm=True, provider="openai_compatible"), MockLLMClient)
+    with pytest.warns(RuntimeWarning, match="LLM_API_KEY is not set"):
+        client = resolve_llm_client(use_llm=True, provider="openai_compatible")
+    assert isinstance(client, MockLLMClient)
 
 
 def test_openai_compatible_llm_client_mock_http(monkeypatch) -> None:
