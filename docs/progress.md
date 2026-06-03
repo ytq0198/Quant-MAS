@@ -1,10 +1,10 @@
 # Quant MAS 开发进度
 
-更新时间：2026-06-03（**v3 M9/M10 本地+服务器 ✅** EXP-027/028/LLM-002，212 passed）
+更新时间：2026-06-03（**v3 M11 ✅** EXP-029，**225 passed** · M9/M10 服务器 ✅）
 
-**Plus v2**：M1–M8 ✅ · **v3 M9/M10** ✅ 双端（EXP-026 DB + EXP-LLM-002）
+**Plus v2**：M1–M8 ✅ · **v3 M9–M11** ✅ 本地（M11 服务器 EXP-POP-002 待做）
 
-第五～六阶段见 [项目plus设计.md](../项目plus设计.md)（M7 RL 模拟 / M8 协议扩展，非实盘）。
+**pytest 基线**：**225 passed**（EXP-20260602-029）· **论文主指标**：Walk-forward OOS sharpe **0.586**
 
 ## Plus v2 八条主线（M1–M8）
 
@@ -21,7 +21,7 @@
 | **M7** | RL / GRPO 实验 | ✅ | TradingEnv、GRPO ranking；180 passed 本地+服务器 | [rl_plan.md](rl_plan.md) |
 | **M8** | MCP / A2A 协议 | ✅ | MCP adapter、AgentCard；195 passed 本地+服务器 | [protocols.md](protocols.md) |
 
-**pytest 基线**：**212 passed**（EXP-027/028 本地+服务器）· **论文主指标**：Walk-forward OOS sharpe **0.586**
+第五～六阶段见 [项目plus设计.md](../项目plus设计.md)（M7 RL 模拟 / M8 协议扩展，非实盘）。
 
 ## Plus v3 主线（M9–M13）
 
@@ -31,7 +31,7 @@
 |------|------|------|-----------------|------|
 | **M9** | 企业数据与数据库 | ✅ | Postgres 骨架；212 passed 本地+服务器 | [database_setup.md](database_setup.md) |
 | **M10** | LLM 生产化 | ✅ | local_vllm；212 passed 本地+服务器 | [codex_prompt_M10.md](codex_prompt_M10.md) |
-| **M11** | 竞争学习 / 策略种群 | 📋 | Population、Elo | 待建 competitive_learning.md |
+| **M11** | 竞争学习 / 策略种群 | ✅ | Population、Elo、competitive CLI；**225 passed** | [competitive_learning.md](competitive_learning.md) |
 | **M12** | RL 训练实验 | 📋 | GRPO/PPO training loop | [rl_plan.md](rl_plan.md) |
 | **M13** | 企业化编排 | 📋 | DAG scheduler | [protocols.md](protocols.md) |
 
@@ -181,8 +181,8 @@ M1/M2 已完成；**M3 本地 ✅**（见下两节）；下一步 **M4**。
 
 | 环境 | Python | 结果 | 日期 | 实验 |
 |------|--------|------|------|------|
-| 本地 Windows | 3.11+ | **212 passed** | 2026-06-01 | EXP-20260602-027 |
-| 服务器 a6000-9961 | 3.11.15 | **212 passed** | 2026-06-01 | EXP-20260602-028 |
+| 本地 Windows | 3.11+ | **225 passed** | 2026-06-03 | EXP-20260602-029 |
+| 服务器 a6000-9961 | 3.11.15 | **212 passed** | 2026-06-01 | EXP-20260602-028（M11 待 pull） |
 
 命令：`python -m pytest -v`（勿裸敲 `pytest` / `pip`）。
 
@@ -202,6 +202,7 @@ python scripts/compare_experiments.py --help
 python scripts/index_documents.py --help
 python scripts/query_memory.py --help
 python scripts/run_rl_baseline.py --help
+python scripts/run_competitive_experiment.py --help
 python scripts/export_agent_cards.py --help
 ```
 
@@ -278,6 +279,7 @@ python scripts/export_agent_cards.py --help
 | Random / BuyHold / MLCopy policies | ✅ |
 | GRPO-style group-relative ranking | ✅ |
 | run_rl_baseline.py --dry-run | ✅ |
+| run_competitive_experiment.py --dry-run | ✅ EXP-POP-001 |
 | test_trading_env | ✅ **13 passed** |
 | test_grpo_experiment | ✅ **6 passed** |
 | 全量 pytest（本地） | ✅ **180 passed** |

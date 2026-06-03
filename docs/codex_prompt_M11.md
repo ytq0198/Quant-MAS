@@ -1,6 +1,6 @@
 # Plus v3 M11：竞争学习 / 策略种群 — Codex 提示词
 
-**状态：📋 待实现**
+**状态：✅ 已完成（本地 EXP-20260602-029，225 passed，2026-06-03）**
 
 更新时间：2026-06-03
 
@@ -15,7 +15,7 @@
 你正在开发 Quant MAS 科研项目（v3 阶段）。
 路径：D:\scientific reasearch and work\SRTP\Quant MAS
 
-测试基线：本地 + 服务器 **212 passed**（v3 M9/M10，EXP-20260602-028）。
+测试基线：本地 **225 passed**（v3 M11，EXP-20260602-029）。
 OOS 主 baseline：EXP-20260602-008，oos.sharpe **0.586**（walk-forward，19 窗）。
 M6 text OOS exploratory：EXP-TEXT-WF-001，oos.sharpe **0.563** vs baseline **0.586**（不可替代主指标）。
 M7 RL：simulation only；`simulation.*` / Population Elo **不得**与 `oos.*` 混比或替代论文主指标。
@@ -341,12 +341,12 @@ python scripts/run_competitive_experiment.py --config configs/competitive.yaml -
 
 ## Cursor 后续（Codex 完成后）
 
-1. 创建/对齐 `docs/competitive_learning.md` 与实现
-2. 更新 `docs/architecture.md` — Competitive Learning Layer（Population / StrategyAgent）
-3. 更新 `docs/experiment_log.md` — **EXP-20260602-029**（本地 pytest）/ **EXP-POP-001**（mock competitive dry-run）
-4. 更新 `docs/progress.md`、`项目进度.md`、`项目v3设计.md` — M11 状态
+1. ~~创建/对齐 `docs/competitive_learning.md` 与实现~~ ✅
+2. ~~更新 `docs/architecture.md` — Competitive Learning Layer~~ ✅
+3. ~~更新 `docs/experiment_log.md` — **EXP-20260602-029** / **EXP-POP-001**~~ ✅
+4. ~~更新 `docs/progress.md`、`项目进度.md`、`项目v3设计.md` — M11 状态~~ ✅
 5. 服务器 pull + pytest + `run_competitive_experiment.py --dry-run`（**EXP-POP-002**）
-6. `docs/server_commands.md` — §6.14 M11 命令块（可选）
+6. ~~`docs/server_commands.md` — §6.14 M11 命令块~~ ✅
 
 **科研说明**：Population Elo、`simulation.*` 为辅助指标；主 baseline 仍为 walk-forward **oos.sharpe 0.586**。
 
@@ -398,9 +398,9 @@ python scripts/run_competitive_experiment.py --config configs/competitive.yaml -
 
 | 编号 | 内容 |
 |------|------|
-| **EXP-20260602-029** | M11 本地 pytest + population mock（212 → N passed） |
-| **EXP-POP-001** | `run_competitive_experiment.py --mode mock --dry-run` 本地 |
-| **EXP-POP-002** | 服务器 competitive mock dry-run |
+| **EXP-20260602-029** | M11 本地 pytest + population mock | ✅ **225 passed**（population 13/13） |
+| **EXP-POP-001** | competitive `--mode mock --dry-run` 本地 | ✅ |
+| **EXP-POP-002** | 服务器 competitive dry-run | 📋 待做 |
 | （未来） | `--mode walk_forward` 真实 OOS 与 **0.586** 对照 — **Cursor 科研任务**，Codex 仅 stub |
 
 论文主指标仍为 **EXP-20260602-008**（oos.sharpe **0.586**）。

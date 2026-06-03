@@ -173,7 +173,7 @@ collect_experiment_metrics → BaselineRegistry / comparison table
 
 ## 测试与部署
 
-- **pytest**：本地 + 服务器 **212 passed**（EXP-027/028）
+- **pytest**：本地 **225 passed**（EXP-029）；服务器 **212**（EXP-028，M11 待 pull）
 - **服务器**：`/mnt/localDisk3/weizian/Quant-MAS`，conda `quant-mas`，Python 3.11.15
 - **GitHub**：https://github.com/ytq0198/Quant-MAS
 
@@ -190,6 +190,7 @@ collect_experiment_metrics → BaselineRegistry / comparison table
 | **M7** RL/GRPO 模拟 | TradingEnv + GRPO ranking | ✅ EXP-021/022（180 passed） |
 | **M8** MCP/A2A | MCP adapter + AgentCard | ✅ EXP-023/024（195 passed） |
 | **M9** 企业 DB | Postgres + pgvector + Neo4j | ✅ EXP-025/028（212 passed 服务器） |
-| **M10** LLM 生产化 | local_vllm + ResearchAgent | ✅ EXP-027/028/LLM-002（212 passed + vLLM smoke） |
+| **M10** LLM 生产化 | local_vllm + ResearchAgent | ✅ EXP-027/028/LLM-002 |
+| **M11** 竞争学习 | StrategyAgent + Population + Elo | ✅ EXP-029（225 passed 本地） |
 
-详见 [项目plus设计.md](../项目plus设计.md)。**Plus v2 系统结构定稿**见 [`项目进度.md`](../项目进度.md) §Plus v2 收官。
+详见 [项目plus设计.md](../项目plus设计.md)、[competitive_learning.md](competitive_learning.md)。**Plus v2 系统结构定稿**见 [`项目进度.md`](../项目进度.md) §Plus v2 收官。

@@ -1,6 +1,6 @@
 # Quant MAS 实验记录
 
-更新时间：2026-06-03（v3 M9 ✅ EXP-026 Postgres/pgvector smoke · M10 ✅ EXP-LLM-002）
+更新时间：2026-06-03（v3 M11 ✅ EXP-20260602-029，**225 passed** · M9/M10 服务器 ✅）
 
 本文件用于记录真实实验和重要验证。不要记录未经实际运行的数据结果；尚未真实运行的项目标记为「待验证」。
 
@@ -178,6 +178,34 @@
 
 ## 当前验证记录
 
+### EXP-20260602-029：v3 M11 竞争学习 / 策略种群本地验证 ✅
+
+- 日期：2026-06-03
+- 阶段：**v3 M11** — StrategyAgent pool + PopulationManager + Elo + CompetitiveEpisodeRunner（mock-first）
+- 环境：本地；Codex 按 [codex_prompt_M11.md](codex_prompt_M11.md) 实现
+- 交付：
+  - `agents/strategy_agent.py` — `MomentumAgent`、`MeanReversionAgent`
+  - `agents/risk_agent.py` — proposal 必经风控裁剪
+  - `agents/population_manager.py` — Elo、Top-K、确定性 `next_generation`
+  - `rl/competitive_runner.py`、`rl/elo_rating.py` — 多 agent × 多 window shadow simulation（复用 M7 `TradingEnv`）
+  - `scripts/run_competitive_experiment.py`、`configs/competitive.yaml`
+  - `docs/competitive_learning.md`
+- 命令与结果：
+  - `python -m pytest tests/test_population_training.py -v` → **13 passed**
+  - `python -m pytest tests/test_trading_env.py tests/test_grpo_experiment.py -v` → **19 passed**（M7 零回归）
+  - `python scripts/run_competitive_experiment.py --config configs/competitive.yaml --mode mock --dry-run` → 成功（仅 stdout，不写 memory/artifacts）
+  - 全量 `python -m pytest -v` → **225 passed**（212→225，+13）
+- 指标边界：只写 `population.*` / `simulation.*`；**不写** `oos.sharpe`；Population Elo ≠ 论文 OOS **0.586**
+- 问题：无
+- 下一步：服务器 pytest + competitive dry-run（**EXP-POP-002**）；M12 RL 训练 loop
+
+### EXP-POP-001：competitive mock dry-run 本地 smoke ✅
+
+- 日期：2026-06-03
+- 命令：`run_competitive_experiment.py --mode mock --dry-run`
+- 结果：stdout summary；`simulation_only: true`；无 broker / LLM / DB / 网络
+- 下一步：服务器 **EXP-POP-002**
+
 ### EXP-20260602-026：v3 M9 服务器 Postgres/pgvector 真实 DB smoke ✅
 
 - 日期：2026-06-03
@@ -190,7 +218,7 @@
   - `python scripts/index_documents.py --vector-store pgvector --dirs docs --embedding-dimensions 64` → **documents=24, chunks=443**
 - 修复：首次 seed 后 `find_best` 报 `Connection has no fetchall` → **`_psycopg_compat.py`**（psycopg3 从 cursor 取行）
 - 问题：无（6 条实验已入库，无需重复 seed；重复跑用 `--skip-existing`）
-- 下一步：EXP-TEXT-WF-002；M11 竞争学习
+- 下一步：EXP-TEXT-WF-002；~~M11 竞争学习~~ ✅ EXP-029
 
 ### EXP-LLM-002：v3 M10 服务器 local_vLLM + ResearchAgent smoke ✅
 
@@ -967,6 +995,8 @@
 | EXP-20260602-009 | 2026-06-02 | Plus M1 研究基线本地 | **102 passed**（+4 测试） |
 | EXP-20260602-010 | 2026-06-02 | Plus M1 服务器 pytest + 比较表 | **102 passed**；OOS sharpe 0.586 |
 | EXP-20260602-011 | 2026-06-02 | Plus M2 数据扩展本地 | **115 passed**（+13） |
+| EXP-20260602-029 | 2026-06-03 | v3 M11 竞争学习本地 | **225 passed**（+13）；population **13/13** |
+| EXP-POP-001 | 2026-06-03 | competitive mock dry-run | ✅ 本地；simulation_only |
 | EXP-20260602-028 | 2026-06-01 | v3 M9/M10 服务器 pytest | **212 passed**（11.39s）@ `3fd32e0` |
 | EXP-20260602-027 | 2026-06-01 | v3 M10 LLM 本地 | **212 passed**（+5）；context **17/17** |
 | EXP-20260602-026 | 2026-06-03 | v3 M9 服务器 DB | ✅ Postgres query + pgvector **443 chunks**；OOS **0.586** @ `02bdb8a` |

@@ -6,7 +6,7 @@
 [![GitHub](https://img.shields.io/badge/GitHub-ytq0198%2FQuant--MAS-181717?logo=github)](https://github.com/ytq0198/Quant-MAS)
 [![Release](https://img.shields.io/badge/release-v0.1.0-blue)](https://github.com/ytq0198/Quant-MAS/releases/tag/v0.1.0)
 [![Python](https://img.shields.io/badge/python-3.11+-3776AB?logo=python&logoColor=white)](https://www.python.org/)
-[![Tests](https://img.shields.io/badge/tests-212%20passed-brightgreen)](docs/progress.md)
+[![Tests](https://img.shields.io/badge/tests-225%20passed-brightgreen)](docs/progress.md)
 [![Status](https://img.shields.io/badge/status-research%20platform-orange)](docs/progress.md)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![MAS Agent](https://img.shields.io/badge/MAS-Agent%20System-purple)](docs/architecture.md)
@@ -47,9 +47,9 @@
 > Quant Engine computes. Agent Layer explains, orchestrates, and reports.  
 > Quant Engine 做计算；Agent Layer 做编排、解释与报告。
 
-**Plus v2 status / 当前进度**：**M1–M8 ✅**（Plus v2 收官）· **v3 M9/M10 ✅** 本地+服务器（**212 pytest** · **EXP-LLM-002** local_vllm smoke）
+**Plus v2 status / 当前进度**：**M1–M8 ✅** · **v3 M9–M11 ✅** 本地（**225 pytest** · EXP-026 + EXP-LLM-002 + EXP-029）
 
-**v3 next / 下一步**：M11–M13 见 [`项目v3设计.md`](项目v3设计.md) · EXP-TEXT-WF-002
+**v3 next / 下一步**：M12 RL 训练 · M13 编排 · EXP-TEXT-WF-002 · 服务器 **EXP-POP-002**
 
 ---
 
@@ -90,6 +90,7 @@ Details: [docs/architecture.md](docs/architecture.md) · [docs/index.md](docs/in
 | **LangGraph** | Optional 6-node ResearchWorkflow DAG + sequential fallback | 可选工作流编排（`[orchestration]` extra） |
 | **Context / LLM (v3 M10)** | ContextBuilder, `mock \| openai_compatible \| **local_vllm**`; server **Qwen2.5-7B** via vLLM (EXP-LLM-002) | 上下文工程；pytest 默认 Mock；a6000 本地推理见 `docs/server_commands.md` §6.13 |
 | **RL Simulation (M7)** | TradingEnv, buy-and-hold / random / ML-copy baselines; GRPO-style ranking | RL 模拟骨架；`simulation.*` 不与 OOS 混比 |
+| **Competitive Learning (v3 M11)** | StrategyAgent pool, PopulationManager, Elo, `run_competitive_experiment.py` | 多 agent shadow simulation；`population.*` ≠ OOS |
 | **Protocol (M8)** | MCP/A2A internal adapter, AgentCard export, policy deny shell/broker/secrets | 协议层 adapter；不接外部 MCP server |
 | **Text Signals (M6)** | Mock / FinBERT / LoRA **skeleton**, merge into feature tables | 文本情绪特征骨架，不替代 LightGBM |
 | **Research Protocol (M1)** | Baseline registry, `compare_experiments.py`, OOS metric discipline | 实验基线对比；论文主指标用 OOS |
@@ -117,7 +118,7 @@ python -m pip install -e ".[llm]"                 # HTTP LLM client
 python -m pip install -e ".[text]"                # FinBERT / LoRA (server manual)
 ```
 
-**Verified baseline / 已验证基线**：**212 passed**（本地+服务器，EXP-027/028）· pytest 默认 synthetic/mock（不联网、不调真实 LLM/DB）· 服务器 **local_vllm** smoke：**EXP-LLM-002**
+**Verified baseline / 已验证基线**：**225 passed**（EXP-029）· pytest 默认 synthetic/mock · 服务器 **212**（EXP-028）待 pull M11
 
 ---
 
@@ -253,7 +254,8 @@ print(result.content)
 
 | Item | Value | Notes |
 |------|-------|-------|
-| **pytest** | **212 passed** | EXP-027/028（本地+服务器） |
+| **pytest** | **225 passed** | EXP-029 本地（212→225）；服务器 212 待 pull |
+| **competitive learning** | Population + Elo mock | EXP-POP-001（`run_competitive_experiment.py --dry-run`） |
 | **local vLLM smoke** | ResearchAgent `local_vllm` | EXP-LLM-002（Qwen2.5-7B @ a6000） |
 | **Postgres/pgvector smoke** | `query_memory` + `index_documents` | EXP-026（6 experiments, **443 chunks**） |
 | **OOS baseline** | **sharpe 0.586** | EXP-20260602-008, 19 walk-forward windows |
@@ -269,11 +271,11 @@ print(result.content)
 
 **English**
 
-> Built **Quant MAS**, a Python 3.11 multi-agent quantitative research platform with deterministic quant pipelines, walk-forward OOS evaluation (baseline sharpe 0.586), Memory/RAG, optional LangGraph, enterprise DB backends (Postgres/pgvector), **local vLLM ResearchAgent** (EXP-LLM-002), text signals, RL simulation, MCP-style protocol adapter, and mock-safe LLM defaults. Maintained **212 passing pytest** cases with strict safeguards preventing LLM agents from direct live trading.
+> Built **Quant MAS**, a Python 3.11 multi-agent quantitative research platform with deterministic quant pipelines, walk-forward OOS evaluation (baseline sharpe 0.586), Memory/RAG, optional LangGraph, enterprise DB backends (Postgres/pgvector), **local vLLM ResearchAgent** (EXP-LLM-002), **competitive strategy population** (M11 Elo simulation), text signals, RL simulation, MCP-style protocol adapter, and mock-safe LLM defaults. Maintained **225 passing pytest** cases with strict safeguards preventing LLM agents from direct live trading.
 
 **中文**
 
-> 基于 Python 3.11 构建 **Quant MAS** 多智能体量化研究平台，完成 Walk-forward OOS、风控、Agent 编排、Memory/RAG、**v3 企业 DB（Postgres/pgvector）**、**本地 vLLM 研究解释（M10）**、文本信号、RL 模拟与 **MCP/A2A 协议层（M8）**；维护 **212 项 pytest** 通过，明确 LLM Agent 不直接参与实盘下单。
+> 基于 Python 3.11 构建 **Quant MAS** 多智能体量化研究平台，完成 Walk-forward OOS、风控、Agent 编排、Memory/RAG、**v3 企业 DB**、**本地 vLLM（M10）**、**竞争学习策略种群（M11）**、文本信号、RL 模拟与 **MCP/A2A 协议层（M8）**；维护 **225 项 pytest** 通过，明确 LLM Agent 不直接参与实盘下单。
 
 ---
 
@@ -288,20 +290,20 @@ Quant-MAS/
 │   ├── strategies/           # ma_cross, ml_signal
 │   ├── backtest/             # engine, walk_forward, metrics
 │   ├── risk/                 # limits, drawdown guard
-│   ├── agents/               # supervisor, report, research
+│   ├── agents/               # supervisor, report, research, strategy (M11)
 │   ├── tools/                # 7 quant tools
 │   ├── memory/               # experiment memory: json | sqlite | postgres (M9)
 │   ├── rag/                  # retriever, in-memory + pgvector (M9)
 │   ├── context/              # ContextBuilder (M5)
 │   ├── core/                 # llm.py — mock | openai_compatible | local_vllm (M10)
 │   ├── text/                 # text signals (M6)
-│   ├── rl/                   # TradingEnv, GRPO ranking (M7)
+│   ├── rl/                   # TradingEnv (M7), competitive runner (M11)
 │   ├── protocols/            # MCP/A2A adapter (M8)
 │   ├── orchestration/        # LangGraph workflow (M4)
 │   └── research/             # baseline registry (M1)
 ├── scripts/                  # CLI entrypoints
 ├── configs/                  # YAML configs (+ llm.server.yaml.example)
-├── tests/                    # 212 pytest cases
+├── tests/                    # 225 pytest cases
 ├── docs/                     # architecture, progress, experiment log, server_commands
 ├── architecture.png          # architecture diagram
 ├── CONTRIBUTING.md
@@ -323,6 +325,7 @@ Quant-MAS/
 | [docs/research_protocol.md](docs/research_protocol.md) | OOS metric rules |
 | [docs/server_commands.md](docs/server_commands.md) | Server deploy, vLLM §6.13, Postgres §6.12 |
 | [docs/database_setup.md](docs/database_setup.md) | M9 Postgres / pgvector / Neo4j |
+| [docs/competitive_learning.md](docs/competitive_learning.md) | M11 population / Elo |
 | [docs/context_engineering.md](docs/context_engineering.md) | LLM providers & ResearchAgent |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | How to contribute |
 
@@ -342,7 +345,7 @@ Quant-MAS/
 - [x] **M8** MCP / A2A protocol adapter ✅
 - [x] **M9** Enterprise DB — Postgres memory, pgvector, Neo4j skeleton; **EXP-026** server smoke ✅
 - [x] **M10** LLM production — `local_vllm`, ResearchAgent smoke **EXP-LLM-002** (Qwen2.5-7B @ a6000) ✅
-- [ ] **M11** Competitive learning / strategy population (Elo, autocurriculum)
+- [x] **M11** Competitive learning — StrategyAgent, PopulationManager, Elo **EXP-029** ✅
 - [ ] **M12** RL training experiments (GRPO/PPO/MARL GPU smoke)
 - [ ] **M13** Enterprise orchestration — multi-experiment DAG scheduler, audit log
 - [ ] FinBERT server smoke + text-enhanced walk-forward ablation (EXP-TEXT-WF-002)

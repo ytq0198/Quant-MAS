@@ -718,6 +718,40 @@ python scripts/run_research_agent.py \
 
 记录：**EXP-LLM-002** ✅（2026-06-03，Qwen2.5-7B-Instruct @ GPU 0，vLLM 0.22.0）。
 
+## 六点十四、v3 M11 竞争学习（EXP-029 / EXP-POP-002）📋
+
+### 6.14.1 拉代码 + pytest
+
+```bash
+cd /mnt/localDisk3/weizian/Quant-MAS
+git fetch origin main
+git merge --ff-only origin/main   # 目标：含 M11，225 pytest
+
+conda activate /mnt/localDisk3/weizian/conda_envs/quant-mas
+python -m pip install -e .
+python -m pytest tests/test_population_training.py -v   # 13 passed
+python -m pytest -v                                     # 预期 225 passed
+```
+
+### 6.14.2 competitive mock dry-run
+
+```bash
+python scripts/run_competitive_experiment.py --help
+
+python scripts/run_competitive_experiment.py \
+  --config configs/competitive.yaml \
+  --mode mock \
+  --dry-run
+```
+
+**说明**：
+
+- `--dry-run` 仅 stdout，不写 ExperimentMemory / artifacts
+- 指标为 `population.*` / `simulation.*`；**不得**与 OOS **0.586** 混比
+- 记录：**EXP-20260602-029** 本地 225；**EXP-POP-002** 服务器待做
+
+详见 [`docs/competitive_learning.md`](competitive_learning.md)。
+
 ## 七、删除旧部署（如曾在 ~/quant-mas 建过）
 
 ```bash

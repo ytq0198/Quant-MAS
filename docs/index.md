@@ -234,7 +234,8 @@ Server: [server_commands.md](server_commands.md)
 | [progress.md](progress.md) | M1–M8 进度、pytest 基线 |
 | [项目v3设计.md](../项目v3设计.md) | **v3 升级规划**（M9–M13） |
 | [codex_prompt_M10.md](codex_prompt_M10.md) | **v3 M10** LLM / local_vllm Codex 任务 |
-| [codex_prompt_M11.md](codex_prompt_M11.md) | **v3 M11** 竞争学习 / 策略种群 Codex 任务 |
+| [competitive_learning.md](competitive_learning.md) | **v3 M11** 竞争学习 / Elo |
+| [codex_prompt_M11.md](codex_prompt_M11.md) | **v3 M11** Codex 任务（✅ 已完成） |
 | [项目plus设计.md](../项目plus设计.md) | v2 历史规划（M1–M8，已收官） |
 | [experiment_log.md](experiment_log.md) | 已验证实验与模板 |
 | [research_protocol.md](research_protocol.md) | OOS 主指标规范 |

@@ -8,6 +8,8 @@ from quant_mas.rl.baseline_policy import (
     build_policy,
 )
 from quant_mas.rl.env_schema import RewardConfig, StepResult, TradingEnvConfig
+from quant_mas.rl.competitive_runner import CompetitiveEpisodeRunner, CompetitiveRunConfig
+from quant_mas.rl.elo_rating import expected_score, update_elo, update_pair
 from quant_mas.rl.grpo_experiment import (
     CandidateRun,
     rank_candidates_by_group_relative_reward,
@@ -20,6 +22,8 @@ from quant_mas.rl.trading_env import TradingEnv
 __all__ = [
     "BuyAndHoldPolicy",
     "CandidateRun",
+    "CompetitiveEpisodeRunner",
+    "CompetitiveRunConfig",
     "MLCopyPolicy",
     "Policy",
     "RandomPolicy",
@@ -32,6 +36,9 @@ __all__ = [
     "build_synthetic_ohlcv",
     "compute_episode_metrics",
     "compute_step_reward",
+    "expected_score",
     "rank_candidates_by_group_relative_reward",
     "summarize_grpo_ranking",
+    "update_elo",
+    "update_pair",
 ]
