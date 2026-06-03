@@ -1,8 +1,8 @@
 # Quant MAS 开发进度
 
-更新时间：2026-06-01（Plus M7 本地+服务器 ✅ EXP-021/022，180 passed）
+更新时间：2026-06-01（Plus M8 本地 ✅ EXP-20260602-023，195 passed）
 
-**Plus v2**：**M1–M7 ✅**（含 M7 服务器）→ **M8** / EXP-TEXT-WF-002
+**Plus v2**：**M1–M8 ✅**（M8 本地；M7 本地+服务器）→ 服务器 M8 pull / EXP-TEXT-WF-002 / Release
 
 第五～六阶段见 [项目plus设计.md](../项目plus设计.md)（M7 RL 模拟 / M8 协议扩展，非实盘）。
 
@@ -19,9 +19,9 @@
 | **M5.5** | 本地 vLLM | 📋 按需 | OpenAI 兼容端点（a6000） | 项目plus设计 §M5.5 |
 | **M6** | 文本信号 | ✅ | FinBERT smoke + WF OOS **0.563** vs **0.586** | [text_model_plan.md](text_model_plan.md) |
 | **M7** | RL / GRPO 实验 | ✅ | TradingEnv、GRPO ranking；180 passed 本地+服务器 | [rl_plan.md](rl_plan.md) |
-| **M8** | MCP / A2A 协议 | 📋 Codex 待实现 | MCP adapter、AgentCard；见 [codex_prompt_M8.md](codex_prompt_M8.md) | [protocols.md](protocols.md) |
+| **M8** | MCP / A2A 协议 | ✅ 本地 | MCP adapter、AgentCard；195 passed | [protocols.md](protocols.md) |
 
-**pytest 基线**：**180 passed**（EXP-021/022 本地+服务器）· **论文主指标**：Walk-forward OOS sharpe **0.586**（EXP-20260602-008）
+**pytest 基线**：**195 passed**（EXP-023 本地）· **180 passed**（服务器，待 M8 pull）· **论文主指标**：Walk-forward OOS sharpe **0.586**（EXP-20260602-008）
 
 ## 阶段总览（v1 Prompt + Plus v2）
 
@@ -169,8 +169,8 @@ M1/M2 已完成；**M3 本地 ✅**（见下两节）；下一步 **M4**。
 
 | 环境 | Python | 结果 | 日期 | 实验 |
 |------|--------|------|------|------|
-| 本地 Windows | 3.11+ | **180 passed** | 2026-06-01 | EXP-20260602-021 |
-| 服务器 a6000-9961 | 3.11.15 | **180 passed**（10.15s） | 2026-06-01 | EXP-20260602-022 |
+| 本地 Windows | 3.11+ | **195 passed** | 2026-06-01 | EXP-20260602-023 |
+| 服务器 a6000-9961 | 3.11.15 | **180 passed**（待 M8 pull） | 2026-06-01 | EXP-20260602-022 |
 
 命令：`python -m pytest -v`（勿裸敲 `pytest` / `pip`）。
 
@@ -190,6 +190,7 @@ python scripts/compare_experiments.py --help
 python scripts/index_documents.py --help
 python scripts/query_memory.py --help
 python scripts/run_rl_baseline.py --help
+python scripts/export_agent_cards.py --help
 ```
 
 ## 当前已实现能力
@@ -270,8 +271,23 @@ python scripts/run_rl_baseline.py --help
 | 全量 pytest（本地） | ✅ **180 passed** |
 | 全量 pytest（服务器） | ✅ **180 passed**（10.15s，EXP-022 @ `d8ece63`） |
 
+## Quant MAS v2：M8 MCP / A2A
+
+> [protocols.md](protocols.md) · [codex_prompt_M8.md](codex_prompt_M8.md)
+
+| 项目 | 状态 |
+|------|------|
+| MCPToolSpec / policy / adapter | ✅ |
+| deny shell/broker/order/secrets | ✅ |
+| AgentCard（Supervisor/Research/Report） | ✅ |
+| export_agent_cards.py | ✅ |
+| test_protocols | ✅ **15 passed** |
+| 全量 pytest（本地） | ✅ **195 passed** |
+| 全量 pytest（服务器） | 📋 待 EXP-20260602-024 |
+
 ## 后续工作
 
-- **M8 MCP/A2A**：见 [codex_prompt_M8.md](codex_prompt_M8.md) · [protocols.md](protocols.md) — **下一步 Codex 实现**
+- **M8 服务器**：pull → pytest **195** → export_agent_cards
 - **M6 科研**：扩大 text JSONL 覆盖 → EXP-TEXT-WF-002
+- **仓库对外**：GitHub Release v0.1.0、Topics
 - 可选：SEC smoke、CPU 对照 `server_lgbm_cpu_001`（EXP-TODO-006）

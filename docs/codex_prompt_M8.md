@@ -1,8 +1,8 @@
 # Plus M8：MCP / A2A 协议化扩展 — Codex 提示词
 
-**状态：📋 待实现（Codex 第一版骨架；前置 M1–M7 ✅，180 passed，EXP-20260602-021/022）**
+**状态：✅ 已完成（本地 EXP-20260602-023，195 passed，2026-06-01）**
 
-更新时间：2026-06-01
+更新时间：2026-06-01（M8 第一版 skeleton 本地验收）
 
 > **用法**：先粘贴下方「固定前缀」，再粘贴「M8 主任务」整段交给 Codex。  
 > **设计依据**：[项目plus设计.md §M8](../项目plus设计.md#m8mcp--a2a-协议化扩展) · 配套：[protocols.md](protocols.md) · 前置：**M1–M7 ✅**
@@ -302,14 +302,14 @@ python scripts/export_agent_cards.py --config configs/protocols.yaml --output-di
 
 ## Cursor 后续（Codex 完成后）
 
-1. 确认 `docs/protocols.md` 与实现对齐
-2. 更新 `docs/architecture.md` — Protocol Layer（M8）
-3. 更新 `docs/experiment_log.md` — EXP-20260602-023（本地）、EXP-20260602-024（服务器）
-4. 更新 `docs/progress.md` / `项目进度.md` — M8 状态
-5. 服务器：`python -m pytest -v` + `export_agent_cards.py`
-6. 可选：`docs/server_commands.md` §6.11 M8
+1. ~~确认 `docs/protocols.md` 与实现对齐~~ ✅
+2. ~~更新 `docs/architecture.md` — Protocol Layer~~ ✅
+3. ~~更新 `docs/experiment_log.md` — EXP-20260602-023~~ ✅
+4. ~~更新 `docs/progress.md` / `项目进度.md` — M8 状态~~ ✅
+5. 服务器 pull + pytest **195 passed** + export_agent_cards（EXP-20260602-024 待做）
+6. ~~`docs/server_commands.md` §6.11 M8~~ ✅
 
-**安全说明**：M8 验收只验证 **deny policy** 与 JSON 导出，不代表已接入生产 MCP 生态。
+**Plus v2 主线 M1–M8 代码骨架已全部落地**；后续为科研复跑（EXP-TEXT-WF-002）或仓库对外（Release/Topics）。
 
 ---
 

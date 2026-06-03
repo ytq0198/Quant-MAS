@@ -6,7 +6,7 @@
 [![GitHub](https://img.shields.io/badge/GitHub-ytq0198%2FQuant--MAS-181717?logo=github)](https://github.com/ytq0198/Quant-MAS)
 [![Release](https://img.shields.io/badge/release-v0.1.0-blue)](https://github.com/ytq0198/Quant-MAS/releases/tag/v0.1.0)
 [![Python](https://img.shields.io/badge/python-3.11+-3776AB?logo=python&logoColor=white)](https://www.python.org/)
-[![Tests](https://img.shields.io/badge/tests-180%20passed-brightgreen)](docs/progress.md)
+[![Tests](https://img.shields.io/badge/tests-195%20passed-brightgreen)](docs/progress.md)
 [![Status](https://img.shields.io/badge/status-research%20platform-orange)](docs/progress.md)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![MAS Agent](https://img.shields.io/badge/MAS-Agent%20System-purple)](docs/architecture.md)
@@ -47,7 +47,7 @@
 > Quant Engine computes. Agent Layer explains, orchestrates, and reports.  
 > Quant Engine 做计算；Agent Layer 做编排、解释与报告。
 
-**Plus v2 status / 当前进度**：M1–M7 ✅（180 pytest，本地+服务器）· M8 MCP 📋
+**Plus v2 status / 当前进度**：M1–M8 ✅ 本地（195 pytest）· 服务器 180（M8 待 pull）
 
 ---
 
@@ -112,7 +112,7 @@ python -m pip install -e ".[llm]"                 # HTTP LLM client
 python -m pip install -e ".[text]"                # FinBERT / LoRA (server manual)
 ```
 
-**Verified baseline / 已验证基线**：**180 passed**（本地+服务器）· tests use synthetic data, mocks, and local files only（不联网、不调真实 LLM、不下载 HF 权重）。
+**Verified baseline / 已验证基线**：**195 passed**（本地）· 服务器 **180**（M8 待 pull）· tests use synthetic data, mocks, and local files only（不联网、不调真实 LLM、不下载 HF 权重）。
 
 ---
 
@@ -240,7 +240,7 @@ print(result.content)
 
 | Item | Value | Notes |
 |------|-------|-------|
-| **pytest** | **180 passed** | Local + server (EXP-021/022) |
+| **pytest** | **195 passed** | Local EXP-023；server 180 pending M8 pull |
 | **OOS baseline** | **sharpe 0.586** | EXP-20260602-008, 19 walk-forward windows |
 | **OOS + FinBERT text** | **sharpe 0.563** | EXP-TEXT-WF-001 · exploratory (200/6033 text coverage) |
 | Single-segment ML backtest | sharpe 2.78 | ⚠️ in-sample — **not** paper metric |
@@ -254,11 +254,11 @@ print(result.content)
 
 **English**
 
-> Built **Quant MAS**, a Python 3.11 multi-agent quantitative research platform with deterministic data/feature/model/backtest/risk pipelines, LightGBM ML signals, walk-forward OOS evaluation (baseline sharpe 0.586), experiment memory & hybrid RAG, optional LangGraph workflow, text-signal layer, RL simulation skeleton (TradingEnv + GRPO-style ranking), and mock-safe LLM ResearchAgent. Maintained **180 passing pytest** cases with strict safeguards preventing LLM agents from direct live trading.
+> Built **Quant MAS**, a Python 3.11 multi-agent quantitative research platform with deterministic quant pipelines, walk-forward OOS evaluation (baseline sharpe 0.586), Memory/RAG, optional LangGraph, text signals, RL simulation, MCP-style protocol adapter, and mock-safe LLM ResearchAgent. Maintained **195 passing pytest** cases with strict safeguards preventing LLM agents from direct live trading.
 
 **中文**
 
-> 基于 Python 3.11 构建 **Quant MAS** 多智能体量化研究平台，完成数据获取、特征工程、LightGBM 训练、Walk-forward 样本外评估、风控工具、SupervisorAgent 工具编排、ExperimentMemory 与 RAG 检索、可选 LangGraph 工作流、文本信号与 **RL 模拟层（M7）**；维护 **180 项 pytest** 通过，明确 LLM Agent 不直接参与实盘下单。
+> 基于 Python 3.11 构建 **Quant MAS** 多智能体量化研究平台，完成 Walk-forward OOS、风控、Agent 编排、Memory/RAG、文本信号、RL 模拟与 **MCP/A2A 协议层（M8）**；维护 **195 项 pytest** 通过，明确 LLM Agent 不直接参与实盘下单。
 
 ---
 
@@ -283,7 +283,7 @@ Quant-MAS/
 │   └── research/             # baseline registry (M1)
 ├── scripts/                  # CLI entrypoints
 ├── configs/                  # YAML configs
-├── tests/                    # 180 pytest cases
+├── tests/                    # 195 pytest cases
 ├── docs/                     # architecture, progress, experiment log
 ├── architecture.png          # architecture diagram
 ├── CONTRIBUTING.md
@@ -317,8 +317,7 @@ Quant-MAS/
 - [x] Context engineering + optional LLM (M5)
 - [x] Text signal layer — mock / FinBERT / LoRA skeleton (M6)
 - [x] **M7** RL simulation / GRPO-style ranking skeleton ✅
-- [ ] **M8** MCP / A2A protocol adapter
-- [ ] **M8** MCP / A2A protocol adapters
+- [x] **M8** MCP / A2A protocol adapter ✅
 - [ ] FinBERT server smoke + text-enhanced walk-forward ablation
 - [ ] Optional paper-trading sandbox (simulation only)
 

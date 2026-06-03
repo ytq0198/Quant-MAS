@@ -11,6 +11,7 @@ GitHub 仓库：[https://github.com/ytq0198/Quant-MAS](https://github.com/ytq019
 | 日期 | 项目 | 结果 | 备注 |
 |------|------|------|------|
 | 2026-06-01 | Plus M7 服务器 | **180 passed**（10.15s）；RL dry-run ✅ | EXP-20260602-022 |
+| 2026-06-01 | Plus M8 MCP/A2A（本地） | **195 passed**（+15） | EXP-20260602-023 |
 | 2026-06-01 | Plus M7 RL 模拟（本地） | **180 passed**（+19） | EXP-20260602-021 |
 | 2026-06-03 | EXP-TEXT-WF-001 text + walk-forward | oos.sharpe **0.563** vs **0.586** | EXP-TEXT-001 |
 | 2026-06-03 | Plus M6 文本信号（服务器） | **161 passed**（22.14s） | EXP-20260602-020 |
@@ -524,6 +525,29 @@ python scripts/run_rl_baseline.py --config configs/rl.yaml --policy buy_hold --d
 - 记录：**EXP-20260602-021**（本地）；**EXP-20260602-022**（服务器 **180 passed**，10.15s）
 
 详见 [`docs/rl_plan.md`](rl_plan.md)。
+
+## 六点十一、Plus M8 MCP/A2A（EXP-20260602-023 / 服务器待 EXP-024）📋
+
+```bash
+cd /mnt/localDisk3/weizian/Quant-MAS
+git pull origin main
+conda activate /mnt/localDisk3/weizian/conda_envs/quant-mas
+python -m pip install -e .
+python -m pytest -v   # 预期 195 passed
+
+python scripts/export_agent_cards.py --help
+python scripts/export_agent_cards.py --config configs/protocols.yaml \
+  --output-dir /mnt/localDisk3/weizian/reports/protocols \
+  --include-mcp-specs
+```
+
+**说明**：
+
+- **内部 adapter only** — 不接外部 MCP server；不启动 network listener
+- policy 默认 deny shell/broker/order/secrets
+- 记录：**EXP-20260602-023**（本地 195 passed）；服务器 → **EXP-20260602-024**
+
+详见 [`docs/protocols.md`](protocols.md)。
 
 ## 七、删除旧部署（如曾在 ~/quant-mas 建过）
 

@@ -11,6 +11,7 @@ Quant MAS 采用「确定性量化引擎 + **Text Signal Layer（M6）** + **RL 
 - **Agent Layer**：规则路由、编排、报告和解释；**M5** 可选真实 LLM（默认 Mock，仅研究/报告）。
 - **Text Signal Layer（Plus M6）**：`FinancialTextRecord` → sentiment signal → `merge_text_signals_into_features`；**不替代** LightGBM，pytest 用 Mock 分类器。
 - **RL Simulation Layer（Plus M7）**：`TradingEnv` + baseline policies + GRPO-style ranking；**simulation only**，metrics 为 `simulation.*`，**不替代** walk-forward OOS。
+- **Protocol Layer（Plus M8）**：MCP-style tool spec + `ToolPolicy` + AgentCard 导出；**不接**外部 MCP server，**不**新增 broker/shell。
 - **Context Layer（Plus M5）**：`ContextBuilder` → `AgentContextBundle`；事实 metrics 与 LLM 叙事分离。
 - **Memory Layer（Plus M3）**：可插拔 `MemoryStore`（JSON / SQLite）；`ExperimentMemory` 仍可用
 - **RAG Layer（Plus M3）**：`SimpleRetriever`（关键词）+ `HybridRetriever`（关键词 + 向量）；`HashEmbeddingClient` / `InMemoryVectorStore` 默认
@@ -54,6 +55,11 @@ Quant MAS
 ├── RL Simulation Layer（Plus M7）
 │   rl/               env_schema, trading_env, reward, baseline_policy, grpo_experiment, mock_data
 │   run_rl_baseline.py   --policy random|buy_hold|ml_copy（simulation_only）
+│
+├── Protocol Layer（Plus M8）
+│   protocols/mcp/    types, policy, adapter
+│   protocols/a2a/    agent_card
+│   export_agent_cards.py
 │
 ├── Context Layer（Plus M5）
 │   context_schema, context_builder, compression
@@ -100,6 +106,7 @@ run_research_agent.py  ResearchAgent + ContextBuilder（M5）
 run_agent.py          Supervisor 规则路由
 run_langgraph_workflow.py  ResearchWorkflow DAG（Plus M4，dry-run）
 run_rl_baseline.py      RL 模拟 baseline rollouts（Plus M7，--dry-run）
+export_agent_cards.py   MCP specs + A2A AgentCard JSON（Plus M8）
 run_pipeline.py       端到端 pipeline
 ```
 
@@ -166,7 +173,7 @@ collect_experiment_metrics → BaselineRegistry / comparison table
 
 ## 测试与部署
 
-- **pytest**：本地 **180 passed**（EXP-20260602-021）；服务器 **161**（M7 待 pull）
+- **pytest**：本地 **195 passed**（EXP-20260602-023）；服务器 **180**（M8 待 pull，EXP-022）
 - **服务器**：`/mnt/localDisk3/weizian/Quant-MAS`，conda `quant-mas`，Python 3.11.15
 - **GitHub**：https://github.com/ytq0198/Quant-MAS
 
@@ -180,6 +187,7 @@ collect_experiment_metrics → BaselineRegistry / comparison table
 | **M4** LangGraph | ResearchWorkflow DAG | ✅ EXP-20260602-015/016 |
 | **M5** 上下文/LLM | ContextBuilder、ResearchAgent | ✅ 本地+服务器（EXP-017/018，EXP-LLM-001） |
 | **M6** 文本大模型 | FinBERT/LoRA + text_signals merge | ✅ EXP-019/020 + **EXP-TEXT-001/WF-001** |
-| **M7** RL/GRPO 模拟 | TradingEnv + GRPO ranking | ✅ 本地（EXP-20260602-021，**180 passed**） |
+| **M7** RL/GRPO 模拟 | TradingEnv + GRPO ranking | ✅ EXP-021/022（180 passed） |
+| **M8** MCP/A2A | MCP adapter + AgentCard | ✅ 本地 EXP-023（195 passed） |
 
 详见 [项目plus设计.md](../项目plus设计.md)。

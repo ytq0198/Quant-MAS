@@ -1,0 +1,25 @@
+protocols:
+  mcp:
+    enabled: true
+    deny_tool_patterns:
+      - shell
+      - exec
+      - broker
+      - order
+      - place_order
+      - live_trade
+    deny_argument_patterns:
+      - api_key
+      - secret
+      - password
+      - token
+    require_confirmation_tools:
+      - pipeline
+  a2a:
+    version: "0.1.0"
+    cards:
+      - supervisor
+      - research
+      - report
+paths:
+  output_dir: outputs/protocols
