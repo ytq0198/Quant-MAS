@@ -1,8 +1,8 @@
 # Quant MAS 开发进度
 
-更新时间：2026-06-01（**v3 M9 本地 ✅** EXP-025，207 passed）
+更新时间：2026-06-01（**v3 M10 本地 ✅** EXP-027，212 passed）
 
-**Plus v2**：M1–M8 ✅ 收官 · **v3 M9** ✅ 本地 → M10 / 服务器 EXP-026
+**Plus v2**：M1–M8 ✅ · **v3 M9/M10** ✅ 本地 → 服务器 EXP-026/028
 
 第五～六阶段见 [项目plus设计.md](../项目plus设计.md)（M7 RL 模拟 / M8 协议扩展，非实盘）。
 
@@ -21,7 +21,7 @@
 | **M7** | RL / GRPO 实验 | ✅ | TradingEnv、GRPO ranking；180 passed 本地+服务器 | [rl_plan.md](rl_plan.md) |
 | **M8** | MCP / A2A 协议 | ✅ | MCP adapter、AgentCard；195 passed 本地+服务器 | [protocols.md](protocols.md) |
 
-**pytest 基线**：本地 **207 passed**（EXP-025）· 服务器 **195**（M9 待 pull）· **论文主指标**：Walk-forward OOS sharpe **0.586**（EXP-20260602-008）
+**pytest 基线**：本地 **212 passed**（EXP-027）· 服务器 **195**（待 pull）· **论文主指标**：Walk-forward OOS sharpe **0.586**
 
 ## Plus v3 主线（M9–M13）
 
@@ -30,7 +30,7 @@
 | 编号 | 名称 | 状态 | 关键交付 / 实验 | 文档 |
 |------|------|------|-----------------|------|
 | **M9** | 企业数据与数据库 | ✅ 本地 | Postgres + pgvector + Neo4j；207 passed | [database_setup.md](database_setup.md) |
-| **M10** | LLM 生产化 | 📋 | local_vllm、EXP-TEXT-WF-002 | [codex_prompt_M10.md](codex_prompt_M10.md) |
+| **M10** | LLM 生产化 | ✅ 本地 | local_vllm、212 passed | [codex_prompt_M10.md](codex_prompt_M10.md) |
 | **M11** | 竞争学习 / 策略种群 | 📋 | Population、Elo | 待建 competitive_learning.md |
 | **M12** | RL 训练实验 | 📋 | GRPO/PPO training loop | [rl_plan.md](rl_plan.md) |
 | **M13** | 企业化编排 | 📋 | DAG scheduler | [protocols.md](protocols.md) |
@@ -181,7 +181,7 @@ M1/M2 已完成；**M3 本地 ✅**（见下两节）；下一步 **M4**。
 
 | 环境 | Python | 结果 | 日期 | 实验 |
 |------|--------|------|------|------|
-| 本地 Windows | 3.11+ | **207 passed** | 2026-06-01 | EXP-20260602-025 |
+| 本地 Windows | 3.11+ | **212 passed** | 2026-06-01 | EXP-20260602-027 |
 | 服务器 a6000-9961 | 3.11.15 | **195 passed**（M9 待 pull） | 2026-06-01 | EXP-20260602-024 |
 
 命令：`python -m pytest -v`（勿裸敲 `pytest` / `pip`）。
@@ -312,6 +312,19 @@ python scripts/export_agent_cards.py --help
 | 全量 pytest（本地） | ✅ **207 passed**（+12） |
 | 服务器 Postgres 真实连接 | 📋 EXP-026 |
 
+## Quant MAS v3：M10 LLM
+
+> [context_engineering.md](context_engineering.md) · [codex_prompt_M10.md](codex_prompt_M10.md)
+
+| 项目 | 状态 |
+|------|------|
+| local_vllm provider | ✅ |
+| ResearchAgent LLM 失败回退 Mock | ✅ |
+| --provider CLI | ✅ |
+| test_context_engineering | ✅ **17 passed** |
+| 全量 pytest（本地） | ✅ **212 passed**（+5） |
+| 服务器 / vLLM smoke | 📋 EXP-028 / EXP-LLM-002 |
+
 ## Plus v2 收官（V2 结尾）
 
 > 系统结构定稿见根目录 [`项目进度.md`](../项目进度.md) §Plus v2 收官；架构详图 [`architecture.md`](architecture.md)。
@@ -330,5 +343,6 @@ python scripts/export_agent_cards.py --help
 
 ## 后续工作（v2 之后）
 
-- **M10 服务器**：pull M10 代码 → pytest 215+（待 Codex 完成）
-- **M9 服务器**：📋 EXP-026 阻塞 — 等管理员 docker 组 → `setup.sh` → pull `06a6a5d` → pytest 207
+- ~~**M10 本地**~~ ✅ EXP-027（212 pytest）
+- **M9/M10 服务器**：📋 EXP-026/028 — docker 权限 + `git pull` → pytest **212**
+- **EXP-LLM-002** / **EXP-TEXT-WF-002** — vLLM smoke / text walk-forward（科研）

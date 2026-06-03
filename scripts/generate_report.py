@@ -38,6 +38,11 @@ def build_parser() -> argparse.ArgumentParser:
         default=False,
         help="Generate optional LLM narrative from latest metrics.",
     )
+    parser.add_argument(
+        "--provider",
+        choices=["mock", "openai_compatible", "local_vllm"],
+        help="LLM provider override. local_vllm requires VLLM_BASE_URL.",
+    )
     return parser
 
 
@@ -59,7 +64,7 @@ def main() -> None:
         raise FileNotFoundError(f"Latest experiment summary not found: {summary_path}")
 
     if args.use_llm:
-        agent = ReportAgent(resolve_llm_client(use_llm=True))
+        agent = ReportAgent(resolve_llm_client(provider=args.provider, use_llm=True))
         result = agent.generate_report(
             title=latest.name,
             metrics=latest.metrics,

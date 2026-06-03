@@ -19,6 +19,9 @@ def train_lora_text_classifier(
 
     Real LoRA training is intentionally server-only. In mode=mock this writes
     auditable placeholder artifacts without loading transformer weights.
+    The resulting adapter is a text-signal model boundary only: it may produce
+    sentiment or event features for the Quant Engine, but it must not emit
+    target weights, broker instructions, or overwrite backtest metrics.
     """
     mode = str(config.get("mode", config.get("text_model", {}).get("mode", "mock")))
     destination = Path(output_dir).expanduser()

@@ -51,15 +51,19 @@ class OpenAICompatibleLLMClient(LLMClient):
         api_key: str,
         model: str,
         timeout_seconds: float = 60,
+        provider: str = "openai_compatible",
+        require_api_key: bool = True,
     ) -> None:
         if not base_url:
             raise ValueError("LLM base_url is required")
-        if not api_key:
+        if require_api_key and not api_key:
             raise ValueError("LLM API key is required")
         self.base_url = base_url.rstrip("/")
         self.api_key = api_key
         self.model = model
         self.timeout_seconds = timeout_seconds
+        self.provider = provider
+        self.require_api_key = require_api_key
 
     def complete(self, messages: Sequence[Message], **kwargs) -> Message:
         payload = {
@@ -71,10 +75,7 @@ class OpenAICompatibleLLMClient(LLMClient):
         req = request.Request(
             f"{self.base_url}/v1/chat/completions",
             data=data,
-            headers={
-                "Authorization": f"Bearer {self.api_key}",
-                "Content-Type": "application/json",
-            },
+            headers=_request_headers(self.api_key),
             method="POST",
         )
         try:
@@ -94,7 +95,28 @@ class OpenAICompatibleLLMClient(LLMClient):
         return Message(
             role="assistant",
             content=str(content),
-            metadata={"provider": "openai_compatible", "model": payload["model"]},
+            metadata={"provider": self.provider, "model": payload["model"]},
+        )
+
+
+class LocalVLLMClient(OpenAICompatibleLLMClient):
+    """OpenAI-compatible chat client for a local vLLM endpoint."""
+
+    def __init__(
+        self,
+        *,
+        base_url: str,
+        model: str,
+        api_key: str = "",
+        timeout_seconds: float = 120,
+    ) -> None:
+        super().__init__(
+            base_url=base_url,
+            api_key=api_key,
+            model=model,
+            timeout_seconds=timeout_seconds,
+            provider="local_vllm",
+            require_api_key=False,
         )
 
 
@@ -108,8 +130,23 @@ def resolve_llm_client(
     selected = (provider or os.getenv("LLM_PROVIDER") or "mock").strip().lower()
     if not use_llm or selected == "mock":
         return MockLLMClient()
+    if selected == "local_vllm":
+        base_url = os.getenv("VLLM_BASE_URL", "")
+        if not base_url:
+            warnings.warn(
+                "VLLM_BASE_URL is not set; falling back to MockLLMClient.",
+                RuntimeWarning,
+                stacklevel=2,
+            )
+            return MockLLMClient()
+        return LocalVLLMClient(
+            base_url=base_url,
+            api_key=os.getenv("VLLM_API_KEY", ""),
+            model=os.getenv("VLLM_MODEL", "quant-mas-local"),
+            timeout_seconds=float(os.getenv("LLM_TIMEOUT_SECONDS", "120")),
+        )
     if selected != "openai_compatible":
-        raise ValueError("Unknown LLM provider. Use mock or openai_compatible.")
+        raise ValueError("Unknown LLM provider. Use mock, openai_compatible, or local_vllm.")
     api_key = os.getenv("LLM_API_KEY", "")
     if not api_key:
         warnings.warn(
@@ -124,3 +161,10 @@ def resolve_llm_client(
         model=os.getenv("LLM_MODEL", "deepseek-chat"),
         timeout_seconds=float(os.getenv("LLM_TIMEOUT_SECONDS", "60")),
     )
+
+
+def _request_headers(api_key: str) -> dict[str, str]:
+    headers = {"Content-Type": "application/json"}
+    if api_key:
+        headers["Authorization"] = f"Bearer {api_key}"
+    return headers

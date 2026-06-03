@@ -10,6 +10,7 @@ GitHub 仓库：[https://github.com/ytq0198/Quant-MAS](https://github.com/ytq019
 
 | 日期 | 项目 | 结果 | 备注 |
 |------|------|------|------|
+| 2026-06-01 | v3 M10 LLM（本地） | **212 passed**（+5）；context **17/17** | EXP-20260602-027 |
 | 2026-06-01 | v3 M9 企业 DB（本地） | **207 passed**（+12）；enterprise **12/12** | EXP-20260602-025 |
 | 2026-06-01 | Plus M8 MCP/A2A 服务器 | **195 passed**（12.41s）；export_agent_cards ✅ | EXP-20260602-024 |
 | 2026-06-01 | Plus M7 服务器 | **180 passed**（10.15s）；RL dry-run ✅ | EXP-20260602-022 |
@@ -602,15 +603,16 @@ cd /mnt/localDisk3/weizian/Quant-MAS
 git status
 git checkout -- docs/experiment_log.md 2>/dev/null || true   # 若有本地文档改动
 git fetch origin main
-git log -1 --oneline origin/main   # 应：06a6a5d
+git log -1 --oneline origin/main   # 目标：M10 后含 212 pytest 的 commit
 git merge --ff-only origin/main
 
 conda activate /mnt/localDisk3/weizian/conda_envs/quant-mas
 python -m pip install -e .
 python -m pip install "psycopg[binary]>=3.1" neo4j   # 若未装
-python -m pytest -v   # 预期 207 passed
+python -m pytest -v   # 预期 212 passed（M9+M10）
 
-python -m pytest tests/test_memory_enterprise.py -v   # 12 passed（mock）
+python -m pytest tests/test_memory_enterprise.py -v   # 12 passed
+python -m pytest tests/test_context_engineering.py -v # 17 passed
 
 # 真实 DB smoke（Postgres 已起且 POSTGRES_DSN 在 .env）
 python scripts/query_memory.py --backend postgres --best-metric oos.sharpe
@@ -619,11 +621,26 @@ python scripts/index_documents.py --vector-store pgvector --dirs docs --embeddin
 
 **说明**：
 
-- pytest 默认 mock，**不依赖**真实 Postgres；207 与 DB 是否启动无关
-- 环境变量名：**`POSTGRES_DSN`**（不是 `DATABASE_URL`）
-- 记录：**EXP-025** 本地 207；**EXP-026** 服务器（待 docker + pull）
+- pytest 默认 mock，**不依赖**真实 Postgres / vLLM；**212** 与 DB 是否启动无关
+- 环境变量名：**`POSTGRES_DSN`**；vLLM：**`VLLM_BASE_URL`**
+- 记录：**EXP-025** 本地 207；**EXP-027** 本地 212；**EXP-026/028** 服务器（待 docker + pull）
 
-详见 [`docs/database_setup.md`](database_setup.md) §M9 Enterprise Backends。
+详见 [`docs/database_setup.md`](database_setup.md) §M9 · [`docs/context_engineering.md`](context_engineering.md) M10。
+
+## 六点十三、v3 M10 LLM（EXP-20260602-027 / 服务器待 EXP-028）📋
+
+```bash
+cd /mnt/localDisk3/weizian/Quant-MAS
+# pull 后（同 §6.12.3）
+python -m pytest tests/test_context_engineering.py -v   # 17 passed
+python scripts/run_research_agent.py --help             # --provider mock|openai_compatible|local_vllm
+
+# 真实 vLLM smoke（非 pytest，需 vLLM 服务 + .env）
+# VLLM_BASE_URL=http://127.0.0.1:8000 VLLM_MODEL=...
+# python scripts/run_research_agent.py --provider local_vllm --use-llm ...
+```
+
+记录：**EXP-20260602-027**（本地 **212 passed**）；服务器 pytest → **EXP-20260602-028**；vLLM smoke → **EXP-LLM-002**。
 
 ## 七、删除旧部署（如曾在 ~/quant-mas 建过）
 

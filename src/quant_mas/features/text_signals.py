@@ -12,7 +12,12 @@ def merge_text_signals_into_features(
     on: tuple[str, str] = ("date", "symbol"),
     signal_columns: list[str] | None = None,
 ) -> pd.DataFrame:
-    """Left join text signals and reject duplicate or future-leaking rows."""
+    """Left join text signals and reject duplicate or future-leaking rows.
+
+    Text signals are ordinary feature columns for downstream deterministic
+    training and walk-forward evaluation. They do not replace Quant Engine
+    metrics and must not contain labels, future returns, or trading orders.
+    """
     date_col, symbol_col = on
     _require_columns(features, [date_col, symbol_col], "features")
     _require_columns(signals, [date_col, symbol_col], "signals")

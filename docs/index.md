@@ -1,7 +1,7 @@
 # Quant MAS Documentation / 项目文档
 
 **Research-first multi-agent quantitative platform · 多智能体量化研究平台**  
-**Release**: [v0.1.0](https://github.com/ytq0198/Quant-MAS/releases/tag/v0.1.0) · **Tests**: 207 passed（本地）· **GitHub**: [ytq0198/Quant-MAS](https://github.com/ytq0198/Quant-MAS)
+**Release**: [v0.1.0](https://github.com/ytq0198/Quant-MAS/releases/tag/v0.1.0) · **Tests**: 212 passed（本地）· **GitHub**: [ytq0198/Quant-MAS](https://github.com/ytq0198/Quant-MAS)
 
 > Documentation hub for students, researchers, and contributors.  
 > 面向学生、科研者与贡献者的文档入口，与 [README](../README.md) 结构对应。
@@ -158,7 +158,7 @@ Memory/RAG feeds **ResearchAgent** context — it does not execute trades.
 
 | Metric | Value | Experiment |
 |--------|-------|------------|
-| pytest | **207 passed** | EXP-025 本地；server 195 待 M9 pull |
+| pytest | **212 passed** | EXP-027 本地；server 待 pull |
 | **OOS sharpe (baseline)** | **0.586** | EXP-20260602-008 |
 | **OOS + FinBERT text** | **0.563** | EXP-TEXT-WF-001 · exploratory (200/6033 coverage) |
 | Single-segment ML sharpe | 2.78 | ⚠️ in-sample only |

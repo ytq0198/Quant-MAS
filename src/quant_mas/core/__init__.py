@@ -4,6 +4,7 @@ from quant_mas.core.agent import BaseAgent
 from quant_mas.core.events import AgentEvent, AgentFinishEvent, ToolCallEvent
 from quant_mas.core.llm import (
     LLMClient,
+    LocalVLLMClient,
     MockLLMClient,
     OpenAICompatibleLLMClient,
     resolve_llm_client,
@@ -15,6 +16,7 @@ __all__ = [
     "AgentFinishEvent",
     "BaseAgent",
     "LLMClient",
+    "LocalVLLMClient",
     "Message",
     "MockLLMClient",
     "OpenAICompatibleLLMClient",

@@ -24,6 +24,11 @@ def build_parser() -> argparse.ArgumentParser:
         default=False,
         help="Use real LLM provider when env is configured; default is mock.",
     )
+    parser.add_argument(
+        "--provider",
+        choices=["mock", "openai_compatible", "local_vllm"],
+        help="LLM provider override. local_vllm requires VLLM_BASE_URL.",
+    )
     parser.add_argument("--storage-config", default="configs/storage.yaml")
     parser.add_argument("--context-config", default="configs/context.yaml")
     parser.add_argument("--memory-backend", choices=["json", "sqlite"], default="json")
@@ -62,7 +67,7 @@ def main() -> int:
             rag_query=args.rag_query,
             workflow_state=workflow_state,
         )
-        agent = ResearchAgent(resolve_llm_client(use_llm=args.use_llm))
+        agent = ResearchAgent(resolve_llm_client(provider=args.provider, use_llm=args.use_llm))
         output = agent.run_research(bundle)
         payload = {"output": output.to_dict(), "context": bundle.to_dict()}
         text = json.dumps(payload, indent=2, ensure_ascii=False)

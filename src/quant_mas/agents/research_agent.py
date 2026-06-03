@@ -3,11 +3,12 @@
 from __future__ import annotations
 
 import json
+import warnings
 from dataclasses import asdict, dataclass
 from typing import Any
 
 from quant_mas.context import AgentContextBundle
-from quant_mas.core import BaseAgent, LLMClient, Message, MockLLMClient
+from quant_mas.core import BaseAgent, LLMClient, Message, MockLLMClient, resolve_llm_client
 
 
 RESEARCH_SYSTEM_PROMPT = """
@@ -52,10 +53,18 @@ class ResearchAgentOutput:
 class ResearchAgent(BaseAgent):
     """Generate research hypotheses from a structured context bundle."""
 
-    def __init__(self, llm_client: LLMClient | None = None, *, max_steps: int = 1) -> None:
+    def __init__(
+        self,
+        llm_client: LLMClient | None = None,
+        *,
+        llm_provider: str | None = None,
+        use_llm: bool = False,
+        max_steps: int = 1,
+    ) -> None:
         super().__init__(
             name="ResearchAgent",
-            llm_client=llm_client or MockLLMClient(),
+            llm_client=llm_client
+            or resolve_llm_client(provider=llm_provider, use_llm=use_llm),
             system_prompt=RESEARCH_SYSTEM_PROMPT,
             max_steps=max_steps,
         )
@@ -65,7 +74,7 @@ class ResearchAgent(BaseAgent):
             "instruction": "Analyze this context and return JSON only.",
             "context": bundle.to_dict(),
         }
-        response_text = self.run(json.dumps(payload, ensure_ascii=False))
+        response_text = self._run_with_fallback(json.dumps(payload, ensure_ascii=False))
         parsed = _parse_json_object(response_text)
         provider = _provider_name(self.llm_client)
         if parsed is None:
@@ -92,6 +101,19 @@ class ResearchAgent(BaseAgent):
     def step(self, *, step: int, **kwargs) -> Message:
         return self.llm_client.complete(self.history)
 
+    def _run_with_fallback(self, prompt: str) -> str:
+        try:
+            return self.run(prompt)
+        except Exception as exc:
+            warnings.warn(
+                f"ResearchAgent LLM call failed; falling back to MockLLMClient: {exc}",
+                RuntimeWarning,
+                stacklevel=2,
+            )
+            self.llm_client = MockLLMClient()
+            self.history = []
+            return self.run(prompt)
+
 
 def _parse_json_object(text: str) -> dict[str, Any] | None:
     try:
@@ -102,8 +124,12 @@ def _parse_json_object(text: str) -> dict[str, Any] | None:
 
 
 def _provider_name(client: LLMClient) -> str:
+    if hasattr(client, "provider"):
+        return str(getattr(client, "provider"))
     if client.__class__.__name__ == "OpenAICompatibleLLMClient":
         return "openai_compatible"
+    if client.__class__.__name__ == "LocalVLLMClient":
+        return "local_vllm"
     return "mock"
 
 

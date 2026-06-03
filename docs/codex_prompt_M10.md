@@ -1,6 +1,6 @@
 # Plus v3 M10：LLM 生产化与文本增强 — Codex 提示词
 
-**状态：📋 待实现（前置：M9 本地 ✅ EXP-025，207 passed；M9 服务器 EXP-026 待 Docker 权限）**
+**状态：✅ 已完成（本地 EXP-20260602-027，212 passed，2026-06-01）**
 
 更新时间：2026-06-01
 
@@ -168,12 +168,12 @@ python scripts/generate_report.py --help
 
 ## Cursor 后续（Codex 完成后）
 
-1. 更新 `docs/context_engineering.md` 与实现对齐
-2. 更新 `docs/experiment_log.md` — **EXP-20260602-027**（M10 本地 pytest）
-3. 更新 `docs/progress.md`、`项目进度.md`、`项目v3设计.md` — M10 状态
-4. 服务器：待 **EXP-026**（M9 Docker + pull 06a6a5d）完成后，再 pull M10 → pytest 215+
-5. 服务器 vLLM smoke（**非 pytest**）：启动 vLLM → `LLM_PROVIDER=local_vllm` + `run_research_agent.py` → 记录 **EXP-LLM-002**
-6. 科研：**EXP-TEXT-WF-002** — 扩大 text JSONL → walk-forward → 与 OOS 0.586 对比（Cursor 手工，不虚构 metrics）
+1. ~~更新 `docs/context_engineering.md` 与实现对齐~~ ✅
+2. ~~更新 `docs/experiment_log.md` — **EXP-20260602-027**~~ ✅
+3. ~~更新 `docs/progress.md`、`项目进度.md`、`项目v3设计.md` — M10 状态~~ ✅
+4. 服务器 pull + pytest **212**（EXP-20260602-028）；M9 Postgres smoke（EXP-026）
+5. 服务器 vLLM smoke → **EXP-LLM-002**
+6. 科研：**EXP-TEXT-WF-002** — 扩大 text JSONL → walk-forward
 
 **M9 服务器阻塞项**（与 M10 并行）：管理员 `usermod -aG docker weizian` 或代启 Postgres → `setup.sh` → EXP-026。
 
@@ -210,8 +210,9 @@ python scripts/generate_report.py --help
 
 | 编号 | 内容 |
 |------|------|
-| **EXP-20260602-027** | M10 local_vllm 本地 pytest + resolve_llm_client |
-| **EXP-LLM-002** | 服务器 vLLM ResearchAgent smoke（待 vLLM 服务就绪） |
+| **EXP-20260602-027** | M10 local_vllm 本地 pytest + resolve_llm_client ✅ |
+| **EXP-20260602-028** | M10 服务器 pytest 212（待 pull） |
+| **EXP-LLM-002** | 服务器 vLLM ResearchAgent smoke（待 vLLM 服务） |
 | **EXP-TEXT-WF-002** | 扩大 text 覆盖 walk-forward OOS（科研，Cursor 手工） |
 
 论文主指标仍为 **EXP-20260602-008**（oos.sharpe **0.586**）。

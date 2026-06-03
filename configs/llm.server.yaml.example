@@ -1,0 +1,11 @@
+# Copy to llm.server.yaml on the server. Do not commit secrets.
+provider: local_vllm
+model: Qwen2.5-7B-Instruct
+base_url: http://127.0.0.1:8000
+timeout_seconds: 120
+
+# vLLM usually does not require an API key. For DeepSeek cloud, use:
+# provider: openai_compatible
+# base_url: https://api.deepseek.com
+# model: deepseek-chat
+# and set LLM_API_KEY in .env, never in this file.

@@ -20,6 +20,7 @@ from quant_mas.context import (
     truncate_text,
 )
 from quant_mas.core import (
+    LocalVLLMClient,
     Message,
     MockLLMClient,
     OpenAICompatibleLLMClient,
@@ -217,6 +218,82 @@ def test_openai_compatible_llm_client_mock_http(monkeypatch) -> None:
     assert captured["timeout"] == 3
 
 
+def test_resolve_local_vllm_without_url_falls_back_to_mock(monkeypatch) -> None:
+    monkeypatch.delenv("VLLM_BASE_URL", raising=False)
+    monkeypatch.setenv("LLM_PROVIDER", "local_vllm")
+    monkeypatch.setattr("quant_mas.core.llm.load_repo_dotenv", lambda *args, **kwargs: False)
+
+    with pytest.warns(RuntimeWarning, match="VLLM_BASE_URL is not set"):
+        client = resolve_llm_client(use_llm=True)
+
+    assert isinstance(client, MockLLMClient)
+
+
+def test_resolve_local_vllm_with_mock_http(monkeypatch) -> None:
+    class FakeResponse:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, exc_type, exc, tb):
+            return False
+
+        def read(self):
+            return json.dumps(
+                {
+                    "choices": [
+                        {
+                            "message": {
+                                "content": json.dumps(
+                                    {
+                                        "hypothesis": "local ok",
+                                        "evidence_summary": "facts only",
+                                        "suggested_experiments": [],
+                                        "risks_and_caveats": "mocked",
+                                    }
+                                )
+                            }
+                        }
+                    ]
+                }
+            ).encode("utf-8")
+
+    captured = {}
+
+    def fake_urlopen(req, timeout):
+        captured["url"] = req.full_url
+        captured["headers"] = dict(req.headers)
+        captured["payload"] = json.loads(req.data.decode("utf-8"))
+        captured["timeout"] = timeout
+        return FakeResponse()
+
+    monkeypatch.setattr("quant_mas.core.llm.load_repo_dotenv", lambda *args, **kwargs: False)
+    monkeypatch.setenv("VLLM_BASE_URL", "http://127.0.0.1:8000")
+    monkeypatch.setenv("VLLM_MODEL", "local-test-model")
+    monkeypatch.delenv("VLLM_API_KEY", raising=False)
+    monkeypatch.setattr("quant_mas.core.llm.request.urlopen", fake_urlopen)
+
+    client = resolve_llm_client(use_llm=True, provider="local_vllm")
+    response = client.complete([Message(role="user", content="hello")])
+
+    assert isinstance(client, LocalVLLMClient)
+    assert response.metadata["provider"] == "local_vllm"
+    assert captured["url"] == "http://127.0.0.1:8000/v1/chat/completions"
+    assert captured["payload"]["model"] == "local-test-model"
+    assert captured["payload"]["messages"][0]["content"] == "hello"
+    assert "Authorization" not in captured["headers"]
+    assert captured["timeout"] == 120
+
+
+def test_use_llm_false_ignores_local_vllm_env(monkeypatch) -> None:
+    monkeypatch.setattr("quant_mas.core.llm.load_repo_dotenv", lambda *args, **kwargs: False)
+    monkeypatch.setenv("LLM_PROVIDER", "local_vllm")
+    monkeypatch.setenv("VLLM_BASE_URL", "http://127.0.0.1:8000")
+
+    client = resolve_llm_client(use_llm=False)
+
+    assert isinstance(client, MockLLMClient)
+
+
 def test_research_agent_returns_structured_output_without_orders() -> None:
     client = MockLLMClient(
         [
@@ -239,6 +316,69 @@ def test_research_agent_returns_structured_output_without_orders() -> None:
     assert output.suggested_experiments
     assert "buy" not in text
     assert "sell order" not in text
+
+
+def test_research_agent_local_vllm_preserves_metrics(monkeypatch) -> None:
+    class FakeResponse:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, exc_type, exc, tb):
+            return False
+
+        def read(self):
+            return json.dumps(
+                {
+                    "choices": [
+                        {
+                            "message": {
+                                "content": json.dumps(
+                                    {
+                                        "hypothesis": "OOS baseline remains primary.",
+                                        "evidence_summary": "LLM narration only.",
+                                        "suggested_experiments": ["Run text ablation."],
+                                        "risks_and_caveats": "Do not overwrite metrics.",
+                                    }
+                                )
+                            }
+                        }
+                    ]
+                }
+            ).encode("utf-8")
+
+    monkeypatch.setattr("quant_mas.core.llm.load_repo_dotenv", lambda *args, **kwargs: False)
+    monkeypatch.setenv("VLLM_BASE_URL", "http://127.0.0.1:8000")
+    monkeypatch.setenv("VLLM_MODEL", "local-test-model")
+    monkeypatch.setattr("quant_mas.core.llm.request.urlopen", lambda req, timeout: FakeResponse())
+    bundle = AgentContextBundle(
+        task="Explain baseline",
+        experiments=[
+            ExperimentContextSnapshot(
+                experiment_id="exp",
+                name="walk_forward",
+                metrics={"oos": {"sharpe": 0.586}},
+            )
+        ],
+    )
+
+    output = ResearchAgent(llm_provider="local_vllm", use_llm=True).run_research(bundle)
+
+    assert output.llm_provider == "local_vllm"
+    assert output.context_snapshot["experiments"][0]["metrics"]["oos"]["sharpe"] == 0.586
+
+
+def test_research_agent_llm_failure_warns_and_falls_back() -> None:
+    class BrokenLLMClient(MockLLMClient):
+        def complete(self, messages, **kwargs):
+            raise RuntimeError("service unavailable")
+
+    bundle = AgentContextBundle(task="Explain safely")
+
+    with pytest.warns(RuntimeWarning, match="falling back to MockLLMClient"):
+        output = ResearchAgent(BrokenLLMClient()).run_research(bundle)
+
+    assert output.llm_provider == "mock"
+    assert "Mock response" in output.evidence_summary
 
 
 def test_report_agent_result_preserves_metrics_without_llm() -> None:

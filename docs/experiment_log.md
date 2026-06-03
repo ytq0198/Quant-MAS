@@ -1,6 +1,6 @@
 # Quant MAS 实验记录
 
-更新时间：2026-06-01（v3 M9 本地 ✅ EXP-025；EXP-026 📋 等 Docker 权限；M10 Codex prompt 就绪）
+更新时间：2026-06-01（v3 M10 本地 ✅ EXP-027，212 passed；EXP-026 📋 等 Docker）
 
 本文件用于记录真实实验和重要验证。不要记录未经实际运行的数据结果；尚未真实运行的项目标记为「待验证」。
 
@@ -178,6 +178,25 @@
 
 ## 当前验证记录
 
+### EXP-20260602-027：v3 M10 LLM 生产化本地验证 ✅
+
+- 日期：2026-06-01
+- 阶段：**v3 M10** — `local_vllm` provider + ResearchAgent 生产路径 + 文本边界
+- 环境：本地，Codex 按 [codex_prompt_M10.md](codex_prompt_M10.md) 实现
+- 交付：
+  - `core/llm.py` — `resolve_llm_client` 支持 `mock` | `openai_compatible` | **`local_vllm`**（`VLLM_BASE_URL` / `VLLM_MODEL` / 可选 `VLLM_API_KEY`）；无 URL 时 warning + Mock
+  - `agents/research_agent.py` — provider 配置；LLM 失败 warning + 回退 Mock；**不覆盖 metrics**
+  - `run_research_agent.py` / `generate_report.py` — `--provider mock|openai_compatible|local_vllm`
+  - `configs/llm.server.yaml.example`
+  - `docs/context_engineering.md` — M10 provider 表 + M6 文本边界
+  - `text_signals.py` / `lora_finetune.py` — 边界注释（结构化特征 only）
+- 命令与结果：
+  - `python -m pytest tests/test_context_engineering.py -v` → **17 passed**（12→17，+5）
+  - 全量 `python -m pytest -v` → **212 passed**（207→212，+5）
+- 安全边界：pytest 全 mock HTTP；无真实 DeepSeek/vLLM/HF 网络
+- 问题：无
+- 下一步：服务器 pull + pytest **212**（EXP-20260602-028）；vLLM smoke **EXP-LLM-002**（待 vLLM 服务）
+
 ### EXP-20260602-026：v3 M9 服务器 DB 联调 📋 阻塞中（infra 已备）
 
 - 日期：2026-06-01（探测记录）
@@ -195,7 +214,7 @@
 - 解除阻塞后顺序：
   1. 管理员：`sudo usermod -aG docker weizian`（用户 **重新 SSH 登录**）或管理员在 infra 目录 `sudo docker compose up -d postgres`
   2. `bash /mnt/localDisk3/weizian/infra/quant-mas-db/setup.sh`（CREATE EXTENSION vector）
-  3. Quant-MAS：`git fetch origin main && git merge --ff-only origin/main`（目标 **06a6a5d**）→ `pip install -e .` → pytest **207**
+  3. Quant-MAS：`git fetch origin main && git merge --ff-only origin/main`（目标 **`f20d870`** 或更新）→ pytest **207+**
   4. `query_memory.py --backend postgres` + `index_documents.py --vector-store pgvector` smoke
 - 问题：Docker 权限 + 代码未 pull（非 M9 实现问题）
 - 下一步：管理员加 docker 组 → pull **06a6a5d** → 跑 setup.sh → 完成 EXP-026
@@ -918,7 +937,8 @@
 | EXP-20260602-009 | 2026-06-02 | Plus M1 研究基线本地 | **102 passed**（+4 测试） |
 | EXP-20260602-010 | 2026-06-02 | Plus M1 服务器 pytest + 比较表 | **102 passed**；OOS sharpe 0.586 |
 | EXP-20260602-011 | 2026-06-02 | Plus M2 数据扩展本地 | **115 passed**（+13） |
-| EXP-20260602-026 | 2026-06-01 | v3 M9 服务器 DB | 📋 阻塞：docker 权限 + 待 pull 06a6a5d |
+| EXP-20260602-027 | 2026-06-01 | v3 M10 LLM 本地 | **212 passed**（+5）；context **17/17** |
+| EXP-20260602-026 | 2026-06-01 | v3 M9 服务器 DB | 📋 阻塞：docker 权限 + 待 pull |
 | EXP-20260602-025 | 2026-06-01 | v3 M9 企业 DB 本地 | **207 passed**（+12）；enterprise **12/12** |
 | EXP-20260602-024 | 2026-06-01 | Plus M8 MCP/A2A 服务器 | **195 passed**（12.41s）；export_agent_cards ✅ |
 | EXP-20260602-023 | 2026-06-01 | Plus M8 MCP/A2A 本地 | **195 passed**（+15）；protocols **15/15** |
