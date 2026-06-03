@@ -235,13 +235,14 @@ Server: [server_commands.md](server_commands.md)
 | [langgraph_workflow.md](langgraph_workflow.md) | M4 工作流 |
 | [text_model_plan.md](text_model_plan.md) | M6 文本模型 |
 | [rl_plan.md](rl_plan.md) | M7 RL 模拟 |
+| [protocols.md](protocols.md) | M8 MCP/A2A |
 | [data_sources.md](data_sources.md) | M2 数据源 |
 | [server_commands.md](server_commands.md) | 服务器命令 |
 | [repo_polish_checklist.md](repo_polish_checklist.md) | 仓库整理清单 |
 | [RELEASE_v0.1.0.md](RELEASE_v0.1.0.md) | v0.1.0 发布说明 |
 | [CONTRIBUTING.md](../CONTRIBUTING.md) | 贡献指南 |
 
-Codex prompts: `codex_prompt_M4.md` … `codex_prompt_M7.md`
+Codex prompts: `codex_prompt_M4.md` … `codex_prompt_M8.md`
 
 ---
 

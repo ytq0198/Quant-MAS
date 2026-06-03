@@ -101,9 +101,8 @@
 ```
 已完成   M1 → M2 → M3 → M4 → M5 ✅ → **M6 ✅**（EXP-019/020 + **EXP-TEXT-001/WF-001**，161 passed）
 
-进行中   ① 服务器 M7 pull + pytest **180**
-         ② **M8** MCP/A2A 骨架
-         ③ 可选 EXP-TEXT-WF-002 / EXP-RL-003
+进行中   ① **M8** MCP/A2A 骨架（codex_prompt_M8.md）
+         ② 可选 EXP-TEXT-WF-002 / EXP-RL-003
 
 按需扩展 M3.5 企业 RAG（真 Embedding / pgvector / Postgres / Neo4j）
          ↑ 触发条件见 §M3.5，不阻塞 M6

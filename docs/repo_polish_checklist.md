@@ -149,6 +149,7 @@ Release notes 草稿见本文档 §6。
 | L4 | 英文版 `README.zh-CN.md` 拆分（当前 README 已 inline 双语） |
 | L5 | EXP-TEXT-001 / EXP-TEXT-WF-001 写入 experiment_log | ✅ |
 | L6 | M7 的 `codex_prompt_M7.md` + `rl_plan.md` | ✅ |
+| L7 | M8 的 `codex_prompt_M8.md` + `protocols.md` | ✅ |
 
 ### 4.4 明确未实现（文案中不得写成已完成）
 

@@ -19,7 +19,7 @@
 | **M5.5** | 本地 vLLM | 📋 按需 | OpenAI 兼容端点（a6000） | 项目plus设计 §M5.5 |
 | **M6** | 文本信号 | ✅ | FinBERT smoke + WF OOS **0.563** vs **0.586** | [text_model_plan.md](text_model_plan.md) |
 | **M7** | RL / GRPO 实验 | ✅ | TradingEnv、GRPO ranking；180 passed 本地+服务器 | [rl_plan.md](rl_plan.md) |
-| **M8** | MCP / A2A 协议 | 📋 待做 | protocol adapter | 项目plus设计 §M8 |
+| **M8** | MCP / A2A 协议 | 📋 Codex 待实现 | MCP adapter、AgentCard；见 [codex_prompt_M8.md](codex_prompt_M8.md) | [protocols.md](protocols.md) |
 
 **pytest 基线**：**180 passed**（EXP-021/022 本地+服务器）· **论文主指标**：Walk-forward OOS sharpe **0.586**（EXP-20260602-008）
 
@@ -272,6 +272,6 @@ python scripts/run_rl_baseline.py --help
 
 ## 后续工作
 
-- **M8 MCP/A2A**：见 [项目plus设计.md §M8](../项目plus设计.md)
+- **M8 MCP/A2A**：见 [codex_prompt_M8.md](codex_prompt_M8.md) · [protocols.md](protocols.md) — **下一步 Codex 实现**
 - **M6 科研**：扩大 text JSONL 覆盖 → EXP-TEXT-WF-002
 - 可选：SEC smoke、CPU 对照 `server_lgbm_cpu_001`（EXP-TODO-006）
