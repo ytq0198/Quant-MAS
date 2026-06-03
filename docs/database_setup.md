@@ -1,19 +1,19 @@
-# Memory / RAG v2 数据库与向量存储（Plus M3）
+# Memory / RAG Database Setup
 
-更新时间：2026-06-02
+This document describes Quant MAS memory and RAG storage backends.
 
-> 配置：`configs/memory.yaml` · CLI：`index_documents.py` / `query_memory.py`
+Quant MAS defaults remain local and lightweight:
 
-## 默认（pytest 与本地开发）
+- experiment memory: JSON
+- optional local database: SQLite
+- vector store for tests: InMemoryVectorStore
+- embedding client for tests: HashEmbeddingClient
 
-无需 Docker 或外部服务：
+Enterprise backends added in M9 are optional and are not required for pytest.
 
-| 组件 | 默认 | 说明 |
-|------|------|------|
-| 实验元数据 | `json` | 兼容现有 `outputs/reports/experiments.json` |
-| 可选 SQLite | `sqlite` | `{reports_dir}/experiments.db` |
-| 向量存储 | `in_memory` | `InMemoryVectorStore` + 余弦相似度 |
-| Embedding | `hash` | `HashEmbeddingClient`（确定性，不联网） |
+---
+
+## Default Local Setup
 
 ```yaml
 # configs/memory.yaml
@@ -24,6 +24,8 @@ vector_store: in_memory
 embedding_provider: hash
 ```
 
+Useful commands:
+
 ```bash
 python scripts/index_documents.py --help
 python scripts/query_memory.py --help
@@ -31,50 +33,93 @@ python scripts/query_memory.py --backend json --best-metric oos.sharpe
 python scripts/query_memory.py --rag-query "walk-forward sharpe"
 ```
 
-## 切换到 SQLite
+---
+
+## SQLite
+
+SQLite is useful for local structured experiment queries without running external services.
 
 ```yaml
 memory_backend: sqlite
 sqlite_path: outputs/reports/experiments.db
 ```
 
-或通过 CLI：
-
 ```bash
 python scripts/query_memory.py --backend sqlite --query walk-forward
 ```
 
-## 可选扩展（不进 pytest）
+---
 
-以下需自行安装服务；**勿**把真实密码 commit 到 git。
+## M9 Enterprise Backends
 
-### PostgreSQL + pgvector（占位）
+M9 adds optional enterprise storage backends:
+
+- `PostgresMemoryStore`: experiment metadata storage with JSONB metrics, artifacts, params, and notes.
+- `PgVectorStore`: pgvector-backed vector store for document embeddings.
+- `Neo4jGraphStore`: strategy-feature-experiment graph relationship skeleton.
+
+These backends are optional. Tests use mock connections and do not require real Postgres, pgvector, or Neo4j services.
+
+**Local validation**: EXP-20260602-025 — `test_memory_enterprise.py` **12 passed**; full suite **207 passed** (2026-06-01). Server Postgres smoke: EXP-20260602-026（待做）.
+
+Copy the example config:
+
+```bash
+cp configs/memory.enterprise.yaml.example configs/memory.enterprise.yaml
+```
+
+Do not commit real credentials.
 
 ```env
 POSTGRES_DSN=postgresql://user:password@localhost:5432/quant_mas
-```
-
-用途：生产级实验元数据与 pgvector 向量检索。M3 第一版未强制实现 Postgres 后端，接口可在后续 M 扩展。
-
-### FAISS（可选）
-
-```env
-VECTOR_STORE=faiss
-```
-
-需 `pip install faiss-cpu`（或 GPU 版）。未安装时 `faiss_store` 模块可 import，工厂会给出清晰 `ImportError`。
-
-### Neo4j（占位）
-
-```env
 NEO4J_URI=bolt://localhost:7687
 NEO4J_USER=neo4j
 NEO4J_PASSWORD=change-me
 ```
 
-用途：策略–特征–实验关系图；M3 仅预留 env，pytest 不依赖。
+Query experiment memory from Postgres:
 
-### OpenAI-compatible Embedding（骨架）
+```bash
+python scripts/query_memory.py --backend postgres --best-metric oos.sharpe
+```
+
+Index local docs into pgvector:
+
+```bash
+python scripts/index_documents.py --vector-store pgvector --dirs docs --embedding-dimensions 64
+```
+
+---
+
+## Neo4j Graph Store
+
+`Neo4jGraphStore` is intended for strategy-feature-experiment relationships:
+
+- `Experiment`
+- `Strategy`
+- `Feature`
+- `(:Experiment)-[:USES_STRATEGY]->(:Strategy)`
+- `(:Experiment)-[:USES_FEATURE]->(:Feature)`
+
+The first version is a small CRUD wrapper and is tested with a mock driver.
+
+---
+
+## Optional FAISS
+
+FAISS remains optional and is not required for default tests.
+
+```bash
+python scripts/index_documents.py --vector-store faiss --dirs docs
+```
+
+If FAISS is not installed, the module raises a clear `ImportError`.
+
+---
+
+## Optional OpenAI-Compatible Embeddings
+
+Real embedding APIs should only be used in manually configured environments. Pytest uses `HashEmbeddingClient`.
 
 ```env
 EMBEDDING_PROVIDER=openai_compatible
@@ -83,22 +128,13 @@ EMBEDDING_API_KEY=
 EMBEDDING_MODEL=text-embedding-3-small
 ```
 
-pytest 使用 `hash`；真实 API 仅服务器手工验证时使用。
+---
 
-## 服务器建议
+## Validation
 
-a6000-9961 当前**无 Docker 要求**：
+```bash
+python -m pytest tests/test_memory_enterprise.py -v
+python -m pytest -v
+```
 
-1. `git pull` → `python -m pip install -e .`
-2. `python -m pytest -v`（预期 **126 passed**）
-3. 可选 smoke（不联网）：
-   ```bash
-   python scripts/index_documents.py --dirs docs --vector-store in_memory
-   python scripts/query_memory.py --rag-query "OOS sharpe baseline"
-   ```
-
-## 相关文档
-
-- [architecture.md](architecture.md) — Memory/RAG v2 分层
-- [codex_prompt_M3.md](codex_prompt_M3.md) — M3 设计与验收
-- [mistakes.md](../mistakes.md) — M-014 API key 勿写入 `.env.example`
+Current M9 tests do not connect to external services and do not read secrets.

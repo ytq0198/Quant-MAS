@@ -1,6 +1,6 @@
 # Quant MAS 架构
 
-更新时间：2026-06-01（Plus M7 RL Simulation Layer）
+更新时间：2026-06-01（**Plus v2 收官** — M7 RL + M8 Protocol Layer）
 
 Quant MAS 采用「确定性量化引擎 + **Text Signal Layer（M6）** + **RL Simulation Layer（M7）** + 轻量 Agent 编排 + Context Layer（M5） + Memory/RAG v2 + Research 基线层」架构。Agent 不替代回测、训练、风控和执行，也不允许直接实盘下单。
 
@@ -173,7 +173,7 @@ collect_experiment_metrics → BaselineRegistry / comparison table
 
 ## 测试与部署
 
-- **pytest**：本地 **195 passed**（EXP-20260602-023）；服务器 **180**（M8 待 pull，EXP-022）
+- **pytest**：本地 **207 passed**（EXP-025，v3 M9）；服务器 **195**（M9 待 EXP-026）
 - **服务器**：`/mnt/localDisk3/weizian/Quant-MAS`，conda `quant-mas`，Python 3.11.15
 - **GitHub**：https://github.com/ytq0198/Quant-MAS
 
@@ -188,6 +188,7 @@ collect_experiment_metrics → BaselineRegistry / comparison table
 | **M5** 上下文/LLM | ContextBuilder、ResearchAgent | ✅ 本地+服务器（EXP-017/018，EXP-LLM-001） |
 | **M6** 文本大模型 | FinBERT/LoRA + text_signals merge | ✅ EXP-019/020 + **EXP-TEXT-001/WF-001** |
 | **M7** RL/GRPO 模拟 | TradingEnv + GRPO ranking | ✅ EXP-021/022（180 passed） |
-| **M8** MCP/A2A | MCP adapter + AgentCard | ✅ 本地 EXP-023（195 passed） |
+| **M8** MCP/A2A | MCP adapter + AgentCard | ✅ EXP-023/024（195 passed） |
+| **M9** 企业 DB | Postgres + pgvector + Neo4j | ✅ 本地 EXP-025（207 passed） |
 
-详见 [项目plus设计.md](../项目plus设计.md)。
+详见 [项目plus设计.md](../项目plus设计.md)。**Plus v2 系统结构定稿**见 [`项目进度.md`](../项目进度.md) §Plus v2 收官。

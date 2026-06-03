@@ -6,7 +6,7 @@
 [![GitHub](https://img.shields.io/badge/GitHub-ytq0198%2FQuant--MAS-181717?logo=github)](https://github.com/ytq0198/Quant-MAS)
 [![Release](https://img.shields.io/badge/release-v0.1.0-blue)](https://github.com/ytq0198/Quant-MAS/releases/tag/v0.1.0)
 [![Python](https://img.shields.io/badge/python-3.11+-3776AB?logo=python&logoColor=white)](https://www.python.org/)
-[![Tests](https://img.shields.io/badge/tests-195%20passed-brightgreen)](docs/progress.md)
+[![Tests](https://img.shields.io/badge/tests-207%20passed-brightgreen)](docs/progress.md)
 [![Status](https://img.shields.io/badge/status-research%20platform-orange)](docs/progress.md)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![MAS Agent](https://img.shields.io/badge/MAS-Agent%20System-purple)](docs/architecture.md)
@@ -47,7 +47,7 @@
 > Quant Engine computes. Agent Layer explains, orchestrates, and reports.  
 > Quant Engine 做计算；Agent Layer 做编排、解释与报告。
 
-**Plus v2 status / 当前进度**：M1–M8 ✅ 本地（195 pytest）· 服务器 180（M8 待 pull）
+**Plus v2 status / 当前进度**：M1–M8 ✅ · **v3 M9** ✅ 本地（**207 pytest**）
 
 ---
 
@@ -112,7 +112,7 @@ python -m pip install -e ".[llm]"                 # HTTP LLM client
 python -m pip install -e ".[text]"                # FinBERT / LoRA (server manual)
 ```
 
-**Verified baseline / 已验证基线**：**195 passed**（本地）· 服务器 **180**（M8 待 pull）· tests use synthetic data, mocks, and local files only（不联网、不调真实 LLM、不下载 HF 权重）。
+**Verified baseline / 已验证基线**：**207 passed**（本地 EXP-025）· 服务器 **195**（M9 待 pull）· tests use synthetic data, mocks, and local files only（不联网、不调真实 LLM、不下载 HF 权重）。
 
 ---
 
@@ -240,7 +240,7 @@ print(result.content)
 
 | Item | Value | Notes |
 |------|-------|-------|
-| **pytest** | **195 passed** | Local EXP-023；server 180 pending M8 pull |
+| **pytest** | **207 passed** | EXP-025 本地；server 195 pending M9 pull |
 | **OOS baseline** | **sharpe 0.586** | EXP-20260602-008, 19 walk-forward windows |
 | **OOS + FinBERT text** | **sharpe 0.563** | EXP-TEXT-WF-001 · exploratory (200/6033 text coverage) |
 | Single-segment ML backtest | sharpe 2.78 | ⚠️ in-sample — **not** paper metric |

@@ -8,6 +8,7 @@ from typing import Any
 import yaml
 
 from quant_mas.memory.json_store import JsonMemoryStore
+from quant_mas.memory.postgres_store import PostgresMemoryStore
 from quant_mas.memory.sqlite_store import SqliteMemoryStore
 from quant_mas.memory.store_base import MemoryStore
 
@@ -28,7 +29,14 @@ def create_memory_store(
         if path is None:
             raise ValueError("sqlite backend requires sqlite_path or path")
         return SqliteMemoryStore(path)
-    raise ValueError("Unknown memory backend: " f"{backend}. Use json or sqlite.")
+    if normalized == "postgres":
+        dsn = kwargs.get("postgres_dsn") or kwargs.get("dsn")
+        return PostgresMemoryStore(
+            dsn=dsn,
+            connection=kwargs.get("connection") or kwargs.get("postgres_connection"),
+            initialize=kwargs.get("initialize", True),
+        )
+    raise ValueError("Unknown memory backend: " f"{backend}. Use json, sqlite, or postgres.")
 
 
 def create_memory_store_from_yaml(path: str | Path) -> MemoryStore:
@@ -41,6 +49,7 @@ def create_memory_store_from_yaml(path: str | Path) -> MemoryStore:
         backend,
         json_path=_resolve_optional(config.get("json_path"), config_path),
         sqlite_path=_resolve_optional(config.get("sqlite_path"), config_path),
+        postgres_dsn=config.get("postgres_dsn"),
     )
 
 

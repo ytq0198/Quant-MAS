@@ -1,6 +1,6 @@
 # MCP / A2A 协议层计划（Plus M8）
 
-更新时间：2026-06-01（M8 第一版本地 ✅ EXP-20260602-023）
+更新时间：2026-06-01（M8 ✅ EXP-20260602-023/024，195 passed 本地+服务器）
 
 > Codex 任务：[codex_prompt_M8.md](codex_prompt_M8.md) · 设计：[项目plus设计.md §M8](../项目plus设计.md#m8mcp--a2a-协议化扩展)
 
@@ -45,7 +45,7 @@ M8 **不是**生产 MCP Server，也**不是** broker / shell / 网络监听服�
 
 `pipeline` 可配置为 `require_confirmation`。
 
-## 已验证（本地）
+## 已验证（本地 + 服务器）
 
 ```bash
 python -m pytest tests/test_protocols.py -v    # 15 passed
@@ -55,13 +55,13 @@ python scripts/export_agent_cards.py --config configs/protocols.yaml \
   --output-dir outputs/protocols --include-mcp-specs
 ```
 
-记录：**EXP-20260602-023**（本地）；服务器待 **EXP-20260602-024**。
+记录：**EXP-20260602-023**（本地）；**EXP-20260602-024**（服务器 ✅ **195 passed**，12.41s）。
 
-## 待验证
+## 后续
 
 | 编号 | 内容 |
 |------|------|
-| EXP-20260602-024 | 服务器 pytest 195 + export_agent_cards |
+| EXP-TEXT-WF-002 | 扩大 text JSONL 覆盖后复跑 walk-forward |
 
 ## 相关文档
 

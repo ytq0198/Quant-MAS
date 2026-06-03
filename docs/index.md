@@ -1,7 +1,7 @@
 # Quant MAS Documentation / 项目文档
 
 **Research-first multi-agent quantitative platform · 多智能体量化研究平台**  
-**Release**: [v0.1.0](https://github.com/ytq0198/Quant-MAS/releases/tag/v0.1.0) · **Tests**: 195 passed · **GitHub**: [ytq0198/Quant-MAS](https://github.com/ytq0198/Quant-MAS)
+**Release**: [v0.1.0](https://github.com/ytq0198/Quant-MAS/releases/tag/v0.1.0) · **Tests**: 207 passed（本地）· **GitHub**: [ytq0198/Quant-MAS](https://github.com/ytq0198/Quant-MAS)
 
 > Documentation hub for students, researchers, and contributors.  
 > 面向学生、科研者与贡献者的文档入口，与 [README](../README.md) 结构对应。
@@ -37,7 +37,7 @@ Quant MAS combines a **deterministic Quant Engine** with a **lightweight Agent L
 
 LLM agents **must not** place live orders. Signals require backtesting, risk checks, audit, and human confirmation.
 
-**Plus v2**：M1–M8 ✅（本地 195 pytest）· 详见 [progress.md](progress.md)
+**Plus v2**：M1–M8 ✅ 收官 · **v3 M9** ✅ 本地（207 pytest）· 见 [`项目v3设计.md`](../项目v3设计.md)
 
 ---
 
@@ -158,7 +158,7 @@ Memory/RAG feeds **ResearchAgent** context — it does not execute trades.
 
 | Metric | Value | Experiment |
 |--------|-------|------------|
-| pytest | **195 passed** | EXP-023（本地）；server 180 待 M8 pull |
+| pytest | **207 passed** | EXP-025 本地；server 195 待 M9 pull |
 | **OOS sharpe (baseline)** | **0.586** | EXP-20260602-008 |
 | **OOS + FinBERT text** | **0.563** | EXP-TEXT-WF-001 · exploratory (200/6033 coverage) |
 | Single-segment ML sharpe | 2.78 | ⚠️ in-sample only |
@@ -230,6 +230,8 @@ Server: [server_commands.md](server_commands.md)
 | Document | 说明 |
 |----------|------|
 | [progress.md](progress.md) | M1–M8 进度、pytest 基线 |
+| [项目v3设计.md](../项目v3设计.md) | **v3 升级规划**（M9–M13） |
+| [项目plus设计.md](../项目plus设计.md) | v2 历史规划（M1–M8，已收官） |
 | [experiment_log.md](experiment_log.md) | 已验证实验与模板 |
 | [research_protocol.md](research_protocol.md) | OOS 主指标规范 |
 | [architecture.md](architecture.md) | 架构详解 |

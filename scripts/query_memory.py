@@ -13,9 +13,10 @@ from quant_mas.rag import SimpleRetriever
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Query Quant MAS memory or RAG documents.")
-    parser.add_argument("--backend", choices=("json", "sqlite"), default="json")
+    parser.add_argument("--backend", choices=("json", "sqlite", "postgres"), default="json")
     parser.add_argument("--json-path", default="outputs/reports/experiments.json")
     parser.add_argument("--sqlite-path", default="outputs/reports/experiments.db")
+    parser.add_argument("--postgres-dsn", help="Postgres DSN; defaults to POSTGRES_DSN env.")
     parser.add_argument("--query", help="Experiment name keyword.")
     parser.add_argument("--best-metric", help="Metric path, e.g. oos.sharpe.")
     parser.add_argument("--rag-query", help="Keyword query over documents.")
@@ -39,6 +40,7 @@ def main() -> int:
                 backend=args.backend,
                 json_path=Path(args.json_path).expanduser(),
                 sqlite_path=Path(args.sqlite_path).expanduser(),
+                postgres_dsn=args.postgres_dsn,
                 query=args.query,
                 best_metric=args.best_metric,
             )
@@ -54,6 +56,7 @@ def query_memory(
     backend: str,
     json_path: Path,
     sqlite_path: Path,
+    postgres_dsn: str | None,
     query: str | None,
     best_metric: str | None,
 ) -> list[dict]:
@@ -61,6 +64,7 @@ def query_memory(
         backend,
         json_path=json_path,
         sqlite_path=sqlite_path,
+        postgres_dsn=postgres_dsn,
     )
     if best_metric:
         records = [store.find_best(best_metric)]

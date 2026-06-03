@@ -1,0 +1,21 @@
+# Enterprise memory/RAG configuration example.
+# Do not commit real credentials. Prefer environment variables.
+
+memory_backend: postgres
+postgres_dsn: null  # defaults to POSTGRES_DSN
+
+json_path: outputs/reports/experiments.json
+sqlite_path: outputs/reports/experiments.db
+
+vector_store: pgvector
+pgvector:
+  table_name: rag_vectors
+  dimensions: 64
+  postgres_dsn: null  # defaults to POSTGRES_DSN
+
+neo4j:
+  uri: null       # defaults to NEO4J_URI
+  user: null      # defaults to NEO4J_USER
+  password: null  # defaults to NEO4J_PASSWORD
+
+embedding_provider: hash

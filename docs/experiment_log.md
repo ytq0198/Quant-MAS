@@ -1,6 +1,6 @@
 # Quant MAS 实验记录
 
-更新时间：2026-06-01（Plus M8 本地 ✅ EXP-20260602-023，195 passed）
+更新时间：2026-06-01（**v3 M9 本地 ✅** EXP-20260602-025，207 passed）
 
 本文件用于记录真实实验和重要验证。不要记录未经实际运行的数据结果；尚未真实运行的项目标记为「待验证」。
 
@@ -178,6 +178,41 @@
 
 ## 当前验证记录
 
+### EXP-20260602-025：v3 M9 企业数据与数据库本地验证 ✅
+
+- 日期：2026-06-01
+- 阶段：**v3 M9** — Postgres Memory + pgvector + Neo4j 图关系骨架
+- 环境：本地，Codex 按 [`项目v3设计.md`](../项目v3设计.md) §M9 实现
+- 新增模块：
+  - `src/quant_mas/memory/postgres_store.py` — PostgresMemoryStore（嵌套 metric、`find_best("oos.sharpe")`）
+  - `src/quant_mas/memory/neo4j_store.py` — Neo4jGraphStore（实验/策略/特征节点 CRUD 骨架）
+  - `src/quant_mas/rag/vector_store_pgvector.py` — PgVectorStore（upsert/search/delete）
+  - `memory/factory.py` — `backend: json | sqlite | postgres`
+  - `configs/memory.enterprise.yaml.example`
+- CLI：
+  - `scripts/query_memory.py --backend postgres`
+  - `scripts/index_documents.py --vector-store pgvector`
+- 命令与结果：
+  - `python -m pytest tests/test_memory_enterprise.py -v` → **12 passed**
+  - `python scripts/query_memory.py --help` → 正常
+  - `python scripts/index_documents.py --help` → 正常
+  - 全量 `python -m pytest -v` → **207 passed**（195→207，+12）
+- 安全边界：企业后端测试全 mock，不联网；`DATABASE_URL` / Neo4j 凭据仅环境变量，不入 git
+- 问题：无
+- 下一步：服务器 Postgres 真实连接 + index/query（EXP-20260602-026）；M10 LLM / vLLM
+
+### EXP-20260602-024：Plus M8 MCP/A2A 协议层服务器验收 ✅
+
+- 日期：2026-06-01
+- 阶段：Plus **M8**（服务器 pull @ `0794bd6` 后）
+- 环境：a6000-9961，conda `/mnt/localDisk3/weizian/conda_envs/quant-mas`，Python **3.11.15**
+- 命令与结果：
+  - `python -m pytest -v` → **195 passed** in **12.41s**
+  - `python scripts/export_agent_cards.py --config configs/protocols.yaml --output-dir /mnt/localDisk3/weizian/reports/protocols --include-mcp-specs` → 正常
+  - 输出：`supervisor_agent_card.json`、`research_agent_card.json`、`report_agent_card.json`、`mcp_tools.json`
+- 问题：无
+- 下一步：EXP-TEXT-WF-002 / Release v0.1.0 / GitHub Topics
+
 ### EXP-20260602-023：Plus M8 MCP/A2A 协议层本地验证 ✅
 
 - 日期：2026-06-01
@@ -195,7 +230,7 @@
   - 全量 `python -m pytest -v` → **195 passed**（180→195，+15）
 - 安全边界：不接外部 MCP server；deny shell/broker/order/secrets；执行仍经 ToolRegistry
 - 问题：无
-- 下一步：服务器 pytest（EXP-20260602-024）；可选 EXP-TEXT-WF-002 / Release v0.1.0
+- 下一步：~~服务器 pytest（EXP-20260602-024）~~ ✅；可选 EXP-TEXT-WF-002 / Release v0.1.0
 
 ### EXP-20260602-022：Plus M7 RL 模拟服务器验收 ✅
 
@@ -861,6 +896,8 @@
 | EXP-20260602-009 | 2026-06-02 | Plus M1 研究基线本地 | **102 passed**（+4 测试） |
 | EXP-20260602-010 | 2026-06-02 | Plus M1 服务器 pytest + 比较表 | **102 passed**；OOS sharpe 0.586 |
 | EXP-20260602-011 | 2026-06-02 | Plus M2 数据扩展本地 | **115 passed**（+13） |
+| EXP-20260602-025 | 2026-06-01 | v3 M9 企业 DB 本地 | **207 passed**（+12）；enterprise **12/12** |
+| EXP-20260602-024 | 2026-06-01 | Plus M8 MCP/A2A 服务器 | **195 passed**（12.41s）；export_agent_cards ✅ |
 | EXP-20260602-023 | 2026-06-01 | Plus M8 MCP/A2A 本地 | **195 passed**（+15）；protocols **15/15** |
 | EXP-20260602-022 | 2026-06-01 | Plus M7 服务器 pytest + RL dry-run | **180 passed**（10.15s） |
 | EXP-20260602-021 | 2026-06-01 | Plus M7 RL 模拟本地 | **180 passed**（+19）；trading_env **13/13** |

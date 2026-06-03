@@ -11,6 +11,7 @@ from quant_mas.rag.hybrid_retriever import HybridRetrievalResult, HybridRetrieve
 from quant_mas.rag.in_memory_vector_store import InMemoryVectorStore
 from quant_mas.rag.simple_retriever import RetrievalResult, SimpleRetriever
 from quant_mas.rag.vector_store_base import VectorSearchResult, VectorStore
+from quant_mas.rag.vector_store_pgvector import PgVectorStore
 
 __all__ = [
     "Document",
@@ -20,6 +21,7 @@ __all__ = [
     "HybridRetriever",
     "InMemoryVectorStore",
     "OpenAICompatibleEmbeddingClient",
+    "PgVectorStore",
     "RetrievalResult",
     "SimpleRetriever",
     "VectorSearchResult",

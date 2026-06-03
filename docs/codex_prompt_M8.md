@@ -1,6 +1,6 @@
 # Plus M8：MCP / A2A 协议化扩展 — Codex 提示词
 
-**状态：✅ 已完成（本地 EXP-20260602-023，195 passed，2026-06-01）**
+**状态：✅ 已完成（本地 EXP-20260602-023 + 服务器 EXP-20260602-024，195 passed，2026-06-01）**
 
 更新时间：2026-06-01（M8 第一版 skeleton 本地验收）
 
@@ -306,7 +306,7 @@ python scripts/export_agent_cards.py --config configs/protocols.yaml --output-di
 2. ~~更新 `docs/architecture.md` — Protocol Layer~~ ✅
 3. ~~更新 `docs/experiment_log.md` — EXP-20260602-023~~ ✅
 4. ~~更新 `docs/progress.md` / `项目进度.md` — M8 状态~~ ✅
-5. 服务器 pull + pytest **195 passed** + export_agent_cards（EXP-20260602-024 待做）
+5. ~~服务器 pull + pytest **195 passed** + export_agent_cards（EXP-20260602-024）~~ ✅
 6. ~~`docs/server_commands.md` §6.11 M8~~ ✅
 
 **Plus v2 主线 M1–M8 代码骨架已全部落地**；后续为科研复跑（EXP-TEXT-WF-002）或仓库对外（Release/Topics）。
@@ -345,6 +345,6 @@ python scripts/export_agent_cards.py --config configs/protocols.yaml --output-di
 | 编号 | 内容 |
 |------|------|
 | **EXP-20260602-023** | M8 protocols 本地 pytest + export_agent_cards |
-| **EXP-20260602-024** | M8 服务器 pytest（待做） |
+| **EXP-20260602-024** | M8 服务器 pytest 195 + export_agent_cards ✅ |
 
 论文主指标仍为 **EXP-20260602-008**（oos.sharpe **0.586**）。

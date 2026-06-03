@@ -10,6 +10,8 @@ GitHub 仓库：[https://github.com/ytq0198/Quant-MAS](https://github.com/ytq019
 
 | 日期 | 项目 | 结果 | 备注 |
 |------|------|------|------|
+| 2026-06-01 | v3 M9 企业 DB（本地） | **207 passed**（+12）；enterprise **12/12** | EXP-20260602-025 |
+| 2026-06-01 | Plus M8 MCP/A2A 服务器 | **195 passed**（12.41s）；export_agent_cards ✅ | EXP-20260602-024 |
 | 2026-06-01 | Plus M7 服务器 | **180 passed**（10.15s）；RL dry-run ✅ | EXP-20260602-022 |
 | 2026-06-01 | Plus M8 MCP/A2A（本地） | **195 passed**（+15） | EXP-20260602-023 |
 | 2026-06-01 | Plus M7 RL 模拟（本地） | **180 passed**（+19） | EXP-20260602-021 |
@@ -526,7 +528,7 @@ python scripts/run_rl_baseline.py --config configs/rl.yaml --policy buy_hold --d
 
 详见 [`docs/rl_plan.md`](rl_plan.md)。
 
-## 六点十一、Plus M8 MCP/A2A（EXP-20260602-023 / 服务器待 EXP-024）📋
+## 六点十一、Plus M8 MCP/A2A（EXP-20260602-023 / EXP-20260602-024）✅
 
 ```bash
 cd /mnt/localDisk3/weizian/Quant-MAS
@@ -545,9 +547,39 @@ python scripts/export_agent_cards.py --config configs/protocols.yaml \
 
 - **内部 adapter only** — 不接外部 MCP server；不启动 network listener
 - policy 默认 deny shell/broker/order/secrets
-- 记录：**EXP-20260602-023**（本地 195 passed）；服务器 → **EXP-20260602-024**
+- 记录：**EXP-20260602-023**（本地 195 passed）；**EXP-20260602-024**（服务器 **195 passed**，12.41s）
 
 详见 [`docs/protocols.md`](protocols.md)。
+
+## 六点十二、v3 M9 企业 DB（EXP-20260602-025 / 服务器待 EXP-026）📋
+
+```bash
+cd /mnt/localDisk3/weizian/Quant-MAS
+git pull origin main
+conda activate /mnt/localDisk3/weizian/conda_envs/quant-mas
+python -m pip install -e .
+python -m pytest -v   # 预期 207 passed
+
+python -m pytest tests/test_memory_enterprise.py -v   # 12 passed（mock，不联网）
+
+# 可选：真实 Postgres（需 DATABASE_URL，勿提交 git）
+cp configs/memory.enterprise.yaml.example configs/memory.enterprise.yaml
+# 编辑 memory.enterprise.yaml 或 export DATABASE_URL=postgresql://...
+
+python scripts/query_memory.py --help
+python scripts/query_memory.py --backend postgres --best-metric oos.sharpe
+
+python scripts/index_documents.py --help
+python scripts/index_documents.py --vector-store pgvector --dirs docs --embedding-dimensions 64
+```
+
+**说明**：
+
+- pytest 默认 mock，**不依赖**真实 Postgres/pgvector/Neo4j
+- `DATABASE_URL`、`NEO4J_URI` 等仅环境变量
+- 记录：**EXP-20260602-025**（本地 **207 passed**，enterprise **12/12**）；服务器 Postgres smoke → **EXP-20260602-026**
+
+详见 [`docs/database_setup.md`](database_setup.md) §M9 Enterprise Backends。
 
 ## 七、删除旧部署（如曾在 ~/quant-mas 建过）
 

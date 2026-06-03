@@ -7,7 +7,7 @@ import json
 import sys
 from pathlib import Path
 
-from quant_mas.rag import HashEmbeddingClient, InMemoryVectorStore, chunk_text, load_documents
+from quant_mas.rag import HashEmbeddingClient, InMemoryVectorStore, PgVectorStore, chunk_text, load_documents
 from quant_mas.rag.faiss_store import FaissVectorStore
 
 
@@ -16,9 +16,11 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--dirs", nargs="*", default=["docs", "outputs/reports"])
     parser.add_argument("--chunk-size", type=int, default=512)
     parser.add_argument("--overlap", type=int, default=64)
-    parser.add_argument("--vector-store", choices=("in_memory", "faiss"), default="in_memory")
+    parser.add_argument("--vector-store", choices=("in_memory", "faiss", "pgvector"), default="in_memory")
+    parser.add_argument("--backend", choices=("in_memory", "faiss", "pgvector"), help="Alias for --vector-store.")
     parser.add_argument("--output", default="outputs/rag/index.json")
     parser.add_argument("--embedding-dimensions", type=int, default=64)
+    parser.add_argument("--postgres-dsn", help="Postgres DSN; defaults to POSTGRES_DSN env.")
     return parser
 
 
@@ -30,9 +32,10 @@ def main() -> int:
             dirs=[Path(value).expanduser() for value in args.dirs],
             chunk_size=args.chunk_size,
             overlap=args.overlap,
-            vector_store=args.vector_store,
+            vector_store=args.backend or args.vector_store,
             output=Path(args.output).expanduser(),
             embedding_dimensions=args.embedding_dimensions,
+            postgres_dsn=args.postgres_dsn,
         )
     except Exception as exc:
         print(f"[index] ERROR: {exc}", file=sys.stderr)
@@ -50,6 +53,7 @@ def index_documents(
     vector_store: str,
     output: Path,
     embedding_dimensions: int = 64,
+    postgres_dsn: str | None = None,
 ) -> dict[str, int | str]:
     documents = []
     for directory in dirs:
@@ -75,15 +79,20 @@ def index_documents(
     embeddings = HashEmbeddingClient(dimensions=embedding_dimensions).embed(texts)
     if vector_store == "faiss":
         FaissVectorStore()
-    store = InMemoryVectorStore()
+        store = InMemoryVectorStore()
+    elif vector_store == "pgvector":
+        store = PgVectorStore(dsn=postgres_dsn, dimensions=embedding_dimensions)
+    else:
+        store = InMemoryVectorStore()
     store.upsert(ids, embeddings, metadata)
     output.parent.mkdir(parents=True, exist_ok=True)
+    records = store.to_records() if hasattr(store, "to_records") else []
     output.write_text(
         json.dumps(
             {
                 "vector_store": vector_store,
                 "embedding_provider": "hash",
-                "records": store.to_records(),
+                "records": records,
             },
             indent=2,
             ensure_ascii=False,

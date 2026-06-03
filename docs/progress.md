@@ -1,8 +1,8 @@
 # Quant MAS 开发进度
 
-更新时间：2026-06-01（Plus M8 本地 ✅ EXP-20260602-023，195 passed）
+更新时间：2026-06-01（**v3 M9 本地 ✅** EXP-025，207 passed）
 
-**Plus v2**：**M1–M8 ✅**（M8 本地；M7 本地+服务器）→ 服务器 M8 pull / EXP-TEXT-WF-002 / Release
+**Plus v2**：M1–M8 ✅ 收官 · **v3 M9** ✅ 本地 → M10 / 服务器 EXP-026
 
 第五～六阶段见 [项目plus设计.md](../项目plus设计.md)（M7 RL 模拟 / M8 协议扩展，非实盘）。
 
@@ -13,15 +13,27 @@
 | **M1** | 研究基线与实验规范 | ✅ | BaselineRegistry、`compare_experiments.py`；OOS **0.586** | [research_protocol.md](research_protocol.md) |
 | **M2** | 数据源扩展 | ✅ | Alpha Vantage / Finnhub / FRED / SEC fetchers | [data_sources.md](data_sources.md) |
 | **M3** | Memory / RAG v2 | ✅ | SQLite、HybridRetriever、index/query CLI | [database_setup.md](database_setup.md) |
-| **M3.5** | 企业 RAG 扩展 | 📋 按需 | Postgres/pgvector、真 Embedding | 项目plus设计 §M3.5 |
+| **M3.5** | 企业 RAG 扩展 | ✅ 并入 M9 | Postgres/pgvector/Neo4j（本地 EXP-025） | [database_setup.md](database_setup.md) |
 | **M4** | LangGraph 工作流 | ✅ | ResearchWorkflow、sequential + langgraph | [langgraph_workflow.md](langgraph_workflow.md) |
 | **M5** | 上下文 / LLM | ✅ | ContextBuilder、ResearchAgent；EXP-LLM-001 | [context_engineering.md](context_engineering.md) |
 | **M5.5** | 本地 vLLM | 📋 按需 | OpenAI 兼容端点（a6000） | 项目plus设计 §M5.5 |
 | **M6** | 文本信号 | ✅ | FinBERT smoke + WF OOS **0.563** vs **0.586** | [text_model_plan.md](text_model_plan.md) |
 | **M7** | RL / GRPO 实验 | ✅ | TradingEnv、GRPO ranking；180 passed 本地+服务器 | [rl_plan.md](rl_plan.md) |
-| **M8** | MCP / A2A 协议 | ✅ 本地 | MCP adapter、AgentCard；195 passed | [protocols.md](protocols.md) |
+| **M8** | MCP / A2A 协议 | ✅ | MCP adapter、AgentCard；195 passed 本地+服务器 | [protocols.md](protocols.md) |
 
-**pytest 基线**：**195 passed**（EXP-023 本地）· **180 passed**（服务器，待 M8 pull）· **论文主指标**：Walk-forward OOS sharpe **0.586**（EXP-20260602-008）
+**pytest 基线**：本地 **207 passed**（EXP-025）· 服务器 **195**（M9 待 pull）· **论文主指标**：Walk-forward OOS sharpe **0.586**（EXP-20260602-008）
+
+## Plus v3 主线（M9–M13）
+
+> 设计：[项目v3设计.md](../项目v3设计.md)
+
+| 编号 | 名称 | 状态 | 关键交付 / 实验 | 文档 |
+|------|------|------|-----------------|------|
+| **M9** | 企业数据与数据库 | ✅ 本地 | Postgres + pgvector + Neo4j；207 passed | [database_setup.md](database_setup.md) |
+| **M10** | LLM 生产化 | 📋 | local_vllm、EXP-TEXT-WF-002 | [context_engineering.md](context_engineering.md) |
+| **M11** | 竞争学习 / 策略种群 | 📋 | Population、Elo | 待建 competitive_learning.md |
+| **M12** | RL 训练实验 | 📋 | GRPO/PPO training loop | [rl_plan.md](rl_plan.md) |
+| **M13** | 企业化编排 | 📋 | DAG scheduler | [protocols.md](protocols.md) |
 
 ## 阶段总览（v1 Prompt + Plus v2）
 
@@ -39,7 +51,7 @@
 | **Plus M4** | LangGraph 编排 | ✅ | EXP-20260602-015/016 |
 | **Plus M5** | 上下文/LLM | ✅ | EXP-20260602-017/018，EXP-LLM-001，**150 passed** |
 | **Plus M7** | RL 模拟 | ✅ | EXP-021/022，**180 passed** |
-| 第五～六阶段 | 编排 / RL 模拟 | 📋 | Plus **M8** MCP/A2A；服务器 M7 验收 |
+| 第五～六阶段 | 编排 / 协议 | ✅ | Plus **M8** MCP/A2A（EXP-023/024） |
 
 ## Quant MAS v2：M1 研究基线
 
@@ -169,8 +181,8 @@ M1/M2 已完成；**M3 本地 ✅**（见下两节）；下一步 **M4**。
 
 | 环境 | Python | 结果 | 日期 | 实验 |
 |------|--------|------|------|------|
-| 本地 Windows | 3.11+ | **195 passed** | 2026-06-01 | EXP-20260602-023 |
-| 服务器 a6000-9961 | 3.11.15 | **180 passed**（待 M8 pull） | 2026-06-01 | EXP-20260602-022 |
+| 本地 Windows | 3.11+ | **207 passed** | 2026-06-01 | EXP-20260602-025 |
+| 服务器 a6000-9961 | 3.11.15 | **195 passed**（M9 待 pull） | 2026-06-01 | EXP-20260602-024 |
 
 命令：`python -m pytest -v`（勿裸敲 `pytest` / `pip`）。
 
@@ -283,11 +295,41 @@ python scripts/export_agent_cards.py --help
 | export_agent_cards.py | ✅ |
 | test_protocols | ✅ **15 passed** |
 | 全量 pytest（本地） | ✅ **195 passed** |
-| 全量 pytest（服务器） | 📋 待 EXP-20260602-024 |
+| 全量 pytest（服务器） | ✅ **195 passed**（12.41s，EXP-024）；M9 待 EXP-026 |
 
-## 后续工作
+## Quant MAS v3：M9 企业 DB
 
-- **M8 服务器**：pull → pytest **195** → export_agent_cards
-- **M6 科研**：扩大 text JSONL 覆盖 → EXP-TEXT-WF-002
-- **仓库对外**：GitHub Release v0.1.0、Topics
-- 可选：SEC smoke、CPU 对照 `server_lgbm_cpu_001`（EXP-TODO-006）
+> [database_setup.md](database_setup.md) · [项目v3设计.md](../项目v3设计.md) §M9
+
+| 项目 | 状态 |
+|------|------|
+| PostgresMemoryStore + oos.sharpe 嵌套查询 | ✅ |
+| PgVectorStore upsert/search/delete | ✅ |
+| Neo4jGraphStore 骨架 | ✅ |
+| factory json \| sqlite \| postgres | ✅ |
+| query_memory / index_documents CLI | ✅ |
+| test_memory_enterprise | ✅ **12 passed** |
+| 全量 pytest（本地） | ✅ **207 passed**（+12） |
+| 服务器 Postgres 真实连接 | 📋 EXP-026 |
+
+## Plus v2 收官（V2 结尾）
+
+> 系统结构定稿见根目录 [`项目进度.md`](../项目进度.md) §Plus v2 收官；架构详图 [`architecture.md`](architecture.md)。
+
+**设计原则**：Quant Engine 做计算；Agent Layer 做编排、解释与报告；LLM 不直接实盘下单。
+
+**十层架构（定稿）**：Quant Engine → Tool Layer（7 tools）→ Agent Layer → Text（M6）→ RL Simulation（M7）→ Protocol（M8）→ Context（M5）→ Orchestration（M4）→ Memory/RAG（M3）→ Research（M1）。
+
+**主数据流**：`download_data → features → train → walk_forward（OOS 0.586）→ ExperimentMemory → compare_experiments`。
+
+**Agent 路径**：`SupervisorAgent → ToolRegistry → Quant Engine → metrics`。
+
+**v2 关键指标**：pytest **195** · OOS sharpe **0.586** · text OOS **0.563**（exploratory）· RL `simulation.*` 不与 OOS 混比。
+
+**v2 不做**：实盘 broker、外部 MCP server、ShellTool。
+
+## 后续工作（v2 之后）
+
+- ~~**M8 服务器**~~ ✅ · ~~**M9 本地**~~ ✅ EXP-025（207 pytest）
+- **M9 服务器**：pull → pytest **207** → Postgres smoke（EXP-026）
+- **M10**：local_vllm + EXP-TEXT-WF-002
