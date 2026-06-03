@@ -62,6 +62,8 @@
 | [M-015](#m-015-sec-edgar-需真实-user-agent) | P1 | Plus M2 / EXP-DATA-001 | SEC User-Agent |
 | [M-016](#m-016-langgraph-建边-zipstrict-长度不匹配) | **P0** | Plus M4 / langgraph backend | zip() strict |
 | [M-017](#m-017-服务器-env-导致-pytest-llm-用例失败) | P1 | Plus M5 / 服务器 pytest | load_repo_dotenv |
+| [M-018](#m-018-服务器-huggingface-hub-不可达) | P2 | Plus M6 / FinBERT | ModelScope 本地路径 |
+| [M-019](#m-019-market_data-被小样本覆盖) | P1 | Plus M6 / features | merge_parquet 恢复 |
 
 ---
 
@@ -463,6 +465,32 @@ python scripts/download_data.py \
 
 ---
 
+## Plus M6：文本信号 + Walk-forward（EXP-TEXT-001 / EXP-TEXT-WF-001）
+
+> 阶段：Plus v2 **M6** · 实验：**EXP-TEXT-001**、**EXP-TEXT-WF-001**  
+> 文档：[`docs/text_model_plan.md`](docs/text_model_plan.md)
+
+#### M-018 服务器 HuggingFace Hub 不可达
+
+| 项 | 内容 |
+|----|------|
+| **日期** | 2026-06-03 |
+| **现象** | `FinBERTSentimentClassifier` / `from_pretrained` 报 `Network unreachable`（huggingface.co） |
+| **解决** | 1. 用 **ModelScope** 下载 `ProsusAI/finbert` 到 `/mnt/localDisk3/weizian/models/hf/finbert_prosus/`<br>2. `configs/text_model.server.yaml` 中 `model_name` 设为**本地目录**（见 `configs/text_model.server.yaml.example`）<br>3. 或配置 HTTP 代理后再走 Hub |
+| **验证** | EXP-TEXT-001：200 signals → `signals_finbert.parquet` |
+
+#### M-019 `market_data.parquet` 被小样本覆盖
+
+| 项 | 内容 |
+|----|------|
+| **日期** | 2026-06-03 |
+| **现象** | `market_data.parquet` 仅 **105 行**（单标的 AAPL），features 构建异常 |
+| **根因** | 某次 download/smoke 写入了合并路径，覆盖原 **6033 行** 全量数据 |
+| **解决** | 用 `scripts/merge_parquet.py` 从 `raw/*_YYYY.parquet` **重新合并** 为 6033 行；勿对小路径直接 `--output` 覆盖生产 raw |
+| **预防** | 服务器 raw 写前备份；download 用独立 experiment 目录或 `--output` 指向 staging |
+
+---
+
 ## 跨阶段通用规则
 
 以下规则来自多次踩坑后的**固定习惯**，适用于所有阶段：
@@ -509,7 +537,7 @@ python -m pip install -e .
 | — | Plus M3 | Memory/RAG v2 SQLite | ✅ EXP-20260602-013/014 |
 | — | Plus M4 | LangGraph workflow | ✅ EXP-20260602-015/016（含 langgraph backend 修复 M-016） |
 | — | Plus M5 | 上下文/LLM | ✅ EXP-017/018；DeepSeek EXP-LLM-001 |
-| — | Plus M6 | 文本信号 | ✅ EXP-019/020 本地+服务器 **161 passed** |
+| — | Plus M6 | 文本信号 | ✅ EXP-019/020 + **EXP-TEXT-001/WF-001**（OOS 0.563 vs 0.586） |
 
 ---
 

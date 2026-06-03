@@ -10,7 +10,8 @@ GitHub 仓库：[https://github.com/ytq0198/Quant-MAS](https://github.com/ytq019
 
 | 日期 | 项目 | 结果 | 备注 |
 |------|------|------|------|
-| 2026-06-03 | Plus M6 文本信号（服务器） | **161 passed**（9.20s） | EXP-20260602-020 |
+| 2026-06-03 | EXP-TEXT-WF-001 text + walk-forward | oos.sharpe **0.563** vs **0.586** | EXP-TEXT-001 |
+| 2026-06-03 | Plus M6 文本信号（服务器） | **161 passed**（22.14s） | EXP-20260602-020 |
 | 2026-06-03 | Plus M6 文本信号（本地） | **161 passed** | EXP-20260602-019 |
 | 2026-06-03 | Plus M5 上下文/LLM（服务器） | **150 passed**（7.24s） | EXP-20260602-018 |
 | 2026-06-03 | Plus M5 上下文/LLM（本地） | **150+1 warning** | EXP-20260602-017 |
@@ -448,27 +449,52 @@ python scripts/run_research_agent.py \
 
 记录：**EXP-20260602-018**（2026-06-03，a6000-9961 @ `43c812a`）；**EXP-LLM-001**（DeepSeek smoke）。`.env` 导致 mock 测试失败见 [`mistakes.md`](../mistakes.md) **M-017**。
 
-## 六点九、Plus M6 文本信号（EXP-20260602-019/020）
+## 六点九、Plus M6 文本信号 + Walk-forward（EXP-TEXT-001 / EXP-TEXT-WF-001）✅
 
 ```bash
 cd /mnt/localDisk3/weizian/Quant-MAS
 git pull origin main
 conda activate /mnt/localDisk3/weizian/conda_envs/quant-mas
-python -m pip install -e .
+python -m pip install -e ".[ml,text]"
+python -m pytest -v   # 161 passed
 
-python -m pytest tests/test_text_signals.py -v   # 预期 11 passed
-python scripts/train_text_model.py --help
-python scripts/train_text_model.py --mode mock --config configs/text_model.yaml --dry-run \
-  --output-dir /tmp/text_model_mock
-python -m pytest -v   # 161 passed（EXP-020：9.20s @ b9de2f2）
+# 配置：复制 example → 编辑路径
+# cp configs/text_model.server.yaml.example configs/text_model.server.yaml
+# cp configs/features.text.server.yaml.example configs/features.text.yaml
 
-# 可选 FinBERT smoke（EXP-TEXT-001，需 GPU + HF_TOKEN）：
-# python -m pip install -e ".[text]"
-# nvidia-smi
-# python scripts/train_text_model.py --mode finbert_baseline --config configs/text_model.yaml
+# FinBERT（Hub 不可达时用 ModelScope 本地路径，见 mistakes.md M-018）
+python scripts/train_text_model.py --mode finbert_baseline \
+  --config configs/text_model.server.yaml \
+  --text-path data/text/smoke_from_features.jsonl \
+  --output-dir /mnt/localDisk3/weizian/models/text/exp_text_001 \
+  --signals-output /mnt/localDisk3/weizian/datasets/text/signals_finbert.parquet \
+  2>&1 | tee /mnt/localDisk3/weizian/logs/exp_text_001_finbert.log
+
+python scripts/build_features.py \
+  --config configs/features.text.yaml \
+  --storage-config configs/storage.server.yaml \
+  --input /mnt/localDisk3/weizian/datasets/raw/market_data.parquet \
+  --output /mnt/localDisk3/weizian/datasets/features/features_with_text.parquet
+# fillna(0) on finbert_sentiment if sparse — see text_model_plan.md
+
+python scripts/run_walk_forward.py \
+  --config configs/walk_forward.yaml \
+  --storage-config configs/storage.server.yaml \
+  --features-path /mnt/localDisk3/weizian/datasets/features/features_with_text.parquet \
+  --experiment-name server_walk_forward_text_001 \
+  --output-dir /mnt/localDisk3/weizian/reports/walk_forward_text_001
+
+python scripts/compare_experiments.py \
+  --storage-config configs/storage.server.yaml \
+  --memory-path /mnt/localDisk3/weizian/reports/experiments.json \
+  --output-dir /mnt/localDisk3/weizian/reports/research
 ```
 
-记录：**EXP-20260602-020**（2026-06-03，a6000-9961 @ `b9de2f2`，**161 passed**，9.20s）。
+**EXP-TEXT-WF-001 结果**：oos.sharpe **0.563** vs baseline **0.586**（Δ -0.023）；200/6033 text 覆盖 + fillna(0)，exploratory。
+
+**注意**：勿覆盖 `market_data.parquet` 为小样本（见 **M-019**）；应用 `merge_parquet.py` 恢复 6033 行。
+
+记录：**EXP-20260602-020**（pytest 161）；**EXP-TEXT-001**；**EXP-TEXT-WF-001**。
 
 详见 [`docs/text_model_plan.md`](text_model_plan.md)。
 

@@ -1,0 +1,21 @@
+# Feature build with FinBERT text signals (server paths).
+# Copy to configs/features.text.yaml on a6000 or merge into your features config.
+
+price_column: close
+windows:
+  moving_average:
+    - 5
+    - 20
+  volatility:
+    - 20
+  volume:
+    - 20
+rsi_window: 14
+return_periods:
+  - 1
+label:
+  horizon: 5
+
+text_signals_path: /mnt/localDisk3/weizian/datasets/text/signals_finbert.parquet
+text_signal_columns:
+  - finbert_sentiment

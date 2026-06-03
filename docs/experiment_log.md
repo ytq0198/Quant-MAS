@@ -1,6 +1,6 @@
 # Quant MAS 实验记录
 
-更新时间：2026-06-03（Plus M6 服务器 EXP-20260602-020）
+更新时间：2026-06-03（EXP-TEXT-001 / EXP-TEXT-WF-001 服务器 text+walk-forward）
 
 本文件用于记录真实实验和重要验证。不要记录未经实际运行的数据结果；尚未真实运行的项目标记为「待验证」。
 
@@ -52,14 +52,21 @@
 | server_lgbm_gpu_001 | lightgbm | — | — | — | — | — | 0.479 | 不可直接比 OOS | EXP-20260602-004 |
 | server_ml_backtest_001 | ml_backtest | **2.781** | — | 68.27 | — | -0.246 | — | ⚠️ in-sample | EXP-20260602-005 |
 | server_walk_forward_001 | walk_forward | — | **0.586** | — | 0.443 | — | — | **baseline** | EXP-20260602-008 |
+| server_walk_forward_text_001 | walk_forward | — | **0.563** | — | 0.420 | — | — | ↓ -0.023 | EXP-TEXT-WF-001 |
 | （RAG/LLM/RL 等） | other | 待验证 | 待验证 | 待验证 | 待验证 | 待验证 | 待验证 | 待验证 | Plus M4+ |
 
 **说明：**
 
 - CLI 输出 `oos.sharpe` 精确值 **0.585673** ≈ 报告 **0.586**，与 EXP-20260602-008 一致。
 - 仅 **walk_forward** 行可用于论文主结论。
+- EXP-TEXT-WF-001：200/6033 text 覆盖 + fillna(0)，**exploratory**；Δ oos.sharpe **-0.023**。
 
-### 历史快照：COMP-20260602-001（手工整理，已被 COMP-20260602-002 取代）
+### 当前快照：COMP-20260603-001（text walk-forward，6 rows）
+
+- 生成：`compare_experiments.py` → `/mnt/localDisk3/weizian/reports/research/comparison.md`
+- walk-forward：baseline **0.586** vs text **0.563**
+
+### 历史快照：COMP-20260602-002（5 rows，EXP-20260602-010）
 
 ## 实验记录模板
 
@@ -177,6 +184,63 @@
 
 ## 当前验证记录
 
+### EXP-TEXT-WF-001：FinBERT text + Walk-forward OOS（服务器）✅
+
+- 日期：2026-06-03
+- 阶段：Plus **M6 科研** — text signal 并入 features → walk-forward
+- 环境：a6000-9961，4× RTX A6000，CUDA LightGBM，git ≥ `b9de2f2`
+- 数据：
+  - `features_with_text.parquet`：**6033 rows**，**20 cols**（+`finbert_sentiment`）
+  - 文本覆盖：200/6033 signals；fillna(0) → 134 非零、5899 中性 0
+  - 插曲：`market_data.parquet` 曾误覆盖为 105 行 → 已从年度分片 **re-merge 6033 行**
+- 命令：
+  ```bash
+  python scripts/build_features.py --config configs/features.text.yaml \
+    --storage-config configs/storage.server.yaml \
+    --output /mnt/localDisk3/weizian/datasets/features/features_with_text.parquet
+  python scripts/run_walk_forward.py \
+    --config configs/walk_forward.yaml \
+    --storage-config configs/storage.server.yaml \
+    --features-path /mnt/localDisk3/weizian/datasets/features/features_with_text.parquet \
+    --experiment-name server_walk_forward_text_001 \
+    --output-dir /mnt/localDisk3/weizian/reports/walk_forward_text_001
+  python scripts/compare_experiments.py \
+    --storage-config configs/storage.server.yaml \
+    --memory-path /mnt/localDisk3/weizian/reports/experiments.json \
+    --output-dir /mnt/localDisk3/weizian/reports/research
+  ```
+- **OOS 对比**（vs **EXP-20260602-008** / `server_walk_forward_001`）：
+
+  | 指标 | baseline | + text | Δ |
+  |------|----------|--------|---|
+  | **oos.sharpe** | **0.586** | **0.563** | **-0.023** |
+  | oos.total_return | 0.443 | 0.420 | -0.023 |
+  | oos.max_drawdown | -0.255 | -0.259 | — |
+  | oos.auc_mean | 0.472 | 0.473 | +0.001 |
+  | feature_count | 15 | 16 | +1 |
+  | window_count | 19 | 19 | — |
+
+- 产物：`/mnt/localDisk3/weizian/reports/walk_forward_text_001/`（metrics.json、summary.md 等）
+- 比较表：`reports/research/comparison.md` **6 rows**（含两行 walk_forward）
+- **结论（exploratory）**：200/6033 覆盖 + fillna(0) 下 OOS sharpe **略低于** baseline；**smoke 级探索**，不能据此否定 text 特征；需扩大新闻覆盖率后再评估
+- 下一步：扩大 JSONL 覆盖；forward-fill 或真实 neutral 策略；可选 EXP-TEXT-002 LoRA
+
+### EXP-TEXT-001：FinBERT baseline smoke（服务器）✅
+
+- 日期：2026-06-03
+- 阶段：Plus **M6** — 真实 FinBERT 推理（非 pytest）
+- 环境：a6000-9961，`pip install -e ".[ml,text]"`，pytest **161 passed**（22.14s）
+- 模型：
+  - HuggingFace Hub **不可达**（Python `Network unreachable`）
+  - **ModelScope** 下载 `ProsusAI/finbert` → `/mnt/localDisk3/weizian/models/hf/finbert_prosus/`
+  - 配置：`configs/text_model.server.yaml`（本地 `model_name` 路径）
+- 命令与结果：
+  - 200 条 text records → **`datasets/text/signals_finbert.parquet`**
+  - `models/text/exp_text_001/metadata.json`
+  - 日志：`logs/exp_text_001_finbert.log`
+- 问题：huggingface.co 不稳定；`.env` HF_TOKEN 当时为空（本次靠 ModelScope）
+- 下一步：→ EXP-TEXT-WF-001 ✅
+
 ### EXP-20260602-020：Plus M6 服务器 pytest ✅
 
 - 日期：2026-06-03
@@ -187,7 +251,7 @@
   - `python -m pip install -e .`
   - `python -m pytest -v` → **161 passed** in **9.20s**
 - 问题：无
-- 下一步：可选 **EXP-TEXT-001** FinBERT smoke（`pip install -e ".[text]"`）；text signal + walk-forward vs **EXP-20260602-008**（OOS sharpe **0.586**）
+- 下一步：~~EXP-TEXT-001 / walk-forward~~ ✅ EXP-TEXT-001 / EXP-TEXT-WF-001
 
 ### EXP-20260602-019：Plus M6 金融文本信号本地验证 ✅
 
@@ -207,7 +271,7 @@
   - `python scripts/train_text_model.py --mode mock --config configs/text_model.yaml --dry-run ...` → 写 `signals.parquet` + `metadata.json`
   - 全量 `python -m pytest -v` → **161 passed**（150→161，+11）
 - 问题：无
-- 下一步：~~push → 服务器~~ ✅ EXP-020 → 可选 EXP-TEXT-001 / walk-forward
+- 下一步：~~EXP-TEXT-001~~ ✅ → EXP-TEXT-WF-001 ✅；扩大 text 覆盖后复跑 WF
 
 ### EXP-LLM-001：DeepSeek 云端 ResearchAgent smoke ✅
 
@@ -748,6 +812,8 @@
 | EXP-20260602-009 | 2026-06-02 | Plus M1 研究基线本地 | **102 passed**（+4 测试） |
 | EXP-20260602-010 | 2026-06-02 | Plus M1 服务器 pytest + 比较表 | **102 passed**；OOS sharpe 0.586 |
 | EXP-20260602-011 | 2026-06-02 | Plus M2 数据扩展本地 | **115 passed**（+13） |
+| EXP-TEXT-WF-001 | 2026-06-03 | FinBERT + walk-forward OOS | oos.sharpe **0.563** vs baseline **0.586** |
+| EXP-TEXT-001 | 2026-06-03 | FinBERT smoke（ModelScope） | 200 signals → signals_finbert.parquet |
 | EXP-20260602-020 | 2026-06-03 | Plus M6 服务器 pytest | **161 passed**（9.20s） |
 | EXP-20260602-019 | 2026-06-03 | Plus M6 文本信号本地 | **161 passed**（+11）；test_text_signals **11/11** |
 | EXP-LLM-001 | 2026-06-03 | DeepSeek ResearchAgent smoke | openai_compatible；OOS sharpe **0.586** |

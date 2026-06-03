@@ -1,0 +1,21 @@
+# Server text-model config (copy to configs/text_model.server.yaml on a6000).
+# FinBERT weights: download via ModelScope if huggingface.co is unreachable.
+# Do not commit real HF_TOKEN — use repo root .env only.
+
+text_model:
+  mode: finbert_baseline
+  # Local directory after ModelScope download (not Hub id when offline)
+  model_name: /mnt/localDisk3/weizian/models/hf/finbert_prosus
+  max_length: 128
+  batch_size: 16
+  output_signal_name: finbert_sentiment
+paths:
+  text_records: data/text/smoke_from_features.jsonl
+  output_dir: /mnt/localDisk3/weizian/models/text/exp_text_001
+  signals_output: /mnt/localDisk3/weizian/datasets/text/signals_finbert.parquet
+split:
+  train_end: "2023-12-31"
+  val_end: "2024-06-30"
+features:
+  merge_signal_columns:
+    - finbert_sentiment
