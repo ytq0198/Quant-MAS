@@ -508,7 +508,8 @@ python -m pip install -e .
 | — | Plus M2 | 多数据源 API smoke | ✅ EXP-DATA-001（Finnhub 免费 blocked；SEC 待测，见 M-015） |
 | — | Plus M3 | Memory/RAG v2 SQLite | ✅ EXP-20260602-013/014 |
 | — | Plus M4 | LangGraph workflow | ✅ EXP-20260602-015/016（含 langgraph backend 修复 M-016） |
-| — | Plus M5 | 上下文/LLM | ✅ EXP-017/018 本地+服务器；DeepSeek EXP-LLM-001（M-017 已修复） |
+| — | Plus M5 | 上下文/LLM | ✅ EXP-017/018；DeepSeek EXP-LLM-001 |
+| — | Plus M6 | 文本信号 | ✅ EXP-20260602-019 本地 **161 passed**；服务器待 pull |
 
 ---
 

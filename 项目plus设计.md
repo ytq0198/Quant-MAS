@@ -4,7 +4,7 @@
 
 > 本文档在 **Prompt 1–20 主链路已完成**（第零～四阶段）的基础上，规划 **Quant MAS v2** 的研究型升级路线。  
 > 基线状态：本地 **137+1 skip**（138 项；EXP-20260602-015）；服务器 M4 langgraph ✅（EXP-20260602-016 @ `c0fa5e3`）。  
-> **当前执行**：M1–M5 ✅（EXP-20260602-018 / EXP-LLM-001）→ **M6**。  
+> **当前执行**：M1–M6 本地 ✅（EXP-20260602-019）→ **M6 服务器 + EXP-TEXT-001**。  
 > 与 `项目进度.md` / `项目指导.md` 的关系：后者记录「已完成什么」；本文档记录「接下来怎么优化、怎么给 Codex/Cursor 下指令」。
 
 ---
@@ -69,8 +69,9 @@
 ### 2.1 工程完成度
 
 - **第零～四阶段 + Prompt 13 文档收口** ✅
-- **测试**：本地 **150 passed, 1 warning**；服务器 **150 passed**（EXP-20260602-018，7.24s）
+- **测试**：本地 **161 passed**（EXP-20260602-019）；M5 服务器 **150 passed**（EXP-20260602-018）
 - **Context/LLM（M5 第一版）** ✅：ContextBuilder、ResearchAgent、resolve_llm_client；**DeepSeek 云端** smoke ✅（EXP-LLM-001）
+- **Text Signal（M6 第一版）** ✅ 本地：text schema、mock classifier、text_signals merge、train_text_model CLI（EXP-20260602-019）
 - **M5.5 本地 vLLM**：📋 待定（a6000 上 vLLM OpenAI 兼容端点；见 [§M5.5](#m55服务器本地-vllm-进阶待定)）
 - **Memory/RAG v2（M3 第一版）** ✅ 本地：MemoryStore JSON/SQLite、HybridRetriever、index/query CLI（EXP-20260602-013）
 - **M3.5 企业 RAG**：📋 待定（真 Embedding + 持久化向量 + Postgres；见 [§M3.5](#m35企业-rag-扩展待定)）
@@ -98,9 +99,11 @@
 ### 3.1 当前推荐执行顺序（2026-06-03 更新）
 
 ```
-已完成   M1 → M2 → M3 → M4 → **M5 ✅**（EXP-017/018，EXP-LLM-001）
+已完成   M1 → M2 → M3 → M4 → M5 ✅ → **M6 本地 ✅**（EXP-20260602-019，161 passed）
 
-进行中   **M6** 文本大模型（[codex_prompt_M6.md](docs/codex_prompt_M6.md)）
+进行中   ① 服务器 M6 pull + pytest **161**
+         ② 可选 EXP-TEXT-001 FinBERT smoke（`pip install -e ".[text]"`）
+         ③ text signal + walk-forward vs OOS **0.586**
 
 按需扩展 M3.5 企业 RAG（真 Embedding / pgvector / Postgres / Neo4j）
          ↑ 触发条件见 §M3.5，不阻塞 M6
@@ -115,7 +118,7 @@
 
 ```
 优先级 1（先做）  M1 研究基线  →  M2 数据扩展  →  M3 Memory/RAG 第一版 ✅
-优先级 2          M4 LangGraph ✅  →  M5 上下文/LLM ✅  →  M6 文本大模型
+优先级 2          M4 LangGraph ✅  →  M5 上下文/LLM ✅  →  M6 文本大模型 ✅ 本地
 优先级 2.5（按需） M3.5 企业 RAG 扩展（不替换 M3 接口，只加后端）
 优先级 2.6（按需） M5.5 服务器本地 vLLM（不替换 M5 接口，只换 LLM 后端）
 优先级 3          M6 文本大模型微调
@@ -578,7 +581,7 @@ LLM_FALLBACK_MODEL=deepseek-chat
 
 ## M6：金融文本大模型 / 开源模型微调
 
-> **状态：📋 待做** · [codex_prompt_M6.md](docs/codex_prompt_M6.md) · 前置 M1–M5 ✅
+> **状态：✅ 本地（EXP-20260602-019）** · [text_model_plan.md](docs/text_model_plan.md) · [codex_prompt_M6.md](docs/codex_prompt_M6.md)
 
 ### 目标
 
@@ -611,10 +614,10 @@ MODEL_CACHE_DIR=/mnt/localDisk3/weizian/models/hf
 ### 给 Cursor 的提示词
 
 ```
-1. 服务器：nvidia-smi；检查 transformers/peft。
-2. 新增 docs/text_model_plan.md。
-3. experiment_log 模板：EXP-TEXT-001 FinBERT；EXP-TEXT-002 Qwen LoRA 小样本。
-4. 小样本训练后跑 walk-forward，与 EXP-20260602-008 对比。
+1. 服务器：git pull → python -m pytest -v（**161**）；nvidia-smi。
+2. docs/text_model_plan.md ✅；experiment_log EXP-019 ✅。
+3. 可选 EXP-TEXT-001 FinBERT；EXP-TEXT-002 LoRA 小样本。
+4. text signal 并入 features 后 walk-forward，与 EXP-20260602-008 对比。
 5. HF token 不入库。
 ```
 
@@ -707,7 +710,7 @@ MODEL_CACHE_DIR=/mnt/localDisk3/weizian/models/hf
 | **M4** LangGraph | 4 | workflow + nodes | langgraph_workflow.md | 无 | ✅ |
 | **M5** 上下文/LLM | 5 | ContextBuilder、ResearchAgent | [context_engineering.md](docs/context_engineering.md) | **DeepSeek 云端** | ✅ 本地+服务器 |
 | **M5.5** 本地 vLLM | 5.5 | provider 扩展、smoke 脚本 | vllm_server_setup（待写） | vLLM @ a6000 | 📋 待定 |
-| **M6** 文本大模型 | 6 | FinBERT/LoRA 骨架 | [codex_prompt_M6.md](docs/codex_prompt_M6.md) | HF_TOKEN | 📋 待做 |
+| **M6** 文本大模型 | 6 | FinBERT/LoRA + text_signals | [text_model_plan.md](docs/text_model_plan.md) | HF_TOKEN | ✅ 本地 |
 | **M7** RL/GRPO | 7 | TradingEnv、GRPO ranking | rl_plan.md | W&B 可选 | ✅ |
 | **M8** MCP/A2A | 8 | protocol adapter | protocols.md | 暂不接 | ❌ |
 
@@ -870,12 +873,12 @@ flowchart TB
 ```
 你正在开发 Quant MAS 科研项目。
 路径：D:\scientific reasearch and work\SRTP\Quant MAS
-测试基线：本地 150+1 warning；服务器 **150 passed**（EXP-018）；OOS baseline sharpe 0.586（EXP-20260602-008）。
-LLM 不允许直接下单；pytest 不联网不调真实 LLM/FinBERT 权重。
+测试基线：本地 **161 passed**（EXP-019）；M5 服务器 **150 passed**（EXP-018）；OOS baseline sharpe 0.586（EXP-20260602-008）。
+LLM/文本模型不允许直接下单；pytest 不联网、不加载真实 FinBERT 权重。
 请只实现当前一个模块，完成后 python -m pytest -v 全量通过。
-详细需求见 docs/codex_prompt_M6.md（当前 **M6**）。
+下一步：M6 服务器验收 或 M7 RL 骨架（见 项目plus设计.md §M7）。
 ```
 
 ---
 
-*文档版本：2026-06-03 · Quant MAS Plus v2（M1–M5 ✅；下一步 M6）*
+*文档版本：2026-06-03 · Quant MAS Plus v2（M6 本地 ✅；服务器 M6 + EXP-TEXT-001 待做）*

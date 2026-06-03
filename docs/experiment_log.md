@@ -1,6 +1,6 @@
 # Quant MAS 实验记录
 
-更新时间：2026-06-03（Plus M5 服务器 EXP-20260602-018 / EXP-LLM-001）
+更新时间：2026-06-03（Plus M6 本地 EXP-20260602-019）
 
 本文件用于记录真实实验和重要验证。不要记录未经实际运行的数据结果；尚未真实运行的项目标记为「待验证」。
 
@@ -88,6 +88,26 @@
 ```
 
 ## 当前验证记录
+
+### EXP-20260602-019：Plus M6 金融文本信号本地验证 ✅
+
+- 日期：2026-06-03
+- 阶段：Plus v2 **M6**（本地 mock / synthetic，无真实 HF 权重）
+- 环境：本地 Windows，核心 `pip install -e .`（**未装** `[text]` extra）
+- 新增模块：
+  - `src/quant_mas/text/` — `FinancialTextRecord` / `TextSignalRecord`、时间切分、`MockSentimentClassifier`、`FinBERTSentimentClassifier` 骨架、`train_lora_text_classifier` mock 骨架
+  - `src/quant_mas/features/text_signals.py` — `merge_text_signals_into_features`（left join、duplicate key、future leakage 检查）
+  - `scripts/train_text_model.py` — `--mode mock|finbert_baseline|lora`，`--dry-run`
+  - `configs/text_model.yaml`；`pyproject.toml` 可选依赖 `[text]`
+- 命令与结果：
+  - `python -m pytest tests/test_text_signals.py -v` → **11 passed**
+  - `python -m pytest tests/test_features.py -v` → **3 passed**
+  - `python -m pytest tests/test_train_model.py -v` → **5 passed**
+  - `python scripts/train_text_model.py --help` → 正常
+  - `python scripts/train_text_model.py --mode mock --config configs/text_model.yaml --dry-run ...` → 写 `signals.parquet` + `metadata.json`
+  - 全量 `python -m pytest -v` → **161 passed**（150→161，+11）
+- 问题：无
+- 下一步：push → 服务器 pytest **161**；可选 **EXP-TEXT-001** FinBERT smoke（`pip install -e ".[text]"`）；文本 signal 并入 features 后 walk-forward 与 **EXP-20260602-008** 对比
 
 ### EXP-LLM-001：DeepSeek 云端 ResearchAgent smoke ✅
 
@@ -628,6 +648,7 @@
 | EXP-20260602-009 | 2026-06-02 | Plus M1 研究基线本地 | **102 passed**（+4 测试） |
 | EXP-20260602-010 | 2026-06-02 | Plus M1 服务器 pytest + 比较表 | **102 passed**；OOS sharpe 0.586 |
 | EXP-20260602-011 | 2026-06-02 | Plus M2 数据扩展本地 | **115 passed**（+13） |
+| EXP-20260602-019 | 2026-06-03 | Plus M6 文本信号本地 | **161 passed**（+11）；test_text_signals **11/11** |
 | EXP-LLM-001 | 2026-06-03 | DeepSeek ResearchAgent smoke | openai_compatible；OOS sharpe **0.586** |
 | EXP-20260602-018 | 2026-06-03 | Plus M5 服务器 pytest | **150 passed**（7.24s） |
 | EXP-20260602-017 | 2026-06-03 | Plus M5 上下文/LLM 本地 | **150+1 warning**（+12） |

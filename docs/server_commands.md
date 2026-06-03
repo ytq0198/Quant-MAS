@@ -10,6 +10,7 @@ GitHub 仓库：[https://github.com/ytq0198/Quant-MAS](https://github.com/ytq019
 
 | 日期 | 项目 | 结果 | 备注 |
 |------|------|------|------|
+| 2026-06-03 | Plus M6 文本信号（本地） | **161 passed** | EXP-20260602-019 |
 | 2026-06-03 | Plus M5 上下文/LLM（服务器） | **150 passed**（7.24s） | EXP-20260602-018 |
 | 2026-06-03 | Plus M5 上下文/LLM（本地） | **150+1 warning** | EXP-20260602-017 |
 | 2026-06-03 | Plus M4 LangGraph 服务器 | langgraph dry-run ✅ | EXP-20260602-016 |
@@ -445,6 +446,28 @@ python scripts/run_research_agent.py \
 ```
 
 记录：**EXP-20260602-018**（2026-06-03，a6000-9961 @ `43c812a`）；**EXP-LLM-001**（DeepSeek smoke）。`.env` 导致 mock 测试失败见 [`mistakes.md`](../mistakes.md) **M-017**。
+
+## 六点九、Plus M6 文本信号（EXP-20260602-019 待服务器）
+
+```bash
+cd /mnt/localDisk3/weizian/Quant-MAS
+git pull origin main
+conda activate /mnt/localDisk3/weizian/conda_envs/quant-mas
+python -m pip install -e .
+
+python -m pytest tests/test_text_signals.py -v   # 预期 11 passed
+python scripts/train_text_model.py --help
+python scripts/train_text_model.py --mode mock --config configs/text_model.yaml --dry-run \
+  --output-dir /tmp/text_model_mock
+python -m pytest -v   # 预期 161 passed
+
+# 可选 FinBERT smoke（EXP-TEXT-001，需 GPU + HF_TOKEN）：
+# python -m pip install -e ".[text]"
+# nvidia-smi
+# python scripts/train_text_model.py --mode finbert_baseline --config configs/text_model.yaml
+```
+
+详见 [`docs/text_model_plan.md`](text_model_plan.md)。
 
 ## 七、删除旧部署（如曾在 ~/quant-mas 建过）
 

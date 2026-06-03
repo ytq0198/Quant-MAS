@@ -9,6 +9,7 @@ import pandas as pd
 
 from quant_mas.data import validate_ohlcv
 from quant_mas.features.labels import add_future_return_label
+from quant_mas.features.text_signals import merge_text_signals_into_features
 from quant_mas.features.technical import (
     add_ma_distance,
     add_moving_averages,
@@ -70,7 +71,7 @@ def build_feature_table_from_config(
 ) -> pd.DataFrame:
     windows = config.get("windows", {})
     label = config.get("label", {})
-    return build_feature_table(
+    features = build_feature_table(
         frame,
         price_column=config.get("price_column", "close"),
         return_periods=config.get("return_periods", (1,)),
@@ -80,4 +81,12 @@ def build_feature_table_from_config(
         rsi_window=config.get("rsi_window", 14),
         label_horizon=label.get("horizon", 5),
     )
-
+    text_signals_path = config.get("text_signals_path")
+    if text_signals_path:
+        signals = pd.read_parquet(text_signals_path)
+        features = merge_text_signals_into_features(
+            features,
+            signals,
+            signal_columns=config.get("text_signal_columns"),
+        )
+    return features

@@ -1,6 +1,6 @@
 # Plus M6：金融文本大模型 / 文本信号 — Codex 提示词
 
-**状态：📋 待做**
+**状态：✅ 已完成（EXP-20260602-019，161 passed，2026-06-03）**
 
 更新时间：2026-06-03
 
@@ -236,12 +236,9 @@ python scripts/train_text_model.py --mode mock --config configs/text_model.yaml 
 
 ## Cursor 后续（Codex 完成后）
 
-1. 新增 `docs/text_model_plan.md`：FinBERT vs LoRA、与 OOS baseline 对比流程、GPU 需求。
-2. 更新 `docs/architecture.md` — Text Signal Layer。
-3. 更新 `docs/experiment_log.md`：
-   - 本地 EXP-20260602-019（M6 pytest）
-   - 服务器 EXP-TEXT-001（FinBERT smoke，可选）
-   - 服务器 EXP-TEXT-002（LoRA 小样本，可选）
+1. ~~新增 `docs/text_model_plan.md`~~ ✅
+2. ~~更新 `docs/architecture.md` — Text Signal Layer~~ ✅
+3. ~~更新 `docs/experiment_log.md` — EXP-20260602-019~~ ✅
 4. 服务器（**不写入 pytest**）：
    ```bash
    nvidia-smi

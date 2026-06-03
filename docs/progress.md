@@ -1,8 +1,8 @@
 # Quant MAS 开发进度
 
-更新时间：2026-06-03（Plus M5 本地+服务器 ✅ EXP-018 / EXP-LLM-001）
+更新时间：2026-06-03（Plus M6 本地 ✅ EXP-20260602-019）
 
-**Plus v2**：**M1–M5 ✅**（本地+服务器 **150 passed**，EXP-20260602-017/018；DeepSeek smoke EXP-LLM-001）→ **M6**
+**Plus v2**：**M1–M6 本地 ✅**（M6 **161 passed**，+11）；M5 服务器 **150 passed** → **M6 服务器待 pull**
 
 第五～六阶段见 [项目plus设计.md](../项目plus设计.md)（M4 LangGraph / M7 模拟，非实盘）。
 
@@ -21,7 +21,7 @@
 | **Plus M3** | Memory/RAG v2 | ✅ 本地 | EXP-20260602-013，**126 passed** |
 | **Plus M4** | LangGraph 编排 | ✅ | EXP-20260602-015/016 |
 | **Plus M5** | 上下文/LLM | ✅ | EXP-20260602-017/018，EXP-LLM-001，**150 passed** |
-| **Plus M6** | 文本大模型 | 📋 | 见 项目plus设计.md |
+| **Plus M6** | 文本大模型 | ✅ 本地 | EXP-20260602-019，**161 passed** |
 | 第五～六阶段 | 编排 / RL 模拟 | 📋 | Plus M4 / M7 |
 
 ## Quant MAS v2：M1 研究基线
@@ -152,7 +152,8 @@ M1/M2 已完成；**M3 本地 ✅**（见下两节）；下一步 **M4**。
 
 | 环境 | Python | 结果 | 日期 | 实验 |
 |------|--------|------|------|------|
-| 本地 Windows | 3.11+ | **150 passed, 1 warning** | 2026-06-03 | EXP-20260602-017 |
+| 本地 Windows | 3.11+ | **161 passed** | 2026-06-03 | EXP-20260602-019 |
+| 本地 Windows（M5） | 3.11+ | **150 passed, 1 warning** | 2026-06-03 | EXP-20260602-017 |
 | 服务器 a6000-9961 | 3.11.15 | **150 passed**（7.24s） | 2026-06-03 | EXP-20260602-018 |
 
 命令：`python -m pytest -v`（勿裸敲 `pytest` / `pip`）。
@@ -219,8 +220,22 @@ python scripts/query_memory.py --help
 3. Agent 可编排 ML 回测、风控、pipeline；Memory/RAG 可检索历史实验与文档。
 4. **Plus M1**：任何新实验写入 ExperimentMemory 后，须用 `compare_experiments.py` 生成比较表，并与 **EXP-20260602-008** 对照后再下结论。
 
+## Quant MAS v2：M6 文本信号
+
+> [text_model_plan.md](text_model_plan.md) · [codex_prompt_M6.md](codex_prompt_M6.md)
+
+| 项目 | 状态 |
+|------|------|
+| text/ schema + mock classifier | ✅ |
+| text_signals merge + leakage 检查 | ✅ |
+| train_text_model.py（mock dry-run） | ✅ |
+| test_text_signals | ✅ **11 passed** |
+| 全量 pytest（本地） | ✅ **161 passed** |
+| 服务器 pytest | 📋 待 pull |
+| EXP-TEXT-001 FinBERT smoke | 📋 待验证 |
+
 ## 后续工作
 
-- **M6 文本大模型**：见 [项目plus设计.md §M6](../项目plus设计.md#m6金融文本大模型--开源模型微调)
-- 科研：特征/模型调参、更多 walk-forward 窗口（**必须标注 OOS**）
+- **M6 服务器**：pull → pytest **161**；可选 `pip install -e ".[text]"` + FinBERT smoke
+- **M6 科研**：text signal + walk-forward，与 **EXP-20260602-008** 对比
 - 可选：SEC smoke、CPU 对照 `server_lgbm_cpu_001`（EXP-TODO-006）

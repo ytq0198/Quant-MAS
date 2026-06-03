@@ -1,0 +1,16 @@
+text_model:
+  mode: mock
+  model_name: ProsusAI/finbert
+  max_length: 128
+  batch_size: 16
+  output_signal_name: finbert_sentiment
+paths:
+  text_records: data/text/sample_news.jsonl
+  output_dir: outputs/text_models
+  signals_output: outputs/text/signals.parquet
+split:
+  train_end: "2023-12-31"
+  val_end: "2024-06-30"
+features:
+  merge_signal_columns:
+    - finbert_sentiment
