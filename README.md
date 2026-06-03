@@ -1,36 +1,97 @@
-# Quant MAS
+# Quant MAS — 多智能体量化研究平台 / Multi-Agent Quantitative Research Platform
 
-**A research-first Multi-Agent System for quantitative research, backtesting, risk control, memory, RAG, and explainable experiment workflows.**<br>
-**Quant MAS 是一个面向科研、学习和实习作品集的多智能体量化研究平台：让确定性 Quant Engine 做计算，让 Agent Layer 做编排、解释和报告。**
+> 这是一个面向 **AI Agent / Quant / ML** 实习与科研申请者的开源项目：可运行、可回测、可训练、可记录。  
+> A **resume-ready** research platform for AI Agent & Quant internships — backtesting, ML training, memory/RAG, and safe agent orchestration.
 
 [![GitHub](https://img.shields.io/badge/GitHub-ytq0198%2FQuant--MAS-181717?logo=github)](https://github.com/ytq0198/Quant-MAS)
-[![Python](https://img.shields.io/badge/Python-3.11+-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![Release](https://img.shields.io/badge/release-v0.1.0-blue)](https://github.com/ytq0198/Quant-MAS/releases/tag/v0.1.0)
+[![Python](https://img.shields.io/badge/python-3.11+-3776AB?logo=python&logoColor=white)](https://www.python.org/)
 [![Tests](https://img.shields.io/badge/tests-161%20passed-brightgreen)](docs/progress.md)
-[![Status](https://img.shields.io/badge/status-research%20MVP-blue)](docs/progress.md)
-[![License](https://img.shields.io/badge/license-MIT-green)](#license)
-[![MAS Agent](https://img.shields.io/badge/MAS-Agent%20Layer-purple)](docs/architecture.md)
+[![Status](https://img.shields.io/badge/status-research%20platform-orange)](docs/progress.md)
+[![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+[![MAS Agent](https://img.shields.io/badge/MAS-Agent%20System-purple)](docs/architecture.md)
 
-> This is **not** an autonomous live-trading bot. LLM agents never place live orders directly.<br>
-> 这不是让 LLM 直接实盘交易的系统。LLM Agent 不允许直接下单，所有信号必须经过回测、风控、审计和人工确认。
-
----
-
-## Why Quant MAS?
-
-Quant MAS is designed for students, researchers, and internship candidates who want a credible end-to-end project that combines:
-
-- deterministic quantitative research,
-- machine learning experiments,
-- multi-agent tool orchestration,
-- experiment memory and RAG,
-- explainable research reports,
-- and reproducible tests without relying on real network calls.
-
-Quant MAS 适合希望展示完整工程能力的同学：从行情数据、特征、策略、回测、风控，到机器学习、文本信号、Agent 编排、Memory/RAG 和实验报告，形成一个可扩展的科研平台。
+> **Not a live-trading bot.** LLM agents never place live orders directly.  
+> **非实盘系统。** LLM Agent 不允许直接下单；所有信号须经回测、风控、审计和人工确认。
 
 ---
 
-## Quick Start
+## 目录 / Table of Contents
+
+- [项目简介 / Project Overview](#项目简介--project-overview)
+- [架构 / Architecture](#架构--architecture)
+- [项目亮点 / Features](#项目亮点--features)
+- [快速开始 / Quick Start](#快速开始--quick-start)
+- [运行示例 / CLI Examples](#运行示例--cli-examples)
+- [Agent 工作流 / Agent Workflow](#agent-工作流--agent-workflow)
+- [实验结果摘要 / Experiment Results](#实验结果摘要--experiment-results)
+- [简历写法参考 / Resume Usage](#简历写法参考--resume-usage)
+- [项目结构 / Project Structure](#项目结构--project-structure)
+- [文档 / Documentation](#文档--documentation)
+- [Roadmap](#roadmap)
+- [贡献指南 / Contributing](#贡献指南--contributing)
+- [License](#license)
+- [免责声明 / Disclaimer](#免责声明--disclaimer)
+- [社交 & 联系方式 / Contact & Social](#社交--联系方式--contact--social)
+
+---
+
+## 项目简介 / Project Overview
+
+**Quant MAS** integrates a **deterministic Quant Engine** (data → features → models → strategies → backtest → risk → reports) with a **lightweight Agent Layer** (tool routing, research narration, optional LLM) and **Memory/RAG** for experiment retrieval.
+
+**Quant MAS** 将确定性量化引擎与轻量 Agent 层、Memory/RAG 结合：Quant Engine 负责计算与 metrics，Agent 负责编排、解释与报告，二者边界清晰。
+
+**Design principle / 设计原则**
+
+> Quant Engine computes. Agent Layer explains, orchestrates, and reports.  
+> Quant Engine 做计算；Agent Layer 做编排、解释与报告。
+
+**Plus v2 status / 当前进度**：M1–M6 ✅（161 pytest，本地+服务器）· M7 RL / M8 MCP 📋 planned
+
+---
+
+## 架构 / Architecture
+
+![Quant MAS architecture — Quant Engine, Agent Layer, Memory/RAG, and research workflow](architecture.png)
+
+<details>
+<summary>Mermaid diagram / 点击展开流程图</summary>
+
+```mermaid
+flowchart LR
+    A["Data Sources"] --> B["Quant Engine"]
+    B --> C["Features / Labels"]
+    C --> D["Models / Strategies"]
+    D --> E["Backtest / Risk"]
+    E --> F["Reports / ExperimentMemory"]
+    F --> G["Memory + RAG"]
+    G --> H["Agent Layer"]
+    H --> I["Research / Explanation"]
+```
+
+</details>
+
+Details: [docs/architecture.md](docs/architecture.md) · [docs/index.md](docs/index.md)
+
+---
+
+## 项目亮点 / Features
+
+| Layer | English | 中文 |
+|-------|---------|------|
+| **Quant Engine** | Parquet storage, OHLCV validation, features, MA Cross / ML strategies, backtest, risk, metrics | 数据、特征、策略、回测、风控、绩效 |
+| **ML** | LightGBM direction model, MLSignalStrategy, **walk-forward OOS** evaluation | 方向模型、ML 信号策略、样本外 walk-forward |
+| **MAS Agent** | `ToolRegistry`, **SupervisorAgent** (rule routing), **ReportAgent**, **ResearchAgent** | 工具注册、监督路由、报告与研究智能体 |
+| **Memory / RAG** | JSON & SQLite experiment memory, hybrid retrieval, index/query CLI | 实验记忆、混合检索、文档索引 |
+| **LangGraph** | Optional 6-node ResearchWorkflow DAG + sequential fallback | 可选工作流编排（`[orchestration]` extra） |
+| **Context / LLM** | ContextBuilder, OpenAI-compatible client (default **Mock** in tests) | 上下文工程；pytest 默认 Mock |
+| **Text Signals** | Mock / FinBERT / LoRA **skeleton**, merge into feature tables (M6) | 文本情绪特征骨架，不替代 LightGBM |
+| **Research Protocol** | Baseline registry, `compare_experiments.py`, OOS metric discipline | 实验基线对比；论文主指标用 OOS |
+
+---
+
+## 快速开始 / Quick Start
 
 ```bash
 git clone https://github.com/ytq0198/Quant-MAS.git
@@ -41,15 +102,23 @@ python -m pytest -v
 python -c "import quant_mas; print('Quant MAS ready')"
 ```
 
-Current verified baseline: **161 tests passed**. Tests use synthetic data, mocks, and local files only.
+**Optional extras / 可选依赖**
 
-当前测试基线：**161 passed**。测试不依赖真实网络请求、不调用真实 LLM API、不下载大模型权重。
+```bash
+python -m pip install -r requirements-data.txt    # market data fetchers
+python -m pip install -r requirements-ml.txt      # LightGBM
+python -m pip install -e ".[orchestration]"       # LangGraph workflow
+python -m pip install -e ".[llm]"                 # HTTP LLM client
+python -m pip install -e ".[text]"                # FinBERT / LoRA (server manual)
+```
+
+**Verified baseline / 已验证基线**：**161 passed** · tests use synthetic data, mocks, and local files only（不联网、不调真实 LLM、不下载 HF 权重）。
 
 ---
 
-## CLI Examples
+## 运行示例 / CLI Examples
 
-### Build features and run a local pipeline
+### End-to-end pipeline / 端到端 pipeline
 
 ```bash
 python scripts/run_pipeline.py \
@@ -61,7 +130,7 @@ python scripts/run_pipeline.py \
   --experiment-name local_ma_cross_demo
 ```
 
-### Train a direction model
+### Train LightGBM / 训练方向模型
 
 ```bash
 python scripts/train_model.py \
@@ -70,7 +139,7 @@ python scripts/train_model.py \
   --experiment-name local_lgbm_demo
 ```
 
-### Run ML signal backtest
+### ML signal backtest / ML 信号回测
 
 ```bash
 python scripts/run_ml_backtest.py \
@@ -79,14 +148,31 @@ python scripts/run_ml_backtest.py \
   --experiment-name local_ml_backtest_demo
 ```
 
-### Run ResearchAgent without real LLM
+### Walk-forward OOS / 样本外 walk-forward
+
+```bash
+python scripts/run_walk_forward.py \
+  --config configs/walk_forward.yaml \
+  --storage-config configs/storage.yaml \
+  --experiment-name local_walk_forward_demo
+```
+
+### SupervisorAgent (rule routing) / 规则路由
+
+```bash
+python scripts/run_agent.py \
+  --task "summarize this dataset" \
+  --data-path data/features/features.parquet
+```
+
+### ResearchAgent (mock-safe) / 研究解释（默认 Mock）
 
 ```bash
 python scripts/run_research_agent.py \
   --task "Summarize OOS baseline vs latest ML run"
 ```
 
-### Generate mock text signals
+### Mock text signals / 文本信号（mock）
 
 ```bash
 python scripts/train_text_model.py \
@@ -95,9 +181,44 @@ python scripts/train_text_model.py \
   --dry-run
 ```
 
+### Compare experiments / 实验对比
+
+```bash
+python scripts/compare_experiments.py \
+  --storage-config configs/storage.yaml \
+  --output-dir outputs/research
+```
+
 ---
 
-## SupervisorAgent Example
+## Agent 工作流 / Agent Workflow
+
+Quant MAS uses **real, implemented** agents — not a separate broker layer.
+
+当前已实现的两条 Agent 路径：
+
+**1. SupervisorAgent + Quant Tools（规则路由）**
+
+```
+User task → SupervisorAgent → ToolRegistry → one of 7 tools
+  (data_summary | backtest | train_model | report | risk_check | ml_backtest | pipeline)
+```
+
+**2. ResearchWorkflow DAG（Plus M4，optional LangGraph）**
+
+```
+download → features → train → ml_backtest → risk → report
+  (sequential fallback always available; LangGraph optional)
+```
+
+**3. ResearchAgent（Plus M5，解释层）**
+
+```
+Memory/RAG + metrics → ContextBuilder → ResearchAgent → hypotheses & narrative
+  (does NOT modify metrics or place orders)
+```
+
+Python snippet / 代码示例：
 
 ```python
 from quant_mas.agents import SupervisorAgent
@@ -110,120 +231,128 @@ result = agent.run(
     "summarize this dataset",
     data_path="data/features/features.parquet",
 )
-
 print(result.content)
 ```
 
-The current SupervisorAgent uses deterministic rule routing. It does not call a real LLM and does not place trades.
+---
 
-当前 SupervisorAgent 使用规则路由，不调用真实 LLM，也不会下单。
+## 实验结果摘要 / Experiment Results
+
+| Item | Value | Notes |
+|------|-------|-------|
+| **pytest** | **161 passed** | Local + server (EXP-019/020) |
+| **OOS baseline** | **sharpe 0.586** | EXP-20260602-008, 19 walk-forward windows |
+| Single-segment ML backtest | sharpe 2.78 | ⚠️ in-sample — **not** paper metric |
+| GPU LightGBM | verified on server | CUDA path documented in `docs/server_commands.md` |
+
+**Research rule / 科研规则**：paper-level conclusions must use **walk-forward OOS** metrics and compare via `compare_experiments.py`. See [docs/research_protocol.md](docs/research_protocol.md).
 
 ---
 
-## Features
-
-| Layer | English | 中文 |
-|---|---|---|
-| Quant Engine | Data storage, features, strategies, backtesting, metrics, risk checks, ML training | 数据、特征、策略、回测、绩效、风控、模型训练 |
-| MAS Agent | Tool registry, SupervisorAgent, ReportAgent, ResearchAgent | 工具注册、监督智能体、报告智能体、研究智能体 |
-| Memory/RAG | JSON and SQLite experiment memory, trade memory stub, keyword/vector/hybrid retrieval | 实验记忆、交易记忆雏形、关键词/向量/混合检索 |
-| LangGraph | Optional workflow backend with sequential fallback | 可选工作流编排，保留轻量顺序执行 |
-| ML | LightGBM/XGBoost-ready direction modeling, MLSignalStrategy, walk-forward OOS evaluation | 方向模型、机器学习信号策略、样本外 walk-forward |
-| Text Signals | Mock/FinBERT/LoRA skeleton, text signal merge into feature tables | 文本情绪信号、FinBERT/LoRA 骨架、文本特征融合 |
-| Research Protocol | Baseline registry, experiment comparison, OOS metric discipline | 研究基线、实验对比、论文主指标使用 OOS |
-
----
-
-## Architecture
-
-![Quant MAS architecture — Quant Engine, Agent Layer, Memory/RAG, and research workflow](architecture.png)
-
-<details>
-<summary>Mermaid diagram (click to expand)</summary>
-
-```mermaid
-flowchart LR
-    A["Data Sources"] --> B["Quant Engine"]
-    B --> C["Features / Labels"]
-    C --> D["Models / Strategies"]
-    D --> E["Backtest / Risk"]
-    E --> F["Reports / ExperimentMemory"]
-    F --> G["Memory + RAG"]
-    G --> H["Agent Layer"]
-    H --> I["Research / Planning / Explanation"]
-```
-
-</details>
-
-Read more: [docs/architecture.md](docs/architecture.md) and [docs/index.md](docs/index.md).
-
----
-
-## Resume Usage
+## 简历写法参考 / Resume Usage
 
 **English**
 
-> Built Quant MAS, a Python 3.11 multi-agent quantitative research platform with deterministic data/feature/model/backtest/risk pipelines, LightGBM-based ML signal experiments, walk-forward OOS evaluation, experiment memory, RAG retrieval, optional LangGraph orchestration, and mock-safe LLM research agents. Maintained 161 passing pytest cases and strict safeguards preventing LLM agents from direct live trading.
+> Built **Quant MAS**, a Python 3.11 multi-agent quantitative research platform with deterministic data/feature/model/backtest/risk pipelines, LightGBM ML signals, walk-forward OOS evaluation (baseline sharpe 0.586), experiment memory & hybrid RAG, optional LangGraph workflow, text-signal skeleton, and mock-safe LLM ResearchAgent. Maintained **161 passing pytest** cases with strict safeguards preventing LLM agents from direct live trading.
 
 **中文**
 
-> 开发 Quant MAS 多智能体量化研究平台，基于 Python 3.11 实现数据、特征、模型、策略、回测、风控和报告的确定性量化闭环；支持 LightGBM 方向模型、MLSignalStrategy、Walk-forward 样本外评估、ExperimentMemory、Memory/RAG、可选 LangGraph 编排和 Mock-safe LLM ResearchAgent；维护 161 项 pytest 通过，并明确限制 LLM Agent 不直接参与实盘下单。
+> 基于 Python 3.11 构建 **Quant MAS** 多智能体量化研究平台，完成数据获取、特征工程、LightGBM 训练、Walk-forward 样本外评估、风控工具、SupervisorAgent 工具编排、ExperimentMemory 与 RAG 检索、可选 LangGraph 工作流及文本信号模块；维护 **161 项 pytest** 通过，明确 LLM Agent 不直接参与实盘下单。
+
+---
+
+## 项目结构 / Project Structure
+
+```text
+Quant-MAS/
+├── src/quant_mas/          # core package
+│   ├── data/               # storage, fetchers, validation
+│   ├── features/           # technical, labels, text_signals
+│   ├── models/               # LightGBM direction model
+│   ├── strategies/           # ma_cross, ml_signal
+│   ├── backtest/             # engine, walk_forward, metrics
+│   ├── risk/                 # limits, drawdown guard
+│   ├── agents/               # supervisor, report, research
+│   ├── tools/                # 7 quant tools
+│   ├── memory/               # experiment + sqlite stores
+│   ├── rag/                  # retriever, vector store
+│   ├── context/              # ContextBuilder (M5)
+│   ├── text/                 # text signals (M6)
+│   ├── orchestration/        # LangGraph workflow (M4)
+│   └── research/             # baseline registry (M1)
+├── scripts/                  # CLI entrypoints
+├── configs/                  # YAML configs
+├── tests/                    # 161 pytest cases
+├── docs/                     # architecture, progress, experiment log
+├── architecture.png          # architecture diagram
+├── CONTRIBUTING.md
+├── LICENSE
+└── README.md
+```
+
+---
+
+## 文档 / Documentation
+
+| Doc | Description |
+|-----|-------------|
+| [docs/index.md](docs/index.md) | Documentation hub (bilingual) |
+| [docs/progress.md](docs/progress.md) | M1–M8 progress & pytest status |
+| [docs/experiment_log.md](docs/experiment_log.md) | Verified experiments |
+| [docs/research_protocol.md](docs/research_protocol.md) | OOS metric rules |
+| [docs/server_commands.md](docs/server_commands.md) | Server deployment |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | How to contribute |
 
 ---
 
 ## Roadmap
 
-- [x] Project skeleton, pytest, configs, docs
-- [x] Parquet storage and data catalog
-- [x] OHLCV validation and market data fetchers
-- [x] Technical features, labels, strategy, backtest, risk
-- [x] Experiment memory and backtest reports
-- [x] LightGBM direction model and ML backtest
-- [x] Lightweight Agent Core and SupervisorAgent
+- [x] Quant Engine MVP — data, features, backtest, risk, reports
+- [x] LightGBM training & ML signal backtest
 - [x] Walk-forward OOS evaluation
-- [x] Memory/RAG v2 with JSON, SQLite, vector store skeleton
-- [x] Context engineering and optional OpenAI-compatible LLM client
-- [x] Text signal layer with mock/FinBERT/LoRA skeleton
-- [ ] Plus **M7** RL/GRPO simulation skeleton
-- [ ] Plus **M8** MCP/A2A protocol adapters
-- [ ] Stronger ResearchAgent workflows and report templates
-- [ ] More robust real-data experiments and ablation studies
-- [ ] Optional production-grade deployment docs
+- [x] SupervisorAgent + 7 Quant Tools
+- [x] Memory / RAG v2 (JSON, SQLite, hybrid retrieval)
+- [x] LangGraph ResearchWorkflow (optional)
+- [x] Context engineering + optional LLM (M5)
+- [x] Text signal layer — mock / FinBERT / LoRA skeleton (M6)
+- [ ] **M7** RL / GRPO simulation skeleton
+- [ ] **M8** MCP / A2A protocol adapters
+- [ ] FinBERT server smoke + text-enhanced walk-forward ablation
+- [ ] Optional paper-trading sandbox (simulation only)
 
 ---
 
-## Documentation
+## 贡献指南 / Contributing
 
-- [Documentation Index](docs/index.md)
-- [Architecture](docs/architecture.md)
-- [Progress](docs/progress.md)
-- [Experiment Log](docs/experiment_log.md)
-- [Research Protocol](docs/research_protocol.md)
-- [Server Commands](docs/server_commands.md)
-- [Text Model Plan](docs/text_model_plan.md)
-- [Repo Polish Checklist](docs/repo_polish_checklist.md)
+1. **Fork** and clone the repository  
+2. `python -m pip install -e .` and run `python -m pytest -v`  
+3. Add Tool / Agent / Fetcher / Strategy with tests (mock/synthetic only)  
+4. Open an **Issue** or **Pull Request**
 
----
-
-## Contributing
-
-Issues, pull requests, experiment reports, and good-first-issue ideas are welcome.<br>
-欢迎 Star / Fork / Issue / PR，也欢迎把它作为课程项目、科研项目或实习作品集继续扩展。
-
-Start here: [CONTRIBUTING.md](CONTRIBUTING.md)
-
-Contact: **3240101782@zju.edu.cn**
+**Do not commit** real API keys, datasets, or model weights. See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ---
 
 ## License
 
-MIT License. See [LICENSE](LICENSE).
+[MIT License](LICENSE)
 
 ---
 
-## Disclaimer
+## 免责声明 / Disclaimer
 
-Quant MAS is for **research and education only**. It is not financial advice, investment advice, or a recommendation to buy or sell any asset. Backtest results and model outputs are experimental and may be wrong, incomplete, or overfit.
+This project is for **research and education only**. It is not financial advice and must not be used for live trading without independent validation, risk review, and human approval.
 
-Quant MAS 仅用于科研和教育目的，不构成任何投资建议、交易建议或收益承诺。任何策略、模型、回测结果都必须经过独立验证、风控审计和人工确认。
+本项目仅用于科研和教育，不构成投资建议或收益承诺。回测与模型结果可能错误、不完整或过拟合。
+
+---
+
+## 社交 & 联系方式 / Contact & Social
+
+**Repository**: https://github.com/ytq0198/Quant-MAS
+
+欢迎 **Star / Fork / Issue / PR** — feedback from students and researchers is welcome!
+
+**Email**: [3240101782@zju.edu.cn](mailto:3240101782@zju.edu.cn)
+
+If this project helps your portfolio or coursework, a ⭐ on GitHub is appreciated.
