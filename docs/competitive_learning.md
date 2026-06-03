@@ -14,6 +14,7 @@ trading and not for replacing walk-forward OOS evidence.
 | M7 RL simulation | Single policy in `TradingEnv` | Implemented |
 | M11 population | Multiple `StrategyAgent` instances, RiskAgent, Elo, Top-K | Implemented, mock-first |
 | M11.5 training loop | Multi-generation Top-K + mutation | Implemented — see [population_training.md](population_training.md) |
+| M11.6 candidate bridge | Top-K → StrategyCandidate → backtest smoke | Implemented — see [strategy_candidate_bridge.md](strategy_candidate_bridge.md) |
 | M12 RL training | GRPO/PPO/MARL on `TradingEnv` | Planned |
 
 Each agent runs a shadow episode on the same synthetic market window. The runner

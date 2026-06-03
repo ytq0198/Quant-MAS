@@ -1,0 +1,19 @@
+candidate_validation:
+  top_k: 2
+  output_dir: outputs/candidates
+  run_backtest_smoke: true
+  run_walk_forward: false
+
+population:
+  config: configs/population_training.yaml
+
+experiment:
+  name: strategy_candidate_validation_mock_001
+  family: strategy_candidate_validation
+
+memory:
+  json_path: outputs/reports/experiments.json
+
+baseline:
+  oos_reference: EXP-20260602-008
+  oos_sharpe: 0.586

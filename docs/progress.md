@@ -1,10 +1,10 @@
 # Quant MAS 开发进度
 
-更新时间：2026-06-03（**v3 M11/M11.5 ✅** 双端 **237 passed** · EXP-POP-003）
+更新时间：2026-06-03（**v3 M11.6 ✅** 本地 **248 passed** · EXP-031）
 
-**Plus v2**：M1–M8 ✅ · **v3 M9–M11.5** ✅ 本地+服务器
+**Plus v2**：M1–M8 ✅ · **v3 M9–M11.6** ✅ 本地（M11–M11.5 双端 237）
 
-**pytest 基线**：**237 passed**（EXP-030 / EXP-POP-003）· **论文主指标**：Walk-forward OOS sharpe **0.586**
+**pytest 基线**：**248 passed** 本地（EXP-031）；M11.5 双端 **237**（EXP-030/POP-003）· **论文主指标**：Walk-forward OOS sharpe **0.586**
 
 ## Plus v2 八条主线（M1–M8）
 
@@ -33,6 +33,7 @@
 | **M10** | LLM 生产化 | ✅ | local_vllm；212 passed 本地+服务器 | [codex_prompt_M10.md](codex_prompt_M10.md) |
 | **M11** | 竞争学习 / 策略种群 | ✅ | competitive CLI；225 双端（EXP-POP-002） | [competitive_learning.md](competitive_learning.md) |
 | **M11.5** | 种群训练闭环 | ✅ | 237 双端（EXP-030/POP-003） | [population_training.md](population_training.md) |
+| **M11.6** | 候选验证桥 | ✅ | 248 本地（EXP-031）；bridge 11/11 | [strategy_candidate_bridge.md](strategy_candidate_bridge.md) |
 | **M12** | RL 训练实验 | 📋 | GRPO/PPO training loop | [rl_plan.md](rl_plan.md) |
 | **M13** | 企业化编排 | 📋 | DAG scheduler | [protocols.md](protocols.md) |
 
@@ -182,8 +183,8 @@ M1/M2 已完成；**M3 本地 ✅**（见下两节）；下一步 **M4**。
 
 | 环境 | Python | 结果 | 日期 | 实验 |
 |------|--------|------|------|------|
-| 本地 Windows | 3.11+ | **237 passed** | 2026-06-03 | EXP-20260602-030 |
-| 服务器 a6000-9961 | 3.11.15 | **237 passed** | 2026-06-03 | EXP-POP-003 @ `aa841d4` |
+| 本地 Windows | 3.11+ | **248 passed** | 2026-06-03 | EXP-20260602-031 |
+| 服务器 a6000-9961 | 3.11.15 | **237 passed** | 2026-06-03 | EXP-POP-003 @ `aa841d4`（M11.6 待 **EXP-POP-004**） |
 
 命令：`python -m pytest -v`（勿裸敲 `pytest` / `pip`）。
 
@@ -205,6 +206,7 @@ python scripts/query_memory.py --help
 python scripts/run_rl_baseline.py --help
 python scripts/run_competitive_experiment.py --help
 python scripts/run_population_training.py --help
+python scripts/export_population_candidates.py --help
 python scripts/export_agent_cards.py --help
 ```
 

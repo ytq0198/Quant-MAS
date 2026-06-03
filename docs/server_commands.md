@@ -10,6 +10,7 @@ GitHub 仓库：[https://github.com/ytq0198/Quant-MAS](https://github.com/ytq019
 
 | 日期 | 项目 | 结果 | 备注 |
 |------|------|------|------|
+| 2026-06-03 | v3 M11.6 候选验证桥（本地） | **248 passed**；bridge **11/11** ✅ | EXP-20260602-031 |
 | 2026-06-03 | v3 M11.5 服务器 pytest + population training | **237 passed**（41.83s）+ 3-gen dry-run ✅ | EXP-POP-003 @ `aa841d4` |
 | 2026-06-03 | v3 M11 服务器 pytest + competitive mock | **225 passed**（17.32s）+ dry-run ✅ | EXP-POP-002 @ `64a5b2a` |
 | 2026-06-03 | v3 M10 local_vLLM smoke | ResearchAgent `local_vllm` ✅ | EXP-LLM-002 |
@@ -784,6 +785,42 @@ python scripts/run_population_training.py \
 - 记录：**EXP-20260602-030** 本地 237；**EXP-POP-003** ✅ 服务器 **237 passed**（41.83s）+ training dry-run（2026-06-03 @ `aa841d4`）
 
 详见 [`docs/population_training.md`](population_training.md)。
+
+## 六点十六、v3 M11.6 候选验证桥（EXP-031 / EXP-POP-004）📋
+
+### 6.16.1 拉代码 + pytest
+
+```bash
+cd /mnt/localDisk3/weizian/Quant-MAS
+git fetch origin main
+git merge --ff-only origin/main   # 目标：含 M11.6，248 pytest
+
+conda activate /mnt/localDisk3/weizian/conda_envs/quant-mas
+python -m pip install -e .
+python -m pytest tests/test_strategy_candidate_bridge.py -v   # 11 passed
+python -m pytest -v                                             # 预期 248 passed
+```
+
+### 6.16.2 export candidates + backtest smoke dry-run
+
+```bash
+python scripts/export_population_candidates.py --help
+
+python scripts/export_population_candidates.py \
+  --population-config configs/population_training.yaml \
+  --top-k 2 \
+  --run-backtest-smoke \
+  --dry-run
+```
+
+**说明**：
+
+- `--dry-run` 仅 stdout，不写 ExperimentMemory / artifacts
+- 指标为 `population.*` / `simulation.*` / `backtest.*`；**不得**写或混比 `oos.*`（论文主指标 **0.586**）
+- `--run-walk-forward` 第一版为 stub，不产出 OOS 数字
+- 记录：**EXP-20260602-031** 本地 248；**EXP-POP-004** 服务器待做
+
+详见 [`docs/strategy_candidate_bridge.md`](strategy_candidate_bridge.md)。
 
 ## 七、删除旧部署（如曾在 ~/quant-mas 建过）
 

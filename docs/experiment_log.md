@@ -1,6 +1,6 @@
 # Quant MAS 实验记录
 
-更新时间：2026-06-03（v3 M11/M11.5 ✅ **237 passed 双端** · EXP-POP-003）
+更新时间：2026-06-03（v3 M11.6 ✅ **248 passed 本地** · EXP-031）
 
 本文件用于记录真实实验和重要验证。不要记录未经实际运行的数据结果；尚未真实运行的项目标记为「待验证」。
 
@@ -178,6 +178,27 @@
 
 ## 当前验证记录
 
+### EXP-20260602-031：v3 M11.6 StrategyCandidate 候选验证桥本地验证 ✅
+
+- 日期：2026-06-03
+- 阶段：**M11.6** — Population Top-K → `StrategyCandidate` → Quant Engine backtest smoke
+- 环境：本地
+- 交付：
+  - `research/strategy_candidate.py` — `StrategyCandidate`、`assert_no_oos_metrics`（严格拒绝 `oos.*`）
+  - `rl/candidate_bridge.py` — `extract_top_candidates`、`write_candidates`、`run_candidate_backtest_smoke`、`walk_forward_stub`
+  - `scripts/export_population_candidates.py`、`configs/candidate_validation.yaml`
+  - `docs/strategy_candidate_bridge.md`、`tests/test_strategy_candidate_bridge.py` — **11** 项
+- 命令与结果：
+  - `python -m pytest tests/test_strategy_candidate_bridge.py -v` → **11 passed**
+  - `python -m pytest tests/test_population_training_loop.py tests/test_population_training.py -v` → **25 passed**
+  - `python scripts/export_population_candidates.py --help` → 正常
+  - `python scripts/export_population_candidates.py --population-config configs/population_training.yaml --top-k 2 --run-backtest-smoke --dry-run` → 正常
+  - 全量 `python -m pytest -v` → **248 passed**（237→248，+11）
+- 边界：无 broker / LLM / 网络 / 真实 walk-forward OOS；不写 `oos.*`；`backtest.*` 仅为 synthetic smoke
+- 链路：`M11 竞争评估 → M11.5 多代训练 → M11.6 Top-K 导出 + backtest smoke → 后续真实 Walk-forward OOS`
+- 问题：无
+- 下一步：服务器 **EXP-POP-004**；M12 RL 训练；EXP-TEXT-WF-002
+
 ### EXP-POP-003：v3 M11.5 服务器 pytest + population training dry-run ✅
 
 - 日期：2026-06-03
@@ -191,7 +212,7 @@
     - `best_agent`: `mean_rev_1`；Elo 平局 **1500**（mock draw）；`simulation.sharpe_mean` ≈ **7.15**（**≠** OOS **0.586**）
     - 无 `oos.*`；无 memory/artifacts
 - 问题：无
-- 下一步：M12 RL 训练 loop；EXP-TEXT-WF-002
+- 下一步：~~M11.6 候选桥~~ ✅ EXP-031；服务器 EXP-POP-004；M12 RL 训练；EXP-TEXT-WF-002
 
 ### EXP-20260602-030：v3 M11.5 种群训练闭环本地验证 ✅
 
@@ -1047,6 +1068,7 @@
 | EXP-20260602-009 | 2026-06-02 | Plus M1 研究基线本地 | **102 passed**（+4 测试） |
 | EXP-20260602-010 | 2026-06-02 | Plus M1 服务器 pytest + 比较表 | **102 passed**；OOS sharpe 0.586 |
 | EXP-20260602-011 | 2026-06-02 | Plus M2 数据扩展本地 | **115 passed**（+13） |
+| EXP-20260602-031 | 2026-06-03 | v3 M11.6 候选验证桥 | **248 passed**（+11）；bridge **11/11** |
 | EXP-POP-003 | 2026-06-03 | v3 M11.5 服务器 | **237 passed**（41.83s）+ training dry-run @ `aa841d4` |
 | EXP-20260602-030 | 2026-06-03 | v3 M11.5 种群训练闭环 | **237 passed**（+12）；loop **12/12** |
 | EXP-POP-002 | 2026-06-03 | v3 M11 服务器 | **225 passed**（17.32s）+ competitive dry-run @ `64a5b2a` |

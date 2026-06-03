@@ -7,6 +7,12 @@ from quant_mas.rl.baseline_policy import (
     RandomPolicy,
     build_policy,
 )
+from quant_mas.rl.candidate_bridge import (
+    extract_top_candidates,
+    run_candidate_backtest_smoke,
+    walk_forward_stub,
+    write_candidates,
+)
 from quant_mas.rl.env_schema import RewardConfig, StepResult, TradingEnvConfig
 from quant_mas.rl.competitive_runner import CompetitiveEpisodeRunner, CompetitiveRunConfig
 from quant_mas.rl.elo_rating import expected_score, update_elo, update_pair
@@ -44,9 +50,13 @@ __all__ = [
     "build_synthetic_ohlcv",
     "compute_episode_metrics",
     "compute_step_reward",
+    "extract_top_candidates",
     "expected_score",
     "rank_candidates_by_group_relative_reward",
+    "run_candidate_backtest_smoke",
     "summarize_grpo_ranking",
     "update_elo",
     "update_pair",
+    "walk_forward_stub",
+    "write_candidates",
 ]
