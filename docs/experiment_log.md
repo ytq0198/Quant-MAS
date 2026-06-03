@@ -1,6 +1,6 @@
 # Quant MAS 实验记录
 
-更新时间：2026-06-03（Plus M5 本地 EXP-20260602-017）
+更新时间：2026-06-03（Plus M5 服务器 EXP-20260602-018 / EXP-LLM-001）
 
 本文件用于记录真实实验和重要验证。不要记录未经实际运行的数据结果；尚未真实运行的项目标记为「待验证」。
 
@@ -89,6 +89,39 @@
 
 ## 当前验证记录
 
+### EXP-LLM-001：DeepSeek 云端 ResearchAgent smoke ✅
+
+- 日期：2026-06-03
+- 阶段：Plus v2 **M5**（服务器真实 LLM，非 pytest）
+- 环境：a6000-9961，`LLM_PROVIDER=openai_compatible`，DeepSeek API（**key 不入库**）
+- 命令：
+  ```bash
+  python scripts/run_research_agent.py \
+    --storage-config configs/storage.server.yaml \
+    --json-path /mnt/localDisk3/weizian/reports/experiments.json \
+    --task "Explain walk-forward OOS sharpe baseline and compare to latest ML run" \
+    --use-llm
+  ```
+- 结果摘要：
+  - `"llm_provider": "openai_compatible"`（非 mock）
+  - `baseline` → `server_walk_forward_001`，**oos.sharpe = 0.585673**（≈ EXP-20260602-008 **0.586**）
+  - RAG 命中 `experiment_log.md` 等；LLM 正确指出：上下文中**无**更新 ML run metrics，不得对 in-sample sharpe 2.78 下 OOS 结论
+  - 建议实验含 walk-forward 对比、显著性检验、分段分析（LLM 叙事，**非**引擎 metrics）
+- 问题：无
+- 下一步：**M6** 文本信号；可选 `generate_report.py --latest --use-llm`
+
+### EXP-20260602-018：Plus M5 服务器 pytest + DeepSeek 路径 ✅
+
+- 日期：2026-06-03
+- 阶段：Plus v2 **M5**（服务器）
+- 环境：a6000-9961，conda `/mnt/localDisk3/weizian/conda_envs/quant-mas`，git **`43c812a`**（M-017 pytest 隔离修复）
+- 命令与结果：
+  - `python -m pip install -e ".[llm]"`
+  - `python -m pytest -v` → **150 passed** in **7.24s**（服务器 `.env` 含 `LLM_API_KEY` 时亦全绿）
+  - DeepSeek smoke → 见 **EXP-LLM-001**
+- 问题：首次有 `.env` 时 `test_resolve_llm_client_defaults_to_mock` 失败（M-017，已修复）
+- 下一步：**M6** 金融文本模型
+
 ### EXP-20260602-017：Plus M5 上下文/LLM 本地验证 ✅
 
 - 日期：2026-06-03
@@ -109,7 +142,7 @@
   - `generate_report.py --help` / `--latest` 行为保持
   - Supervisor **未替换**；metrics 不被 LLM 覆盖
 - 问题：无
-- 下一步：push → 服务器 pytest → 可选 EXP-LLM-001（真实 LLM smoke）
+- 下一步：~~服务器~~ ✅ EXP-018 / EXP-LLM-001 → **M6**
 
 ### EXP-20260602-016：Plus M4 服务器 LangGraph 验收 ✅
 
@@ -595,6 +628,8 @@
 | EXP-20260602-009 | 2026-06-02 | Plus M1 研究基线本地 | **102 passed**（+4 测试） |
 | EXP-20260602-010 | 2026-06-02 | Plus M1 服务器 pytest + 比较表 | **102 passed**；OOS sharpe 0.586 |
 | EXP-20260602-011 | 2026-06-02 | Plus M2 数据扩展本地 | **115 passed**（+13） |
+| EXP-LLM-001 | 2026-06-03 | DeepSeek ResearchAgent smoke | openai_compatible；OOS sharpe **0.586** |
+| EXP-20260602-018 | 2026-06-03 | Plus M5 服务器 pytest | **150 passed**（7.24s） |
 | EXP-20260602-017 | 2026-06-03 | Plus M5 上下文/LLM 本地 | **150+1 warning**（+12） |
 | EXP-20260602-016 | 2026-06-03 | Plus M4 服务器 langgraph backend | langgraph dry-run ✅；commit `c0fa5e3` |
 | EXP-20260602-015 | 2026-06-02 | Plus M4 LangGraph 本地 | **137+1 skip**（138 项；+11 workflow 测试） |

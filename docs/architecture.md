@@ -149,7 +149,7 @@ collect_experiment_metrics → BaselineRegistry / comparison table
 
 ## 测试与部署
 
-- **pytest**：本地 **150 passed, 1 warning**（EXP-20260602-017）；服务器 M5 待 pull
+- **pytest**：本地 **150 passed, 1 warning**（EXP-20260602-017）；服务器 **150 passed**（EXP-20260602-018）
 - **服务器**：`/mnt/localDisk3/weizian/Quant-MAS`，conda `quant-mas`，Python 3.11.15
 - **GitHub**：https://github.com/ytq0198/Quant-MAS
 
@@ -161,7 +161,7 @@ collect_experiment_metrics → BaselineRegistry / comparison table
 | **M2** 数据扩展 | 多数据源 fetcher + registry | ✅ EXP-20260602-011/012，EXP-DATA-001 |
 | **M3** Memory/RAG v2 | SQLite / 向量 / HybridRetriever | ✅ 本地（EXP-20260602-013） |
 | **M4** LangGraph | ResearchWorkflow DAG | ✅ EXP-20260602-015/016 |
-| **M5** 上下文/LLM | ContextBuilder、ResearchAgent | ✅ 本地（EXP-20260602-017） |
+| **M5** 上下文/LLM | ContextBuilder、ResearchAgent | ✅ 本地+服务器（EXP-017/018，EXP-LLM-001） |
 | **M6** 文本大模型 | FinBERT/LoRA 骨架 | 📋 待做 |
 
 详见 [项目plus设计.md](../项目plus设计.md)。

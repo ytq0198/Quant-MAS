@@ -10,6 +10,7 @@ GitHub 仓库：[https://github.com/ytq0198/Quant-MAS](https://github.com/ytq019
 
 | 日期 | 项目 | 结果 | 备注 |
 |------|------|------|------|
+| 2026-06-03 | Plus M5 上下文/LLM（服务器） | **150 passed**（7.24s） | EXP-20260602-018 |
 | 2026-06-03 | Plus M5 上下文/LLM（本地） | **150+1 warning** | EXP-20260602-017 |
 | 2026-06-03 | Plus M4 LangGraph 服务器 | langgraph dry-run ✅ | EXP-20260602-016 |
 | 2026-06-02 | Plus M3 Memory/RAG v2（本地+服务器） | **126 passed** | EXP-20260602-013/014 |
@@ -420,25 +421,30 @@ python scripts/run_langgraph_workflow.py --dry-run --backend langgraph
 
 记录：**EXP-20260602-016**（2026-06-03，a6000-9961 @ `c0fa5e3`）。首次 M4 pull 若 langgraph backend 报 `zip() argument 2 is shorter`，见 [`mistakes.md`](../mistakes.md) **M-016**。
 
-## 六点八、Plus M5 上下文/LLM（EXP-20260602-017/018）
+## 六点八、Plus M5 上下文/LLM（EXP-20260602-017/018 / EXP-LLM-001）
 
 ```bash
 cd /mnt/localDisk3/weizian/Quant-MAS
-git pull origin main
+git pull origin main   # 须含 43c812a（M-017 pytest 隔离）
 conda activate /mnt/localDisk3/weizian/conda_envs/quant-mas
 python -m pip install -e .
+python -m pip install -e ".[llm]"
 
-python -m pytest tests/test_context_engineering.py -v   # 预期 12 passed, 1 warning
+python -m pytest tests/test_context_engineering.py -v   # 12 passed, 1 warning
 python scripts/run_research_agent.py --help
 python scripts/run_research_agent.py --task "Summarize OOS baseline vs latest ML run"
-python -m pytest -v   # 预期 150 passed, 1 warning
+python -m pytest -v   # 150 passed（EXP-018：7.24s，含 .env LLM_API_KEY）
 
-# 可选真实 LLM（有 key 时，不写入 pytest）：
-# python -m pip install -e ".[llm]"
-# python scripts/run_research_agent.py --task "Explain walk-forward OOS baseline" --use-llm
+# 真实 LLM smoke（DeepSeek，key 在 repo 根 .env，不入库）：
+python scripts/run_research_agent.py \
+  --storage-config configs/storage.server.yaml \
+  --json-path /mnt/localDisk3/weizian/reports/experiments.json \
+  --task "Explain walk-forward OOS sharpe baseline and compare to latest ML run" \
+  --use-llm
+# → EXP-LLM-001：llm_provider=openai_compatible，baseline oos.sharpe ≈ 0.586
 ```
 
-详见 [`docs/context_engineering.md`](context_engineering.md)。
+记录：**EXP-20260602-018**（2026-06-03，a6000-9961 @ `43c812a`）；**EXP-LLM-001**（DeepSeek smoke）。`.env` 导致 mock 测试失败见 [`mistakes.md`](../mistakes.md) **M-017**。
 
 ## 七、删除旧部署（如曾在 ~/quant-mas 建过）
 

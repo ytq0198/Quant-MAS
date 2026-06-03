@@ -1,8 +1,8 @@
 # Quant MAS 开发进度
 
-更新时间：2026-06-03（Plus M4 服务器 ✅ EXP-20260602-016）
+更新时间：2026-06-03（Plus M5 本地+服务器 ✅ EXP-018 / EXP-LLM-001）
 
-**Plus v2**：**M1–M5 ✅**（M5 本地 **150+1 warning**，EXP-20260602-017）→ **M6**
+**Plus v2**：**M1–M5 ✅**（本地+服务器 **150 passed**，EXP-20260602-017/018；DeepSeek smoke EXP-LLM-001）→ **M6**
 
 第五～六阶段见 [项目plus设计.md](../项目plus设计.md)（M4 LangGraph / M7 模拟，非实盘）。
 
@@ -20,7 +20,7 @@
 | **Plus M2** | 数据扩展 | ✅ | EXP-20260602-011/012，EXP-DATA-001 |
 | **Plus M3** | Memory/RAG v2 | ✅ 本地 | EXP-20260602-013，**126 passed** |
 | **Plus M4** | LangGraph 编排 | ✅ | EXP-20260602-015/016 |
-| **Plus M5** | 上下文/LLM | ✅ 本地 | EXP-20260602-017 |
+| **Plus M5** | 上下文/LLM | ✅ | EXP-20260602-017/018，EXP-LLM-001，**150 passed** |
 | **Plus M6** | 文本大模型 | 📋 | 见 项目plus设计.md |
 | 第五～六阶段 | 编排 / RL 模拟 | 📋 | Plus M4 / M7 |
 
@@ -102,7 +102,7 @@ M1/M2 已完成；**M3 本地 ✅**（见下两节）；下一步 **M4**。
 |------|------|
 | 全量 pytest（本地） | ✅ **126 passed**（EXP-20260602-013） |
 | test_memory_rag（Prompt 20） | ✅ **11 passed**（未破坏） |
-| 全量 pytest（服务器） | 待 pull 验证 **126** |
+| 全量 pytest（服务器） | ✅ **126 passed**（EXP-20260602-014） |
 | index/query CLI `--help` | ✅ |
 
 ## Prompt 任务状态
@@ -145,14 +145,15 @@ M1/M2 已完成；**M3 本地 ✅**（见下两节）；下一步 **M4**。
 | resolve_llm_client（默认 Mock） | ✅ |
 | test_context_engineering | ✅ 12 passed, 1 warning |
 | 全量 pytest（本地） | ✅ **150 passed, 1 warning** |
-| 服务器 | 📋 待 pull |
+| 全量 pytest（服务器） | ✅ **150 passed**（7.24s，EXP-018 @ `43c812a`） |
+| DeepSeek ResearchAgent smoke | ✅ EXP-LLM-001（openai_compatible） |
 
 ## 当前 pytest 状态
 
 | 环境 | Python | 结果 | 日期 | 实验 |
 |------|--------|------|------|------|
 | 本地 Windows | 3.11+ | **150 passed, 1 warning** | 2026-06-03 | EXP-20260602-017 |
-| 服务器 a6000-9961 | 3.11.15 | M4 langgraph ✅ | 2026-06-03 | M5 待 pull |
+| 服务器 a6000-9961 | 3.11.15 | **150 passed**（7.24s） | 2026-06-03 | EXP-20260602-018 |
 
 命令：`python -m pytest -v`（勿裸敲 `pytest` / `pip`）。
 

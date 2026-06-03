@@ -1,6 +1,6 @@
 # 上下文工程与 LLM 接入（Plus M5）
 
-更新时间：2026-06-03
+更新时间：2026-06-03（Plus M5 本地+服务器 ✅ EXP-018 / EXP-LLM-001）
 
 > 配置：`configs/context.yaml`、`configs/llm.yaml` · CLI：`scripts/run_research_agent.py`  
 > Codex 任务：[codex_prompt_M5.md](codex_prompt_M5.md)
@@ -108,7 +108,7 @@ python scripts/run_research_agent.py \
 成功时 JSON 中 `"llm_provider"` 应为 **`openai_compatible`**（不是 `mock`）。  
 `baseline: null` 通常是因为默认 `experiments.json` 路径不对；务必用 `--storage-config storage.server.yaml` 或 `--json-path` 指向服务器真实 memory。
 
-记录 **EXP-LLM-001**（输出摘要、latency；**不写 key**）。本地 vLLM 见 [项目plus设计.md §M5.5](../项目plus设计.md#m55服务器本地-vllm-进阶待定)。
+记录 **EXP-LLM-001** ✅（2026-06-03：openai_compatible，OOS sharpe **0.586**；**不写 key**）。本地 vLLM 见 [项目plus设计.md §M5.5](../项目plus设计.md#m55服务器本地-vllm-进阶待定)。
 
 ## 相关文档
 
