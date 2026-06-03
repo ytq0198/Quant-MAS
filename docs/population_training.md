@@ -110,3 +110,5 @@ python scripts/export_population_candidates.py \
 ```
 
 See [strategy_candidate_bridge.md](strategy_candidate_bridge.md) for the full M11.6 bridge (`StrategyCandidate`, `backtest.*`, walk-forward stub).
+
+Next step: [strategy_candidate_oos.md](strategy_candidate_oos.md) — M11.7 walk-forward OOS hook (writes `oos.*`).

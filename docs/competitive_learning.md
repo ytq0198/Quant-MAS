@@ -88,8 +88,10 @@ M11.5 adds the multi-generation loop; see [population_training.md](population_tr
 
 M11.6 exports Top-K winners to `StrategyCandidate` records and optional backtest smoke; see [strategy_candidate_bridge.md](strategy_candidate_bridge.md).
 
-Full chain (dual-end verified @ **248 pytest**, EXP-031/POP-004):
+Full chain (dual-end M11–M11.6 @ **248 pytest**; M11.7 mock OOS @ **259**):
 
 ```text
-M11 competitive eval → M11.5 population training → M11.6 candidate export + backtest smoke
+M11 competitive eval → M11.5 population training → M11.6 candidate export + backtest smoke → M11.7 walk-forward OOS
 ```
+
+M11.7 details: [strategy_candidate_oos.md](strategy_candidate_oos.md).

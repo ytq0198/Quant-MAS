@@ -1,6 +1,6 @@
 # Quant MAS 实验记录
 
-更新时间：2026-06-03（v3 M11.6 ✅ **248 passed 双端** · EXP-POP-004）
+更新时间：2026-06-03（v3 M11.7 ✅ **259 passed 本地** · EXP-032）
 
 本文件用于记录真实实验和重要验证。不要记录未经实际运行的数据结果；尚未真实运行的项目标记为「待验证」。
 
@@ -178,6 +178,26 @@
 
 ## 当前验证记录
 
+### EXP-20260602-032：v3 M11.7 StrategyCandidate Walk-forward OOS 本地验证 ✅
+
+- 日期：2026-06-03
+- 阶段：**M11.7** — 候选策略 walk-forward OOS hook（mock-first，synthetic features）
+- 环境：本地
+- 交付：
+  - `research/candidate_validation.py` — `CandidateStrategyAdapter`、`run_candidate_walk_forward`、`save_candidate_validation_report`
+  - `scripts/validate_candidate_oos.py`、`configs/candidate_oos.yaml`
+  - `docs/strategy_candidate_oos.md`、`tests/test_candidate_oos_validation.py` — **11** 项
+- 设计：复用 `build_walk_forward_windows` + `BacktestEngine`；**不修改** ML `walk_forward.py`
+- 命令与结果：
+  - `python -m pytest tests/test_candidate_oos_validation.py -v` → **11 passed**
+  - `python -m pytest tests/test_strategy_candidate_bridge.py tests/test_candidate_oos_validation.py -v` → **22 passed**
+  - `python scripts/validate_candidate_oos.py --help` → 正常
+  - 全量 `python -m pytest -v` → **259 passed**（248→259，+11）
+- 边界：M11.6 不写 `oos.*`；**M11.7 才允许** walk-forward 产出 `oos.*`；无 broker / LLM / 网络 / 模型训练；信号禁止 `future_*`
+- metrics 含 `summary.baseline_oos_sharpe`（0.586）、`summary.vs_baseline_sharpe`
+- 问题：无
+- 下一步：服务器 **EXP-POP-005** 真实 `features.parquet` candidate OOS vs **0.586**；M12 RL 训练
+
 ### EXP-POP-004：v3 M11.6 服务器 pytest + candidate export dry-run ✅
 
 - 日期：2026-06-03
@@ -213,7 +233,7 @@
 - 边界：无 broker / LLM / 网络 / 真实 walk-forward OOS；不写 `oos.*`；`backtest.*` 仅为 synthetic smoke
 - 链路：`M11 竞争评估 → M11.5 多代训练 → M11.6 Top-K 导出 + backtest smoke → 后续真实 Walk-forward OOS`
 - 问题：无
-- 下一步：~~服务器 EXP-POP-004~~ ✅；M12 RL 训练；EXP-TEXT-WF-002
+- 下一步：~~M11.7 walk-forward hook~~ ✅ EXP-032；服务器 **EXP-POP-005**；M12 RL 训练；EXP-TEXT-WF-002
 
 ### EXP-POP-003：v3 M11.5 服务器 pytest + population training dry-run ✅
 
@@ -1084,6 +1104,7 @@
 | EXP-20260602-009 | 2026-06-02 | Plus M1 研究基线本地 | **102 passed**（+4 测试） |
 | EXP-20260602-010 | 2026-06-02 | Plus M1 服务器 pytest + 比较表 | **102 passed**；OOS sharpe 0.586 |
 | EXP-20260602-011 | 2026-06-02 | Plus M2 数据扩展本地 | **115 passed**（+13） |
+| EXP-20260602-032 | 2026-06-03 | v3 M11.7 候选 Walk-forward OOS | **259 passed**（+11）；OOS **11/11** |
 | EXP-POP-004 | 2026-06-03 | v3 M11.6 服务器 | **248 passed**（55.15s）+ export dry-run @ `7ab510f` |
 | EXP-20260602-031 | 2026-06-03 | v3 M11.6 候选验证桥 | **248 passed**（+11）；bridge **11/11** |
 | EXP-POP-003 | 2026-06-03 | v3 M11.5 服务器 | **237 passed**（41.83s）+ training dry-run @ `aa841d4` |

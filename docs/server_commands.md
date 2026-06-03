@@ -10,6 +10,7 @@ GitHub 仓库：[https://github.com/ytq0198/Quant-MAS](https://github.com/ytq019
 
 | 日期 | 项目 | 结果 | 备注 |
 |------|------|------|------|
+| 2026-06-03 | v3 M11.7 候选 OOS hook（本地 mock） | **259 passed**；OOS **11/11** ✅ | EXP-20260602-032 |
 | 2026-06-03 | v3 M11.6 服务器 pytest + candidate export | **248 passed**（55.15s）+ dry-run ✅ | EXP-POP-004 @ `7ab510f` |
 | 2026-06-03 | v3 M11.6 候选验证桥（本地） | **248 passed**；bridge **11/11** ✅ | EXP-20260602-031 |
 | 2026-06-03 | v3 M11.5 服务器 pytest + population training | **237 passed**（41.83s）+ 3-gen dry-run ✅ | EXP-POP-003 @ `aa841d4` |
@@ -822,6 +823,62 @@ python scripts/export_population_candidates.py \
 - 记录：**EXP-20260602-031** 本地 248；**EXP-POP-004** ✅ 服务器 **248 passed**（55.15s，bridge 2.48s）+ export dry-run（2026-06-03 @ `7ab510f`）
 
 详见 [`docs/strategy_candidate_bridge.md`](strategy_candidate_bridge.md)。
+
+## 六点十七、v3 M11.7 候选 Walk-forward OOS（EXP-032 / EXP-POP-005）📋
+
+### 6.17.1 拉代码 + pytest
+
+```bash
+cd /mnt/localDisk3/weizian/Quant-MAS
+git fetch origin main
+git merge --ff-only origin/main   # 目标：含 M11.7，259 pytest
+
+conda activate /mnt/localDisk3/weizian/conda_envs/quant-mas
+python -m pip install -e .
+python -m pytest tests/test_candidate_oos_validation.py -v   # 11 passed
+python -m pytest -v                                             # 预期 259 passed
+```
+
+### 6.17.2 真实 features 上跑 candidate OOS
+
+先导出候选（M11.6）：
+
+```bash
+python scripts/export_population_candidates.py \
+  --population-config configs/population_training.yaml \
+  --top-k 2 \
+  --run-backtest-smoke \
+  --dry-run
+```
+
+再跑 walk-forward OOS（M11.7）：
+
+```bash
+python scripts/validate_candidate_oos.py --help
+
+python scripts/validate_candidate_oos.py \
+  --candidate-json outputs/candidates/candidates.json \
+  --candidate-id cand_mean_rev_1 \
+  --features-path data/features/features.parquet \
+  --config configs/candidate_oos.yaml \
+  --storage-config configs/storage.yaml \
+  --dry-run
+
+# 非 dry-run 写 artifacts + ExperimentMemory
+python scripts/validate_candidate_oos.py \
+  --candidate-json outputs/candidates/candidates.json \
+  --features-path data/features/features.parquet \
+  --config configs/candidate_oos.yaml \
+  --no-dry-run
+```
+
+**说明**：
+
+- **M11.7 是唯一**允许从候选链路写入 `oos.*` 的模块
+- 对比 baseline：**EXP-20260602-008**，`oos.sharpe = 0.586`
+- 记录：**EXP-20260602-032** 本地 259 mock；**EXP-POP-005** 服务器真实 OOS 待做
+
+详见 [`docs/strategy_candidate_oos.md`](strategy_candidate_oos.md)。
 
 ## 七、删除旧部署（如曾在 ~/quant-mas 建过）
 
