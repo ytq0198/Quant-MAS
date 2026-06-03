@@ -47,9 +47,9 @@
 > Quant Engine computes. Agent Layer explains, orchestrates, and reports.  
 > Quant Engine 做计算；Agent Layer 做编排、解释与报告。
 
-**Plus v2 status / 当前进度**：**M1–M8 ✅** · **v3 M9–M11.5 ✅** 本地（**237 pytest** · M11 双端 EXP-POP-002）
+**Plus v2 status / 当前进度**：**M1–M8 ✅** · **v3 M9–M11.5 ✅** 双端（**237 pytest**）
 
-**v3 next / 下一步**：M12 RL 训练 · M13 编排 · EXP-TEXT-WF-002 · 服务器 **EXP-POP-003**
+**v3 next / 下一步**：M12 RL 训练 · M13 编排 · EXP-TEXT-WF-002
 
 ---
 
@@ -119,7 +119,7 @@ python -m pip install -e ".[llm]"                 # HTTP LLM client
 python -m pip install -e ".[text]"                # FinBERT / LoRA (server manual)
 ```
 
-**Verified baseline / 已验证基线**：**237 passed** 本地（EXP-030）· 服务器 **225**（EXP-POP-002，M11.5 待 pull）
+**Verified baseline / 已验证基线**：**237 passed**（本地+服务器，EXP-030 / EXP-POP-003）
 
 ---
 
@@ -255,8 +255,8 @@ print(result.content)
 
 | Item | Value | Notes |
 |------|-------|-------|
-| **pytest** | **237 passed** | EXP-030 本地（225→237）；服务器 225（EXP-POP-002） |
-| **population training** | Multi-gen loop dry-run | EXP-030（`run_population_training.py`） |
+| **pytest** | **237 passed** | EXP-030 / EXP-POP-003 双端（41.83s 服务器） |
+| **population training** | 3-gen loop dry-run | EXP-POP-003 ✅ |
 | **local vLLM smoke** | ResearchAgent `local_vllm` | EXP-LLM-002（Qwen2.5-7B @ a6000） |
 | **Postgres/pgvector smoke** | `query_memory` + `index_documents` | EXP-026（6 experiments, **443 chunks**） |
 | **OOS baseline** | **sharpe 0.586** | EXP-20260602-008, 19 walk-forward windows |
@@ -348,7 +348,7 @@ Quant-MAS/
 - [x] **M9** Enterprise DB — Postgres memory, pgvector, Neo4j skeleton; **EXP-026** server smoke ✅
 - [x] **M10** LLM production — `local_vllm`, ResearchAgent smoke **EXP-LLM-002** (Qwen2.5-7B @ a6000) ✅
 - [x] **M11** Competitive learning — StrategyAgent, PopulationManager, Elo **EXP-029/POP-002** ✅
-- [x] **M11.5** Population training loop — multi-generation **EXP-030** ✅
+- [x] **M11.5** Population training loop — multi-generation **EXP-030/POP-003** ✅
 - [ ] **M12** RL training experiments (GRPO/PPO/MARL GPU smoke)
 - [ ] **M13** Enterprise orchestration — multi-experiment DAG scheduler, audit log
 - [ ] FinBERT server smoke + text-enhanced walk-forward ablation (EXP-TEXT-WF-002)

@@ -1,10 +1,10 @@
 # Quant MAS 开发进度
 
-更新时间：2026-06-03（**v3 M11/M11.5 ✅** EXP-030，**237 passed** · EXP-POP-002 服务器 ✅）
+更新时间：2026-06-03（**v3 M11/M11.5 ✅** 双端 **237 passed** · EXP-POP-003）
 
-**Plus v2**：M1–M8 ✅ · **v3 M9–M11.5** ✅ 本地（服务器 M11.5 待 **EXP-POP-003**）
+**Plus v2**：M1–M8 ✅ · **v3 M9–M11.5** ✅ 本地+服务器
 
-**pytest 基线**：**237 passed**（EXP-20260602-030）· **论文主指标**：Walk-forward OOS sharpe **0.586**
+**pytest 基线**：**237 passed**（EXP-030 / EXP-POP-003）· **论文主指标**：Walk-forward OOS sharpe **0.586**
 
 ## Plus v2 八条主线（M1–M8）
 
@@ -32,7 +32,7 @@
 | **M9** | 企业数据与数据库 | ✅ | Postgres 骨架；212 passed 本地+服务器 | [database_setup.md](database_setup.md) |
 | **M10** | LLM 生产化 | ✅ | local_vllm；212 passed 本地+服务器 | [codex_prompt_M10.md](codex_prompt_M10.md) |
 | **M11** | 竞争学习 / 策略种群 | ✅ | competitive CLI；225 双端（EXP-POP-002） | [competitive_learning.md](competitive_learning.md) |
-| **M11.5** | 种群训练闭环 | ✅ | PopulationTrainingLoop；**237 passed** | [population_training.md](population_training.md) |
+| **M11.5** | 种群训练闭环 | ✅ | 237 双端（EXP-030/POP-003） | [population_training.md](population_training.md) |
 | **M12** | RL 训练实验 | 📋 | GRPO/PPO training loop | [rl_plan.md](rl_plan.md) |
 | **M13** | 企业化编排 | 📋 | DAG scheduler | [protocols.md](protocols.md) |
 
@@ -183,7 +183,7 @@ M1/M2 已完成；**M3 本地 ✅**（见下两节）；下一步 **M4**。
 | 环境 | Python | 结果 | 日期 | 实验 |
 |------|--------|------|------|------|
 | 本地 Windows | 3.11+ | **237 passed** | 2026-06-03 | EXP-20260602-030 |
-| 服务器 a6000-9961 | 3.11.15 | **225 passed** | 2026-06-03 | EXP-POP-002（M11.5 待 pull） |
+| 服务器 a6000-9961 | 3.11.15 | **237 passed** | 2026-06-03 | EXP-POP-003 @ `aa841d4` |
 
 命令：`python -m pytest -v`（勿裸敲 `pytest` / `pip`）。
 
@@ -282,7 +282,7 @@ python scripts/export_agent_cards.py --help
 | GRPO-style group-relative ranking | ✅ |
 | run_rl_baseline.py --dry-run | ✅ |
 | run_competitive_experiment.py --dry-run | ✅ EXP-POP-001/002 |
-| run_population_training.py --dry-run | ✅ EXP-030 本地 |
+| run_population_training.py --dry-run | ✅ EXP-030/POP-003 双端 |
 | test_trading_env | ✅ **13 passed** |
 | test_grpo_experiment | ✅ **6 passed** |
 | 全量 pytest（本地） | ✅ **180 passed** |

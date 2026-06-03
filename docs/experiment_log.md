@@ -1,6 +1,6 @@
 # Quant MAS 实验记录
 
-更新时间：2026-06-03（v3 M11.5 ✅ **237 passed** · M11 EXP-POP-002 双端）
+更新时间：2026-06-03（v3 M11/M11.5 ✅ **237 passed 双端** · EXP-POP-003）
 
 本文件用于记录真实实验和重要验证。不要记录未经实际运行的数据结果；尚未真实运行的项目标记为「待验证」。
 
@@ -178,6 +178,21 @@
 
 ## 当前验证记录
 
+### EXP-POP-003：v3 M11.5 服务器 pytest + population training dry-run ✅
+
+- 日期：2026-06-03
+- 阶段：**M11.5** 服务器 pull @ **`aa841d4`**
+- 环境：a6000-9961；conda `quant-mas`；Python **3.11.15**
+- 命令与结果：
+  - `python -m pytest -v` → **237 passed** in **41.83s**
+  - `python scripts/run_population_training.py --config configs/population_training.yaml --dry-run` → ✅
+    - **3 generations**；`simulation_only: true`；`dry_run: true`
+    - Gen1: 2 agents → Gen2/3: Top-K + mutation（如 `mean_rev_1_g1_1` scale **1.01**、`mean_rev_1_g1_1_g2_2` scale **1.03**）
+    - `best_agent`: `mean_rev_1`；Elo 平局 **1500**（mock draw）；`simulation.sharpe_mean` ≈ **7.15**（**≠** OOS **0.586**）
+    - 无 `oos.*`；无 memory/artifacts
+- 问题：无
+- 下一步：M12 RL 训练 loop；EXP-TEXT-WF-002
+
 ### EXP-20260602-030：v3 M11.5 种群训练闭环本地验证 ✅
 
 - 日期：2026-06-03
@@ -197,7 +212,7 @@
   - 全量 `python -m pytest -v` → **237 passed**（225→237，+12）
 - 边界：无 broker / LLM / 网络 / GPU；dry-run 不写 memory/artifacts；非 dry-run 写 generation metrics + ExperimentMemory；**无** `oos.*`
 - 问题：无
-- 下一步：服务器 pull + pytest（**EXP-POP-003**）；M12 RL 训练
+- 下一步：~~服务器 pull + pytest~~ ✅ EXP-POP-003；M12 RL 训练
 
 ### EXP-POP-002：v3 M11 服务器 pytest + competitive mock dry-run ✅
 
@@ -1032,6 +1047,7 @@
 | EXP-20260602-009 | 2026-06-02 | Plus M1 研究基线本地 | **102 passed**（+4 测试） |
 | EXP-20260602-010 | 2026-06-02 | Plus M1 服务器 pytest + 比较表 | **102 passed**；OOS sharpe 0.586 |
 | EXP-20260602-011 | 2026-06-02 | Plus M2 数据扩展本地 | **115 passed**（+13） |
+| EXP-POP-003 | 2026-06-03 | v3 M11.5 服务器 | **237 passed**（41.83s）+ training dry-run @ `aa841d4` |
 | EXP-20260602-030 | 2026-06-03 | v3 M11.5 种群训练闭环 | **237 passed**（+12）；loop **12/12** |
 | EXP-POP-002 | 2026-06-03 | v3 M11 服务器 | **225 passed**（17.32s）+ competitive dry-run @ `64a5b2a` |
 | EXP-20260602-029 | 2026-06-03 | v3 M11 竞争学习本地 | **225 passed**（+13）；population **13/13** |

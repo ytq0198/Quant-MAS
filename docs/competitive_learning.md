@@ -13,7 +13,8 @@ trading and not for replacing walk-forward OOS evidence.
 | --- | --- | --- |
 | M7 RL simulation | Single policy in `TradingEnv` | Implemented |
 | M11 population | Multiple `StrategyAgent` instances, RiskAgent, Elo, Top-K | Implemented, mock-first |
-| M12 training loop | Longer autocurriculum / RL training loop | Planned |
+| M11.5 training loop | Multi-generation Top-K + mutation | Implemented — see [population_training.md](population_training.md) |
+| M12 RL training | GRPO/PPO/MARL on `TradingEnv` | Planned |
 
 Each agent runs a shadow episode on the same synthetic market window. The runner
 uses the existing `TradingEnv`, so action timing remains next-bar execution. No

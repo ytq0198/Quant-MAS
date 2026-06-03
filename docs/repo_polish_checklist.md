@@ -13,7 +13,7 @@
 | 检查项 | 状态 | 说明 |
 |--------|------|------|
 | 双语标题与一句话定位 | ✅ 已完成 | 英 + 中首段 |
-| 徽章（Python / Tests / Status / License / GitHub） | ✅ 已完成 | Tests=212 passed（本地+服务器） |
+| 徽章（Python / Tests / Status / License / GitHub） | ✅ 已完成 | Tests=237 passed（本地+服务器，EXP-030/POP-003） |
 | 安全声明（非实盘、LLM 不下单） | ✅ 已完成 | blockquote 双语 |
 | Quick Start | ✅ 已完成 | clone → pip → pytest |
 | CLI Examples | ✅ 已完成 | pipeline / train / ml backtest / ResearchAgent / text mock |

@@ -1,11 +1,11 @@
 # Plus v3 M11：竞争学习 / 策略种群 — Codex 提示词
 
-**状态：✅ 已完成（本地 EXP-20260602-029 + 服务器 EXP-POP-002，225 passed 双端，2026-06-03）**
+**状态：✅ 已完成（M11 EXP-029/POP-002 + M11.5 EXP-030/POP-003，237 passed 双端，2026-06-03）**
 
 更新时间：2026-06-03
 
 > **用法**：先粘贴下方「固定前缀」，再粘贴「M11 主任务」整段交给 Codex。  
-> **设计依据**：[项目v3设计.md §M11](../项目v3设计.md#m11竞争学习--自博弈--策略种群) · 配套：新建 `docs/competitive_learning.md` · 前置：**M1–M8 ✅**、**M9/M10 ✅**（212 pytest，EXP-026 + EXP-LLM-002）
+> **设计依据**：[项目v3设计.md §M11](../项目v3设计.md#m11竞争学习--自博弈--策略种群) · 配套：新建 `docs/competitive_learning.md` · 前置：**M1–M8 ✅**、**M9/M10 ✅**（212 pytest，EXP-026 + EXP-LLM-002）· **M11.5** 见 [population_training.md](population_training.md)（237 pytest，EXP-030/POP-003）
 
 ---
 
@@ -15,7 +15,7 @@
 你正在开发 Quant MAS 科研项目（v3 阶段）。
 路径：D:\scientific reasearch and work\SRTP\Quant MAS
 
-测试基线：本地 **225 passed**（v3 M11，EXP-20260602-029）。
+测试基线：本地+服务器 **237 passed**（v3 M11/M11.5，EXP-20260602-030 / EXP-POP-003）。
 OOS 主 baseline：EXP-20260602-008，oos.sharpe **0.586**（walk-forward，19 窗）。
 M6 text OOS exploratory：EXP-TEXT-WF-001，oos.sharpe **0.563** vs baseline **0.586**（不可替代主指标）。
 M7 RL：simulation only；`simulation.*` / Population Elo **不得**与 `oos.*` 混比或替代论文主指标。
@@ -27,7 +27,7 @@ M9/M10：Postgres/pgvector（EXP-026）、local_vllm（EXP-LLM-002）已完成�
 3. 所有 StrategyAgent 的 `propose()` 输出 target_weight **必须**经 RiskAgent（或 `check_position_limits`）裁剪后再进入 env。
 4. pytest **不联网、不跑长训练、不依赖 GPU**；synthetic OHLCV + 2～5 个 mock agent + 确定性 Elo。
 5. **禁止 future leakage**：观测与 M7 TradingEnv 一致，仅 `t` 及之前信息。
-6. 请只实现当前 **M11** 一个模块；改完后 `python -m pytest -v` 全量通过（预期 212+，增量在 tests/test_population_training.py）。
+6. 请只实现当前 **M11** 一个模块；改完后 `python -m pytest -v` 全量通过（M11 基线 225+；含 M11.5 后 **237**，增量在 `tests/test_population_training_loop.py`）。
 7. **不得破坏** M7 现有 `TradingEnv` / `run_rl_baseline.py` / `test_trading_env.py` 行为（向后兼容）。
 8. 禁止 commit `.env`、API key、大 checkpoint。
 9. 新实验 family 建议：`competitive_learning` 或 `population_simulation`；与 `walk_forward` 族别分离。
@@ -402,7 +402,7 @@ python scripts/run_competitive_experiment.py --config configs/competitive.yaml -
 | **EXP-POP-001** | competitive `--mode mock --dry-run` 本地 | ✅ |
 | **EXP-POP-002** | 服务器 competitive dry-run | ✅ **225 passed** + dry-run（17.32s @ `64a5b2a`） |
 | **EXP-20260602-030** | M11.5 本地 population training loop | ✅ **237 passed**（loop 12/12） |
-| **EXP-POP-003** | 服务器 population training dry-run | 📋 待做 |
+| **EXP-POP-003** | 服务器 population training dry-run | ✅ **237 passed** + 3-gen dry-run（41.83s @ `aa841d4`） |
 | （未来） | `--mode walk_forward` 真实 OOS 与 **0.586** 对照 — **Cursor 科研任务**，Codex 仅 stub |
 
 论文主指标仍为 **EXP-20260602-008**（oos.sharpe **0.586**）。

@@ -86,3 +86,12 @@ Paper baseline remains EXP-20260602-008 oos.sharpe 0.586.
 - No LLM-generated target weights.
 - RiskAgent remains mandatory before simulation steps.
 - No synthetic population metric can be treated as a paper OOS result.
+
+## Verification
+
+| Experiment | Environment | Result |
+| --- | --- | --- |
+| **EXP-20260602-030** | Local | **237 passed**; loop tests **12/12** |
+| **EXP-POP-003** | Server a6000-9961 @ `aa841d4` | **237 passed** (41.83s); 3-gen `--dry-run` OK |
+
+Server dry-run observed deterministic mutation (e.g. `mean_rev_1_g1_1` scale 1.01 → `mean_rev_1_g1_1_g2_2` scale 1.03), Elo draws at 1500 on mock data, and `simulation.sharpe_mean` ≈ 7.15 — **not** walk-forward OOS **0.586**.

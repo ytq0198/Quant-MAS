@@ -10,6 +10,8 @@ GitHub 仓库：[https://github.com/ytq0198/Quant-MAS](https://github.com/ytq019
 
 | 日期 | 项目 | 结果 | 备注 |
 |------|------|------|------|
+| 2026-06-03 | v3 M11.5 服务器 pytest + population training | **237 passed**（41.83s）+ 3-gen dry-run ✅ | EXP-POP-003 @ `aa841d4` |
+| 2026-06-03 | v3 M11 服务器 pytest + competitive mock | **225 passed**（17.32s）+ dry-run ✅ | EXP-POP-002 @ `64a5b2a` |
 | 2026-06-03 | v3 M10 local_vLLM smoke | ResearchAgent `local_vllm` ✅ | EXP-LLM-002 |
 | 2026-06-01 | v3 M9/M10 服务器 pytest | **212 passed**（11.39s） | EXP-20260602-028 |
 | 2026-06-01 | v3 M9 企业 DB（本地） | **207 passed**（+12）；enterprise **12/12** | EXP-20260602-025 |
@@ -752,7 +754,7 @@ python scripts/run_competitive_experiment.py \
 
 详见 [`docs/competitive_learning.md`](competitive_learning.md)。
 
-## 六点十五、v3 M11.5 种群训练闭环（EXP-030 / EXP-POP-003）📋
+## 六点十五、v3 M11.5 种群训练闭环（EXP-030 / EXP-POP-003）✅
 
 ### 6.15.1 拉代码 + pytest
 
@@ -779,7 +781,7 @@ python scripts/run_population_training.py \
 
 非 dry-run 会写 `outputs/population_training/` 与 ExperimentMemory（仍仅 `population.*` / `simulation.*`）。
 
-- 记录：**EXP-20260602-030** 本地 237；**EXP-POP-003** 服务器待做
+- 记录：**EXP-20260602-030** 本地 237；**EXP-POP-003** ✅ 服务器 **237 passed**（41.83s）+ training dry-run（2026-06-03 @ `aa841d4`）
 
 详见 [`docs/population_training.md`](population_training.md)。
 
