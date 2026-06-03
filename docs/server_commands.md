@@ -10,7 +10,7 @@ GitHub 仓库：[https://github.com/ytq0198/Quant-MAS](https://github.com/ytq019
 
 | 日期 | 项目 | 结果 | 备注 |
 |------|------|------|------|
-| 2026-06-01 | v3 M10 LLM（本地） | **212 passed**（+5）；context **17/17** | EXP-20260602-027 |
+| 2026-06-01 | v3 M9/M10 服务器 pytest | **212 passed**（11.39s） | EXP-20260602-028 |
 | 2026-06-01 | v3 M9 企业 DB（本地） | **207 passed**（+12）；enterprise **12/12** | EXP-20260602-025 |
 | 2026-06-01 | Plus M8 MCP/A2A 服务器 | **195 passed**（12.41s）；export_agent_cards ✅ | EXP-20260602-024 |
 | 2026-06-01 | Plus M7 服务器 | **180 passed**（10.15s）；RL dry-run ✅ | EXP-20260602-022 |
@@ -640,7 +640,7 @@ python scripts/run_research_agent.py --help             # --provider mock|openai
 # python scripts/run_research_agent.py --provider local_vllm --use-llm ...
 ```
 
-记录：**EXP-20260602-027**（本地 **212 passed**）；服务器 pytest → **EXP-20260602-028**；vLLM smoke → **EXP-LLM-002**。
+记录：**EXP-20260602-027**（本地 **212 passed**）；**EXP-20260602-028**（服务器 **212 passed**，11.39s）；vLLM smoke → **EXP-LLM-002**。
 
 ## 七、删除旧部署（如曾在 ~/quant-mas 建过）
 

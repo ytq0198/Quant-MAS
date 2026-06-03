@@ -171,7 +171,7 @@ python scripts/generate_report.py --help
 1. ~~更新 `docs/context_engineering.md` 与实现对齐~~ ✅
 2. ~~更新 `docs/experiment_log.md` — **EXP-20260602-027**~~ ✅
 3. ~~更新 `docs/progress.md`、`项目进度.md`、`项目v3设计.md` — M10 状态~~ ✅
-4. 服务器 pull + pytest **212**（EXP-20260602-028）；M9 Postgres smoke（EXP-026）
+4. ~~服务器 pull + pytest **212**（EXP-20260602-028）~~ ✅
 5. 服务器 vLLM smoke → **EXP-LLM-002**
 6. 科研：**EXP-TEXT-WF-002** — 扩大 text JSONL → walk-forward
 
@@ -211,7 +211,7 @@ python scripts/generate_report.py --help
 | 编号 | 内容 |
 |------|------|
 | **EXP-20260602-027** | M10 local_vllm 本地 pytest + resolve_llm_client ✅ |
-| **EXP-20260602-028** | M10 服务器 pytest 212（待 pull） |
+| **EXP-20260602-028** | M10 服务器 pytest 212 ✅ |
 | **EXP-LLM-002** | 服务器 vLLM ResearchAgent smoke（待 vLLM 服务） |
 | **EXP-TEXT-WF-002** | 扩大 text 覆盖 walk-forward OOS（科研，Cursor 手工） |
 

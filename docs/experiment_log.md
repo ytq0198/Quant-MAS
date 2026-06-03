@@ -1,6 +1,6 @@
 # Quant MAS 实验记录
 
-更新时间：2026-06-01（v3 M10 本地 ✅ EXP-027，212 passed；EXP-026 📋 等 Docker）
+更新时间：2026-06-01（v3 M9/M10 服务器 ✅ EXP-028，212 passed；EXP-026 DB smoke 待 Docker）
 
 本文件用于记录真实实验和重要验证。不要记录未经实际运行的数据结果；尚未真实运行的项目标记为「待验证」。
 
@@ -178,6 +178,17 @@
 
 ## 当前验证记录
 
+### EXP-20260602-028：v3 M9/M10 服务器 pytest 验收 ✅
+
+- 日期：2026-06-01
+- 阶段：**v3 M9 + M10** 服务器 pull 后全量 pytest（**不含**真实 Postgres/vLLM smoke）
+- 环境：a6000-9961，conda `quant-mas`，Python **3.11.15**；代码 @ **`3fd32e0`**（M10）
+- 命令与结果：
+  - `python -m pytest -v` → **212 passed** in **11.39s**
+  - 含 `test_memory_enterprise.py` **12/12**、`test_context_engineering.py` **17/17**（全 mock，不联网）
+- 问题：无
+- 下一步：EXP-026 真实 Postgres smoke（待 Docker 权限）；**EXP-LLM-002** vLLM smoke
+
 ### EXP-20260602-027：v3 M10 LLM 生产化本地验证 ✅
 
 - 日期：2026-06-01
@@ -195,29 +206,18 @@
   - 全量 `python -m pytest -v` → **212 passed**（207→212，+5）
 - 安全边界：pytest 全 mock HTTP；无真实 DeepSeek/vLLM/HF 网络
 - 问题：无
-- 下一步：服务器 pull + pytest **212**（EXP-20260602-028）；vLLM smoke **EXP-LLM-002**（待 vLLM 服务）
+- 下一步：~~服务器 pytest **212**~~ ✅ EXP-028；vLLM smoke **EXP-LLM-002**
 
-### EXP-20260602-026：v3 M9 服务器 DB 联调 📋 阻塞中（infra 已备）
+### EXP-20260602-026：v3 M9 服务器 Postgres/pgvector 真实 DB smoke 📋 阻塞中
 
-- 日期：2026-06-01（探测记录）
-- 阶段：**v3 M9** 服务器真实 Postgres/pgvector smoke
-- 环境：a6000-9961，Ubuntu **22.04.5**，用户 **weizian**；Quant-MAS 当前 **`0794bd6`（M8，195 pytest）**，M9 代码在 GitHub **`06a6a5d`** 待 pull
-- 服务器已就绪：
-  - 目录 `/mnt/localDisk3/weizian/infra/quant-mas-db/` — `docker-compose.yml`、`setup.sh`、`.env`（密码勿 commit）
-  - Quant-MAS `.env` — `POSTGRES_DSN`、`NEO4J_URI/USER/PASSWORD` 已与 compose 对齐；`memory.enterprise.yaml` 已复制
-  - conda：`psycopg[binary]` **3.3.4**、`neo4j` **6.2.0** 已装
-  - Docker **28.1.1** + Compose **v2.35.1** 已装
-- 阻塞项（须管理员或 docker 组）：
-  1. **weizian 不在 docker 组、无 sudo 免密** → 无法 `docker compose up`
-  2. **5432 未监听** → Postgres 容器未启动
-  3. **git 未拉到 M9** → 无 `--backend postgres` / `--vector-store pgvector`，pytest 仍为 **195** 非 207
-- 解除阻塞后顺序：
-  1. 管理员：`sudo usermod -aG docker weizian`（用户 **重新 SSH 登录**）或管理员在 infra 目录 `sudo docker compose up -d postgres`
-  2. `bash /mnt/localDisk3/weizian/infra/quant-mas-db/setup.sh`（CREATE EXTENSION vector）
-  3. Quant-MAS：`git fetch origin main && git merge --ff-only origin/main`（目标 **`f20d870`** 或更新）→ pytest **207+**
-  4. `query_memory.py --backend postgres` + `index_documents.py --vector-store pgvector` smoke
-- 问题：Docker 权限 + 代码未 pull（非 M9 实现问题）
-- 下一步：管理员加 docker 组 → pull **06a6a5d** → 跑 setup.sh → 完成 EXP-026
+- 日期：2026-06-01（探测 + 更新）
+- 阶段：**v3 M9** 真实 Postgres/pgvector 联调（**pytest 部分已由 EXP-028 完成**）
+- 环境：a6000-9961；infra `/mnt/localDisk3/weizian/infra/quant-mas-db/` 已备；`.env` POSTGRES_DSN 已配置
+- 仍阻塞：
+  1. **weizian 不在 docker 组** → 无法 `docker compose up`；**5432 未监听**
+  2. 未跑 `query_memory.py --backend postgres` / `index_documents.py --vector-store pgvector` 真实 smoke
+- ~~git / pytest~~：✅ **212 passed**（EXP-028 @ `3fd32e0`）
+- 下一步：管理员 docker 组 → `setup.sh` → 完成 EXP-026 DB smoke
 
 ### EXP-20260602-025：v3 M9 企业数据与数据库本地验证 ✅
 
@@ -937,6 +937,7 @@
 | EXP-20260602-009 | 2026-06-02 | Plus M1 研究基线本地 | **102 passed**（+4 测试） |
 | EXP-20260602-010 | 2026-06-02 | Plus M1 服务器 pytest + 比较表 | **102 passed**；OOS sharpe 0.586 |
 | EXP-20260602-011 | 2026-06-02 | Plus M2 数据扩展本地 | **115 passed**（+13） |
+| EXP-20260602-028 | 2026-06-01 | v3 M9/M10 服务器 pytest | **212 passed**（11.39s）@ `3fd32e0` |
 | EXP-20260602-027 | 2026-06-01 | v3 M10 LLM 本地 | **212 passed**（+5）；context **17/17** |
 | EXP-20260602-026 | 2026-06-01 | v3 M9 服务器 DB | 📋 阻塞：docker 权限 + 待 pull |
 | EXP-20260602-025 | 2026-06-01 | v3 M9 企业 DB 本地 | **207 passed**（+12）；enterprise **12/12** |

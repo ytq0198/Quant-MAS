@@ -158,7 +158,7 @@ Memory/RAG feeds **ResearchAgent** context — it does not execute trades.
 
 | Metric | Value | Experiment |
 |--------|-------|------------|
-| pytest | **212 passed** | EXP-027 本地；server 待 pull |
+| pytest | **212 passed** | EXP-027/028（本地+服务器） |
 | **OOS sharpe (baseline)** | **0.586** | EXP-20260602-008 |
 | **OOS + FinBERT text** | **0.563** | EXP-TEXT-WF-001 · exploratory (200/6033 coverage) |
 | Single-segment ML sharpe | 2.78 | ⚠️ in-sample only |
