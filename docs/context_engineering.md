@@ -68,19 +68,30 @@ VLLM_MODEL=
 VLLM_API_KEY=
 ```
 
-Server-side vLLM example:
+Server-side vLLM example (a6000, verified **EXP-LLM-002**):
 
 ```bash
-export LLM_PROVIDER=local_vllm
+# Terminal 1 — vLLM service (conda env vllm, NOT quant-mas)
+conda activate /mnt/localDisk3/weizian/conda_envs/vllm
+export HF_HUB_OFFLINE=1
+export VLLM_USE_FLASHINFER_SAMPLER=0   # required on CUDA 11 hosts
+
+CUDA_VISIBLE_DEVICES=0 vllm serve /mnt/localDisk3/weizian/models/Qwen2.5-7B-Instruct \
+  --host 127.0.0.1 --port 8000 --dtype auto --max-model-len 8192 \
+  --served-model-name Qwen/Qwen2.5-7B-Instruct --enforce-eager
+
+# Terminal 2 — Quant-MAS client
+conda activate /mnt/localDisk3/weizian/conda_envs/quant-mas
 export VLLM_BASE_URL=http://127.0.0.1:8000
-export VLLM_MODEL=Qwen2.5-7B-Instruct
+export VLLM_MODEL=Qwen/Qwen2.5-7B-Instruct
 
 python scripts/run_research_agent.py \
-  --task "Explain walk-forward OOS baseline and latest ML run" \
-  --use-llm \
-  --provider local_vllm \
-  --storage-config configs/storage.server.yaml
+  --provider local_vllm --use-llm \
+  --task "Interpret ONLY walk-forward OOS baseline EXP-20260602-008 (oos.sharpe ≈ 0.586)." \
+  --rag-query "OOS baseline EXP-20260602-008 sharpe 0.586"
 ```
+
+Full setup (model mirror download, FlashInfer workaround, GPU OOM): [`server_commands.md`](server_commands.md) §6.13.
 
 DeepSeek cloud example:
 
@@ -119,6 +130,7 @@ python scripts/run_research_agent.py --help
 python scripts/generate_report.py --help
 ```
 
-The server vLLM smoke should be recorded separately as `EXP-LLM-002` after the
-local vLLM service is running. Do not invent that result in docs before running it.
+**EXP-LLM-002** ✅ (2026-06-03): server `local_vllm` smoke on a6000; `llm_provider=local_vllm`.
+Use constrained tasks (OOS **0.586** only); Qwen may wrap JSON in markdown fences.
+LLM narrative is non-authoritative — paper metric remains **oos.sharpe 0.586**.
 

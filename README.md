@@ -47,7 +47,7 @@
 > Quant Engine computes. Agent Layer explains, orchestrates, and reports.  
 > Quant Engine 做计算；Agent Layer 做编排、解释与报告。
 
-**Plus v2 status / 当前进度**：M1–M8 ✅ · **v3 M9/M10** ✅ 本地+服务器（**212 pytest**）
+**Plus v2 status / 当前进度**：M1–M8 ✅ · **v3 M9/M10** ✅ 本地+服务器（**212 pytest** + **EXP-LLM-002** vLLM smoke）
 
 ---
 

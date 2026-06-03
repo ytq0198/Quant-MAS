@@ -172,7 +172,7 @@ python scripts/generate_report.py --help
 2. ~~更新 `docs/experiment_log.md` — **EXP-20260602-027**~~ ✅
 3. ~~更新 `docs/progress.md`、`项目进度.md`、`项目v3设计.md` — M10 状态~~ ✅
 4. ~~服务器 pull + pytest **212**（EXP-20260602-028）~~ ✅
-5. 服务器 vLLM smoke → **EXP-LLM-002**
+5. ~~服务器 vLLM smoke → **EXP-LLM-002**~~ ✅
 6. 科研：**EXP-TEXT-WF-002** — 扩大 text JSONL → walk-forward
 
 **M9 服务器阻塞项**（与 M10 并行）：管理员 `usermod -aG docker weizian` 或代启 Postgres → `setup.sh` → EXP-026。
@@ -212,7 +212,7 @@ python scripts/generate_report.py --help
 |------|------|
 | **EXP-20260602-027** | M10 local_vllm 本地 pytest + resolve_llm_client ✅ |
 | **EXP-20260602-028** | M10 服务器 pytest 212 ✅ |
-| **EXP-LLM-002** | 服务器 vLLM ResearchAgent smoke（待 vLLM 服务） |
+| **EXP-LLM-002** | 服务器 vLLM ResearchAgent smoke ✅（Qwen2.5-7B，vLLM 0.22.0，EXP-LLM-002-constrained.json） |
 | **EXP-TEXT-WF-002** | 扩大 text 覆盖 walk-forward OOS（科研，Cursor 手工） |
 
 论文主指标仍为 **EXP-20260602-008**（oos.sharpe **0.586**）。

@@ -10,6 +10,7 @@ GitHub 仓库：[https://github.com/ytq0198/Quant-MAS](https://github.com/ytq019
 
 | 日期 | 项目 | 结果 | 备注 |
 |------|------|------|------|
+| 2026-06-03 | v3 M10 local_vLLM smoke | ResearchAgent `local_vllm` ✅ | EXP-LLM-002 |
 | 2026-06-01 | v3 M9/M10 服务器 pytest | **212 passed**（11.39s） | EXP-20260602-028 |
 | 2026-06-01 | v3 M9 企业 DB（本地） | **207 passed**（+12）；enterprise **12/12** | EXP-20260602-025 |
 | 2026-06-01 | Plus M8 MCP/A2A 服务器 | **195 passed**（12.41s）；export_agent_cards ✅ | EXP-20260602-024 |
@@ -623,24 +624,92 @@ python scripts/index_documents.py --vector-store pgvector --dirs docs --embeddin
 
 - pytest 默认 mock，**不依赖**真实 Postgres / vLLM；**212** 与 DB 是否启动无关
 - 环境变量名：**`POSTGRES_DSN`**；vLLM：**`VLLM_BASE_URL`**
-- 记录：**EXP-025** 本地 207；**EXP-027** 本地 212；**EXP-026/028** 服务器（待 docker + pull）
+- 记录：**EXP-025** 本地 207；**EXP-027/028** 212；**EXP-026** DB smoke 待 Docker；**EXP-LLM-002** ✅
 
 详见 [`docs/database_setup.md`](database_setup.md) §M9 · [`docs/context_engineering.md`](context_engineering.md) M10。
 
-## 六点十三、v3 M10 LLM（EXP-20260602-027 / 服务器待 EXP-028）📋
+## 六点十三、v3 M10 LLM（EXP-027 / EXP-028 / EXP-LLM-002）✅
+
+### 6.13.1 pytest（mock，不启 vLLM）
 
 ```bash
 cd /mnt/localDisk3/weizian/Quant-MAS
-# pull 后（同 §6.12.3）
+conda activate /mnt/localDisk3/weizian/conda_envs/quant-mas
 python -m pytest tests/test_context_engineering.py -v   # 17 passed
-python scripts/run_research_agent.py --help             # --provider mock|openai_compatible|local_vllm
-
-# 真实 vLLM smoke（非 pytest，需 vLLM 服务 + .env）
-# VLLM_BASE_URL=http://127.0.0.1:8000 VLLM_MODEL=...
-# python scripts/run_research_agent.py --provider local_vllm --use-llm ...
+python -m pytest -v                                     # 212 passed
 ```
 
-记录：**EXP-20260602-027**（本地 **212 passed**）；**EXP-20260602-028**（服务器 **212 passed**，11.39s）；vLLM smoke → **EXP-LLM-002**。
+记录：**EXP-20260602-027**（本地 212）；**EXP-20260602-028**（服务器 212，11.39s）。
+
+### 6.13.2 vLLM 环境（独立 conda，勿装进 quant-mas）
+
+```bash
+# 一次性：独立环境
+conda create -p /mnt/localDisk3/weizian/conda_envs/vllm python=3.11 -y
+conda activate /mnt/localDisk3/weizian/conda_envs/vllm
+pip install vllm
+which vllm   # 必须在 .../conda_envs/vllm/bin/vllm，不是 ~/.local/bin/vllm
+```
+
+**模型**（服务器无法直连 huggingface.co 时用镜像下载到本地）：
+
+```bash
+export HF_ENDPOINT=https://hf-mirror.com
+huggingface-cli download Qwen/Qwen2.5-7B-Instruct \
+  --local-dir /mnt/localDisk3/weizian/models/Qwen2.5-7B-Instruct \
+  --local-dir-use-symlinks False
+```
+
+**踩坑**：
+
+| 问题 | 处理 |
+|------|------|
+| `Network is unreachable`（HF） | 镜像下载 + 本地路径 serve |
+| FlashInfer / CUDA 12 编译失败 | `export VLLM_USE_FLASHINFER_SAMPLER=0` |
+| `vllm: command not found` | 先 `conda activate .../vllm` |
+| GPU OOM（3GB free） | 旧 vLLM 仍占 GPU 0：`pkill -f "vllm serve"` 或 `kill <EngineCore PID>` |
+| 误用 `VLLM_USE_FLASHINFER` | v0.22 无效；用 **`VLLM_USE_FLASHINFER_SAMPLER=0`** |
+
+### 6.13.3 启动 vLLM（终端 1，建议 tmux）
+
+```bash
+tmux new -s vllm
+conda activate /mnt/localDisk3/weizian/conda_envs/vllm
+
+export HF_HUB_OFFLINE=1
+export VLLM_USE_FLASHINFER_SAMPLER=0
+unset VLLM_BASE_URL VLLM_MODEL VLLM_USE_FLASHINFER
+
+CUDA_VISIBLE_DEVICES=0 vllm serve /mnt/localDisk3/weizian/models/Qwen2.5-7B-Instruct \
+  --host 127.0.0.1 --port 8000 --dtype auto --max-model-len 8192 \
+  --served-model-name Qwen/Qwen2.5-7B-Instruct --enforce-eager
+# 等到 Application startup complete；Ctrl+B D detach
+```
+
+### 6.13.4 ResearchAgent smoke（终端 2，EXP-LLM-002）
+
+```bash
+conda activate /mnt/localDisk3/weizian/conda_envs/quant-mas
+cd /mnt/localDisk3/weizian/Quant-MAS
+
+curl -s http://127.0.0.1:8000/v1/models | python -m json.tool
+
+export VLLM_BASE_URL=http://127.0.0.1:8000
+export VLLM_MODEL=Qwen/Qwen2.5-7B-Instruct
+
+mkdir -p /mnt/localDisk3/weizian/reports/llm
+
+python scripts/run_research_agent.py \
+  --provider local_vllm --use-llm \
+  --task "Interpret ONLY the walk-forward OOS baseline EXP-20260602-008 (oos.sharpe ≈ 0.586). Do NOT treat workflow_ml_backtest, single-segment ML sharpe, or pytest milestones as paper metrics. List three research risks." \
+  --experiment-name walk-forward \
+  --rag-query "OOS baseline EXP-20260602-008 sharpe 0.586" \
+  --output-json /mnt/localDisk3/weizian/reports/llm/EXP-LLM-002-constrained.json
+```
+
+验收：`llm_provider=local_vllm`；RAG 命中 `experiment_log.md`；**不**将单段 ML sharpe 当论文指标。
+
+记录：**EXP-LLM-002** ✅（2026-06-03，Qwen2.5-7B-Instruct @ GPU 0，vLLM 0.22.0）。
 
 ## 七、删除旧部署（如曾在 ~/quant-mas 建过）
 

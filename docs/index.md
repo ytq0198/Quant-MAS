@@ -159,10 +159,12 @@ Memory/RAG feeds **ResearchAgent** context — it does not execute trades.
 | Metric | Value | Experiment |
 |--------|-------|------------|
 | pytest | **212 passed** | EXP-027/028（本地+服务器） |
+| local vLLM smoke | ResearchAgent `local_vllm` | EXP-LLM-002 |
 | **OOS sharpe (baseline)** | **0.586** | EXP-20260602-008 |
 | **OOS + FinBERT text** | **0.563** | EXP-TEXT-WF-001 · exploratory (200/6033 coverage) |
 | Single-segment ML sharpe | 2.78 | ⚠️ in-sample only |
 | DeepSeek ResearchAgent smoke | verified | EXP-LLM-001 |
+| local vLLM ResearchAgent smoke (a6000) | verified | EXP-LLM-002 |
 | FinBERT text smoke (server) | 200 signals | EXP-TEXT-001 · ModelScope local path |
 | RL simulation (local) | TradingEnv + GRPO ranking | EXP-20260602-021/022 |
 | MCP / A2A (local) | Policy gateway + AgentCard export | EXP-20260602-023 |

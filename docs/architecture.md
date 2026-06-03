@@ -190,6 +190,6 @@ collect_experiment_metrics → BaselineRegistry / comparison table
 | **M7** RL/GRPO 模拟 | TradingEnv + GRPO ranking | ✅ EXP-021/022（180 passed） |
 | **M8** MCP/A2A | MCP adapter + AgentCard | ✅ EXP-023/024（195 passed） |
 | **M9** 企业 DB | Postgres + pgvector + Neo4j | ✅ EXP-025/028（212 passed 服务器） |
-| **M10** LLM 生产化 | local_vllm + ResearchAgent | ✅ EXP-027/028（212 passed） |
+| **M10** LLM 生产化 | local_vllm + ResearchAgent | ✅ EXP-027/028/LLM-002（212 passed + vLLM smoke） |
 
 详见 [项目plus设计.md](../项目plus设计.md)。**Plus v2 系统结构定稿**见 [`项目进度.md`](../项目进度.md) §Plus v2 收官。

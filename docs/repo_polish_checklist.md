@@ -156,7 +156,7 @@ Release notes 草稿见本文档 §6。
 - M7 RL/GRPO 训练与 TradingEnv
 - M8 MCP/A2A 协议适配器
 - M3.5 企业 RAG（Postgres/pgvector 生产后端）
-- M5.5 本地 vLLM 服务
+- M5.5 本地 vLLM 服务 ✅ EXP-LLM-002（见 server_commands §6.13）
 - 真实 FinBERT/LoRA 生产训练流水线（仅骨架 + 服务器手工 smoke）
 - 实盘下单 / broker 对接
 

@@ -1,6 +1,6 @@
 # Quant MAS 实验记录
 
-更新时间：2026-06-01（v3 M9/M10 服务器 ✅ EXP-028，212 passed；EXP-026 DB smoke 待 Docker）
+更新时间：2026-06-03（v3 M10 服务器 ✅ EXP-LLM-002 local_vllm smoke；EXP-026 DB smoke 待 Docker）
 
 本文件用于记录真实实验和重要验证。不要记录未经实际运行的数据结果；尚未真实运行的项目标记为「待验证」。
 
@@ -178,6 +178,28 @@
 
 ## 当前验证记录
 
+### EXP-LLM-002：v3 M10 服务器 local_vLLM + ResearchAgent smoke ✅
+
+- 日期：2026-06-03
+- 阶段：**v3 M10** — a6000 上真实 vLLM OpenAI 兼容端点 + `ResearchAgent --provider local_vllm`
+- 环境：a6000-9961；conda **`vllm`**（vLLM **0.22.0**，Python 3.11）+ **`quant-mas`**（客户端）；GPU **0**（RTX A6000）
+- 模型：`/mnt/localDisk3/weizian/models/Qwen2.5-7B-Instruct`（本地 4×safetensors，HF 镜像下载；`HF_HUB_OFFLINE=1`）
+- vLLM 启动要点：
+  - **独立 conda 环境** `/mnt/localDisk3/weizian/conda_envs/vllm`（勿装进 quant-mas；勿用 `~/.local/bin/vllm`）
+  - `export VLLM_USE_FLASHINFER_SAMPLER=0`（系统 CUDA 11 + FlashInfer JIT 会失败；用 PyTorch-native sampler）
+  - `--enforce-eager`；`--served-model-name Qwen/Qwen2.5-7B-Instruct`
+  - 端点：`http://127.0.0.1:8000`
+- 命令与结果：
+  - `curl http://127.0.0.1:8000/v1/models` → `Qwen/Qwen2.5-7B-Instruct`
+  - `python scripts/run_research_agent.py --provider local_vllm --use-llm ...` → `llm_provider=local_vllm`
+  - 产物：`/mnt/localDisk3/weizian/reports/llm/EXP-LLM-002.json`、`EXP-LLM-002-constrained.json`
+- 约束 task 验收：仅解释 **EXP-20260602-008** walk-forward OOS baseline（**oos.sharpe ≈ 0.586**）；未将 `workflow_ml_backtest` 单段 sharpe 或 pytest 里程碑当论文指标
+- 已知限制：
+  - Qwen 常把 JSON 包在 markdown fence → 顶层 `hypothesis` 可能 fallback；实质内容在 `evidence_summary`
+  - LLM 叙事非权威；论文主指标仍为 **OOS 0.586**
+- 问题：无（FlashInfer/CUDA12 已通过 `VLLM_USE_FLASHINFER_SAMPLER=0` 规避；GPU OOM 因重复起第二个 vLLM，kill 旧进程即可）
+- 下一步：EXP-026 Postgres smoke；EXP-TEXT-WF-002
+
 ### EXP-20260602-028：v3 M9/M10 服务器 pytest 验收 ✅
 
 - 日期：2026-06-01
@@ -187,7 +209,7 @@
   - `python -m pytest -v` → **212 passed** in **11.39s**
   - 含 `test_memory_enterprise.py` **12/12**、`test_context_engineering.py` **17/17**（全 mock，不联网）
 - 问题：无
-- 下一步：EXP-026 真实 Postgres smoke（待 Docker 权限）；**EXP-LLM-002** vLLM smoke
+- 下一步：EXP-026 真实 Postgres smoke（待 Docker 权限）；~~EXP-LLM-002~~ ✅
 
 ### EXP-20260602-027：v3 M10 LLM 生产化本地验证 ✅
 
@@ -206,7 +228,7 @@
   - 全量 `python -m pytest -v` → **212 passed**（207→212，+5）
 - 安全边界：pytest 全 mock HTTP；无真实 DeepSeek/vLLM/HF 网络
 - 问题：无
-- 下一步：~~服务器 pytest **212**~~ ✅ EXP-028；vLLM smoke **EXP-LLM-002**
+- 下一步：~~服务器 pytest **212**~~ ✅ EXP-028；~~vLLM smoke EXP-LLM-002~~ ✅
 
 ### EXP-20260602-026：v3 M9 服务器 Postgres/pgvector 真实 DB smoke 📋 阻塞中
 
