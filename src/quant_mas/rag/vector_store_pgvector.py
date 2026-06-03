@@ -6,6 +6,7 @@ import json
 import os
 from typing import Any, Protocol
 
+from quant_mas.memory._psycopg_compat import pg_execute, pg_fetchall
 from quant_mas.rag.vector_store_base import VectorSearchResult, VectorStore
 
 
@@ -49,7 +50,8 @@ class PgVectorStore(VectorStore):
         try:
             for id_, embedding, item_metadata in zip(ids, embeddings, metadata, strict=True):
                 self._validate_embedding(embedding)
-                connection.execute(
+                pg_execute(
+                    connection,
                     f"""
                     INSERT INTO {self.table_name} (id, embedding, metadata)
                     VALUES (%s, %s, %s::jsonb)
@@ -78,7 +80,8 @@ class PgVectorStore(VectorStore):
         self._validate_embedding(query_embedding)
         connection = self._connect()
         try:
-            connection.execute(
+            rows = pg_fetchall(
+                connection,
                 f"""
                 SELECT id, metadata, 1 - (embedding <=> %s) AS score
                 FROM {self.table_name}
@@ -91,7 +94,6 @@ class PgVectorStore(VectorStore):
                     top_k,
                 ),
             )
-            rows = connection.fetchall()
         finally:
             self._close_if_owned(connection)
         return [_row_to_result(row) for row in rows]
@@ -100,7 +102,11 @@ class PgVectorStore(VectorStore):
         connection = self._connect()
         try:
             for id_ in ids:
-                connection.execute(f"DELETE FROM {self.table_name} WHERE id = %s", (id_,))
+                pg_execute(
+                    connection,
+                    f"DELETE FROM {self.table_name} WHERE id = %s",
+                    (id_,),
+                )
             connection.commit()
         finally:
             self._close_if_owned(connection)
@@ -108,8 +114,9 @@ class PgVectorStore(VectorStore):
     def _initialize(self) -> None:
         connection = self._connect()
         try:
-            connection.execute("CREATE EXTENSION IF NOT EXISTS vector")
-            connection.execute(
+            pg_execute(connection, "CREATE EXTENSION IF NOT EXISTS vector")
+            pg_execute(
+                connection,
                 f"""
                 CREATE TABLE IF NOT EXISTS {self.table_name} (
                     id TEXT PRIMARY KEY,

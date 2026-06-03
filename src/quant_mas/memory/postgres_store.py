@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Any, Protocol
 from uuid import uuid4
 
+from quant_mas.memory._psycopg_compat import pg_execute, pg_fetchall, pg_fetchone
 from quant_mas.memory.experiment_memory import ExperimentRecord, _json_safe
 from quant_mas.memory.store_base import (
     MemoryStore,
@@ -74,7 +75,8 @@ class PostgresMemoryStore(MemoryStore):
         )
         connection = self._connect()
         try:
-            connection.execute(
+            pg_execute(
+                connection,
                 """
                 INSERT INTO experiments (
                     id, name, status, created_at, metrics_json,
@@ -101,7 +103,8 @@ class PostgresMemoryStore(MemoryStore):
     def get(self, experiment_id: str) -> ExperimentRecord:
         connection = self._connect()
         try:
-            connection.execute(
+            row = pg_fetchone(
+                connection,
                 """
                 SELECT id, name, status, created_at, metrics_json,
                        artifacts_json, params_json, notes
@@ -110,7 +113,6 @@ class PostgresMemoryStore(MemoryStore):
                 """,
                 (experiment_id,),
             )
-            row = connection.fetchone()
         finally:
             self._close_if_owned(connection)
         if row is None:
@@ -120,7 +122,8 @@ class PostgresMemoryStore(MemoryStore):
     def list(self) -> list[ExperimentRecord]:
         connection = self._connect()
         try:
-            connection.execute(
+            rows = pg_fetchall(
+                connection,
                 """
                 SELECT id, name, status, created_at, metrics_json,
                        artifacts_json, params_json, notes
@@ -128,7 +131,6 @@ class PostgresMemoryStore(MemoryStore):
                 ORDER BY created_at ASC, id ASC
                 """
             )
-            rows = connection.fetchall()
         finally:
             self._close_if_owned(connection)
         return [_row_to_record(row) for row in rows]
@@ -171,7 +173,8 @@ class PostgresMemoryStore(MemoryStore):
     def _initialize(self) -> None:
         connection = self._connect()
         try:
-            connection.execute(
+            pg_execute(
+                connection,
                 """
                 CREATE TABLE IF NOT EXISTS experiments (
                     id TEXT PRIMARY KEY,

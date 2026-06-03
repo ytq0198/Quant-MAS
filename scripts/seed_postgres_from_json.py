@@ -67,8 +67,8 @@ def main() -> int:
         oos = best.metrics.get("oos", {})
         sharpe = oos.get("sharpe") if isinstance(oos, dict) else None
         print(f"[seed] best oos.sharpe -> {best.name!r} sharpe={sharpe}")
-    except ValueError as exc:
-        print(f"[seed] WARN: {exc}", file=sys.stderr)
+    except (ValueError, AttributeError) as exc:
+        print(f"[seed] WARN: could not verify best metric: {exc}", file=sys.stderr)
     return 0
 
 
