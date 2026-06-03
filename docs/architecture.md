@@ -17,7 +17,13 @@ Quant MAS 采用「确定性量化引擎 + **Text Signal Layer（M6）** + 轻�
 - LLM Agent **不允许**直接实盘下单。
 - 所有交易信号须经过回测、风控、审计和人工确认。
 
-## 当前架构图
+## 架构图（Architecture Diagram）
+
+![Quant MAS 架构图](../architecture.png)
+
+> **说明**：架构图见仓库根目录 [`architecture.png`](../architecture.png)。下方为文本树补充说明。
+
+## 当前架构图（文本树）
 
 ```text
 Quant MAS

@@ -63,6 +63,94 @@
 
 ## 实验记录模板
 
+复制以下块追加到「当前验证记录」或「待验证实验」。**禁止**填写未运行结果的 metrics；API key 不得入库。
+
+### 通用模板（工程 / pytest / CLI）
+
+```markdown
+## 实验编号：EXP-YYYYMMDD-NNN
+
+- 日期：
+- 阶段：（Prompt / Plus M1–M8）
+- 环境：（本地 Windows / 服务器 a6000-9961；Python；git commit）
+- 命令：
+  ```bash
+  # 粘贴实际命令
+  ```
+- 结果摘要：
+- 指标：（仅填已验证数值；OOS 须标注 is_oos=是）
+- 产物路径：
+- 问题：
+- 下一步：
+```
+
+### Walk-forward / 论文主指标模板
+
+```markdown
+## 实验编号：EXP-YYYYMMDD-NNN
+
+- 日期：
+- 阶段：Walk-forward OOS
+- 数据：`features.parquet` 路径与行数
+- 配置：`configs/walk_forward.yaml` 窗口参数
+- 参数：`--experiment-name`、device
+- **OOS 指标**（论文唯一主指标）：
+  - oos.sharpe：
+  - oos.total_return：
+  - oos.max_drawdown：
+  - window_count：
+- 与 baseline 对比：**EXP-20260602-008** oos.sharpe **0.586** → ↑/↓/≈
+- 产物：`metrics.json`、`summary.md`、`windows.csv`
+- 问题：
+- 下一步：
+```
+
+### LLM / ResearchAgent smoke 模板（不写 key）
+
+```markdown
+## 实验编号：EXP-LLM-NNN
+
+- 日期：
+- 阶段：Plus M5
+- 环境：`llm_provider`（mock / openai_compatible）
+- 命令：`run_research_agent.py --use-llm ...`
+- 结果摘要：（baseline 是否命中、RAG 命中文件、latency 可选）
+- **禁止记录**：API key、完整 prompt 中的 secrets
+- 下一步：
+```
+
+### 文本模型 smoke 模板（FinBERT / LoRA）
+
+```markdown
+## 实验编号：EXP-TEXT-NNN
+
+- 日期：
+- 阶段：Plus M6
+- 模式：mock / finbert_baseline / lora
+- 文本来源：（jsonl 路径、条数、是否 synthetic）
+- 产物：`signals.parquet`、`metadata.json`
+- 是否加载真实 HF 权重：是 / 否
+- walk-forward 对比 baseline：**待验证 / 已对比 0.586**
+- 问题：
+- 下一步：
+```
+
+### 比较表快照模板
+
+```markdown
+### 快照：COMP-YYYYMMDD-001
+
+- 生成：`python scripts/compare_experiments.py --storage-config ... --output-dir ...`
+- Memory 路径：
+- 对照 baseline：**EXP-20260602-008**（OOS sharpe **0.586**）
+
+| name | family | is_oos | oos.sharpe | vs baseline | 备注 |
+|------|--------|--------|------------|-------------|------|
+| | walk_forward / ml_backtest / ... | 是/否 | | ↑/↓/≈ | |
+```
+
+### 历史简短模板（兼容旧记录）
+
 ```markdown
 ## 实验编号：EXP-YYYYMMDD-001
 

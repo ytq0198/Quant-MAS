@@ -2,11 +2,28 @@
 
 更新时间：2026-06-03（Plus M6 本地 ✅ EXP-20260602-019）
 
-**Plus v2**：**M1–M6 ✅**（本地+服务器 **161 passed**，EXP-019/020）→ 可选 EXP-TEXT-001 / M7
+**Plus v2**：**M1–M6 ✅**（本地+服务器 **161 passed**，EXP-019/020）→ 可选 EXP-TEXT-001 / **M7** / **M8**
 
-第五～六阶段见 [项目plus设计.md](../项目plus设计.md)（M4 LangGraph / M7 模拟，非实盘）。
+第五～六阶段见 [项目plus设计.md](../项目plus设计.md)（M7 RL 模拟 / M8 协议扩展，非实盘）。
 
-## 阶段总览
+## Plus v2 八条主线（M1–M8）
+
+| 编号 | 名称 | 状态 | 关键交付 / 实验 | 文档 |
+|------|------|------|-----------------|------|
+| **M1** | 研究基线与实验规范 | ✅ | BaselineRegistry、`compare_experiments.py`；OOS **0.586** | [research_protocol.md](research_protocol.md) |
+| **M2** | 数据源扩展 | ✅ | Alpha Vantage / Finnhub / FRED / SEC fetchers | [data_sources.md](data_sources.md) |
+| **M3** | Memory / RAG v2 | ✅ | SQLite、HybridRetriever、index/query CLI | [database_setup.md](database_setup.md) |
+| **M3.5** | 企业 RAG 扩展 | 📋 按需 | Postgres/pgvector、真 Embedding | 项目plus设计 §M3.5 |
+| **M4** | LangGraph 工作流 | ✅ | ResearchWorkflow、sequential + langgraph | [langgraph_workflow.md](langgraph_workflow.md) |
+| **M5** | 上下文 / LLM | ✅ | ContextBuilder、ResearchAgent；EXP-LLM-001 | [context_engineering.md](context_engineering.md) |
+| **M5.5** | 本地 vLLM | 📋 按需 | OpenAI 兼容端点（a6000） | 项目plus设计 §M5.5 |
+| **M6** | 文本信号 | ✅ | text/、text_signals merge；161 passed | [text_model_plan.md](text_model_plan.md) |
+| **M7** | RL / GRPO 实验 | 📋 待做 | TradingEnv 骨架、模拟 ranking | 项目plus设计 §M7 |
+| **M8** | MCP / A2A 协议 | 📋 待做 | protocol adapter | 项目plus设计 §M8 |
+
+**pytest 基线**：**161 passed**（EXP-019/020） · **论文主指标**：Walk-forward OOS sharpe **0.586**（EXP-20260602-008）
+
+## 阶段总览（v1 Prompt + Plus v2）
 
 | 阶段 | 名称 | 状态 | 关键交付 |
 |------|------|------|----------|
@@ -22,7 +39,7 @@
 | **Plus M4** | LangGraph 编排 | ✅ | EXP-20260602-015/016 |
 | **Plus M5** | 上下文/LLM | ✅ | EXP-20260602-017/018，EXP-LLM-001，**150 passed** |
 | **Plus M6** | 文本大模型 | ✅ | EXP-20260602-019/020，**161 passed** |
-| 第五～六阶段 | 编排 / RL 模拟 | 📋 | Plus M4 / M7 |
+| 第五～六阶段 | 编排 / RL 模拟 | 📋 | Plus **M7** RL/GRPO；**M8** MCP/A2A |
 
 ## Quant MAS v2：M1 研究基线
 
