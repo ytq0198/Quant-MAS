@@ -160,8 +160,10 @@ Memory/RAG feeds **ResearchAgent** context — it does not execute trades.
 |--------|-------|------------|
 | pytest | **161 passed** | EXP-019/020 |
 | **OOS sharpe (baseline)** | **0.586** | EXP-20260602-008 |
+| **OOS + FinBERT text** | **0.563** | EXP-TEXT-WF-001 · exploratory (200/6033 coverage) |
 | Single-segment ML sharpe | 2.78 | ⚠️ in-sample only |
 | DeepSeek ResearchAgent smoke | verified | EXP-LLM-001 |
+| FinBERT text smoke (server) | 200 signals | EXP-TEXT-001 · ModelScope local path |
 
 ⚠️ Single-run backtest ≠ paper evidence. Always compare via `compare_experiments.py`.
 

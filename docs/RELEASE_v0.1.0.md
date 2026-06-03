@@ -5,11 +5,12 @@
 - **161 passing pytest** cases (mock/synthetic in tests)
 - Agent layer: SupervisorAgent, ResearchAgent, optional LLM narration (**no live orders**)
 - Memory/RAG v2, optional LangGraph workflow
-- Text signal layer (M6 skeleton)
+- Text signal layer (M6) — FinBERT smoke + walk-forward OOS comparison (EXP-TEXT-WF-001)
 
 ## Verified research baseline
 
 - Walk-forward OOS sharpe **0.586** (EXP-20260602-008, server walk-forward)
+- Text-augmented walk-forward OOS sharpe **0.563** (EXP-TEXT-WF-001, exploratory; 200/6033 text coverage)
 
 ## Install
 

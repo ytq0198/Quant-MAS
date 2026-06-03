@@ -4,7 +4,7 @@
 
 > 本文档在 **Prompt 1–20 主链路已完成**（第零～四阶段）的基础上，规划 **Quant MAS v2** 的研究型升级路线。  
 > 基线状态：本地 **137+1 skip**（138 项；EXP-20260602-015）；服务器 M4 langgraph ✅（EXP-20260602-016 @ `c0fa5e3`）。  
-> **当前执行**：M1–M6 ✅（EXP-019/020，161 passed）→ 可选 EXP-TEXT-001 / **M7**。  
+> **当前执行**：M1–M6 ✅（含 EXP-TEXT-001 / EXP-TEXT-WF-001）→ **M7** / 扩大 text 覆盖（EXP-TEXT-WF-002）。  
 > 与 `项目进度.md` / `项目指导.md` 的关系：后者记录「已完成什么」；本文档记录「接下来怎么优化、怎么给 Codex/Cursor 下指令」。
 
 ---
@@ -99,11 +99,11 @@
 ### 3.1 当前推荐执行顺序（2026-06-03 更新）
 
 ```
-已完成   M1 → M2 → M3 → M4 → M5 ✅ → **M6 ✅**（EXP-019/020，161 passed）
+已完成   M1 → M2 → M3 → M4 → M5 ✅ → **M6 ✅**（EXP-019/020 + **EXP-TEXT-001/WF-001**，161 passed）
 
-进行中   ① 可选 EXP-TEXT-001 FinBERT smoke
-         ② text signal + walk-forward vs OOS **0.586**
-         ③ **M7** RL/GRPO
+进行中   ① 扩大 text JSONL 覆盖 → EXP-TEXT-WF-002
+         ② **M7** RL/GRPO 骨架
+         ③ 可选 EXP-TEXT-002 LoRA 小样本
 
 按需扩展 M3.5 企业 RAG（真 Embedding / pgvector / Postgres / Neo4j）
          ↑ 触发条件见 §M3.5，不阻塞 M6
@@ -614,11 +614,9 @@ MODEL_CACHE_DIR=/mnt/localDisk3/weizian/models/hf
 ### 给 Cursor 的提示词
 
 ```
-1. 服务器：git pull → python -m pytest -v（**161**）；nvidia-smi。
-2. docs/text_model_plan.md ✅；experiment_log EXP-019 ✅。
-3. 可选 EXP-TEXT-001 FinBERT；EXP-TEXT-002 LoRA 小样本。
-4. text signal 并入 features 后 walk-forward，与 EXP-20260602-008 对比。
-5. HF token 不入库。
+1. M6 代码 + 服务器 text 验收 ✅（EXP-TEXT-001 / EXP-TEXT-WF-001；OOS **0.563** vs **0.586**）。
+2. 下一步：扩大 JSONL 覆盖 → EXP-TEXT-WF-002；或 **M7** RL 骨架（codex_prompt_M7.md）。
+3. HF token 不入库；服务器优先 ModelScope（见 mistakes M-018）。
 ```
 
 ---
@@ -876,9 +874,9 @@ flowchart TB
 测试基线：本地 **161 passed**（EXP-019）；M5 服务器 **150 passed**（EXP-018）；OOS baseline sharpe 0.586（EXP-20260602-008）。
 LLM/文本模型不允许直接下单；pytest 不联网、不加载真实 FinBERT 权重。
 请只实现当前一个模块，完成后 python -m pytest -v 全量通过。
-下一步：M6 服务器验收 或 M7 RL 骨架（见 项目plus设计.md §M7）。
+下一步：M7 RL 骨架 或 扩大 text 覆盖复跑 WF（见 项目plus设计.md §M7 / text_model_plan.md）。
 ```
 
 ---
 
-*文档版本：2026-06-03 · Quant MAS Plus v2（M1–M6 ✅；下一步 EXP-TEXT-001 / M7）*
+*文档版本：2026-06-03 · Quant MAS Plus v2（M1–M6 ✅；EXP-TEXT-WF-001 OOS 0.563 vs 0.586；下一步 M7 / EXP-TEXT-WF-002）*

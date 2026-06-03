@@ -173,6 +173,6 @@ collect_experiment_metrics → BaselineRegistry / comparison table
 | **M3** Memory/RAG v2 | SQLite / 向量 / HybridRetriever | ✅ 本地（EXP-20260602-013） |
 | **M4** LangGraph | ResearchWorkflow DAG | ✅ EXP-20260602-015/016 |
 | **M5** 上下文/LLM | ContextBuilder、ResearchAgent | ✅ 本地+服务器（EXP-017/018，EXP-LLM-001） |
-| **M6** 文本大模型 | FinBERT/LoRA + text_signals merge | ✅（EXP-20260602-019/020，**161 passed**） |
+| **M6** 文本大模型 | FinBERT/LoRA + text_signals merge | ✅ EXP-019/020 + **EXP-TEXT-001/WF-001**（OOS **0.563** vs **0.586**） |
 
 详见 [项目plus设计.md](../项目plus设计.md)。

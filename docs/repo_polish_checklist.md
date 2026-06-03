@@ -147,7 +147,7 @@ Release notes 草稿见本文档 §6。
 | L2 | GitHub Actions：`python -m pytest -v` on push |
 | L3 | `docs/screenshots/` CLI 输出截图 |
 | L4 | 英文版 `README.zh-CN.md` 拆分（当前 README 已 inline 双语） |
-| L5 | EXP-TEXT-001 FinBERT 服务器 smoke 写入 experiment_log |
+| L5 | EXP-TEXT-001 / EXP-TEXT-WF-001 写入 experiment_log | ✅ |
 | L6 | M7/M8 的 `codex_prompt_M7.md` |
 
 ### 4.4 明确未实现（文案中不得写成已完成）
@@ -168,7 +168,7 @@ Release notes 草稿见本文档 §6。
 | 回测 / 风控 | ✅ 已实现，pytest 覆盖 |
 | Walk-forward OOS | ✅ 已实现；服务器 verified sharpe **0.586** |
 | LLM Agent | ✅ ResearchAgent/ReportAgent；默认 Mock；可选云端 API |
-| 文本情绪特征 | ✅ mock + 骨架；真实 FinBERT 需 `[text]` extra + GPU |
+| 文本情绪特征 | ✅ mock + FinBERT 服务器 smoke（EXP-TEXT-001）；WF OOS **0.563** vs **0.586**（exploratory） |
 | LangGraph | ✅ 可选依赖 `[orchestration]` |
 | RL / MCP | 📋 设计文档已有，**代码未实现** |
 
@@ -187,10 +187,11 @@ Release notes 草稿见本文档 §6。
 - 161 passing pytest cases (mock/synthetic only in CI)
 - Agent layer: SupervisorAgent, ResearchAgent, optional LLM narration
 - Memory/RAG v2, optional LangGraph workflow
-- Text signal layer (M6 skeleton)
+- Text signal layer (M6) — FinBERT smoke + walk-forward OOS comparison on server
 
 ### Verified research baseline
 - Walk-forward OOS sharpe **0.586** (EXP-20260602-008, server walk-forward)
+- Text-augmented walk-forward OOS sharpe **0.563** (EXP-TEXT-WF-001, exploratory)
 
 ### Not included
 - No live trading / broker integration

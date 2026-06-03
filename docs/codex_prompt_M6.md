@@ -1,8 +1,8 @@
 # Plus M6：金融文本大模型 / 文本信号 — Codex 提示词
 
-**状态：✅ 已完成（EXP-20260602-019，161 passed，2026-06-03）**
+**状态：✅ 已完成（本地 EXP-019 + 服务器 EXP-020 / EXP-TEXT-001 / EXP-TEXT-WF-001，161 passed，2026-06-03）**
 
-更新时间：2026-06-03
+更新时间：2026-06-03（含服务器 FinBERT + walk-forward OOS 对比）
 
 > **用法**：先粘贴下方「固定前缀」，再粘贴「M6 主任务」整段交给 Codex。  
 > **设计依据**：[项目plus设计.md §M6](../项目plus设计.md#m6金融文本大模型--开源模型微调) · 前置：**M1–M5 ✅**（EXP-20260602-018 / EXP-LLM-001）
@@ -239,13 +239,10 @@ python scripts/train_text_model.py --mode mock --config configs/text_model.yaml 
 1. ~~新增 `docs/text_model_plan.md`~~ ✅
 2. ~~更新 `docs/architecture.md` — Text Signal Layer~~ ✅
 3. ~~更新 `docs/experiment_log.md` — EXP-20260602-019~~ ✅
-4. 服务器（**不写入 pytest**）：
-   ```bash
-   nvidia-smi
-   python -m pip install -e ".[text]"
-   python scripts/train_text_model.py --mode finbert_baseline --config configs/text_model.yaml
-   ```
-5. 文本 signal 并入 features 后跑 walk-forward，与 **EXP-20260602-008** 对比；未跑则不虚构 oos.sharpe。
+4. ~~服务器 FinBERT smoke（EXP-TEXT-001）~~ ✅ — ModelScope 本地 FinBERT；200 signals
+5. ~~text signal 并入 features → walk-forward（EXP-TEXT-WF-001）~~ ✅ — oos.sharpe **0.563** vs baseline **0.586**（Δ -0.023，exploratory）
+
+**下一步（科研，非 Codex 骨架）**：扩大 JSONL 新闻覆盖 → EXP-TEXT-WF-002；可选 LoRA（EXP-TEXT-002）。详见 [text_model_plan.md](text_model_plan.md)、[server_commands.md](server_commands.md) §6.9。
 
 ---
 

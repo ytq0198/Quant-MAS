@@ -38,11 +38,10 @@
 | （填写） | ma_cross / lightgbm / ml_backtest / walk_forward / other | 是/否 | | | | | | | ↑/↓/≈ / 待验证 | |
 ```
 
-### 当前快照：COMP-20260602-002（服务器 CLI 已验证，EXP-20260602-010）
+### 当前快照：COMP-20260603-001（text walk-forward，**6 rows**）
 
-- 生成：`python scripts/compare_experiments.py --storage-config configs/storage.server.yaml --output-dir outputs/research`
+- 生成：`python scripts/compare_experiments.py --storage-config configs/storage.server.yaml --memory-path /mnt/localDisk3/weizian/reports/experiments.json --output-dir /mnt/localDisk3/weizian/reports/research`
 - Memory：`/mnt/localDisk3/weizian/reports/experiments.json`
-- 行数：**5**
 - 对照 baseline：**EXP-20260602-008**，`oos.sharpe = 0.586`
 
 | name | family | sharpe | oos.sharpe | total_return | oos.total_return | max_drawdown | test_auc | vs OOS baseline | 备注 |
@@ -53,20 +52,15 @@
 | server_ml_backtest_001 | ml_backtest | **2.781** | — | 68.27 | — | -0.246 | — | ⚠️ in-sample | EXP-20260602-005 |
 | server_walk_forward_001 | walk_forward | — | **0.586** | — | 0.443 | — | — | **baseline** | EXP-20260602-008 |
 | server_walk_forward_text_001 | walk_forward | — | **0.563** | — | 0.420 | — | — | ↓ -0.023 | EXP-TEXT-WF-001 |
-| （RAG/LLM/RL 等） | other | 待验证 | 待验证 | 待验证 | 待验证 | 待验证 | 待验证 | 待验证 | Plus M4+ |
 
 **说明：**
 
 - CLI 输出 `oos.sharpe` 精确值 **0.585673** ≈ 报告 **0.586**，与 EXP-20260602-008 一致。
 - 仅 **walk_forward** 行可用于论文主结论。
 - EXP-TEXT-WF-001：200/6033 text 覆盖 + fillna(0)，**exploratory**；Δ oos.sharpe **-0.023**。
+- 产物：`/mnt/localDisk3/weizian/reports/research/comparison.md`
 
-### 当前快照：COMP-20260603-001（text walk-forward，6 rows）
-
-- 生成：`compare_experiments.py` → `/mnt/localDisk3/weizian/reports/research/comparison.md`
-- walk-forward：baseline **0.586** vs text **0.563**
-
-### 历史快照：COMP-20260602-002（5 rows，EXP-20260602-010）
+### 历史快照：COMP-20260602-002（5 rows，EXP-20260602-010，text 实验前）
 
 ## 实验记录模板
 
@@ -245,12 +239,12 @@
 
 - 日期：2026-06-03
 - 阶段：Plus v2 **M6**（服务器）
-- 环境：a6000-9961，conda `/mnt/localDisk3/weizian/conda_envs/quant-mas`，Python 3.11.15，git **`b9de2f2`**
+- 环境：a6000-9961，conda `/mnt/localDisk3/weizian/conda_envs/quant-mas`，Python 3.11.15，git **`f1b00a9`**（pull 后）/ **`b9de2f2`**（M6 代码）
 - 命令与结果：
   - `git pull origin main` → M6 代码
-  - `python -m pip install -e .`
-  - `python -m pytest -v` → **161 passed** in **9.20s**
-- 问题：无
+  - `python -m pip install -e ".[ml,text]"`（text 验收环境）
+  - `python -m pytest -v` → **161 passed** in **9.20s**（核心）/ **22.14s**（含 `[text]` 全量验收）
+- 问题：首次 pull TLS 失败，后 fetch 成功
 - 下一步：~~EXP-TEXT-001 / walk-forward~~ ✅ EXP-TEXT-001 / EXP-TEXT-WF-001
 
 ### EXP-20260602-019：Plus M6 金融文本信号本地验证 ✅
@@ -814,7 +808,7 @@
 | EXP-20260602-011 | 2026-06-02 | Plus M2 数据扩展本地 | **115 passed**（+13） |
 | EXP-TEXT-WF-001 | 2026-06-03 | FinBERT + walk-forward OOS | oos.sharpe **0.563** vs baseline **0.586** |
 | EXP-TEXT-001 | 2026-06-03 | FinBERT smoke（ModelScope） | 200 signals → signals_finbert.parquet |
-| EXP-20260602-020 | 2026-06-03 | Plus M6 服务器 pytest | **161 passed**（9.20s） |
+| EXP-20260602-020 | 2026-06-03 | Plus M6 服务器 pytest | **161 passed**（9.20s / 22.14s 含 `[text]`） |
 | EXP-20260602-019 | 2026-06-03 | Plus M6 文本信号本地 | **161 passed**（+11）；test_text_signals **11/11** |
 | EXP-LLM-001 | 2026-06-03 | DeepSeek ResearchAgent smoke | openai_compatible；OOS sharpe **0.586** |
 | EXP-20260602-018 | 2026-06-03 | Plus M5 服务器 pytest | **150 passed**（7.24s） |
