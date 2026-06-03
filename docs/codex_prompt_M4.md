@@ -1,8 +1,8 @@
 # Plus M4：LangGraph 工作流编排 — Codex 提示词
 
-**状态：✅ 已完成（EXP-20260602-015，136 passed / 1 skipped，2026-06-02）**
+**状态：✅ 已完成（EXP-20260602-015 本地 / EXP-20260602-016 服务器，137+1 skip → 含 orchestration 138 passed，2026-06-03）**
 
-更新时间：2026-06-02  
+更新时间：2026-06-03  
 
 > 运行说明：[langgraph_workflow.md](langgraph_workflow.md) · 设计：[项目plus设计.md §M4](../项目plus设计.md#m4langgraph-工作流编排)
 

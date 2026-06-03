@@ -10,7 +10,8 @@ GitHub 仓库：[https://github.com/ytq0198/Quant-MAS](https://github.com/ytq019
 
 | 日期 | 项目 | 结果 | 备注 |
 |------|------|------|------|
-| 2026-06-02 | Plus M4 LangGraph（本地） | **136+1 skip** | EXP-20260602-015 |
+| 2026-06-03 | Plus M4 LangGraph 服务器（langgraph backend） | langgraph dry-run ✅ | EXP-20260602-016；commit `c0fa5e3` |
+| 2026-06-02 | Plus M4 LangGraph（本地） | **137+1 skip**（138 项） | EXP-20260602-015 |
 | 2026-06-02 | Plus M3 Memory/RAG v2（本地+服务器） | **126 passed** | EXP-20260602-013/014 |
 | 2026-06-02 | Plus M2 数据扩展（本地+服务器） | **115 passed** / test_data_sources **13/13** | EXP-20260602-011/012 |
 | 2026-06-02 | Plus M1 research baseline (local) | **102 passed** | EXP-20260602-009 |
@@ -404,18 +405,20 @@ python scripts/query_memory.py \
 
 ```bash
 cd /mnt/localDisk3/weizian/Quant-MAS
-git pull origin main
+git pull origin main   # 需 >= c0fa5e3（M-016 建边修复）
 conda activate /mnt/localDisk3/weizian/conda_envs/quant-mas
 python -m pip install -e .
-python -m pytest -v   # 预期 136 passed, 1 skipped
+python -m pip install -e ".[orchestration]"
 
+python -m pytest tests/test_langgraph_workflow.py::test_langgraph_build_and_dry_run_when_available -v
 python scripts/run_langgraph_workflow.py --help
 python scripts/run_langgraph_workflow.py --dry-run --backend sequential
-# 可选：python -m pip install -e ".[orchestration]"
-# python scripts/run_langgraph_workflow.py --dry-run --backend langgraph
+python scripts/run_langgraph_workflow.py --dry-run --backend langgraph
+# 全量（可选）：核心 137+1 skip；含 orchestration 138 passed
+# python -m pytest -v
 ```
 
-详见 [`docs/langgraph_workflow.md`](langgraph_workflow.md)。
+记录：**EXP-20260602-016**（2026-06-03，a6000-9961 @ `c0fa5e3`）。首次 M4 pull 若 langgraph backend 报 `zip() argument 2 is shorter`，见 [`mistakes.md`](../mistakes.md) **M-016**。
 
 ## 七、删除旧部署（如曾在 ~/quant-mas 建过）
 

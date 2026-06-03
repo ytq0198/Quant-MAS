@@ -3,7 +3,7 @@
 > 记录各开发阶段遇到的典型问题、根因与解决方法，便于复盘和避免重复踩坑。  
 > 与 [`项目指导.md`](项目指导.md) §20 操作手册、`docs/server_commands.md` 配合使用。
 
-**最后更新**：2026-06-02（Plus M2 EXP-DATA-001）  
+**最后更新**：2026-06-03（Plus M4 EXP-20260602-016）  
 **维护方式**：每遇到新问题，在对应 Phase 章节末尾追加一条（含日期、步骤、现象、根因、解法）。
 
 ---
@@ -21,6 +21,7 @@
 - [Phase 2：机器学习实验（进行中）](#phase-2机器学习实验进行中)
   - [Step 2.2b GPU 训练 ✅](#step-22b-gpu-训练--已完成2026-06-02)
 - [Plus M2：多数据源扩展（EXP-DATA-001）](#plus-m2多数据源扩展exp-data-001)
+- [Plus M4：LangGraph 编排（EXP-20260602-016）](#plus-m4langgraph-编排exp-20260602-016)
 - [跨阶段通用规则](#跨阶段通用规则)
 - [待验证 / 未完全解决](#待验证--未完全解决)
 
@@ -59,6 +60,7 @@
 | [M-013](#m-013-finnhub-免费-tier-无-candle-权限) | P1 | Plus M2 / EXP-DATA-001 | Finnhub 403 |
 | [M-014](#m-014-把-api-key-写入-envexample-或-commit) | **P0** | Plus M2 / 安全 | .env vs .env.example |
 | [M-015](#m-015-sec-edgar-需真实-user-agent) | P1 | Plus M2 / EXP-DATA-001 | SEC User-Agent |
+| [M-016](#m-016-langgraph-建边-zipstrict-长度不匹配) | **P0** | Plus M4 / langgraph backend | zip() strict |
 
 ---
 
@@ -424,6 +426,30 @@ python scripts/download_data.py \
 
 ---
 
+## Plus M4：LangGraph 编排（EXP-20260602-016）
+
+> 阶段：Plus v2 **M4**（`src/quant_mas/orchestration/langgraph_workflow.py`）  
+> 实验：**EXP-20260602-015**（本地）、**EXP-20260602-016**（服务器 langgraph backend）  
+> 文档：[`docs/langgraph_workflow.md`](docs/langgraph_workflow.md)
+
+### Step M4.1 服务器 `--backend langgraph`
+
+#### M-016 LangGraph 建边 `zip(..., strict=True)` 长度不匹配
+
+| 项 | 内容 |
+|----|------|
+| **日期** | 2026-06-03 |
+| **阶段** | Plus M4 / 服务器 smoke（`pip install -e ".[orchestration]"` 后） |
+| **现象** | `python scripts/run_langgraph_workflow.py --dry-run --backend langgraph` 报错：<br>`[workflow] ERROR: zip() argument 2 is shorter than argument 1`<br>sequential backend 正常；pytest 中 langgraph 用例在无 langgraph 时被 skip |
+| **根因** | `langgraph_workflow.py` 建边时使用 `zip(NODE_ORDER, NODE_ORDER[1:], strict=True)`。`NODE_ORDER` 有 **6** 个节点，而 `NODE_ORDER[1:]` 只有 **5** 个；`strict=True` 要求两 iterable **等长**，配对相邻边应使用 `NODE_ORDER[:-1]` 与 `NODE_ORDER[1:]` |
+| **解决方法** | 1. 拉取修复 commit **`c0fa5e3`** 及以上<br>2. 建边改为 `zip(NODE_ORDER[:-1], NODE_ORDER[1:], strict=True)`（或 `_node_edges()` 辅助函数）<br>3. 复测：<br>```bash<br>python -m pytest tests/test_langgraph_workflow.py::test_langgraph_build_and_dry_run_when_available -v<br>python scripts/run_langgraph_workflow.py --dry-run --backend langgraph<br>``` |
+| **相关提交** | `c0fa5e3` — Fix LangGraph backend zip strict mismatch on node edges |
+| **相关文件** | `src/quant_mas/orchestration/langgraph_workflow.py`、`tests/test_langgraph_workflow.py` |
+| **验证记录** | EXP-20260602-016：a6000-9961 @ `c0fa5e3`，langgraph invoke 测试通过；dry-run 6 节点、`errors: []` |
+| **预防** | 用 `strict=True` 配对「相邻元素」时，左边取 `seq[:-1]`、右边取 `seq[1:]`，不要对全长 `seq` 与 `seq[1:]` 做 strict zip |
+
+---
+
 ## 跨阶段通用规则
 
 以下规则来自多次踩坑后的**固定习惯**，适用于所有阶段：
@@ -440,6 +466,7 @@ python scripts/download_data.py \
 | M2 API key | 把 key 写进 `.env.example` 或 commit | 真实 key **仅** `.env`；example 只留占位符（见 [M-014](#m-014-把-api-key-写入-envexample-或-commit)） |
 | M2 OHLCV 历史 | Alpha Vantage + 2024 区间 | **Stooq** 做历史；AV 仅近期 ~100 日 smoke（见 [M-011](#m-011-alpha-vantage-历史区间返回-0-行)） |
 | M2 Finnhub | 以为 403 是代码 bug | 免费 tier 无 candle；标 blocked，换 Stooq/AV（见 [M-013](#m-013-finnhub-免费-tier-无-candle-权限)） |
+| M4 LangGraph 建边 | `zip(NODE_ORDER, NODE_ORDER[1:], strict=True)` | 用 `NODE_ORDER[:-1]` 与 `NODE_ORDER[1:]`（见 [M-016](#m-016-langgraph-建边-zipstrict-长度不匹配)） |
 | 源码 vs 产物 | `.gitignore` 写 `data/` | 写 `/data/`、`/models/` 等根目录规则 |
 | 实验记录 | 口头说「跑过了」 | 写入 `docs/experiment_log.md`（含 metrics 路径） |
 
@@ -466,8 +493,8 @@ python -m pip install -e .
 | — | Step 2.2b | GPU/CUDA 训练 | ✅ EXP-20260602-004（见 M-010） |
 | 2.4 Walk-forward | 17 | 见 M-010 若用 GPU | ✅ EXP-20260602-008 |
 | — | Plus M2 | 多数据源 API smoke | ✅ EXP-DATA-001（Finnhub 免费 blocked；SEC 待测，见 M-015） |
-| — | Plus M3 | Memory/RAG v2 SQLite | ✅ 本地 EXP-20260602-013；服务器待 pull |
-| — | Plus M4 | LangGraph workflow | ✅ 本地 EXP-20260602-015；服务器待 pull |
+| — | Plus M3 | Memory/RAG v2 SQLite | ✅ EXP-20260602-013/014 |
+| — | Plus M4 | LangGraph workflow | ✅ EXP-20260602-015/016（含 langgraph backend 修复 M-016） |
 | — | Plus M5 | 上下文/LLM | **当前** |
 
 ---

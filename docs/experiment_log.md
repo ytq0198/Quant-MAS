@@ -1,6 +1,6 @@
 # Quant MAS 实验记录
 
-更新时间：2026-06-02（Plus M3 服务器 EXP-20260602-014）
+更新时间：2026-06-03（Plus M4 服务器 EXP-20260602-016）
 
 本文件用于记录真实实验和重要验证。不要记录未经实际运行的数据结果；尚未真实运行的项目标记为「待验证」。
 
@@ -89,6 +89,22 @@
 
 ## 当前验证记录
 
+### EXP-20260602-016：Plus M4 服务器 LangGraph 验收 ✅
+
+- 日期：2026-06-03
+- 阶段：Plus v2 **M4**（服务器）
+- 环境：a6000-9961，conda `/mnt/localDisk3/weizian/conda_envs/quant-mas`，git **`c0fa5e3`**
+- 前置：`python -m pip install -e ".[orchestration]"`（langgraph 1.2.4）
+- 命令与结果：
+  - `git pull origin main` → Fast-forward 至 `c0fa5e3`（修复 M-016 zip strict 建边）
+  - `python -m pytest tests/test_langgraph_workflow.py::test_langgraph_build_and_dry_run_when_available -v` → **1 passed** in 0.89s
+  - `python scripts/run_langgraph_workflow.py --dry-run --backend langgraph` → 6 节点完成，`errors: []`，artifacts/metrics 与 sequential dry-run 一致
+- 测试基线说明：
+  - 核心 `pip install -e .`：**137 passed, 1 skipped**（138 项；langgraph invoke 用例 skip）
+  - 含 orchestration：**138 passed**（`test_langgraph_workflow.py` **12 passed**）
+- 问题：首次 pull M4 时 langgraph backend 因 M-016 失败；`c0fa5e3` 已修复
+- 下一步：**M5** 上下文/LLM
+
 ### EXP-20260602-015：Plus M4 LangGraph 本地验证 ✅
 
 - 日期：2026-06-02
@@ -99,7 +115,7 @@
   - `test_supervisor_agent.py` → **17 passed**
   - 全量 → **136 passed, 1 skipped**（+10，126→136）
 - 验收：`--dry-run --backend sequential` 6 节点完成；Supervisor **未替换**
-- 问题：无
+- 问题：无（langgraph backend 建边 bug 见 M-016，服务器 EXP-016 已验证修复）
 - 下一步：push → 服务器 → **M5**
 
 ### EXP-20260602-014：Plus M3 服务器验收 ✅
@@ -557,7 +573,8 @@
 | EXP-20260602-009 | 2026-06-02 | Plus M1 研究基线本地 | **102 passed**（+4 测试） |
 | EXP-20260602-010 | 2026-06-02 | Plus M1 服务器 pytest + 比较表 | **102 passed**；OOS sharpe 0.586 |
 | EXP-20260602-011 | 2026-06-02 | Plus M2 数据扩展本地 | **115 passed**（+13） |
-| EXP-20260602-015 | 2026-06-02 | Plus M4 LangGraph 本地 | **136+1 skip**（+10） |
+| EXP-20260602-016 | 2026-06-03 | Plus M4 服务器 langgraph backend | langgraph dry-run ✅；commit `c0fa5e3` |
+| EXP-20260602-015 | 2026-06-02 | Plus M4 LangGraph 本地 | **137+1 skip**（138 项；+11 workflow 测试） |
 | EXP-20260602-014 | 2026-06-02 | Plus M3 服务器 pytest + RAG smoke | **126 passed**（3.04s） |
 | EXP-20260602-013 | 2026-06-02 | Plus M3 Memory/RAG v2 本地 | **126 passed**（+11） |
 | EXP-20260602-012 | 2026-06-02 | Plus M2 服务器 + API smoke | test_data_sources 13/13；FRED/Stooq/AV ✅ |

@@ -1,6 +1,6 @@
 # LangGraph ResearchWorkflow（Plus M4）
 
-更新时间：2026-06-02
+更新时间：2026-06-03
 
 > 配置：`configs/langgraph_workflow.yaml` · CLI：`scripts/run_langgraph_workflow.py`
 
@@ -49,27 +49,26 @@ flowchart LR
 ```bash
 python scripts/run_langgraph_workflow.py --help
 python scripts/run_langgraph_workflow.py --dry-run --backend sequential
-python -m pytest tests/test_langgraph_workflow.py -v   # 10 passed, 1 skipped（无 langgraph）
+python -m pytest tests/test_langgraph_workflow.py -v
+# 核心安装：11 passed, 1 skipped（138 项全量时 137+1 skip）
+# 含 orchestration：12 passed（138 项全量时 138 passed）
 ```
 
-## 服务器 smoke
+## 服务器 smoke（已验证 EXP-20260602-016）
 
 ```bash
 cd /mnt/localDisk3/weizian/Quant-MAS
-git pull origin main
+git pull origin main   # 需 >= c0fa5e3（修复 M-016 建边 zip strict）
 conda activate /mnt/localDisk3/weizian/conda_envs/quant-mas
 python -m pip install -e .
-python -m pytest -v   # 预期 136 passed, 1 skipped
-
-python scripts/run_langgraph_workflow.py --dry-run --backend sequential
-```
-
-可选安装 LangGraph：
-
-```bash
 python -m pip install -e ".[orchestration]"
+
+python -m pytest tests/test_langgraph_workflow.py::test_langgraph_build_and_dry_run_when_available -v
+python scripts/run_langgraph_workflow.py --dry-run --backend sequential
 python scripts/run_langgraph_workflow.py --dry-run --backend langgraph
 ```
+
+全量 pytest（可选）：核心 **137 passed, 1 skipped**；含 orchestration **138 passed**。
 
 ## 真实 workflow（非 dry-run）
 
@@ -82,6 +81,10 @@ python scripts/run_langgraph_workflow.py \
   --storage-config configs/storage.server.yaml \
   --features-path /mnt/localDisk3/weizian/datasets/features/features.parquet
 ```
+
+## 已知问题
+
+- **M-016**（已修复 `c0fa5e3`）：`zip(NODE_ORDER, NODE_ORDER[1:], strict=True)` 长度不等导致 langgraph backend 失败。详见 [`mistakes.md`](../mistakes.md#m-016-langgraph-建边-zipstrict-长度不匹配)。
 
 ## 与 OOS baseline
 

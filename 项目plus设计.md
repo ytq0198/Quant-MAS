@@ -1,10 +1,10 @@
 # Quant MAS Plus 设计（v2 研究与扩展规划）
 
-更新时间：2026-06-02
+更新时间：2026-06-03
 
 > 本文档在 **Prompt 1–20 主链路已完成**（第零～四阶段）的基础上，规划 **Quant MAS v2** 的研究型升级路线。  
-> 基线状态：本地 **126 passed**（EXP-20260602-013，M3 第一版 ✅）；服务器 M2 **115**（**M3 pull 后预期 126**）。  
-> **当前执行**：M4 本地 ✅（EXP-20260602-015）→ 服务器 M4 验收 → **M5**。  
+> 基线状态：本地 **137+1 skip**（138 项；EXP-20260602-015）；服务器 M4 langgraph ✅（EXP-20260602-016 @ `c0fa5e3`）。  
+> **当前执行**：M4 本地+服务器 ✅ → **M5**。  
 > 与 `项目进度.md` / `项目指导.md` 的关系：后者记录「已完成什么」；本文档记录「接下来怎么优化、怎么给 Codex/Cursor 下指令」。
 
 ---
@@ -68,8 +68,8 @@
 ### 2.1 工程完成度
 
 - **第零～四阶段 + Prompt 13 文档收口** ✅
-- **测试**：本地 **136+1 skip**（EXP-20260602-015）；服务器 **126**（M4 pull 后预期 136+1 skip）
-- **Orchestration（M4）** ✅ 本地：ResearchWorkflow、sequential + 可选 langgraph（EXP-20260602-015）
+- **测试**：本地 **137+1 skip**（138 项）；含 orchestration **138 passed**；服务器 langgraph dry-run ✅（EXP-20260602-016）
+- **Orchestration（M4）** ✅：ResearchWorkflow、sequential + langgraph（EXP-20260602-015/016）
 - **Memory/RAG v2（M3 第一版）** ✅ 本地：MemoryStore JSON/SQLite、HybridRetriever、index/query CLI（EXP-20260602-013）
 - **M3.5 企业 RAG**：📋 待定（真 Embedding + 持久化向量 + Postgres；见 [§M3.5](#m35企业-rag-扩展待定)）
 - **Research Layer（M1）**：BaselineRegistry、`compare_experiments.py` ✅
@@ -93,16 +93,15 @@
 
 ## 3. v2 八条主线与优先级
 
-### 3.1 当前推荐执行顺序（2026-06-02 更新）
+### 3.1 当前推荐执行顺序（2026-06-03 更新）
 
 ```
-已完成   M1 → M2 → M3 → **M4 ✅**（EXP-20260602-015）
+已完成   M1 → M2 → M3 → **M4 ✅**（EXP-20260602-015/016）
 
-进行中   ① 服务器 M4 pull + pytest 136+1 skip
-         ② **M5** 上下文/LLM
+进行中   **M5** 上下文/LLM
 
 按需扩展 M3.5 企业 RAG（真 Embedding / pgvector / Postgres / Neo4j）
-         ↑ 触发条件见 §M3.5，不阻塞 M4/M5
+         ↑ 触发条件见 §M3.5，不阻塞 M5
 
 后续     M6 文本大模型 → M7 RL/GRPO → M8 MCP/A2A
 ```
@@ -406,7 +405,7 @@ python scripts/query_memory.py \
 
 ## M4：LangGraph 工作流编排
 
-> **状态：✅ 本地（EXP-20260602-015）** · [langgraph_workflow.md](docs/langgraph_workflow.md) · [codex_prompt_M4.md](docs/codex_prompt_M4.md)
+> **状态：✅ 本地+服务器（EXP-20260602-015/016）** · [langgraph_workflow.md](docs/langgraph_workflow.md) · [codex_prompt_M4.md](docs/codex_prompt_M4.md)
 
 ### 目标
 
@@ -433,7 +432,7 @@ python scripts/query_memory.py \
 |------|------|
 | Codex | 本地 + dry-run mock 测试 |
 | Cursor | langgraph_workflow.md、EXP 记录 |
-| 服务器 | pull → pytest **136+1 skip** → dry-run ✅ EXP-20260602-016 待记 |
+| 服务器 | pull → orchestration → langgraph dry-run ✅ **EXP-20260602-016**（`c0fa5e3`；建边 bug 见 M-016） |
 
 ### 给 Cursor 的提示词
 
@@ -469,23 +468,11 @@ LLM_MODEL=deepseek-chat
 
 ### 给 Codex 的提示词
 
+> **完整版**（含 ContextBuilder、LLM 客户端、ResearchAgent、验收清单）：[docs/codex_prompt_M5.md](docs/codex_prompt_M5.md)
+
 ```
-请实现上下文工程与真实 LLM 接入（仅研究/报告，禁止直接交易）。
-
-需要实现：
-
-1. src/quant_mas/context/context_schema.py — Market/Experiment/Risk/RAG/AgentContextBundle
-2. src/quant_mas/context/context_builder.py — 从 Memory/RAG/metrics 构建上下文
-3. src/quant_mas/context/compression.py — 保留 oos.sharpe 等关键字段，不塞 DataFrame
-4. src/quant_mas/core/llm.py 增强 — OpenAICompatibleLLMClient（env 读取）；测试仍用 Mock
-5. src/quant_mas/agents/research_agent.py — 输出 hypothesis/evidence/suggested_experiments
-6. ReportAgent 增强 — --use-llm 默认 false；LLM 不得改 metrics
-7. scripts/run_research_agent.py
-8. tests/test_context_engineering.py
-
-安全：默认 use_llm=False；事实指标与 LLM 解释分离；key 不打日志。
-
-验收：pytest tests/test_context_engineering.py；无 key 时流程仍可跑。
+请实现上下文工程与真实 LLM 接入（Plus M5，仅研究/报告，禁止直接交易）。
+（详见 docs/codex_prompt_M5.md — 复制「固定前缀」+「M5 主任务」整段）
 ```
 
 ### 给 Cursor 的提示词
@@ -634,8 +621,8 @@ MODEL_CACHE_DIR=/mnt/localDisk3/weizian/models/hf
 | **M2** 数据扩展 | 2 | 多 fetcher + registry | data_sources.md、API 验证 | Stooq/AV/Finnhub/FRED/SEC | ✅ |
 | **M3** Memory/RAG 第一版 | 3 | SQLite/InMemory/索引脚本 | database_setup.md | **无（默认）** | ✅ |
 | **M3.5** 企业 RAG | 3.5 | Postgres/pgvector/FAISS 后端 | codex_prompt_M3_enterprise（待写） | Embedding/DB | 按需 |
-| **M4** LangGraph | 4 | workflow + nodes | langgraph_workflow.md | 无 | ✅ 本地 |
-| **M5** 上下文/LLM | 5 | ContextBuilder、ResearchAgent | context_engineering.md | DeepSeek/OpenAI-compatible | 可选 |
+| **M4** LangGraph | 4 | workflow + nodes | langgraph_workflow.md | 无 | ✅ |
+| **M5** 上下文/LLM | 5 | ContextBuilder、ResearchAgent | [codex_prompt_M5.md](docs/codex_prompt_M5.md) | DeepSeek/OpenAI-compatible | 待做 |
 | **M6** 文本大模型 | 6 | FinBERT/LoRA 骨架 | text_model_plan、GPU 实验 | HF_TOKEN | ✅ |
 | **M7** RL/GRPO | 7 | TradingEnv、GRPO ranking | rl_plan.md | W&B 可选 | ✅ |
 | **M8** MCP/A2A | 8 | protocol adapter | protocols.md | 暂不接 | ❌ |
@@ -789,12 +776,12 @@ flowchart TB
 ```
 你正在开发 Quant MAS 科研项目。
 路径：D:\scientific reasearch and work\SRTP\Quant MAS
-测试基线：本地 136+1 skip（Plus M4）；OOS baseline sharpe 0.586（EXP-20260602-008）。
+测试基线：本地 137+1 skip（138 项；Plus M4）；含 orchestration 138 passed；OOS baseline sharpe 0.586（EXP-20260602-008）。
 LLM 不允许直接下单；pytest 不联网不调真实 LLM。
 请只实现当前一个模块，完成后 python -m pytest -v 全量通过。
-详细需求见 项目plus设计.md 的 M5 章节。
+详细需求见 docs/codex_prompt_M5.md 的 M5 章节。
 ```
 
 ---
 
-*文档版本：2026-06-02 · Quant MAS Plus v2（M3 第一版 ✅，M3.5 待定，下一步 M4）*
+*文档版本：2026-06-03 · Quant MAS Plus v2（M4 ✅，下一步 M5）*
