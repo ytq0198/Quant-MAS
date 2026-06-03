@@ -178,6 +178,23 @@
 
 ## 当前验证记录
 
+### EXP-20260602-022：Plus M7 RL 模拟服务器验收 ✅
+
+- 日期：2026-06-01
+- 阶段：Plus **M7**（服务器 pull @ `d8ece63` 后）
+- 环境：a6000-9961，conda `/mnt/localDisk3/weizian/conda_envs/quant-mas`，Python **3.11.15**
+- 命令与结果：
+  - `git pull origin main` → `d8ece63`（`experiment_log.md` 本地冲突已 `checkout` 丢弃）
+  - `python -m pytest -v` → **180 passed** in **10.15s**
+  - `python scripts/run_rl_baseline.py --config configs/rl.yaml --policy random --dry-run` → 正常
+- dry-run metrics（**simulation only**，synthetic 短 episode，**不可与 OOS 0.586 混比**）：
+  - `simulation.sharpe` ≈ **9.54**
+  - `simulation.total_return` ≈ **0.020**
+  - `simulation.max_drawdown` ≈ **-0.0017**
+  - `simulation_only`: **true**
+- 问题：无
+- 下一步：**M8** MCP / EXP-TEXT-WF-002 / EXP-RL-003（真实 parquet MLCopy）
+
 ### EXP-20260602-021：Plus M7 RL 模拟本地验证 ✅
 
 - 日期：2026-06-01
@@ -195,7 +212,7 @@
   - 全量 `python -m pytest -v` → **180 passed**（161→180，+19）
 - 安全边界：不接 broker；metrics 命名 `simulation.*`；**不替代** walk-forward OOS **0.586**
 - 问题：无
-- 下一步：服务器 pytest + dry-run（EXP-20260602-022）；**M8** MCP 或 EXP-TEXT-WF-002
+- 下一步：~~服务器 pytest + dry-run~~ ✅ EXP-20260602-022；**M8** MCP 或 EXP-TEXT-WF-002
 
 ### EXP-TEXT-WF-001：FinBERT text + Walk-forward OOS（服务器）✅
 
@@ -825,6 +842,7 @@
 | EXP-20260602-009 | 2026-06-02 | Plus M1 研究基线本地 | **102 passed**（+4 测试） |
 | EXP-20260602-010 | 2026-06-02 | Plus M1 服务器 pytest + 比较表 | **102 passed**；OOS sharpe 0.586 |
 | EXP-20260602-011 | 2026-06-02 | Plus M2 数据扩展本地 | **115 passed**（+13） |
+| EXP-20260602-022 | 2026-06-01 | Plus M7 服务器 pytest + RL dry-run | **180 passed**（10.15s） |
 | EXP-20260602-021 | 2026-06-01 | Plus M7 RL 模拟本地 | **180 passed**（+19）；trading_env **13/13** |
 | EXP-TEXT-WF-001 | 2026-06-03 | FinBERT + walk-forward OOS | oos.sharpe **0.563** vs baseline **0.586** |
 | EXP-TEXT-001 | 2026-06-03 | FinBERT smoke（ModelScope） | 200 signals → signals_finbert.parquet |

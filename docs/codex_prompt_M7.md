@@ -303,7 +303,7 @@ python scripts/run_rl_baseline.py --config configs/rl.yaml --policy random --dry
 2. ~~更新 `docs/architecture.md` — RL Simulation Layer~~ ✅
 3. ~~更新 `docs/experiment_log.md` — EXP-20260602-021 / EXP-RL-001~~ ✅
 4. ~~更新 `docs/progress.md` / `项目进度.md` — M7 状态~~ ✅
-5. 服务器 pull + pytest **180 passed** + `run_rl_baseline.py --dry-run`（EXP-20260602-022 待做）
+5. ~~服务器 pull + pytest **180 passed** + `run_rl_baseline.py --dry-run`（EXP-20260602-022）~~ ✅
 6. ~~`docs/server_commands.md` §6.10 M7 命令块~~ ✅
 
 **科研说明**：RL metrics 为 `simulation.*`；主 baseline 仍为 walk-forward **oos.sharpe 0.586**。

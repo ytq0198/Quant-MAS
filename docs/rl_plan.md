@@ -49,13 +49,13 @@ python -m pytest -v                              # 180 passed
 python scripts/run_rl_baseline.py --config configs/rl.yaml --policy random --dry-run
 ```
 
-记录：**EXP-20260602-021**（本地）；服务器待 **EXP-20260602-022**。
+记录：**EXP-20260602-021**（本地）；**EXP-20260602-022**（服务器 ✅ 180 passed，10.15s）。
 
 ## 待验证
 
 | 编号 | 内容 |
 |------|------|
-| EXP-20260602-022 | 服务器 pytest 180 + `run_rl_baseline.py --dry-run` |
+| EXP-20260602-022 | 服务器 pytest 180 + `run_rl_baseline.py --dry-run` | ✅ |
 | EXP-RL-003 | 可选：真实 features 上 MLCopy vs buy_hold（仍 simulation） |
 
 ## 相关文档

@@ -1,8 +1,8 @@
 # Quant MAS 开发进度
 
-更新时间：2026-06-01（Plus M7 本地 ✅ EXP-20260602-021，180 passed）
+更新时间：2026-06-01（Plus M7 本地+服务器 ✅ EXP-021/022，180 passed）
 
-**Plus v2**：**M1–M7 ✅**（M7 本地 skeleton）→ **M8** / 服务器 M7 验收 / EXP-TEXT-WF-002
+**Plus v2**：**M1–M7 ✅**（含 M7 服务器）→ **M8** / EXP-TEXT-WF-002
 
 第五～六阶段见 [项目plus设计.md](../项目plus设计.md)（M7 RL 模拟 / M8 协议扩展，非实盘）。
 
@@ -18,10 +18,10 @@
 | **M5** | 上下文 / LLM | ✅ | ContextBuilder、ResearchAgent；EXP-LLM-001 | [context_engineering.md](context_engineering.md) |
 | **M5.5** | 本地 vLLM | 📋 按需 | OpenAI 兼容端点（a6000） | 项目plus设计 §M5.5 |
 | **M6** | 文本信号 | ✅ | FinBERT smoke + WF OOS **0.563** vs **0.586** | [text_model_plan.md](text_model_plan.md) |
-| **M7** | RL / GRPO 实验 | ✅ 本地 | TradingEnv、GRPO ranking；180 passed | [rl_plan.md](rl_plan.md) |
+| **M7** | RL / GRPO 实验 | ✅ | TradingEnv、GRPO ranking；180 passed 本地+服务器 | [rl_plan.md](rl_plan.md) |
 | **M8** | MCP / A2A 协议 | 📋 待做 | protocol adapter | 项目plus设计 §M8 |
 
-**pytest 基线**：**180 passed**（EXP-021 本地）· **161 passed**（服务器，待 M7 pull）· **论文主指标**：Walk-forward OOS sharpe **0.586**（EXP-20260602-008）
+**pytest 基线**：**180 passed**（EXP-021/022 本地+服务器）· **论文主指标**：Walk-forward OOS sharpe **0.586**（EXP-20260602-008）
 
 ## 阶段总览（v1 Prompt + Plus v2）
 
@@ -38,7 +38,7 @@
 | **Plus M3** | Memory/RAG v2 | ✅ 本地 | EXP-20260602-013，**126 passed** |
 | **Plus M4** | LangGraph 编排 | ✅ | EXP-20260602-015/016 |
 | **Plus M5** | 上下文/LLM | ✅ | EXP-20260602-017/018，EXP-LLM-001，**150 passed** |
-| **Plus M7** | RL 模拟 | ✅ 本地 | EXP-20260602-021，**180 passed**（+19） |
+| **Plus M7** | RL 模拟 | ✅ | EXP-021/022，**180 passed** |
 | 第五～六阶段 | 编排 / RL 模拟 | 📋 | Plus **M8** MCP/A2A；服务器 M7 验收 |
 
 ## Quant MAS v2：M1 研究基线
@@ -170,7 +170,7 @@ M1/M2 已完成；**M3 本地 ✅**（见下两节）；下一步 **M4**。
 | 环境 | Python | 结果 | 日期 | 实验 |
 |------|--------|------|------|------|
 | 本地 Windows | 3.11+ | **180 passed** | 2026-06-01 | EXP-20260602-021 |
-| 服务器 a6000-9961 | 3.11.15 | **161 passed**（待 M7 pull） | 2026-06-03 | EXP-020 + EXP-TEXT-001 |
+| 服务器 a6000-9961 | 3.11.15 | **180 passed**（10.15s） | 2026-06-01 | EXP-20260602-022 |
 
 命令：`python -m pytest -v`（勿裸敲 `pytest` / `pip`）。
 
@@ -268,11 +268,10 @@ python scripts/run_rl_baseline.py --help
 | test_trading_env | ✅ **13 passed** |
 | test_grpo_experiment | ✅ **6 passed** |
 | 全量 pytest（本地） | ✅ **180 passed** |
-| 全量 pytest（服务器） | 📋 待 EXP-20260602-022 |
+| 全量 pytest（服务器） | ✅ **180 passed**（10.15s，EXP-022 @ `d8ece63`） |
 
 ## 后续工作
 
 - **M8 MCP/A2A**：见 [项目plus设计.md §M8](../项目plus设计.md)
-- **M7 服务器**：pull → pytest 180 → `run_rl_baseline.py --dry-run`
 - **M6 科研**：扩大 text JSONL 覆盖 → EXP-TEXT-WF-002
 - 可选：SEC smoke、CPU 对照 `server_lgbm_cpu_001`（EXP-TODO-006）

@@ -47,7 +47,7 @@
 > Quant Engine computes. Agent Layer explains, orchestrates, and reports.  
 > Quant Engine 做计算；Agent Layer 做编排、解释与报告。
 
-**Plus v2 status / 当前进度**：M1–M7 ✅ 本地（180 pytest）· M8 MCP 📋 · 服务器 M7 待 pull
+**Plus v2 status / 当前进度**：M1–M7 ✅（180 pytest，本地+服务器）· M8 MCP 📋
 
 ---
 
@@ -112,7 +112,7 @@ python -m pip install -e ".[llm]"                 # HTTP LLM client
 python -m pip install -e ".[text]"                # FinBERT / LoRA (server manual)
 ```
 
-**Verified baseline / 已验证基线**：**180 passed**（本地）· 服务器 **161**（M7 待 pull）· tests use synthetic data, mocks, and local files only（不联网、不调真实 LLM、不下载 HF 权重）。
+**Verified baseline / 已验证基线**：**180 passed**（本地+服务器）· tests use synthetic data, mocks, and local files only（不联网、不调真实 LLM、不下载 HF 权重）。
 
 ---
 
@@ -240,7 +240,7 @@ print(result.content)
 
 | Item | Value | Notes |
 |------|-------|-------|
-| **pytest** | **180 passed** | Local EXP-021；server 161 pending M7 pull |
+| **pytest** | **180 passed** | Local + server (EXP-021/022) |
 | **OOS baseline** | **sharpe 0.586** | EXP-20260602-008, 19 walk-forward windows |
 | **OOS + FinBERT text** | **sharpe 0.563** | EXP-TEXT-WF-001 · exploratory (200/6033 text coverage) |
 | Single-segment ML backtest | sharpe 2.78 | ⚠️ in-sample — **not** paper metric |
