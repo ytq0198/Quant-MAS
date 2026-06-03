@@ -30,7 +30,7 @@
 | 编号 | 名称 | 状态 | 关键交付 / 实验 | 文档 |
 |------|------|------|-----------------|------|
 | **M9** | 企业数据与数据库 | ✅ 本地 | Postgres + pgvector + Neo4j；207 passed | [database_setup.md](database_setup.md) |
-| **M10** | LLM 生产化 | 📋 | local_vllm、EXP-TEXT-WF-002 | [context_engineering.md](context_engineering.md) |
+| **M10** | LLM 生产化 | 📋 | local_vllm、EXP-TEXT-WF-002 | [codex_prompt_M10.md](codex_prompt_M10.md) |
 | **M11** | 竞争学习 / 策略种群 | 📋 | Population、Elo | 待建 competitive_learning.md |
 | **M12** | RL 训练实验 | 📋 | GRPO/PPO training loop | [rl_plan.md](rl_plan.md) |
 | **M13** | 企业化编排 | 📋 | DAG scheduler | [protocols.md](protocols.md) |
@@ -330,6 +330,5 @@ python scripts/export_agent_cards.py --help
 
 ## 后续工作（v2 之后）
 
-- ~~**M8 服务器**~~ ✅ · ~~**M9 本地**~~ ✅ EXP-025（207 pytest）
-- **M9 服务器**：pull → pytest **207** → Postgres smoke（EXP-026）
-- **M10**：local_vllm + EXP-TEXT-WF-002
+- **M10 服务器**：pull M10 代码 → pytest 215+（待 Codex 完成）
+- **M9 服务器**：📋 EXP-026 阻塞 — 等管理员 docker 组 → `setup.sh` → pull `06a6a5d` → pytest 207

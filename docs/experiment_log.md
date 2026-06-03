@@ -1,6 +1,6 @@
 # Quant MAS 实验记录
 
-更新时间：2026-06-01（**v3 M9 本地 ✅** EXP-20260602-025，207 passed）
+更新时间：2026-06-01（v3 M9 本地 ✅ EXP-025；EXP-026 📋 等 Docker 权限；M10 Codex prompt 就绪）
 
 本文件用于记录真实实验和重要验证。不要记录未经实际运行的数据结果；尚未真实运行的项目标记为「待验证」。
 
@@ -177,6 +177,28 @@
 ```
 
 ## 当前验证记录
+
+### EXP-20260602-026：v3 M9 服务器 DB 联调 📋 阻塞中（infra 已备）
+
+- 日期：2026-06-01（探测记录）
+- 阶段：**v3 M9** 服务器真实 Postgres/pgvector smoke
+- 环境：a6000-9961，Ubuntu **22.04.5**，用户 **weizian**；Quant-MAS 当前 **`0794bd6`（M8，195 pytest）**，M9 代码在 GitHub **`06a6a5d`** 待 pull
+- 服务器已就绪：
+  - 目录 `/mnt/localDisk3/weizian/infra/quant-mas-db/` — `docker-compose.yml`、`setup.sh`、`.env`（密码勿 commit）
+  - Quant-MAS `.env` — `POSTGRES_DSN`、`NEO4J_URI/USER/PASSWORD` 已与 compose 对齐；`memory.enterprise.yaml` 已复制
+  - conda：`psycopg[binary]` **3.3.4**、`neo4j` **6.2.0** 已装
+  - Docker **28.1.1** + Compose **v2.35.1** 已装
+- 阻塞项（须管理员或 docker 组）：
+  1. **weizian 不在 docker 组、无 sudo 免密** → 无法 `docker compose up`
+  2. **5432 未监听** → Postgres 容器未启动
+  3. **git 未拉到 M9** → 无 `--backend postgres` / `--vector-store pgvector`，pytest 仍为 **195** 非 207
+- 解除阻塞后顺序：
+  1. 管理员：`sudo usermod -aG docker weizian`（用户 **重新 SSH 登录**）或管理员在 infra 目录 `sudo docker compose up -d postgres`
+  2. `bash /mnt/localDisk3/weizian/infra/quant-mas-db/setup.sh`（CREATE EXTENSION vector）
+  3. Quant-MAS：`git fetch origin main && git merge --ff-only origin/main`（目标 **06a6a5d**）→ `pip install -e .` → pytest **207**
+  4. `query_memory.py --backend postgres` + `index_documents.py --vector-store pgvector` smoke
+- 问题：Docker 权限 + 代码未 pull（非 M9 实现问题）
+- 下一步：管理员加 docker 组 → pull **06a6a5d** → 跑 setup.sh → 完成 EXP-026
 
 ### EXP-20260602-025：v3 M9 企业数据与数据库本地验证 ✅
 
@@ -896,6 +918,7 @@
 | EXP-20260602-009 | 2026-06-02 | Plus M1 研究基线本地 | **102 passed**（+4 测试） |
 | EXP-20260602-010 | 2026-06-02 | Plus M1 服务器 pytest + 比较表 | **102 passed**；OOS sharpe 0.586 |
 | EXP-20260602-011 | 2026-06-02 | Plus M2 数据扩展本地 | **115 passed**（+13） |
+| EXP-20260602-026 | 2026-06-01 | v3 M9 服务器 DB | 📋 阻塞：docker 权限 + 待 pull 06a6a5d |
 | EXP-20260602-025 | 2026-06-01 | v3 M9 企业 DB 本地 | **207 passed**（+12）；enterprise **12/12** |
 | EXP-20260602-024 | 2026-06-01 | Plus M8 MCP/A2A 服务器 | **195 passed**（12.41s）；export_agent_cards ✅ |
 | EXP-20260602-023 | 2026-06-01 | Plus M8 MCP/A2A 本地 | **195 passed**（+15）；protocols **15/15** |

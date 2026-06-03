@@ -551,33 +551,77 @@ python scripts/export_agent_cards.py --config configs/protocols.yaml \
 
 详见 [`docs/protocols.md`](protocols.md)。
 
-## 六点十二、v3 M9 企业 DB（EXP-20260602-025 / 服务器待 EXP-026）📋
+## 六点十二、v3 M9 企业 DB（EXP-025 / EXP-026）📋
+
+### 6.12.1 服务器现状（2026-06-01 探测）
+
+| 项 | 状态 |
+|----|------|
+| OS | Ubuntu 22.04.5 |
+| Docker | 28.1.1 + Compose v2.35.1 已装 |
+| 用户 weizian | **不在 docker 组**，无 sudo 免密 → 无法自启容器 |
+| 5432 | 未监听（Postgres 未起） |
+| Quant-MAS | **`0794bd6`（M8，195 pytest）** — M9 在 **`06a6a5d`** 待 pull |
+| infra | `/mnt/localDisk3/weizian/infra/quant-mas-db/`（compose + setup.sh + .env） |
+| Python 驱动 | psycopg 3.3.4、neo4j 6.2.0 ✅ |
+
+### 6.12.2 阻塞解除（找管理员，二选一）
+
+**推荐 A — 加入 docker 组（长期）**
+
+```bash
+# 管理员执行一次
+sudo usermod -aG docker weizian
+# weizian 必须退出 SSH 重新登录后生效
+groups   # 应含 docker
+```
+
+**B — 管理员代启 Postgres（一次性）**
+
+```bash
+cd /mnt/localDisk3/weizian/infra/quant-mas-db
+sudo docker compose up -d postgres
+sudo docker exec quant-mas-postgres psql -U quant_mas -d quant_mas \
+  -c "CREATE EXTENSION IF NOT EXISTS vector;"
+```
+
+weizian 获得 docker 权限并重新登录后：
+
+```bash
+bash /mnt/localDisk3/weizian/infra/quant-mas-db/setup.sh
+# 可选 Neo4j：
+# cd /mnt/localDisk3/weizian/infra/quant-mas-db && docker compose --profile neo4j up -d neo4j
+```
+
+密码仅在 `infra/quant-mas-db/.env` 与 `Quant-MAS/.env`（**勿 commit**）。
+
+### 6.12.3 拉 M9 代码并验收（EXP-026）
 
 ```bash
 cd /mnt/localDisk3/weizian/Quant-MAS
-git pull origin main
+git status
+git checkout -- docs/experiment_log.md 2>/dev/null || true   # 若有本地文档改动
+git fetch origin main
+git log -1 --oneline origin/main   # 应：06a6a5d
+git merge --ff-only origin/main
+
 conda activate /mnt/localDisk3/weizian/conda_envs/quant-mas
 python -m pip install -e .
+python -m pip install "psycopg[binary]>=3.1" neo4j   # 若未装
 python -m pytest -v   # 预期 207 passed
 
-python -m pytest tests/test_memory_enterprise.py -v   # 12 passed（mock，不联网）
+python -m pytest tests/test_memory_enterprise.py -v   # 12 passed（mock）
 
-# 可选：真实 Postgres（需 DATABASE_URL，勿提交 git）
-cp configs/memory.enterprise.yaml.example configs/memory.enterprise.yaml
-# 编辑 memory.enterprise.yaml 或 export DATABASE_URL=postgresql://...
-
-python scripts/query_memory.py --help
+# 真实 DB smoke（Postgres 已起且 POSTGRES_DSN 在 .env）
 python scripts/query_memory.py --backend postgres --best-metric oos.sharpe
-
-python scripts/index_documents.py --help
 python scripts/index_documents.py --vector-store pgvector --dirs docs --embedding-dimensions 64
 ```
 
 **说明**：
 
-- pytest 默认 mock，**不依赖**真实 Postgres/pgvector/Neo4j
-- `DATABASE_URL`、`NEO4J_URI` 等仅环境变量
-- 记录：**EXP-20260602-025**（本地 **207 passed**，enterprise **12/12**）；服务器 Postgres smoke → **EXP-20260602-026**
+- pytest 默认 mock，**不依赖**真实 Postgres；207 与 DB 是否启动无关
+- 环境变量名：**`POSTGRES_DSN`**（不是 `DATABASE_URL`）
+- 记录：**EXP-025** 本地 207；**EXP-026** 服务器（待 docker + pull）
 
 详见 [`docs/database_setup.md`](database_setup.md) §M9 Enterprise Backends。
 
