@@ -1,6 +1,6 @@
 # Quant MAS 实验记录
 
-更新时间：2026-06-03（v3 M11 ✅ 本地+服务器 **225 passed** · EXP-POP-002）
+更新时间：2026-06-03（v3 M11.5 ✅ **237 passed** · M11 EXP-POP-002 双端）
 
 本文件用于记录真实实验和重要验证。不要记录未经实际运行的数据结果；尚未真实运行的项目标记为「待验证」。
 
@@ -178,6 +178,27 @@
 
 ## 当前验证记录
 
+### EXP-20260602-030：v3 M11.5 种群训练闭环本地验证 ✅
+
+- 日期：2026-06-03
+- 阶段：**M11.5** — 多代 population training loop（M11 单轮评估 → 闭环训练）
+- 环境：本地
+- 交付：
+  - `rl/population_training.py` — `PopulationTrainingConfig`、`GenerationSummary`、`PopulationTrainingLoop`
+  - `scripts/run_population_training.py` — 默认 `--dry-run`；`--generations` / `--output-dir` / `--memory-path` / `--seed`
+  - `configs/population_training.yaml`、`docs/population_training.md`
+  - `tests/test_population_training_loop.py` — **12** 项
+- 闭环：`initial population → competitive mock eval → Elo/ranking → Top-K → mutation → next generation`
+- 命令与结果：
+  - `python -m pytest tests/test_population_training_loop.py -v` → **12 passed**
+  - `python -m pytest tests/test_population_training.py -v` → **13 passed**
+  - `python -m pytest tests/test_trading_env.py tests/test_grpo_experiment.py -v` → **19 passed**
+  - `python scripts/run_population_training.py --config configs/population_training.yaml --dry-run` → 正常
+  - 全量 `python -m pytest -v` → **237 passed**（225→237，+12）
+- 边界：无 broker / LLM / 网络 / GPU；dry-run 不写 memory/artifacts；非 dry-run 写 generation metrics + ExperimentMemory；**无** `oos.*`
+- 问题：无
+- 下一步：服务器 pull + pytest（**EXP-POP-003**）；M12 RL 训练
+
 ### EXP-POP-002：v3 M11 服务器 pytest + competitive mock dry-run ✅
 
 - 日期：2026-06-03
@@ -220,7 +241,7 @@
 - 日期：2026-06-03
 - 命令：`run_competitive_experiment.py --mode mock --dry-run`
 - 结果：stdout summary；`simulation_only: true`；无 broker / LLM / DB / 网络
-- 下一步：~~服务器 **EXP-POP-002**~~ ✅
+- 下一步：~~服务器 **EXP-POP-002**~~ ✅；M11.5 **EXP-030** / 服务器 **EXP-POP-003**
 
 ### EXP-20260602-026：v3 M9 服务器 Postgres/pgvector 真实 DB smoke ✅
 
@@ -1011,6 +1032,7 @@
 | EXP-20260602-009 | 2026-06-02 | Plus M1 研究基线本地 | **102 passed**（+4 测试） |
 | EXP-20260602-010 | 2026-06-02 | Plus M1 服务器 pytest + 比较表 | **102 passed**；OOS sharpe 0.586 |
 | EXP-20260602-011 | 2026-06-02 | Plus M2 数据扩展本地 | **115 passed**（+13） |
+| EXP-20260602-030 | 2026-06-03 | v3 M11.5 种群训练闭环 | **237 passed**（+12）；loop **12/12** |
 | EXP-POP-002 | 2026-06-03 | v3 M11 服务器 | **225 passed**（17.32s）+ competitive dry-run @ `64a5b2a` |
 | EXP-20260602-029 | 2026-06-03 | v3 M11 竞争学习本地 | **225 passed**（+13）；population **13/13** |
 | EXP-POP-001 | 2026-06-03 | competitive mock dry-run | ✅ 本地；simulation_only |

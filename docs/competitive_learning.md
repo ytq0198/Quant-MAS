@@ -79,7 +79,7 @@ M12 can reuse:
 - `PopulationManager`
 - `AgentSpec`
 - `CompetitiveEpisodeRunner`
+- **`PopulationTrainingLoop`** (M11.5)
 - Elo utilities in `quant_mas.rl.elo_rating`
 
-The first M11 implementation deliberately keeps training out of scope so the
-pytest suite remains fast, deterministic, and offline.
+M11.5 adds the multi-generation loop; see [population_training.md](population_training.md).

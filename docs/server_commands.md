@@ -752,6 +752,37 @@ python scripts/run_competitive_experiment.py \
 
 详见 [`docs/competitive_learning.md`](competitive_learning.md)。
 
+## 六点十五、v3 M11.5 种群训练闭环（EXP-030 / EXP-POP-003）📋
+
+### 6.15.1 拉代码 + pytest
+
+```bash
+cd /mnt/localDisk3/weizian/Quant-MAS
+git fetch origin main
+git merge --ff-only origin/main   # 目标：含 M11.5，237 pytest
+
+conda activate /mnt/localDisk3/weizian/conda_envs/quant-mas
+python -m pip install -e .
+python -m pytest tests/test_population_training_loop.py -v   # 12 passed
+python -m pytest -v                                             # 预期 237 passed
+```
+
+### 6.15.2 population training dry-run
+
+```bash
+python scripts/run_population_training.py --help
+
+python scripts/run_population_training.py \
+  --config configs/population_training.yaml \
+  --dry-run
+```
+
+非 dry-run 会写 `outputs/population_training/` 与 ExperimentMemory（仍仅 `population.*` / `simulation.*`）。
+
+- 记录：**EXP-20260602-030** 本地 237；**EXP-POP-003** 服务器待做
+
+详见 [`docs/population_training.md`](population_training.md)。
+
 ## 七、删除旧部署（如曾在 ~/quant-mas 建过）
 
 ```bash

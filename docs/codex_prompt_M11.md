@@ -401,6 +401,10 @@ python scripts/run_competitive_experiment.py --config configs/competitive.yaml -
 | **EXP-20260602-029** | M11 本地 pytest + population mock | ✅ **225 passed**（population 13/13） |
 | **EXP-POP-001** | competitive `--mode mock --dry-run` 本地 | ✅ |
 | **EXP-POP-002** | 服务器 competitive dry-run | ✅ **225 passed** + dry-run（17.32s @ `64a5b2a`） |
+| **EXP-20260602-030** | M11.5 本地 population training loop | ✅ **237 passed**（loop 12/12） |
+| **EXP-POP-003** | 服务器 population training dry-run | 📋 待做 |
 | （未来） | `--mode walk_forward` 真实 OOS 与 **0.586** 对照 — **Cursor 科研任务**，Codex 仅 stub |
 
 论文主指标仍为 **EXP-20260602-008**（oos.sharpe **0.586**）。
+
+**M11.5 补充（2026-06-03）**：`PopulationTrainingLoop` + `run_population_training.py` — 见 [population_training.md](population_training.md)。

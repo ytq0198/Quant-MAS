@@ -16,6 +16,11 @@ from quant_mas.rl.grpo_experiment import (
     summarize_grpo_ranking,
 )
 from quant_mas.rl.mock_data import build_synthetic_ml_signals, build_synthetic_ohlcv
+from quant_mas.rl.population_training import (
+    GenerationSummary,
+    PopulationTrainingConfig,
+    PopulationTrainingLoop,
+)
 from quant_mas.rl.reward import compute_episode_metrics, compute_step_reward
 from quant_mas.rl.trading_env import TradingEnv
 
@@ -24,8 +29,11 @@ __all__ = [
     "CandidateRun",
     "CompetitiveEpisodeRunner",
     "CompetitiveRunConfig",
+    "GenerationSummary",
     "MLCopyPolicy",
     "Policy",
+    "PopulationTrainingConfig",
+    "PopulationTrainingLoop",
     "RandomPolicy",
     "RewardConfig",
     "StepResult",
