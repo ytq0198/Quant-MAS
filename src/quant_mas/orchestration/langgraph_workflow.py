@@ -19,6 +19,11 @@ except ImportError:
     LANGGRAPH_AVAILABLE = False
 
 
+def _node_edges() -> list[tuple[str, str]]:
+    """Return pairwise workflow edges between ordered nodes."""
+    return list(zip(NODE_ORDER[:-1], NODE_ORDER[1:], strict=True))
+
+
 def build_langgraph_workflow(tools: ToolRegistry):
     """Build a compiled LangGraph workflow when langgraph is installed."""
     if not LANGGRAPH_AVAILABLE:
@@ -34,7 +39,7 @@ def build_langgraph_workflow(tools: ToolRegistry):
     for node_name in NODE_ORDER:
         graph.add_node(node_name, partial(wrapped, node_name))
     graph.add_edge(START, NODE_ORDER[0])
-    for left, right in zip(NODE_ORDER, NODE_ORDER[1:], strict=True):
+    for left, right in _node_edges():
         graph.add_edge(left, right)
     graph.add_edge(NODE_ORDER[-1], END)
     return graph.compile()

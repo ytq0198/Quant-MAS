@@ -8,7 +8,11 @@ import pytest
 
 from quant_mas.agents import SupervisorAgent
 from quant_mas.orchestration import NODE_ORDER, initial_state, run_sequential_workflow
-from quant_mas.orchestration.langgraph_workflow import build_langgraph_workflow
+from quant_mas.orchestration.langgraph_workflow import (
+    _node_edges,
+    build_langgraph_workflow,
+    run_langgraph_workflow,
+)
 from quant_mas.orchestration.node_context import NodeContext
 from quant_mas.orchestration.registry import WorkflowMockModel, create_default_tool_registry
 from quant_mas.tools import (
@@ -186,6 +190,10 @@ def test_events_include_tool_calls(tmp_path: Path) -> None:
     }
 
 
+def test_langgraph_node_edges_are_pairwise() -> None:
+    assert _node_edges() == list(zip(NODE_ORDER[:-1], NODE_ORDER[1:]))
+
+
 def test_run_langgraph_workflow_cli_help() -> None:
     result = subprocess.run(
         [sys.executable, "scripts/run_langgraph_workflow.py", "--help"],
@@ -237,3 +245,10 @@ def test_langgraph_build_and_dry_run_when_available(tmp_path: Path) -> None:
     graph = build_langgraph_workflow(tools)
 
     assert graph is not None
+
+    result = run_langgraph_workflow(state, tools=tools)
+
+    assert result["errors"] == []
+    assert result["completed_nodes"] == NODE_ORDER
+    assert len(result["completed_nodes"]) == 6
+    assert "summary" in result["artifacts"]
