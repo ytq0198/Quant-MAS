@@ -242,6 +242,7 @@ print(result.content)
 |------|-------|-------|
 | **pytest** | **161 passed** | Local + server (EXP-019/020) |
 | **OOS baseline** | **sharpe 0.586** | EXP-20260602-008, 19 walk-forward windows |
+| **OOS + FinBERT text** | **sharpe 0.563** | EXP-TEXT-WF-001 · exploratory (200/6033 text coverage) |
 | Single-segment ML backtest | sharpe 2.78 | ⚠️ in-sample — **not** paper metric |
 | GPU LightGBM | verified on server | CUDA path documented in `docs/server_commands.md` |
 
