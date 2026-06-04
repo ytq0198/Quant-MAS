@@ -10,6 +10,8 @@ GitHub 仓库：[https://github.com/ytq0198/Quant-MAS](https://github.com/ytq019
 
 | 日期 | 项目 | 结果 | 备注 |
 |------|------|------|------|
+| 2026-06-04 | v3 M11.8 服务器批量 candidate OOS | 4/4 > **0.586**；best **1.039** ✅ | EXP-POP-006 @ `9477c3d` |
+| 2026-06-04 | v3 M11.8 服务器 pytest | **266 passed**（45.63s）✅ | EXP-POP-006 |
 | 2026-06-04 | v3 M11.7 服务器 candidate OOS | `cand_mean_rev_1` **oos.sharpe 1.036** vs **0.586** ✅ | EXP-POP-005 @ `ffef849` |
 | 2026-06-03 | v3 M11.7 服务器 pytest | **259 passed**（48.32s）✅ | EXP-POP-005 @ `f804a95` |
 | 2026-06-03 | v3 M11.7 候选 OOS hook（本地 mock） | **259 passed**；OOS **11/11** ✅ | EXP-20260602-032 |
@@ -895,6 +897,39 @@ python scripts/validate_candidate_oos.py \
 - 记录：**EXP-20260602-032** 本地 mock；**EXP-POP-005** ✅ 服务器 `cand_mean_rev_1` **oos.sharpe 1.036**（77 窗，2019-07→2025-12）vs ML baseline **0.586**（2026-06-04 @ `ffef849`）
 
 详见 [`docs/strategy_candidate_oos.md`](strategy_candidate_oos.md)。
+
+## 六点十八、v3 M11.8 批量候选 OOS（EXP-033 / EXP-POP-006）✅
+
+```bash
+cd /mnt/localDisk3/weizian/Quant-MAS
+conda activate /mnt/localDisk3/weizian/conda_envs/quant-mas
+git pull origin main   # 目标：含 M11.8，266 pytest
+
+python -m pytest -v    # 预期 266 passed
+
+# 若无 candidates.json，先导出
+python scripts/export_population_candidates.py \
+  --population-config configs/population_training.yaml \
+  --top-k 5 \
+  --run-backtest-smoke \
+  --no-dry-run
+
+python scripts/batch_validate_candidates.py \
+  --candidate-json outputs/candidates/candidates.json \
+  --features-path /mnt/localDisk3/weizian/datasets/features/features.parquet \
+  --config configs/candidate_oos.yaml \
+  --top-k 5 \
+  --no-dry-run
+```
+
+**说明**：
+
+- 复用 M11.7 `run_candidate_walk_forward`；输出 `candidate_oos_comparison.csv` / `.md`
+- 对比 baseline：**EXP-20260602-008**，`oos.sharpe = 0.586`
+- 记录：**EXP-20260602-033** 本地；**EXP-POP-006** ✅ 服务器 4 候选均超 baseline，best **1.039**（2026-06-04 @ `9477c3d`）
+- 用于 **ablation / 机制分析**，不替代 ML 主 baseline
+
+详见 [`docs/candidate_oos_batch.md`](candidate_oos_batch.md)。
 
 ## 七、删除旧部署（如曾在 ~/quant-mas 建过）
 

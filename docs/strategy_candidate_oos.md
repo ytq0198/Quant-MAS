@@ -99,6 +99,8 @@ has completed and the artifacts are stored in ExperimentMemory.
 | **EXP-20260602-032** | Local mock | **259 passed**; OOS tests **11/11** |
 | **EXP-POP-005** | Server @ `ffef849` | ✅ **259 passed**; `cand_mean_rev_1` **oos.sharpe 1.036**（77 wf windows）vs baseline **0.586** |
 
+Batch Top-K comparison (M11.8): [candidate_oos_batch.md](candidate_oos_batch.md) — **EXP-POP-006** ✅ best **1.039**, 4/4 > **0.586**.
+
 ## EXP-POP-005 Result (server, 2026-06-04)
 
 | Field | Value |

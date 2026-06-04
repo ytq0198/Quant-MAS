@@ -111,4 +111,5 @@ python scripts/export_population_candidates.py \
 
 See [strategy_candidate_bridge.md](strategy_candidate_bridge.md) for the full M11.6 bridge (`StrategyCandidate`, `backtest.*`, walk-forward stub).
 
-Next step: [strategy_candidate_oos.md](strategy_candidate_oos.md) — M11.7 walk-forward OOS hook (writes `oos.*`).
+Next step: [strategy_candidate_oos.md](strategy_candidate_oos.md) — M11.7 walk-forward OOS hook (writes `oos.*`).  
+Batch comparison: [candidate_oos_batch.md](candidate_oos_batch.md) — M11.8 Top-K OOS table (EXP-POP-006 ✅).

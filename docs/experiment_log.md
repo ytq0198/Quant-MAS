@@ -38,7 +38,25 @@
 | （填写） | ma_cross / lightgbm / ml_backtest / walk_forward / other | 是/否 | | | | | | | ↑/↓/≈ / 待验证 | |
 ```
 
-### 当前快照：COMP-20260603-001（text walk-forward，**6 rows**）
+### 当前快照：COMP-20260604-001（Population 候选批量 OOS，**ablation**）
+
+- 生成：`python scripts/batch_validate_candidates.py ... --no-dry-run`
+- 对照 baseline：**EXP-20260602-008**，`oos.sharpe = 0.586`
+- 实验：**EXP-POP-006** @ `9477c3d`；77 walk-forward 窗；4 条 mean_reversion 候选
+
+| OOS Rank | candidate_id | scale | oos.sharpe | vs baseline | exceeds |
+|----------|--------------|-------|------------|-------------|---------|
+| 1 | `cand_mean_rev_1_g1_1_g2_2` | 1.03 | **1.039** | +0.453 | ✅ |
+| 2 | `cand_mean_rev_1_g2_1` | 1.015 | **1.037** | +0.451 | ✅ |
+| 3 | `cand_mean_rev_1_g1_1` | 1.01 | **1.037** | +0.451 | ✅ |
+| 4 | `cand_mean_rev_1` | 1.0 | **1.036** | +0.450 | ✅ |
+
+**说明**：
+
+- Population 输入 rank ≠ OOS rank；用于机制分析，**不替代** ML 主 baseline **0.586**。
+- 产物：`outputs/candidate_oos_batch/candidate_oos_comparison.md`
+
+### 历史快照：COMP-20260603-001（text walk-forward，**6 rows**）
 
 - 生成：`python scripts/compare_experiments.py --storage-config configs/storage.server.yaml --memory-path /mnt/localDisk3/weizian/reports/experiments.json --output-dir /mnt/localDisk3/weizian/reports/research`
 - Memory：`/mnt/localDisk3/weizian/reports/experiments.json`
@@ -1172,6 +1190,8 @@
 | EXP-20260602-009 | 2026-06-02 | Plus M1 研究基线本地 | **102 passed**（+4 测试） |
 | EXP-20260602-010 | 2026-06-02 | Plus M1 服务器 pytest + 比较表 | **102 passed**；OOS sharpe 0.586 |
 | EXP-20260602-011 | 2026-06-02 | Plus M2 数据扩展本地 | **115 passed**（+13） |
+| EXP-POP-006 | 2026-06-04 | v3 M11.8 服务器批量 candidate OOS | **266 passed**；4/4 > **0.586**；best **1.039** @ `9477c3d` |
+| EXP-20260602-033 | 2026-06-04 | v3 M11.8 批量候选 OOS 本地 | **266 passed**（+7）；batch **7/7** |
 | EXP-POP-005 | 2026-06-04 | v3 M11.7 服务器 candidate OOS | `cand_mean_rev_1` **oos.sharpe 1.036** vs baseline **0.586**（77 窗）@ `ffef849` |
 | EXP-20260602-032 | 2026-06-03 | v3 M11.7 候选 Walk-forward OOS | **259 passed**（+11）；OOS **11/11** |
 | EXP-POP-004 | 2026-06-03 | v3 M11.6 服务器 | **248 passed**（55.15s）+ export dry-run @ `7ab510f` |

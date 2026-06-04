@@ -73,8 +73,15 @@ The comparison table includes:
 - `summary.vs_baseline_sharpe`
 - `exceeds_baseline`
 
-## Server Note
+## Server Validation (EXP-POP-006)
 
-Use the server feature parquet path, not a repo-local sample path. The real
-server validation should be recorded as a new EXP entry and compared against
-`EXP-POP-005` and `EXP-20260602-008`.
+Validated on a6000-9961 @ `9477c3d` (2026-06-04):
+
+- `python -m pytest -v` → **266 passed** in **45.63s**
+- `batch_validate_candidates.py --top-k 5 --no-dry-run` → **4 candidates**, **77 windows**
+- Best: `cand_mean_rev_1_g1_1_g2_2` **oos.sharpe 1.039** vs baseline **0.586** (+0.453)
+- All **4/4** exceed baseline; Population input rank ≠ OOS rank
+- Artifacts: `outputs/candidate_oos_batch/candidate_oos_comparison.csv` / `.md`
+- ExperimentMemory: `family=strategy_candidate_oos_batch`
+
+Compare with **EXP-POP-005** (single `cand_mean_rev_1` **1.036**) and **EXP-20260602-008** (ML **0.586**).

@@ -1,6 +1,6 @@
 # Plus v3 M11：竞争学习 / 策略种群 — Codex 提示词
 
-**状态：✅ 已完成（M11–M11.7 双端闭环，259 pytest，EXP-POP-005 OOS，2026-06-04）**
+**状态：✅ 已完成（M11–M11.8 双端闭环，266 pytest，EXP-POP-006 批量 OOS，2026-06-04）**
 
 更新时间：2026-06-04
 
@@ -15,7 +15,7 @@
 你正在开发 Quant MAS 科研项目（v3 阶段）。
 路径：D:\scientific reasearch and work\SRTP\Quant MAS
 
-测试基线：本地+服务器 **259 passed**（v3 M11.7，EXP-032 / EXP-POP-005 @ `f804a95`）。
+测试基线：本地+服务器 **266 passed**（v3 M11.8，EXP-033 / EXP-POP-006 @ `9477c3d`）。
 OOS 主 baseline：EXP-20260602-008，oos.sharpe **0.586**（walk-forward，19 窗）。
 M6 text OOS exploratory：EXP-TEXT-WF-001，oos.sharpe **0.563** vs baseline **0.586**（不可替代主指标）。
 M7 RL：simulation only；`simulation.*` / Population Elo **不得**与 `oos.*` 混比或替代论文主指标。
