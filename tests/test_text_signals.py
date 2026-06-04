@@ -636,6 +636,7 @@ def test_fetch_finnhub_company_news_records_mock_http(monkeypatch: pytest.Monkey
         api_key="test-key",
         chunk_months=1,
         delay_seconds=0,
+        progress=False,
     )
 
     assert len(records) == 1

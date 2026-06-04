@@ -47,6 +47,11 @@ def main() -> int:
         default=1.0,
         help="Seconds to wait between Finnhub requests.",
     )
+    parser.add_argument(
+        "--quiet",
+        action="store_true",
+        help="Suppress per-request progress logs on stderr.",
+    )
     args = parser.parse_args()
 
     try:
@@ -59,6 +64,7 @@ def main() -> int:
             api_key=args.api_key,
             chunk_months=args.chunk_months,
             delay_seconds=args.delay,
+            progress=not args.quiet,
         )
         output_path = write_real_news_jsonl(records, args.output_path)
     except Exception as exc:  # noqa: BLE001 - CLI should print clean failures.

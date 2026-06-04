@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import sys
 import time
 import urllib.error
 import urllib.parse
@@ -24,6 +25,7 @@ def fetch_finnhub_company_news_records(
     chunk_months: int = 1,
     delay_seconds: float = 1.0,
     request_timeout_seconds: float = 60.0,
+    progress: bool = False,
 ) -> list[RealNewsRecord]:
     """Download Finnhub company news for each symbol between start and end."""
     if chunk_months < 1:
@@ -33,14 +35,29 @@ def fetch_finnhub_company_news_records(
     if not normalized:
         raise ValueError("At least one symbol is required")
 
+    chunks = iter_date_chunks(start, end, chunk_months=chunk_months)
+    total_requests = len(normalized) * len(chunks)
+    if progress:
+        _log_progress(
+            f"starting Finnhub download: symbols={normalized} "
+            f"requests={total_requests} delay={delay_seconds}s"
+        )
+
     records: list[RealNewsRecord] = []
-    seen: set[tuple[str, int]] = set()
+    seen: set[tuple[str, int | str, ...]] = set()
+    request_index = 0
     for index, symbol in enumerate(normalized):
         if index > 0 and delay_seconds > 0:
             time.sleep(delay_seconds)
-        for chunk_start, chunk_end in iter_date_chunks(start, end, chunk_months=chunk_months):
+        for chunk_start, chunk_end in chunks:
+            request_index += 1
             if delay_seconds > 0:
                 time.sleep(delay_seconds)
+            if progress:
+                _log_progress(
+                    f"request {request_index}/{total_requests}: "
+                    f"{symbol} {chunk_start}..{chunk_end} ..."
+                )
             payload = _request_company_news(
                 symbol=symbol,
                 start=chunk_start,
@@ -48,6 +65,7 @@ def fetch_finnhub_company_news_records(
                 api_key=token,
                 request_timeout_seconds=request_timeout_seconds,
             )
+            chunk_added = 0
             for item in payload:
                 record = parse_finnhub_news_item(item, symbol=symbol)
                 news_id = item.get("id")
@@ -60,8 +78,17 @@ def fetch_finnhub_company_news_records(
                     continue
                 seen.add(key)
                 records.append(record)
+                chunk_added += 1
+            if progress:
+                _log_progress(
+                    f"request {request_index}/{total_requests}: "
+                    f"{symbol} {chunk_start}..{chunk_end} -> "
+                    f"+{chunk_added} (total {len(records)})"
+                )
 
     records.sort(key=lambda record: (record.symbol, record.published_at))
+    if progress:
+        _log_progress(f"download complete: {len(records)} unique records")
     return records
 
 
@@ -147,6 +174,10 @@ def _request_company_news(
     if not isinstance(payload, list):
         raise ValueError(f"Unexpected Finnhub company-news payload for {symbol}: {payload!r}")
     return payload
+
+
+def _log_progress(message: str) -> None:
+    print(f"[fetch-real-news] {message}", file=sys.stderr, flush=True)
 
 
 def _format_finnhub_datetime(value: object) -> str:
