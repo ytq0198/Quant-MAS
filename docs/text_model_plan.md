@@ -20,7 +20,7 @@ FinancialTextRecord → sentiment/classifier → TextSignalRecord
 | **EXP-TEXT-001** | ModelScope 本地 FinBERT；200 signals → `signals_finbert.parquet` |
 | **EXP-TEXT-WF-001** | `features_with_text.parquet` 6033×20；OOS sharpe **0.563** vs baseline **0.586**（Δ **-0.023**；3.32% 覆盖） |
 | **EXP-TEXT-WF-002** | 100% 覆盖 + 占位 JSONL；OOS sharpe **0.579** vs baseline **0.586**（Δ **-0.007**） |
-| **EXP-TEXT-WF-003** | Finnhub 真实新闻 2.42% 覆盖 + fillna(0)；OOS sharpe **0.565** vs baseline **0.586**（Δ **-0.021**） |
+| **EXP-TEXT-WF-003** | Finnhub 真实新闻 2.42% 覆盖 + fillna(0)；fetch **2025-06-04~2026-06-04**；OOS sharpe **0.565** vs baseline **0.586**（Δ **-0.021**） |
 
 **Exploratory 结论**：wf001 低覆盖（200/6033）下 OOS sharpe **0.563**；wf002 将覆盖率提至 **100%** 后回升至 **0.579**；wf003 真实 Finnhub 新闻在 **2.42%** 覆盖下为 **0.565**（≈ wf001）。三线均未超越 baseline **0.586**；wf002 回升更可能与占位全量覆盖有关，而非真实语义增量。
 

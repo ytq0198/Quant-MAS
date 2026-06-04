@@ -85,11 +85,15 @@ python -m pip install -e ".[ml,text]"
 python -m pytest tests/test_text_signals.py -v
 
 # 0) Fetch real news from Finnhub (requires FINNHUB_API_KEY in .env).
+# Free tier company-news ≈ 1 year only; --start 2018-01-01 returns raw=0.
+# Verified on server (2026-06-04): --start 2025-06-04 --end 2026-06-04 -> 9434 records.
 python scripts/fetch_real_news.py \
   --source finnhub \
   --symbols AAPL MSFT SPY \
-  --start 2018-01-01 \
-  --end 2025-12-31 \
+  --start 2025-06-04 \
+  --end 2026-06-04 \
+  --chunk-months 1 \
+  --delay 1.0 \
   --output-path /mnt/localDisk3/weizian/datasets/text/real_news_wf003.jsonl
 
 # 1) Align real news to tradable feature bars.
@@ -155,8 +159,9 @@ Incorrect wording:
 
 | Stage | Count / Metric |
 |-------|----------------|
-| Fetch (Finnhub 2025-06-04 ~ 2026-06-04) | **9434** records |
+| Fetch (`--start 2025-06-04 --end 2026-06-04`) | **9434** records |
 | Align | **5088** aligned / **4346** dropped (`no_future_bar`) |
+| Effective overlap (features calendar) | **~2025-06-04 ~ 2025-12-31** |
 | FinBERT signals | **146** rows (date×symbol aggregate) |
 | Coverage audit | **2.42%** (146/6033) |
 | Walk-forward | **19** windows, **16** features |

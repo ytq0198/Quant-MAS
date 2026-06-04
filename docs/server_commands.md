@@ -609,15 +609,18 @@ python -m pytest tests/test_text_signals.py -v   # 预期 31 passed
 python -m pytest -v   # 预期 330 passed（本地）
 
 # 0) 从 Finnhub 拉取真实新闻
-# 免费版 company-news 通常只有最近 1 年；2018 年会 raw=0，勿浪费 288 次请求
+# 免费版 company-news 通常只有最近 1 年；--start 2018-01-01 会 raw=0
+# 已验证（2026-06-04）：--start 2025-06-04 --end 2026-06-04 -> 9434 条
 python scripts/fetch_real_news.py \
   --source finnhub \
   --symbols AAPL MSFT SPY \
-  --recent-days 365 \
+  --start 2025-06-04 \
+  --end 2026-06-04 \
   --chunk-months 1 \
   --delay 1.0 \
   --output-path /mnt/localDisk3/weizian/datasets/text/real_news_wf003.jsonl \
   2>&1 | tee /mnt/localDisk3/weizian/logs/exp_text_wf003_fetch_news.log
+# 等价写法：--recent-days 365（在跑数日当天自动推算起止日期）
 
 # 1) 将真实新闻按发布时间对齐到可交易 bar
 python scripts/align_real_news.py \

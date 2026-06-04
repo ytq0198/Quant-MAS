@@ -204,10 +204,12 @@
 
 - 日期：2026-06-04
 - 阶段：Plus **M6 科研** — 真实新闻 + 发布时间对齐 + walk-forward OOS
-- 环境：a6000-9961；Finnhub 免费版 **1 年**新闻窗（2025-06-04 ~ 2026-06-04）
+- 环境：a6000-9961；Finnhub 免费版 **1 年**新闻窗
+- Fetch 命令（已验证）：`--start 2025-06-04 --end 2026-06-04`（AAPL/MSFT/SPY）
 - 数据链路：
-  - fetch：**9434** 条 → `real_news_wf003.jsonl`
-  - align：**5088** aligned / **4346** dropped（`no_future_bar`，2026 新闻超出 features 截止 2025-12-31）
+  - fetch：**9434** 条 → `real_news_wf003.jsonl`（**2025-06-04 ~ 2026-06-04**）
+  - align：**5088** aligned / **4346** dropped（`no_future_bar`；2026 新闻超出 features 截止 **2025-12-31**）
+  - **有效重叠**（进 FinBERT / walk-forward）：约 **2025-06-04 ~ 2025-12-31**（features 日历 2018-01-02 ~ 2025-12-31）
   - FinBERT signals：**146** 行（按 date×symbol 聚合）
   - 覆盖率审计：**2.42%**（146/6033）；`text_signal_fillna: 0`（与 WF-001 一致；无 fillna 会导致 walk-forward 无窗口）
 - **OOS 对比**（vs **EXP-20260602-008**）：
@@ -225,6 +227,7 @@
   - `/mnt/localDisk3/weizian/reports/real_news_alignment_wf003/`
   - `/mnt/localDisk3/weizian/reports/text_signal_audit_wf003/`
   - `/mnt/localDisk3/weizian/reports/walk_forward_text_003/`
+  - `/mnt/localDisk3/weizian/reports/research/comparison.md`（**8 rows**，含 `server_walk_forward_text_003`）
 - **结论（exploratory）**：
   - 真实 Finnhub 新闻在 **~2.4% 覆盖 + fillna(0)** 下 OOS sharpe **0.565**，与 WF-001（**0.563**）接近，**低于**主基线 **0.586** 与 WF-002 占位（**0.579**）
   - 说明：在相同稀疏覆盖量级下，**真实新闻并未显著优于** WF-001 smoke；WF-002 的回升更可能与 **100% 占位覆盖** 有关，而非真实语义增量
