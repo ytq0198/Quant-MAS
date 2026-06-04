@@ -12,9 +12,12 @@ from quant_mas.features import merge_text_signals_into_features, summarize_text_
 from quant_mas.text import (
     FinancialTextRecord,
     MockSentimentClassifier,
+    RealNewsRecord,
     TextSignalRecord,
+    align_real_news_to_features,
     build_synthetic_text_records,
     build_text_records_from_features,
+    load_real_news_records,
     load_text_records,
     predict_sentiment,
     split_text_records_by_time,
@@ -41,6 +44,23 @@ def test_text_record_schema_round_trip() -> None:
 
     assert FinancialTextRecord.from_dict(record.to_dict()) == record
     assert TextSignalRecord.from_dict(signal.to_dict()) == signal
+
+
+def test_real_news_record_round_trip() -> None:
+    payload = {
+        "published_at": "2024-01-02T15:30:00",
+        "symbol": "aapl",
+        "source": "fixture",
+        "title": "Apple reports stronger demand",
+        "text": "Analysts revised expectations upward.",
+        "url": "https://example.com/aapl",
+        "metadata": {"provider": "synthetic"},
+    }
+
+    record = RealNewsRecord.from_dict(payload)
+
+    assert record.symbol == "AAPL"
+    assert record.to_dict()["metadata"]["provider"] == "synthetic"
 
 
 def test_split_text_records_by_time_is_chronological() -> None:
@@ -166,6 +186,73 @@ def test_summarize_text_signal_coverage_reports_match_rate() -> None:
     assert summary["coverage_ratio"] == 0.5
     assert summary["matched_symbols"] == ["AAA", "BBB"]
     assert summary["column_coverage"]["finbert_sentiment"]["matched_rows"] == 2
+
+
+def test_align_real_news_after_close_to_next_feature_bar() -> None:
+    features = pd.DataFrame(
+        {
+            "date": pd.to_datetime(["2024-01-02", "2024-01-03"]),
+            "symbol": ["AAPL", "AAPL"],
+            "close": [100.0, 101.0],
+        }
+    )
+    records = [
+        RealNewsRecord(
+            published_at="2024-01-02T16:30:00",
+            symbol="AAPL",
+            source="fixture",
+            title="After close headline",
+        )
+    ]
+
+    aligned, audit = align_real_news_to_features(records, features, market_close="16:00")
+
+    assert aligned[0].date == "2024-01-03"
+    assert aligned[0].metadata["published_at"] == "2024-01-02T16:30:00"
+    assert audit["aligned_records"] == 1
+    assert audit["dropped_records"] == 0
+
+
+def test_align_real_news_before_close_same_feature_bar() -> None:
+    features = pd.DataFrame(
+        {
+            "date": pd.to_datetime(["2024-01-02", "2024-01-03"]),
+            "symbol": ["AAPL", "AAPL"],
+            "close": [100.0, 101.0],
+        }
+    )
+    records = [
+        RealNewsRecord(
+            published_at="2024-01-02T09:00:00",
+            symbol="AAPL",
+            source="fixture",
+            title="Premarket headline",
+        )
+    ]
+
+    aligned, _ = align_real_news_to_features(records, features, market_close="16:00")
+
+    assert aligned[0].date == "2024-01-02"
+
+
+def test_align_real_news_audits_unknown_symbol_and_no_future_bar() -> None:
+    features = pd.DataFrame(
+        {
+            "date": pd.to_datetime(["2024-01-02"]),
+            "symbol": ["AAPL"],
+            "close": [100.0],
+        }
+    )
+    records = [
+        RealNewsRecord("2024-01-02T10:00:00", "MSFT", "fixture", "Unknown symbol"),
+        RealNewsRecord("2024-01-02T17:00:00", "AAPL", "fixture", "No future bar"),
+    ]
+
+    aligned, audit = align_real_news_to_features(records, features, market_close="16:00")
+
+    assert aligned == []
+    assert audit["dropped_records"] == 2
+    assert audit["dropped_reasons"] == {"unknown_symbol": 1, "no_future_bar": 1}
 
 
 def test_load_text_records_jsonl_and_write_signal_parquet(tmp_path: Path) -> None:
@@ -395,3 +482,93 @@ def test_build_text_records_from_features_cli_writes_jsonl(tmp_path: Path) -> No
     assert output_path.exists()
     loaded = load_text_records(output_path)
     assert len(loaded) == 2
+
+
+def test_align_real_news_cli_help() -> None:
+    result = subprocess.run(
+        [sys.executable, "scripts/align_real_news.py", "--help"],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    assert result.returncode == 0
+    assert "--news-path" in result.stdout
+
+
+def test_align_real_news_cli_writes_aligned_jsonl(tmp_path: Path) -> None:
+    features_path = tmp_path / "features.parquet"
+    news_path = tmp_path / "real_news.jsonl"
+    output_dir = tmp_path / "aligned"
+    pd.DataFrame(
+        {
+            "date": pd.to_datetime(["2024-01-02", "2024-01-03"]),
+            "symbol": ["AAPL", "AAPL"],
+            "close": [100.0, 101.0],
+        }
+    ).to_parquet(features_path, index=False)
+    news_path.write_text(
+        json.dumps(
+            {
+                "published_at": "2024-01-02T17:15:00",
+                "symbol": "AAPL",
+                "source": "fixture",
+                "title": "Apple after close headline",
+                "text": "Full text body",
+            }
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            "scripts/align_real_news.py",
+            "--news-path",
+            str(news_path),
+            "--features-path",
+            str(features_path),
+            "--output-dir",
+            str(output_dir),
+        ],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    assert result.returncode == 0
+    aligned = load_text_records(output_dir / "aligned_news.jsonl")
+    assert len(aligned) == 1
+    assert aligned[0].date == "2024-01-03"
+    assert (output_dir / "alignment_metrics.json").exists()
+    assert (output_dir / "summary.md").exists()
+
+
+def test_load_real_news_records_jsonl(tmp_path: Path) -> None:
+    news_path = tmp_path / "real_news.jsonl"
+    news_path.write_text(
+        json.dumps(
+            {
+                "published_at": "2024-01-02T10:00:00",
+                "symbol": "AAPL",
+                "source": "fixture",
+                "title": "Apple headline",
+            }
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    records = load_real_news_records(news_path)
+
+    assert len(records) == 1
+    assert records[0].symbol == "AAPL"
+
+
+def test_real_news_documented_sample_matches_schema() -> None:
+    records = load_real_news_records("docs/examples/real_news_wf003.sample.jsonl")
+
+    assert len(records) == 2
+    assert records[0].source == "example_news_provider"
+    assert records[1].published_at.endswith("17:30:00")

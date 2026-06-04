@@ -592,6 +592,56 @@ python scripts/compare_experiments.py \
 - 若 coverage 仍接近 WF-001 的 `200/6033`，结论仍应写成 exploratory
 - `simulation.*`、LLM 解释、单段回测不得替代 OOS
 
+### EXP-TEXT-WF-003：真实金融新闻 JSONL + 时间对齐（待跑）
+
+JSONL schema example: [`docs/examples/real_news_wf003.sample.jsonl`](examples/real_news_wf003.sample.jsonl). The sample is not real data.
+
+```bash
+cd /mnt/localDisk3/weizian/Quant-MAS
+git pull origin main
+conda activate /mnt/localDisk3/weizian/conda_envs/quant-mas
+python -m pip install -e ".[ml,text]"
+python -m pytest tests/test_text_signals.py -v   # 预期 27 passed
+python -m pytest -v   # 预期 326 passed（本地）
+
+# 1) 将真实新闻按发布时间对齐到可交易 bar
+python scripts/align_real_news.py \
+  --news-path /mnt/localDisk3/weizian/datasets/text/real_news_wf003.jsonl \
+  --features-path /mnt/localDisk3/weizian/datasets/features/features.parquet \
+  --output-dir /mnt/localDisk3/weizian/reports/real_news_alignment_wf003 \
+  --market-close 16:00
+
+# 2) 对齐后的 JSONL 进入 FinBERT 信号生成
+python scripts/train_text_model.py --mode finbert_baseline \
+  --config configs/text_model.server.yaml \
+  --text-path /mnt/localDisk3/weizian/reports/real_news_alignment_wf003/aligned_news.jsonl \
+  --output-dir /mnt/localDisk3/weizian/models/text/exp_text_wf003 \
+  --signals-output /mnt/localDisk3/weizian/datasets/text/signals_finbert_wf003.parquet
+
+# 3) 覆盖率审计
+python scripts/audit_text_signals.py \
+  --features-path /mnt/localDisk3/weizian/datasets/features/features.parquet \
+  --signals-path /mnt/localDisk3/weizian/datasets/text/signals_finbert_wf003.parquet \
+  --output-dir /mnt/localDisk3/weizian/reports/text_signal_audit_wf003
+
+# 4) 构建 text-enhanced features 并跑 walk-forward
+# 注意：configs/features.text.yaml 的 text_signals_path 应指向 signals_finbert_wf003.parquet
+python scripts/build_features.py \
+  --config configs/features.text.yaml \
+  --storage-config configs/storage.server.yaml \
+  --input /mnt/localDisk3/weizian/datasets/raw/market_data.parquet \
+  --output /mnt/localDisk3/weizian/datasets/features/features_with_text_wf003.parquet
+
+python scripts/run_walk_forward.py \
+  --config configs/walk_forward.yaml \
+  --storage-config configs/storage.server.yaml \
+  --features-path /mnt/localDisk3/weizian/datasets/features/features_with_text_wf003.parquet \
+  --experiment-name server_walk_forward_text_003 \
+  --output-dir /mnt/localDisk3/weizian/reports/walk_forward_text_003
+```
+
+记录要求：同时报告 alignment dropped rows、coverage ratio、OOS sharpe，并与 **0.586** baseline、WF-002 **0.579** 占位文本结果对比。
+
 ## 六点十、Plus M7 RL 模拟（EXP-20260602-021 / EXP-20260602-022）✅
 
 ```bash

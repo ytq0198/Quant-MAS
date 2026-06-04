@@ -1,6 +1,6 @@
 # Quant MAS 实验记录
 
-更新时间：2026-06-04（**EXP-TEXT-WF-002 ✅** · **314 pytest** · M12.4 双端 · EXP-POP-010 OOS **0.387**）
+更新时间：2026-06-04（**EXP-TEXT-WF-003-PREP ✅** · **326 pytest** · M12.4 双端 · EXP-POP-010 OOS **0.387**）
 
 本文件用于记录真实实验和重要验证。不要记录未经实际运行的数据结果；尚未真实运行的项目标记为「待验证」。
 
@@ -197,6 +197,29 @@
 ```
 
 ## 当前验证记录
+
+### EXP-TEXT-WF-003-PREP：真实新闻 JSONL 对齐工具 ✅
+
+- 日期：2026-06-04
+- 阶段：EXP-TEXT-WF-003 本地准备；**不是 OOS 结果**
+- 目标：用真实金融新闻替代 WF-002 的 `feature_aligned_smoke` 占位文本
+- 交付：
+  - `src/quant_mas/text/real_news.py`：`RealNewsRecord`、真实新闻加载、发布时间 → feature bar 对齐
+  - `scripts/align_real_news.py`：输出 `aligned_news.jsonl`、`alignment_metrics.json`、`summary.md`
+  - `docs/real_news_text_experiment.md`：真实新闻 schema、对齐规则、服务器流程
+- 命令与结果：
+  - `python -m pytest tests/test_text_signals.py -v` → **27 passed**
+  - `python scripts/align_real_news.py --help` → ✅
+  - `python -m pytest -v` → **326 passed**
+- 对齐规则：
+  - 盘前 / 盘中新闻 → 同一交易日
+  - 收盘后新闻 → 下一可用交易日
+  - 未知 symbol / 无未来 bar → 丢弃并计入审计
+- 科研边界：
+  - 本步骤只做数据可用性对齐，不产生 `oos.*`
+  - 真实 OOS 结论必须由 `server_walk_forward_text_003` 产生
+  - 后续需与 baseline **0.586**、WF-002 **0.579**、WF-001 **0.563** 对比
+- 下一步：准备 `/mnt/localDisk3/weizian/datasets/text/real_news_wf003.jsonl` 并在服务器运行 EXP-TEXT-WF-003
 
 ### EXP-TEXT-WF-002：高覆盖 text + Walk-forward OOS（服务器）✅
 
@@ -1415,6 +1438,7 @@
 
 | 编号 | 日期 | 内容 | 关键结果 |
 |------|------|------|----------|
+| EXP-TEXT-WF-003-PREP | 2026-06-04 | 真实新闻 JSONL 对齐工具 | **326 passed**；`align_real_news.py`（**非 OOS**） |
 | EXP-TEXT-WF-002 | 2026-06-04 | 高覆盖 text + walk-forward OOS | coverage **100%**；oos.sharpe **0.579** vs baseline **0.586**（Δ **-0.007**） |
 | EXP-TEXT-WF-002-PREP | 2026-06-04 | 文本信号覆盖率审计工具 | **314 passed**；`audit_text_signals.py` **15/15**（**非 OOS**） |
 | EXP-20260601-004 | 2026-06-01 | Stooq 真实数据 + ma_cross | 6033 rows，sharpe ≈ 1.00 |

@@ -15,18 +15,28 @@ from quant_mas.text.finbert_baseline import (
 )
 from quant_mas.text.lora_finetune import train_lora_text_classifier
 from quant_mas.text.mock_classifier import MockSentimentClassifier
+from quant_mas.text.real_news import (
+    RealNewsRecord,
+    align_real_news_to_features,
+    load_real_news_records,
+    write_real_news_alignment_report,
+)
 
 __all__ = [
     "FinancialTextRecord",
     "FinBERTSentimentClassifier",
     "MockSentimentClassifier",
+    "RealNewsRecord",
     "SentimentClassifier",
     "TextSignalRecord",
+    "align_real_news_to_features",
     "build_synthetic_text_records",
     "build_text_records_from_features",
+    "load_real_news_records",
     "load_text_records",
     "predict_sentiment",
     "split_text_records_by_time",
     "train_lora_text_classifier",
+    "write_real_news_alignment_report",
     "write_text_records_jsonl",
 ]

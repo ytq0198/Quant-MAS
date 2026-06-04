@@ -1,10 +1,10 @@
 # Quant MAS 开发进度
 
-更新时间：2026-06-04（**EXP-TEXT-WF-002 ✅** · **314 pytest** · M12.4 双端闭环）
+更新时间：2026-06-04（**EXP-TEXT-WF-003 prep ✅** · **326 pytest** · M12.4 双端闭环）
 
 **Plus v2**：M1–M8 ✅ · **v3 M9–M12.4** ✅ 双端 · RL observation-aware policy 全链路
 
-**pytest 基线**：**314 passed** 本地 · **308 passed** 服务器 · **论文主指标**：**0.586**（EXP-008）· **RL feature_linear OOS**：**0.387**（EXP-POP-010 ablation）· **RL logits OOS**：**0.0**（EXP-POP-009）
+**pytest 基线**：**326 passed** 本地 · **314 passed** 服务器 · **论文主指标**：**0.586**（EXP-008）· **RL feature_linear OOS**：**0.387**（EXP-POP-010 ablation）· **RL logits OOS**：**0.0**（EXP-POP-009）
 
 ## Plus v2 八条主线（M1–M8）
 
@@ -188,7 +188,7 @@ M1/M2 已完成；**M3 本地 ✅**（见下两节）；下一步 **M4**。
 
 | 环境 | Python | 结果 | 日期 | 实验 |
 |------|--------|------|------|------|
-| 本地 Windows | 3.11+ | **314 passed** | 2026-06-04 | EXP-TEXT-WF-002 prep |
+| 本地 Windows | 3.11+ | **326 passed** | 2026-06-04 | EXP-TEXT-WF-003 prep |
 | 服务器 a6000-9961 | 3.11.15 | **314 passed** | 2026-06-04 | EXP-TEXT-WF-002-PREP @ `8ad636a`（50.97s） |
 
 命令：`python -m pytest -v`（勿裸敲 `pytest` / `pip`）。
@@ -402,3 +402,5 @@ Recommended next steps:
 3. **Optional RL ablation**: longer feature-linear RL training with multi-seed export + M11.8 batch OOS.
 
 EXP-TEXT-WF-002 preparation adds `summarize_text_signal_coverage()` and `scripts/audit_text_signals.py` so coverage can be reported before the next text-enhanced OOS run.
+
+EXP-TEXT-WF-003 preparation adds real-news JSONL ingestion and publication-time alignment. It is ready for server validation once a real financial-news JSONL file is available. See [real_news_text_experiment.md](real_news_text_experiment.md).

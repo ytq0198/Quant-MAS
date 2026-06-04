@@ -109,8 +109,7 @@ python scripts/compare_experiments.py \
 
 | 编号 | 内容 |
 |------|------|
-| EXP-TEXT-002 | LoRA 小样本 |
-| EXP-TEXT-WF-002 | 高覆盖 text + coverage audit + walk-forward | ✅ oos.sharpe **0.579** |
+| EXP-TEXT-WF-003 | 真实新闻 + 时间对齐 + walk-forward | 待服务器；见 [real_news_text_experiment.md](real_news_text_experiment.md) |
 
 ## 相关文档
 
