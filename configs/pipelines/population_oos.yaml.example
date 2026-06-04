@@ -1,0 +1,25 @@
+pipeline_id: population_oos
+version: 1
+description: Dry-run recipe for population candidate export and batch OOS validation.
+metric_families:
+  - population
+  - walk_forward
+  - audit
+nodes:
+  - id: export_population_candidates
+    tool_name: pipeline
+    script: scripts/export_population_candidates.py
+    metric_family: population
+    dry_run_stub:
+      writes_oos: false
+  - id: batch_validate_candidates
+    tool_name: backtest
+    script: scripts/batch_validate_candidates.py
+    metric_family: walk_forward
+    depends_on: [export_population_candidates]
+    allowed_metrics_prefix: ["oos."]
+  - id: compare_experiments
+    tool_name: report
+    script: scripts/compare_experiments.py
+    metric_family: audit
+    depends_on: [batch_validate_candidates]

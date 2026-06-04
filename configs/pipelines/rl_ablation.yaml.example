@@ -1,0 +1,33 @@
+pipeline_id: rl_ablation
+version: 1
+description: Dry-run recipe for RL training, policy export, and candidate OOS validation.
+metric_families:
+  - training
+  - simulation
+  - walk_forward
+  - audit
+nodes:
+  - id: rl_train
+    tool_name: train_model
+    script: scripts/run_rl_experiment.py
+    metric_family: simulation
+    dry_run_stub:
+      allowed_metrics_prefix: ["training.", "simulation."]
+  - id: export_rl_policy
+    tool_name: pipeline
+    script: scripts/export_rl_policy_candidate.py
+    metric_family: audit
+    depends_on: [rl_train]
+    dry_run_stub:
+      writes_oos: false
+  - id: validate_candidate_oos
+    tool_name: backtest
+    script: scripts/validate_candidate_oos.py
+    metric_family: walk_forward
+    depends_on: [export_rl_policy]
+    allowed_metrics_prefix: ["oos."]
+  - id: compare_experiments
+    tool_name: report
+    script: scripts/compare_experiments.py
+    metric_family: audit
+    depends_on: [validate_candidate_oos]

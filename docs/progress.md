@@ -4,7 +4,7 @@
 
 **Plus v2**?M1?M8 ? � **v3 M9?M12.4** ? ?? � RL observation-aware policy ???
 
-**pytest ??**?**342 passed** ?? + ??? � **?????**?**0.586**?EXP-008?� **RL feature_linear OOS**?**0.387**?EXP-POP-010 ablation?� **RL logits OOS**?**0.0**?EXP-POP-009?
+**pytest ??**?**349 passed** ?? + ??? � **?????**?**0.586**?EXP-008?� **RL feature_linear OOS**?**0.387**?EXP-POP-010 ablation?� **RL logits OOS**?**0.0**?EXP-POP-009?
 
 ## Plus v2 ?????M1?M8?
 
@@ -411,12 +411,12 @@ M13 is split into four incremental stages so implementation can stay small and t
 
 | Stage | Status | Purpose | Document |
 |------|--------|---------|----------|
-| **M13.0 MCP Scheduler Minimal** | ? | Internal dry-run scheduler, audit JSONL, ToolPolicy | [mcp_protocol.md](mcp_protocol.md) |
-| **M13.1 Pipeline Recipe Scheduler** | Next | YAML recipes for ML/Text/Population/RL | [mcp_protocol.md](mcp_protocol.md) |
+| **M13.0 MCP Scheduler Minimal** | ✅ | Internal dry-run scheduler, audit JSONL, ToolPolicy | [mcp_protocol.md](mcp_protocol.md) |
+| **M13.1 Pipeline Recipe Scheduler** | ✅ | YAML recipes for ML/Text/Population/RL | [mcp_protocol.md](mcp_protocol.md) |
 | **M13.2 LangGraph Extended DAG** | Later | Optional LangGraph backend for population, RL, and batch walk-forward nodes | [mcp_protocol.md](mcp_protocol.md) |
 | **M13.3 Paper Artifact Export** | Later | Paper-grade result tables, ablation tables, and audit package | [mcp_protocol.md](mcp_protocol.md) |
 
-Current next implementation target: **M13.1** Pipeline Recipe Scheduler.
+Current next target: **M13.2** LangGraph extended DAG or server M13.1 YAML smoke (EXP-M13-002).
 
 ### M13.0 completion note（EXP-M13-001 ✅ 双端）
 
@@ -428,3 +428,25 @@ Current next implementation target: **M13.1** Pipeline Recipe Scheduler.
 Delivered: agent_communication / audit_log / mcp_scheduler / run_mcp_pipeline / test_mcp_scheduler（11/11）
 
 M13.0 remains dry-run only and does not create new OOS research metrics.
+
+### M13.1 completion note
+
+M13.1 Pipeline Recipe Scheduler has been implemented locally.
+
+Delivered:
+
+- `src/quant_mas/orchestration/pipeline_recipe.py`
+- `configs/pipelines/ml_baseline.yaml.example`
+- `configs/pipelines/text_enhanced.yaml.example`
+- `configs/pipelines/population_oos.yaml.example`
+- `configs/pipelines/rl_ablation.yaml.example`
+- `tests/test_mcp_pipeline_recipes.py`
+
+Verification:
+
+- `python -m pytest tests/test_mcp_pipeline_recipes.py -v` �� **7 passed**
+- `python -m pytest tests/test_mcp_scheduler.py -v` �� **11 passed**
+
+- python -m pytest -v → **349 passed**
+
+M13.1 keeps execution dry-run only. It converts mature ML/Text/Population/RL research flows into auditable YAML recipes without running real GPU, network, or LLM jobs in pytest.

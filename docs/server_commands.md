@@ -1222,35 +1222,39 @@ git commit -m "your message"
 git push origin main
 ```
 
-## M13.0 MCP Scheduler Minimal ?
+## M13 ???M13.0 ? · M13.1 ??
 
-M13.0 ???? smoke ??????????????? GPU ????????????? LLM?
+### M13.0 smoke?EXP-M13-001??? 342 pytest?
 
 ```bash
 cd /mnt/localDisk3/weizian/Quant-MAS
-git pull origin main   # 605fa66+
+git pull origin main
 conda activate /mnt/localDisk3/weizian/conda_envs/quant-mas
-python -m pytest -v                              # ?? 342 passed
-python -m pytest tests/test_mcp_scheduler.py -v  # ?? 11 passed
+python -m pytest -v                              # ?? 349 passed
+python -m pytest tests/test_mcp_scheduler.py -v  # 11 passed
+python -m pytest tests/test_mcp_pipeline_recipes.py -v  # 7 passed
 
 python scripts/run_mcp_pipeline.py --list-recipes
 python scripts/run_mcp_pipeline.py --recipe mock_research --dry-run
 python scripts/run_mcp_pipeline.py --recipe text_smoke --dry-run
 ```
 
-**????2026-06-04?EXP-M13-001?**??? **342 passed**?53.99s??`mock_research` / `text_smoke` dry-run ??? `audit.jsonl`?
+### M13.1 YAML recipe dry-run?EXP-M13-002??? ? · ???? smoke?
 
-?????
-
-```text
-outputs/pipelines/<run_id>/audit.jsonl
+```bash
+python scripts/run_mcp_pipeline.py --recipe configs/pipelines/ml_baseline.yaml.example --dry-run
+python scripts/run_mcp_pipeline.py --recipe configs/pipelines/text_enhanced.yaml.example --dry-run
+python scripts/run_mcp_pipeline.py --recipe configs/pipelines/population_oos.yaml.example --dry-run
+python scripts/run_mcp_pipeline.py --recipe configs/pipelines/rl_ablation.yaml.example --dry-run
 ```
+
+???`outputs/pipelines/<run_id>/audit.jsonl`
 
 ???
 
-- ? dry-run ?? mock ?????
-- `ToolPolicy` ?????? shell / broker / order / secrets?
-- ????? MCP server listener?
-- ????? OOS ?????
+- ? dry-run??? GPU / ?? / LLM / ?? walk-forward
+- `ToolPolicy` ?? deny shell / broker / order / secrets
+- ???? OOS ????
+- `text_enhanced`?`audit_text_signals` ??? `walk_forward_eval` ?
 
-????**M13.1** Pipeline Recipe Scheduler?? [mcp_protocol.md](mcp_protocol.md)?
+?? [mcp_protocol.md](mcp_protocol.md)?????**M13.2** ?????? YAML smoke?

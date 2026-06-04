@@ -158,7 +158,7 @@ M13 是批处理研究调度，不是对话路由器，也不是外部 MCP 服�
 
 ## 当前下一步
 
-**M13.0 已完成**（EXP-M13-001，342 pytest 双端）。下一步：**M13.1** YAML recipe 化。
+**M13.1 本地已完成**（EXP-M13-002，349 pytest）。下一步：服务器 YAML dry-run smoke，或 **M13.2** LangGraph 扩展。
 
 ## M13.0 Implementation Note
 
@@ -175,3 +175,36 @@ python -m pytest -v  # 342 passed
 ```
 
 This implementation remains mock-first and dry-run only. It does not create new OOS metrics or replace existing research workflows.
+
+## M13.1 Implementation Note
+
+M13.1 adds YAML pipeline recipes on top of the M13.0 scheduler.
+
+Delivered:
+
+- `src/quant_mas/orchestration/pipeline_recipe.py`
+- `configs/pipelines/ml_baseline.yaml.example`
+- `configs/pipelines/text_enhanced.yaml.example`
+- `configs/pipelines/population_oos.yaml.example`
+- `configs/pipelines/rl_ablation.yaml.example`
+- `tests/test_mcp_pipeline_recipes.py`
+
+Recipe behavior:
+
+- Built-in recipe names from M13.0 still work.
+- `scripts/run_mcp_pipeline.py --recipe <path-to-yaml> --dry-run` loads a YAML recipe.
+- YAML recipes keep `script` metadata for auditability but still execute only dry-run stubs in this stage.
+- Text recipes require `audit_text_signals` before `walk_forward_eval`.
+- RL recipes keep `rl_train` under `simulation` / `training`; OOS is only allowed at candidate validation.
+
+Verification:
+
+```bash
+python -m pytest tests/test_mcp_pipeline_recipes.py -v  # 7 passed
+python -m pytest tests/test_mcp_scheduler.py -v         # 11 passed
+python scripts/run_mcp_pipeline.py \
+  --recipe configs/pipelines/text_enhanced.yaml.example \
+  --dry-run
+```
+
+M13.1 still does not run real server commands. Real execution remains a later explicit server experiment.

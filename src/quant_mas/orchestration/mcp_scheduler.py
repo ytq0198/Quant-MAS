@@ -16,6 +16,7 @@ from quant_mas.orchestration.agent_communication import (
     PlanMessage,
 )
 from quant_mas.orchestration.audit_log import AuditEvent, append_audit_event, summarize_audit_log
+from quant_mas.orchestration.pipeline_recipe import PipelineRecipe, load_recipe_yaml
 from quant_mas.protocols.mcp.policy import PolicyEvaluation, ToolPolicy, evaluate_tool_call
 from quant_mas.protocols.mcp.types import MCPToolCall
 
@@ -120,13 +121,13 @@ class MCPScheduler:
     def list_recipes(self) -> list[str]:
         return sorted(self.recipes)
 
-    def plan(self, recipe: str) -> list[SchedulerNode]:
-        nodes = self._recipe_nodes(recipe)
+    def plan(self, recipe: str | Path | PipelineRecipe) -> list[SchedulerNode]:
+        _, nodes = self._resolve_recipe(recipe)
         return _topological_order(nodes)
 
     def run(
         self,
-        recipe: str,
+        recipe: str | Path | PipelineRecipe,
         *,
         output_dir: str | Path = "outputs/pipelines",
         dry_run: bool = True,
@@ -135,15 +136,16 @@ class MCPScheduler:
         if not dry_run:
             raise ValueError("M13.0 scheduler only supports dry_run=True")
 
-        planned = self.plan(recipe)
-        actual_run_id = run_id or f"{recipe}_{datetime.now(UTC).strftime('%Y%m%d_%H%M%S')}_{uuid4().hex[:8]}"
+        pipeline_id, nodes = self._resolve_recipe(recipe)
+        planned = _topological_order(nodes)
+        actual_run_id = run_id or f"{pipeline_id}_{datetime.now(UTC).strftime('%Y%m%d_%H%M%S')}_{uuid4().hex[:8]}"
         run_dir = Path(output_dir) / actual_run_id
         audit_path = run_dir / "audit.jsonl"
         self.message_bus.publish(
             "pipeline.plan",
             PlanMessage(
                 sender="mcp_scheduler",
-                pipeline_id=recipe,
+                pipeline_id=pipeline_id,
                 nodes=[node.node_id for node in planned],
             ),
         )
@@ -160,7 +162,7 @@ class MCPScheduler:
                 append_audit_event(
                     audit_path,
                     AuditEvent(
-                        pipeline_id=recipe,
+                        pipeline_id=pipeline_id,
                         run_id=actual_run_id,
                         node_id=node.node_id,
                         status="denied",
@@ -185,7 +187,7 @@ class MCPScheduler:
             append_audit_event(
                 audit_path,
                 AuditEvent(
-                    pipeline_id=recipe,
+                    pipeline_id=pipeline_id,
                     run_id=actual_run_id,
                     node_id=node.node_id,
                     status=result.status,
@@ -199,7 +201,7 @@ class MCPScheduler:
                 "pipeline.node_finished",
                 NodeResultMessage(
                     sender="mcp_scheduler",
-                    pipeline_id=recipe,
+                    pipeline_id=pipeline_id,
                     node_id=node.node_id,
                     status=result.status,
                     artifacts=artifacts,
@@ -210,14 +212,14 @@ class MCPScheduler:
                 "pipeline.audit",
                 AuditMessage(
                     sender="mcp_scheduler",
-                    pipeline_id=recipe,
+                    pipeline_id=pipeline_id,
                     node_id=node.node_id,
                     audit_path=str(audit_path),
                 ),
             )
 
         return SchedulerResult(
-            pipeline_id=recipe,
+            pipeline_id=pipeline_id,
             run_id=actual_run_id,
             status="success",
             planned_nodes=[node.node_id for node in planned],
@@ -226,11 +228,35 @@ class MCPScheduler:
             audit_summary=summarize_audit_log(audit_path),
         )
 
-    def _recipe_nodes(self, recipe: str) -> tuple[SchedulerNode, ...]:
-        if recipe not in self.recipes:
+    def _resolve_recipe(
+        self, recipe: str | Path | PipelineRecipe
+    ) -> tuple[str, tuple[SchedulerNode, ...]]:
+        if isinstance(recipe, PipelineRecipe):
+            return recipe.pipeline_id, _nodes_from_pipeline_recipe(recipe)
+        recipe_path = Path(recipe)
+        if recipe_path.exists():
+            loaded = load_recipe_yaml(recipe_path)
+            return loaded.pipeline_id, _nodes_from_pipeline_recipe(loaded)
+        recipe_name = str(recipe)
+        if recipe_name not in self.recipes:
             available = ", ".join(self.list_recipes())
-            raise ValueError(f"unknown recipe: {recipe}. Available recipes: {available}")
-        return self.recipes[recipe]
+            if recipe_path.suffix in {".yaml", ".yml", ".example"} or "/" in recipe_name or "\\" in recipe_name:
+                raise FileNotFoundError(f"recipe file does not exist: {recipe_path}")
+            raise ValueError(f"unknown recipe: {recipe_name}. Available recipes: {available}")
+        return recipe_name, self.recipes[recipe_name]
+
+
+def _nodes_from_pipeline_recipe(recipe: PipelineRecipe) -> tuple[SchedulerNode, ...]:
+    return tuple(
+        SchedulerNode(
+            node_id=node.id,
+            tool_name=node.tool_name,
+            metric_family=node.metric_family,
+            depends_on=node.depends_on,
+            dry_run_stub=node.to_scheduler_dict()["dry_run_stub"],
+        )
+        for node in recipe.nodes
+    )
 
 
 def _topological_order(nodes: tuple[SchedulerNode, ...]) -> list[SchedulerNode]:

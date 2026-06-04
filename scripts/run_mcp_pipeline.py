@@ -23,7 +23,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--recipe",
         default="mock_research",
-        help="Built-in recipe name. Use --list-recipes to inspect choices.",
+        help="Built-in recipe name or path to a YAML recipe (e.g. configs/pipelines/text_enhanced.yaml.example).",
     )
     parser.add_argument(
         "--list-recipes",
