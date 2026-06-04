@@ -592,7 +592,9 @@ python scripts/compare_experiments.py \
 - 若 coverage 仍接近 WF-001 的 `200/6033`，结论仍应写成 exploratory
 - `simulation.*`、LLM 解释、单段回测不得替代 OOS
 
-### EXP-TEXT-WF-003：真实金融新闻 JSONL + 时间对齐（待跑）
+### EXP-TEXT-WF-003：真实金融新闻 JSONL + 时间对齐 ✅
+
+**结果（2026-06-04）**：fetch **9434** → align **5088** → FinBERT **146** signals → coverage **2.42%** → **oos.sharpe 0.565**（Δ vs baseline **-0.021**）。详见 [real_news_text_experiment.md](real_news_text_experiment.md)。
 
 **前置**：`real_news_wf003.jsonl` 须为**真实新闻**（含 `published_at` 时间戳）；**不能**用 `docs/examples/real_news_wf003.sample.jsonl`（仅 schema 样例，不可作 OOS）。推荐用 Finnhub（服务器 `.env` 已配 `FINNHUB_API_KEY`）。
 
@@ -651,9 +653,14 @@ python scripts/run_walk_forward.py \
   --features-path /mnt/localDisk3/weizian/datasets/features/features_with_text_wf003.parquet \
   --experiment-name server_walk_forward_text_003 \
   --output-dir /mnt/localDisk3/weizian/reports/walk_forward_text_003
+
+python scripts/compare_experiments.py \
+  --storage-config configs/storage.server.yaml \
+  --memory-path /mnt/localDisk3/weizian/reports/experiments.json \
+  --output-dir /mnt/localDisk3/weizian/reports/research
 ```
 
-记录要求：同时报告 fetch record_count、alignment dropped rows、coverage ratio、OOS sharpe，并与 **0.586** baseline、WF-002 **0.579** 占位文本结果对比。
+记录要求：同时报告 fetch record_count、alignment dropped rows、coverage ratio、OOS sharpe，并与 **0.586** baseline、WF-002 **0.579**、WF-001 **0.563** 对比。
 
 ## 六点十、Plus M7 RL 模拟（EXP-20260602-021 / EXP-20260602-022）✅
 

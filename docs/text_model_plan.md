@@ -1,6 +1,6 @@
 # 金融文本模型计划（Plus M6）
 
-更新时间：2026-06-04（EXP-TEXT-001 / EXP-TEXT-WF-001 / **EXP-TEXT-WF-002 ✅** 服务器）
+更新时间：2026-06-04（EXP-TEXT-001 / EXP-TEXT-WF-001 / **EXP-TEXT-WF-002 ✅** / **EXP-TEXT-WF-003 ✅** 服务器）
 
 > Codex 任务：[codex_prompt_M6.md](codex_prompt_M6.md) · 设计：[项目plus设计.md §M6](../项目plus设计.md#m6金融文本大模型--开源模型微调)
 
@@ -20,8 +20,9 @@ FinancialTextRecord → sentiment/classifier → TextSignalRecord
 | **EXP-TEXT-001** | ModelScope 本地 FinBERT；200 signals → `signals_finbert.parquet` |
 | **EXP-TEXT-WF-001** | `features_with_text.parquet` 6033×20；OOS sharpe **0.563** vs baseline **0.586**（Δ **-0.023**；3.32% 覆盖） |
 | **EXP-TEXT-WF-002** | 100% 覆盖 + 占位 JSONL；OOS sharpe **0.579** vs baseline **0.586**（Δ **-0.007**） |
+| **EXP-TEXT-WF-003** | Finnhub 真实新闻 2.42% 覆盖 + fillna(0)；OOS sharpe **0.565** vs baseline **0.586**（Δ **-0.021**） |
 
-**Exploratory 结论**：wf001 低覆盖（200/6033）下 OOS sharpe **0.563**；wf002 将覆盖率提至 **100%** 后回升至 **0.579**，仍略低于 baseline **0.586**。占位文本非真实新闻；覆盖率是重要因素，但尚不足以超越 ML 主基线。
+**Exploratory 结论**：wf001 低覆盖（200/6033）下 OOS sharpe **0.563**；wf002 将覆盖率提至 **100%** 后回升至 **0.579**；wf003 真实 Finnhub 新闻在 **2.42%** 覆盖下为 **0.565**（≈ wf001）。三线均未超越 baseline **0.586**；wf002 回升更可能与占位全量覆盖有关，而非真实语义增量。
 
 ## EXP-TEXT-WF-002 设计
 
@@ -109,7 +110,7 @@ python scripts/compare_experiments.py \
 
 | 编号 | 内容 |
 |------|------|
-| EXP-TEXT-WF-003 | 真实新闻 + 时间对齐 + walk-forward | 待服务器；见 [real_news_text_experiment.md](real_news_text_experiment.md) |
+| EXP-TEXT-002 | LoRA 微调 FinBERT（可选）；见 `lora_finetune.py` 骨架 |
 
 ## 相关文档
 

@@ -1,6 +1,6 @@
 # Quant MAS 实验记录
 
-更新时间：2026-06-04（**EXP-TEXT-WF-003-PREP ✅** · **326 pytest** · M12.4 双端 · EXP-POP-010 OOS **0.387**）
+更新时间：2026-06-04（**EXP-TEXT-WF-003 ✅** · **331 pytest** · 文本三线消融闭环）
 
 本文件用于记录真实实验和重要验证。不要记录未经实际运行的数据结果；尚未真实运行的项目标记为「待验证」。
 
@@ -71,14 +71,16 @@
 | server_walk_forward_001 | walk_forward | — | **0.586** | — | 0.443 | — | — | **baseline** | EXP-20260602-008 |
 | server_walk_forward_text_001 | walk_forward | — | **0.563** | — | 0.420 | — | — | ↓ -0.023 | EXP-TEXT-WF-001 |
 | server_walk_forward_text_002 | walk_forward | — | **0.579** | — | 0.443 | — | — | ↓ -0.007 | EXP-TEXT-WF-002 |
+| server_walk_forward_text_003 | walk_forward | — | **0.565** | — | 0.421 | — | — | ↓ -0.021 | EXP-TEXT-WF-003 |
 
 **说明：**
 
 - CLI 输出 `oos.sharpe` 精确值 **0.585673** ≈ 报告 **0.586**，与 EXP-20260602-008 一致。
 - 仅 **walk_forward** 行可用于论文主结论。
 - EXP-TEXT-WF-001：200/6033 text 覆盖 + fillna(0)，**exploratory**；Δ oos.sharpe **-0.023**。
-- EXP-TEXT-WF-002：100% 覆盖 + `feature_aligned_smoke` 占位文本；Δ oos.sharpe **-0.007**（较 wf001 **+0.016**，仍略低于 baseline）。
-- 产物：`/mnt/localDisk3/weizian/reports/research/comparison.md`（**7 rows**）
+- EXP-TEXT-WF-002：100% 覆盖 + `feature_aligned_smoke` 占位文本；Δ oos.sharpe **-0.007**。
+- EXP-TEXT-WF-003：Finnhub 真实新闻 **2.42%** 覆盖 + fillna(0)；Δ oos.sharpe **-0.021**（≈ WF-001，低于 WF-002）。
+- 产物：`/mnt/localDisk3/weizian/reports/research/comparison.md`（**8 rows**）
 
 ### 历史快照：COMP-20260602-002（5 rows，EXP-20260602-010，text 实验前）
 
@@ -198,6 +200,37 @@
 
 ## 当前验证记录
 
+### EXP-TEXT-WF-003：真实 Finnhub 新闻 + Walk-forward OOS（服务器）✅
+
+- 日期：2026-06-04
+- 阶段：Plus **M6 科研** — 真实新闻 + 发布时间对齐 + walk-forward OOS
+- 环境：a6000-9961；Finnhub 免费版 **1 年**新闻窗（2025-06-04 ~ 2026-06-04）
+- 数据链路：
+  - fetch：**9434** 条 → `real_news_wf003.jsonl`
+  - align：**5088** aligned / **4346** dropped（`no_future_bar`，2026 新闻超出 features 截止 2025-12-31）
+  - FinBERT signals：**146** 行（按 date×symbol 聚合）
+  - 覆盖率审计：**2.42%**（146/6033）；`text_signal_fillna: 0`（与 WF-001 一致；无 fillna 会导致 walk-forward 无窗口）
+- **OOS 对比**（vs **EXP-20260602-008**）：
+
+  | 指标 | baseline | wf001 | wf002 | **wf003** | wf003 Δ |
+  |------|----------|-------|-------|-----------|---------|
+  | **oos.sharpe** | **0.586** | 0.563 | 0.579 | **0.565** | **-0.021** |
+  | oos.total_return | 0.443 | 0.420 | 0.443 | **0.421** | -0.022 |
+  | oos.max_drawdown | -0.255 | -0.259 | -0.265 | **-0.259** | — |
+  | text coverage | — | 3.32% | 100% | **2.42%** | — |
+  | 文本类型 | — | smoke | 占位 | **Finnhub 真实** | — |
+  | window_count | 19 | 19 | 19 | **19** | — |
+
+- 产物：
+  - `/mnt/localDisk3/weizian/reports/real_news_alignment_wf003/`
+  - `/mnt/localDisk3/weizian/reports/text_signal_audit_wf003/`
+  - `/mnt/localDisk3/weizian/reports/walk_forward_text_003/`
+- **结论（exploratory）**：
+  - 真实 Finnhub 新闻在 **~2.4% 覆盖 + fillna(0)** 下 OOS sharpe **0.565**，与 WF-001（**0.563**）接近，**低于**主基线 **0.586** 与 WF-002 占位（**0.579**）
+  - 说明：在相同稀疏覆盖量级下，**真实新闻并未显著优于** WF-001 smoke；WF-002 的回升更可能与 **100% 占位覆盖** 有关，而非真实语义增量
+  - 论文须同时报告 fetch/align/coverage 与 `oos.*`；**不能**替代 EXP-20260602-008 主基线
+- 工程备注：首次 walk-forward 因未 `fillna(0)` 仅余 146 行 → `no complete windows`；已在 `build_features` 支持 `text_signal_fillna`（`86ab767`）
+
 ### EXP-TEXT-WF-003-PREP：真实新闻 JSONL 对齐工具 ✅
 
 - 日期：2026-06-04
@@ -220,7 +253,7 @@
   - 本步骤只做数据可用性对齐，不产生 `oos.*`
   - 真实 OOS 结论必须由 `server_walk_forward_text_003` 产生
   - 后续需与 baseline **0.586**、WF-002 **0.579**、WF-001 **0.563** 对比
-- 下一步：服务器 `fetch_real_news.py` → align → FinBERT → walk-forward（EXP-TEXT-WF-003 OOS）
+- 下一步：~~服务器 EXP-TEXT-WF-003 OOS~~ ✅
 
 ### EXP-TEXT-WF-002：高覆盖 text + Walk-forward OOS（服务器）✅
 
@@ -1439,6 +1472,7 @@
 
 | 编号 | 日期 | 内容 | 关键结果 |
 |------|------|------|----------|
+| EXP-TEXT-WF-003 | 2026-06-04 | 真实 Finnhub 新闻 + walk-forward OOS | coverage **2.42%**；oos.sharpe **0.565** vs baseline **0.586**（Δ **-0.021**） |
 | EXP-TEXT-WF-003-PREP | 2026-06-04 | 真实新闻 JSONL 对齐工具 | **326 passed**；`align_real_news.py`（**非 OOS**） |
 | EXP-TEXT-WF-002 | 2026-06-04 | 高覆盖 text + walk-forward OOS | coverage **100%**；oos.sharpe **0.579** vs baseline **0.586**（Δ **-0.007**） |
 | EXP-TEXT-WF-002-PREP | 2026-06-04 | 文本信号覆盖率审计工具 | **314 passed**；`audit_text_signals.py` **15/15**（**非 OOS**） |

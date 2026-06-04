@@ -1,7 +1,7 @@
 # EXP-TEXT-WF-003 Real Financial News Text Experiment
 
 更新时间：2026-06-04  
-状态：设计 + 本地工具实现；服务器真实新闻跑数待验证
+状态：**服务器 OOS 已完成**（`oos.sharpe = 0.565`，2.42% 覆盖）
 
 ## 目标
 
@@ -16,6 +16,7 @@ EXP-TEXT-WF-003 用真实、带发布时间戳的金融新闻替代 feature-alig
 | EXP-20260602-008 | n/a | **0.586** | **0.443** | ML main baseline |
 | EXP-TEXT-WF-001 | 3.32% | **0.563** | **0.420** | sparse FinBERT smoke |
 | EXP-TEXT-WF-002 | 100% | **0.579** | **0.443** | placeholder headlines |
+| EXP-TEXT-WF-003 | **2.42%** | **0.565** | **0.421** | real Finnhub news (1-year free tier) |
 
 WF-002 narrowed the gap from `-0.023` to `-0.007`, but it used placeholder headlines. Therefore it can only support the claim that coverage matters, not that real news sentiment improves the baseline.
 
@@ -112,7 +113,9 @@ python scripts/audit_text_signals.py \
   --output-dir /mnt/localDisk3/weizian/reports/text_signal_audit_wf003
 
 # 4) Build text-enhanced features.
-# Edit configs/features.text.yaml so text_signals_path points to signals_finbert_wf003.parquet.
+# configs/features.text.yaml must include:
+#   text_signals_path: .../signals_finbert_wf003.parquet
+#   text_signal_fillna: 0
 python scripts/build_features.py \
   --config configs/features.text.yaml \
   --storage-config configs/storage.server.yaml \
@@ -148,6 +151,30 @@ Incorrect wording:
 
 > FinBERT or LLM text signals are useful without OOS validation.
 
+## Server Results (2026-06-04)
+
+| Stage | Count / Metric |
+|-------|----------------|
+| Fetch (Finnhub 2025-06-04 ~ 2026-06-04) | **9434** records |
+| Align | **5088** aligned / **4346** dropped (`no_future_bar`) |
+| FinBERT signals | **146** rows (date×symbol aggregate) |
+| Coverage audit | **2.42%** (146/6033) |
+| Walk-forward | **19** windows, **16** features |
+| **oos.sharpe** | **0.565** (Δ vs baseline **-0.021**) |
+| oos.total_return | **0.421** |
+| oos.max_drawdown | **-0.259** |
+
+Artifacts:
+
+- `/mnt/localDisk3/weizian/datasets/text/real_news_wf003.jsonl`
+- `/mnt/localDisk3/weizian/reports/real_news_alignment_wf003/`
+- `/mnt/localDisk3/weizian/datasets/text/signals_finbert_wf003.parquet`
+- `/mnt/localDisk3/weizian/reports/text_signal_audit_wf003/`
+- `/mnt/localDisk3/weizian/datasets/features/features_with_text_wf003.parquet`
+- `/mnt/localDisk3/weizian/reports/walk_forward_text_003/`
+
+**Interpretation**: Real news at sparse coverage performs similarly to WF-001 (`0.563`) and below WF-002 placeholder (`0.579`). Finnhub free tier limits historical depth; longer news history is needed for a fair high-coverage real-news test.
+
 ## Current Status
 
 Implemented locally:
@@ -157,10 +184,10 @@ Implemented locally:
 - `align_real_news_to_features()`
 - `write_real_news_alignment_report()`
 - `scripts/align_real_news.py`
+- `scripts/fetch_real_news.py`
 - synthetic tests for after-close alignment and leakage prevention
 
-Pending:
+Completed on server:
 
-- acquire or prepare real financial news JSONL
-- run server EXP-TEXT-WF-003
-- compare against `0.586`, `0.579`, and `0.563`
+- EXP-TEXT-WF-003 walk-forward OOS (`server_walk_forward_text_003`)
+- Compared against `0.586`, `0.579`, and `0.563`

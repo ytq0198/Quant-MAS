@@ -1,6 +1,6 @@
 # Quant MAS 开发进度
 
-更新时间：2026-06-04（**EXP-TEXT-WF-003 prep ✅** · **326 pytest** · M12.4 双端闭环）
+更新时间：2026-06-04（**EXP-TEXT-WF-003 ✅** · 文本三线消融闭环 · M12.4 双端）
 
 **Plus v2**：M1–M8 ✅ · **v3 M9–M12.4** ✅ 双端 · RL observation-aware policy 全链路
 
@@ -17,7 +17,7 @@
 | **M4** | LangGraph 工作流 | ✅ | ResearchWorkflow、sequential + langgraph | [langgraph_workflow.md](langgraph_workflow.md) |
 | **M5** | 上下文 / LLM | ✅ | ContextBuilder、ResearchAgent；EXP-LLM-001 | [context_engineering.md](context_engineering.md) |
 | **M5.5** | 本地 vLLM | 📋 按需 | OpenAI 兼容端点（a6000） | 项目plus设计 §M5.5 |
-| **M6** | 文本信号 | ✅ | FinBERT smoke + WF OOS **0.563** vs **0.586** | [text_model_plan.md](text_model_plan.md) |
+| **M6** | 文本信号 | ✅ | FinBERT smoke **0.563** · 占位 **0.579** · 真实 **0.565** vs **0.586** | [text_model_plan.md](text_model_plan.md) |
 | **M7** | RL / GRPO 实验 | ✅ | TradingEnv、GRPO ranking；180 passed 本地+服务器 | [rl_plan.md](rl_plan.md) |
 | **M8** | MCP / A2A 协议 | ✅ | MCP adapter、AgentCard；195 passed 本地+服务器 | [protocols.md](protocols.md) |
 
@@ -257,6 +257,7 @@ python scripts/export_agent_cards.py --help
 | EXP-TEXT-001 | FinBERT smoke（ModelScope） | 200 signals；6033 行 features 中 134 非零 |
 | EXP-TEXT-WF-001 | Walk-forward + text | OOS sharpe **0.563** vs baseline **0.586**（exploratory；3.32% 覆盖） |
 | EXP-TEXT-WF-002 | Walk-forward + 100% text | OOS sharpe **0.579** vs baseline **0.586**（Δ **-0.007**；占位文本） |
+| EXP-TEXT-WF-003 | Walk-forward + 真实新闻 | OOS sharpe **0.565** vs baseline **0.586**（Δ **-0.021**；Finnhub 2.42% 覆盖） |
 | EXP-POP-005 | 单候选 OOS（M11.7） | `cand_mean_rev_1` **oos.sharpe 1.036** vs **0.586**（77 窗） |
 | EXP-POP-007 | RL training smoke（M12.1） | **simulation.sharpe_mean 6.31**（**≠ OOS 0.586**） |
 | EXP-POP-006 | 批量候选 OOS（M11.8） | 4/4 超 baseline；best **1.039** |
@@ -267,7 +268,7 @@ python scripts/export_agent_cards.py --help
 2. OOS auc_mean 0.472 与 val/test AUC ≈ 0.46–0.48 一致；模型调参留作后续研究。
 3. Agent 可编排 ML 回测、风控、pipeline；Memory/RAG 可检索历史实验与文档。
 4. **Plus M1**：任何新实验写入 ExperimentMemory 后，须用 `compare_experiments.py` 生成比较表，并与 **EXP-20260602-008** 对照后再下结论。
-5. **Plus M6 text**：EXP-TEXT-WF-001（3.32% 覆盖）OOS sharpe **0.563**；EXP-TEXT-WF-002（100% 覆盖，占位文本）**0.579**（Δ vs baseline **-0.007**）。仍略低于主基线 **0.586**；需真实新闻验证。
+5. **Plus M6 text**：EXP-TEXT-WF-001（3.32%）**0.563**；EXP-TEXT-WF-002（100% 占位）**0.579**；EXP-TEXT-WF-003（Finnhub 真实 2.42%）**0.565**。三线均略低于主基线 **0.586**；真实新闻在稀疏覆盖下 ≈ WF-001，未复现 WF-002 占位回升。
 
 ## Quant MAS v2：M6 文本信号
 
@@ -375,6 +376,7 @@ python scripts/export_agent_cards.py --help
 - ~~**M12.4 Observation-aware RL policy**~~ ✅ 双端 EXP-036 / **EXP-POP-010**（OOS **0.387**）
 - ~~**EXP-TEXT-WF-002** coverage audit tool~~ ✅ EXP-TEXT-WF-002-PREP（**314 pytest**）
 - ~~**EXP-TEXT-WF-002** 服务器 walk-forward OOS~~ ✅ oos.sharpe **0.579** vs **0.586**
+- ~~**EXP-TEXT-WF-003** 服务器 walk-forward OOS~~ ✅ oos.sharpe **0.565** vs **0.586**
 - M13 编排
 
 ## Quant MAS v3：M12.4 Observation-aware RL
@@ -397,10 +399,8 @@ Research interpretation: M12.4 improves the RL ablation from all-cash (`oos.shar
 
 Recommended next steps:
 
-1. **EXP-TEXT-WF-002**: improve text coverage and rerun walk-forward against the 0.586 baseline.
+1. **EXP-TEXT-002** (optional): LoRA fine-tune FinBERT on domain news; rerun walk-forward.
 2. **M13 orchestration**: consolidate repeated research flows into a controlled DAG/scheduler.
 3. **Optional RL ablation**: longer feature-linear RL training with multi-seed export + M11.8 batch OOS.
 
-EXP-TEXT-WF-002 preparation adds `summarize_text_signal_coverage()` and `scripts/audit_text_signals.py` so coverage can be reported before the next text-enhanced OOS run.
-
-EXP-TEXT-WF-003 preparation adds real-news JSONL ingestion and publication-time alignment. It is ready for server validation once a real financial-news JSONL file is available. See [real_news_text_experiment.md](real_news_text_experiment.md).
+EXP-TEXT-WF-003 completed real Finnhub news alignment and walk-forward OOS (`oos.sharpe = 0.565`, 2.42% coverage). See [real_news_text_experiment.md](real_news_text_experiment.md).
