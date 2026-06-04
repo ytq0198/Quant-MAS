@@ -4,7 +4,7 @@
 
 **Plus v2**：M1–M8 ✅ · **v3 M9–M12.4** ✅ 双端 · RL observation-aware policy 全链路
 
-**pytest 基线**：**326 passed** 本地 · **314 passed** 服务器 · **论文主指标**：**0.586**（EXP-008）· **RL feature_linear OOS**：**0.387**（EXP-POP-010 ablation）· **RL logits OOS**：**0.0**（EXP-POP-009）
+**pytest 基线**：**326 passed** 本地 + 服务器 · **论文主指标**：**0.586**（EXP-008）· **RL feature_linear OOS**：**0.387**（EXP-POP-010 ablation）· **RL logits OOS**：**0.0**（EXP-POP-009）
 
 ## Plus v2 八条主线（M1–M8）
 
@@ -189,7 +189,7 @@ M1/M2 已完成；**M3 本地 ✅**（见下两节）；下一步 **M4**。
 | 环境 | Python | 结果 | 日期 | 实验 |
 |------|--------|------|------|------|
 | 本地 Windows | 3.11+ | **326 passed** | 2026-06-04 | EXP-TEXT-WF-003 prep |
-| 服务器 a6000-9961 | 3.11.15 | **314 passed** | 2026-06-04 | EXP-TEXT-WF-002-PREP @ `8ad636a`（50.97s） |
+| 服务器 a6000-9961 | 3.11.15 | **326 passed** | 2026-06-04 | EXP-TEXT-WF-003-PREP @ `635a54a`（58.50s） |
 
 命令：`python -m pytest -v`（勿裸敲 `pytest` / `pip`）。
 

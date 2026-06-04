@@ -594,7 +594,18 @@ python scripts/compare_experiments.py \
 
 ### EXP-TEXT-WF-003：真实金融新闻 JSONL + 时间对齐（待跑）
 
-JSONL schema example: [`docs/examples/real_news_wf003.sample.jsonl`](examples/real_news_wf003.sample.jsonl). The sample is not real data.
+**前置**：`real_news_wf003.jsonl` 须为**真实新闻**（含 `published_at` 时间戳）；**不能**用 `docs/examples/real_news_wf003.sample.jsonl`（仅 schema 样例，不可作 OOS）。
+
+```bash
+# 0) 确认真实新闻文件已就位
+ls -la /mnt/localDisk3/weizian/datasets/text/real_news_wf003.jsonl
+
+# 可选：先用 repo 内 schema 样例做 align 冒烟（不产生 OOS 结论）
+# cp docs/examples/real_news_wf003.sample.jsonl /tmp/real_news_schema_smoke.jsonl
+# python scripts/align_real_news.py --news-path /tmp/real_news_schema_smoke.jsonl ...
+```
+
+JSONL schema example: [`docs/examples/real_news_wf003.sample.jsonl`](examples/real_news_wf003.sample.jsonl).
 
 ```bash
 cd /mnt/localDisk3/weizian/Quant-MAS

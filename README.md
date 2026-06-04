@@ -300,7 +300,7 @@ print(result.content)
 | Item | Value | Notes |
 |------|-------|-------|
 | **RL feature_linear OOS (M12.4)** | `rl_feature_linear_policy_001_1` | **oos.sharpe 0.387** vs ML **0.586**（EXP-POP-010 ✅） |
-| **pytest** | **326 passed** | EXP-TEXT-WF-003-PREP 本地；服务器 **314** @ WF-002 |
+| **pytest** | **326 passed** | EXP-TEXT-WF-003-PREP 本地 + 服务器双端 @ `635a54a` |
 | **Text coverage audit** | `audit_text_signals.py` | EXP-TEXT-WF-002-PREP ✅（**非 OOS**） |
 | **RL candidate OOS (M12.3)** | `rl_grpo_policy_001_1` walk-forward | **oos.sharpe 0.0**（全现金 ablation；**≠ simulation 6.31**）EXP-POP-009 ✅ |
 | **RL training (M12.1)** | GRPO loop + checkpoint | **simulation.sharpe_mean 6.31**（**≠ OOS 0.586**）EXP-POP-007 ✅ |

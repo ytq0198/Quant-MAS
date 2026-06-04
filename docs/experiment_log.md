@@ -210,7 +210,7 @@
 - 命令与结果：
   - `python -m pytest tests/test_text_signals.py -v` → **27 passed**
   - `python scripts/align_real_news.py --help` → ✅
-  - `python -m pytest -v` → **326 passed**
+  - 全量 `python -m pytest -v` → **326 passed**（本地 + 服务器 **58.50s** @ `635a54a`）
 - 对齐规则：
   - 盘前 / 盘中新闻 → 同一交易日
   - 收盘后新闻 → 下一可用交易日
