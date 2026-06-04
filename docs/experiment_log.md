@@ -206,6 +206,7 @@
 - 交付：
   - `src/quant_mas/text/real_news.py`：`RealNewsRecord`、真实新闻加载、发布时间 → feature bar 对齐
   - `scripts/align_real_news.py`：输出 `aligned_news.jsonl`、`alignment_metrics.json`、`summary.md`
+  - `scripts/fetch_real_news.py`：Finnhub company-news → `real_news_wf003.jsonl`
   - `docs/real_news_text_experiment.md`：真实新闻 schema、对齐规则、服务器流程
 - 命令与结果：
   - `python -m pytest tests/test_text_signals.py -v` → **27 passed**
@@ -219,7 +220,7 @@
   - 本步骤只做数据可用性对齐，不产生 `oos.*`
   - 真实 OOS 结论必须由 `server_walk_forward_text_003` 产生
   - 后续需与 baseline **0.586**、WF-002 **0.579**、WF-001 **0.563** 对比
-- 下一步：准备 `/mnt/localDisk3/weizian/datasets/text/real_news_wf003.jsonl` 并在服务器运行 EXP-TEXT-WF-003
+- 下一步：服务器 `fetch_real_news.py` → align → FinBERT → walk-forward（EXP-TEXT-WF-003 OOS）
 
 ### EXP-TEXT-WF-002：高覆盖 text + Walk-forward OOS（服务器）✅
 

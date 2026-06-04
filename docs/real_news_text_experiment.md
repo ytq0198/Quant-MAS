@@ -68,6 +68,7 @@ This prevents future text leakage. The aligned output is ordinary `FinancialText
 
 | Tool | Purpose |
 |------|---------|
+| `scripts/fetch_real_news.py` | Download Finnhub company news JSONL |
 | `scripts/align_real_news.py` | Align real news JSONL/parquet to feature dates |
 | `scripts/audit_text_signals.py` | Audit text signal coverage after FinBERT signal generation |
 | `scripts/train_text_model.py` | Generate FinBERT/mock sentiment signals |
@@ -81,6 +82,14 @@ git pull origin main
 conda activate /mnt/localDisk3/weizian/conda_envs/quant-mas
 python -m pip install -e ".[ml,text]"
 python -m pytest tests/test_text_signals.py -v
+
+# 0) Fetch real news from Finnhub (requires FINNHUB_API_KEY in .env).
+python scripts/fetch_real_news.py \
+  --source finnhub \
+  --symbols AAPL MSFT SPY \
+  --start 2018-01-01 \
+  --end 2025-12-31 \
+  --output-path /mnt/localDisk3/weizian/datasets/text/real_news_wf003.jsonl
 
 # 1) Align real news to tradable feature bars.
 python scripts/align_real_news.py \

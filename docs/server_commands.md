@@ -594,16 +594,7 @@ python scripts/compare_experiments.py \
 
 ### EXP-TEXT-WF-003：真实金融新闻 JSONL + 时间对齐（待跑）
 
-**前置**：`real_news_wf003.jsonl` 须为**真实新闻**（含 `published_at` 时间戳）；**不能**用 `docs/examples/real_news_wf003.sample.jsonl`（仅 schema 样例，不可作 OOS）。
-
-```bash
-# 0) 确认真实新闻文件已就位
-ls -la /mnt/localDisk3/weizian/datasets/text/real_news_wf003.jsonl
-
-# 可选：先用 repo 内 schema 样例做 align 冒烟（不产生 OOS 结论）
-# cp docs/examples/real_news_wf003.sample.jsonl /tmp/real_news_schema_smoke.jsonl
-# python scripts/align_real_news.py --news-path /tmp/real_news_schema_smoke.jsonl ...
-```
+**前置**：`real_news_wf003.jsonl` 须为**真实新闻**（含 `published_at` 时间戳）；**不能**用 `docs/examples/real_news_wf003.sample.jsonl`（仅 schema 样例，不可作 OOS）。推荐用 Finnhub（服务器 `.env` 已配 `FINNHUB_API_KEY`）。
 
 JSONL schema example: [`docs/examples/real_news_wf003.sample.jsonl`](examples/real_news_wf003.sample.jsonl).
 
@@ -612,8 +603,19 @@ cd /mnt/localDisk3/weizian/Quant-MAS
 git pull origin main
 conda activate /mnt/localDisk3/weizian/conda_envs/quant-mas
 python -m pip install -e ".[ml,text]"
-python -m pytest tests/test_text_signals.py -v   # 预期 27 passed
-python -m pytest -v   # 预期 326 passed（本地）
+python -m pytest tests/test_text_signals.py -v   # 预期 31 passed
+python -m pytest -v   # 预期 330 passed（本地）
+
+# 0) 从 Finnhub 拉取真实新闻（2018–2025；按月分块；约 3×96 次请求，注意限速）
+python scripts/fetch_real_news.py \
+  --source finnhub \
+  --symbols AAPL MSFT SPY \
+  --start 2018-01-01 \
+  --end 2025-12-31 \
+  --chunk-months 1 \
+  --delay 1.0 \
+  --output-path /mnt/localDisk3/weizian/datasets/text/real_news_wf003.jsonl \
+  2>&1 | tee /mnt/localDisk3/weizian/logs/exp_text_wf003_fetch_news.log
 
 # 1) 将真实新闻按发布时间对齐到可交易 bar
 python scripts/align_real_news.py \
@@ -651,7 +653,7 @@ python scripts/run_walk_forward.py \
   --output-dir /mnt/localDisk3/weizian/reports/walk_forward_text_003
 ```
 
-记录要求：同时报告 alignment dropped rows、coverage ratio、OOS sharpe，并与 **0.586** baseline、WF-002 **0.579** 占位文本结果对比。
+记录要求：同时报告 fetch record_count、alignment dropped rows、coverage ratio、OOS sharpe，并与 **0.586** baseline、WF-002 **0.579** 占位文本结果对比。
 
 ## 六点十、Plus M7 RL 模拟（EXP-20260602-021 / EXP-20260602-022）✅
 

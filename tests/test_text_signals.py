@@ -572,3 +572,98 @@ def test_real_news_documented_sample_matches_schema() -> None:
     assert len(records) == 2
     assert records[0].source == "example_news_provider"
     assert records[1].published_at.endswith("17:30:00")
+
+
+def test_parse_finnhub_news_item_maps_fields() -> None:
+    from quant_mas.text.finnhub_news import parse_finnhub_news_item
+
+    record = parse_finnhub_news_item(
+        {
+            "datetime": 1615813200,
+            "headline": "Apple beats estimates",
+            "summary": "Revenue grew year over year.",
+            "source": "CNBC",
+            "url": "https://example.com/aapl",
+            "id": 42,
+            "category": "company",
+        },
+        symbol="aapl",
+    )
+
+    assert record.symbol == "AAPL"
+    assert record.source == "finnhub:CNBC"
+    assert record.title == "Apple beats estimates"
+    assert record.metadata["finnhub_id"] == 42
+
+
+def test_iter_date_chunks_splits_month_windows() -> None:
+    from quant_mas.text.finnhub_news import iter_date_chunks
+
+    chunks = iter_date_chunks("2018-01-15", "2018-03-10", chunk_months=1)
+
+    assert chunks == [
+        ("2018-01-15", "2018-01-31"),
+        ("2018-02-01", "2018-02-28"),
+        ("2018-03-01", "2018-03-10"),
+    ]
+
+
+def test_fetch_finnhub_company_news_records_mock_http(monkeypatch: pytest.MonkeyPatch) -> None:
+    from quant_mas.text.finnhub_news import fetch_finnhub_company_news_records
+
+    calls: list[str] = []
+
+    def fake_urlopen(url, timeout=60.0):
+        calls.append(str(url))
+        payload = [
+            {
+                "datetime": 1514764800,
+                "headline": "Headline",
+                "summary": "Summary",
+                "source": "Yahoo",
+                "url": "https://example.com/1",
+                "id": 1,
+            }
+        ]
+        return FakeFinnhubResponse(payload)
+
+    monkeypatch.setattr("urllib.request.urlopen", fake_urlopen)
+
+    records = fetch_finnhub_company_news_records(
+        ["AAPL"],
+        start="2018-01-01",
+        end="2018-01-31",
+        api_key="test-key",
+        chunk_months=1,
+        delay_seconds=0,
+    )
+
+    assert len(records) == 1
+    assert records[0].symbol == "AAPL"
+    assert "company-news" in calls[0]
+
+
+def test_fetch_real_news_cli_help() -> None:
+    result = subprocess.run(
+        [sys.executable, "scripts/fetch_real_news.py", "--help"],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    assert result.returncode == 0
+    assert "--output-path" in result.stdout
+
+
+class FakeFinnhubResponse:
+    def __init__(self, payload: list[dict]) -> None:
+        self.payload = json.dumps(payload).encode("utf-8")
+
+    def read(self) -> bytes:
+        return self.payload
+
+    def __enter__(self) -> FakeFinnhubResponse:
+        return self
+
+    def __exit__(self, *args: object) -> None:
+        return None
