@@ -204,7 +204,7 @@
 
 - 日期：2026-06-04
 - 阶段：v3 **M13.3** — 从 ExperimentMemory + M13 audit JSONL 导出论文级表格（**非 OOS，不推断**）
-- 环境：本地 Windows；待服务器真实 `experiments.json` + `outputs/pipelines` 导出 smoke
+- 环境：本地 Windows；git **`aff9051`**；待服务器真实 `experiments.json` + `outputs/pipelines` 导出 smoke
 - 交付：
   - `paper_artifacts.py`：`export_paper_artifacts(...)`
   - `scripts/export_paper_artifacts.py` CLI
