@@ -541,19 +541,10 @@ ls -la /mnt/localDisk3/weizian/datasets/text/news_wf002.jsonl
 ls -la data/text/smoke_from_features.jsonl   # EXP-TEXT-001 用的 200 条 smoke
 #
 # 1b) 若 news_wf002.jsonl 尚未准备：从 features 对齐生成全量占位 JSONL（6033 行 × 3 symbol）
-# python - <<'PY'
-# import json
-# import pandas as pd
-# df = pd.read_parquet("/mnt/localDisk3/weizian/datasets/features/features.parquet")
-# out = "/mnt/localDisk3/weizian/datasets/text/news_wf002.jsonl"
-# with open(out, "w", encoding="utf-8") as f:
-#     for row in df.itertuples(index=False):
-#         d = str(getattr(row, "date", row[0]))[:10]
-#         sym = str(getattr(row, "symbol", row[1]))
-#         f.write(json.dumps({"date": d, "symbol": sym, "source": "feature_aligned_smoke",
-#                             "text": f"{sym} market headline for {d}", "metadata": {}}, ensure_ascii=False) + "\n")
-# print("wrote", out, "rows", len(df))
-# PY
+python scripts/build_text_records_from_features.py \
+  --features-path /mnt/localDisk3/weizian/datasets/features/features.parquet \
+  --output-path /mnt/localDisk3/weizian/datasets/text/news_wf002.jsonl \
+  2>&1 | tee /mnt/localDisk3/weizian/logs/exp_text_wf002_build_records.log
 #
 # 输出建议命名为 signals_finbert_wf002.parquet，避免覆盖 EXP-TEXT-001 产物
 python scripts/train_text_model.py --mode finbert_baseline \

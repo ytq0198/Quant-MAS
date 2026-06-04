@@ -29,6 +29,11 @@ EXP-TEXT-WF-002 的目标不是直接证明文本信号一定有效，而是用�
 第一步必须先做覆盖率审计：
 
 ```bash
+# 若尚无 news_wf002.jsonl，先从 features 生成全量对齐占位 JSONL
+python scripts/build_text_records_from_features.py \
+  --features-path /mnt/localDisk3/weizian/datasets/features/features.parquet \
+  --output-path /mnt/localDisk3/weizian/datasets/text/news_wf002.jsonl
+
 python scripts/audit_text_signals.py \
   --features-path /mnt/localDisk3/weizian/datasets/features/features.parquet \
   --signals-path /mnt/localDisk3/weizian/datasets/text/signals_finbert_wf002.parquet \

@@ -228,7 +228,7 @@
 
 与 EXP-TEXT-WF-001（oos.sharpe **0.563**）一致：低覆盖 smoke 级信号，不能代表高覆盖结论。
 
-**CLI 注意**：`train_text_model.py` 使用 `--text-path`、`--signals-output`、`--output-dir`（**不是** `--records-path` / `--output-path`）。步骤 1 前须确认 `news_wf002.jsonl` 已存在。
+**CLI 注意**：`train_text_model.py` 使用 `--text-path`、`--signals-output`、`--output-dir`（**不是** `--records-path` / `--output-path`）。步骤 1 前须确认 `news_wf002.jsonl` 已存在；可用 `scripts/build_text_records_from_features.py` 从 `features.parquet` 生成全量对齐占位 JSONL。
 
 ### EXP-20260602-036：v3 M12.4 Observation-aware RL Policy 本地验证 ✅
 

@@ -3,8 +3,10 @@
 from quant_mas.text.data_schema import FinancialTextRecord, TextSignalRecord
 from quant_mas.text.dataset import (
     build_synthetic_text_records,
+    build_text_records_from_features,
     load_text_records,
     split_text_records_by_time,
+    write_text_records_jsonl,
 )
 from quant_mas.text.finbert_baseline import (
     FinBERTSentimentClassifier,
@@ -21,8 +23,10 @@ __all__ = [
     "SentimentClassifier",
     "TextSignalRecord",
     "build_synthetic_text_records",
+    "build_text_records_from_features",
     "load_text_records",
     "predict_sentiment",
     "split_text_records_by_time",
     "train_lora_text_classifier",
+    "write_text_records_jsonl",
 ]

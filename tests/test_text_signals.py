@@ -14,10 +14,12 @@ from quant_mas.text import (
     MockSentimentClassifier,
     TextSignalRecord,
     build_synthetic_text_records,
+    build_text_records_from_features,
     load_text_records,
     predict_sentiment,
     split_text_records_by_time,
     train_lora_text_classifier,
+    write_text_records_jsonl,
 )
 
 
@@ -325,3 +327,71 @@ def test_train_text_model_mock_dry_run(tmp_path: Path) -> None:
     assert result.returncode == 0
     assert signals_output.exists()
     assert (output_dir / "metadata.json").exists()
+
+
+def test_build_text_records_from_features_matches_feature_rows() -> None:
+    features = pd.DataFrame(
+        {
+            "date": pd.to_datetime(["2024-01-02", "2024-01-01", "2024-01-01"]),
+            "symbol": ["AAA", "AAA", "BBB"],
+            "close": [11.0, 10.0, 20.0],
+        }
+    )
+
+    records = build_text_records_from_features(features)
+
+    assert len(records) == 3
+    assert records[0].symbol == "AAA"
+    assert records[0].date == "2024-01-01"
+    assert records[-1].symbol == "BBB"
+    assert records[-1].metadata["feature_aligned"] is True
+
+
+def test_write_text_records_jsonl_round_trip(tmp_path: Path) -> None:
+    records = build_synthetic_text_records(2, symbol="AAA")
+    jsonl_path = tmp_path / "records.jsonl"
+    write_text_records_jsonl(records, jsonl_path)
+    loaded = load_text_records(jsonl_path)
+    assert loaded == records
+
+
+def test_build_text_records_from_features_cli_help() -> None:
+    result = subprocess.run(
+        [sys.executable, "scripts/build_text_records_from_features.py", "--help"],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    assert result.returncode == 0
+    assert "--features-path" in result.stdout
+
+
+def test_build_text_records_from_features_cli_writes_jsonl(tmp_path: Path) -> None:
+    features_path = tmp_path / "features.parquet"
+    output_path = tmp_path / "news_wf002.jsonl"
+    pd.DataFrame(
+        {
+            "date": pd.to_datetime(["2024-01-01", "2024-01-02"]),
+            "symbol": ["AAA", "AAA"],
+            "close": [10.0, 11.0],
+        }
+    ).to_parquet(features_path, index=False)
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            "scripts/build_text_records_from_features.py",
+            "--features-path",
+            str(features_path),
+            "--output-path",
+            str(output_path),
+        ],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    assert result.returncode == 0
+    assert output_path.exists()
+    loaded = load_text_records(output_path)
+    assert len(loaded) == 2

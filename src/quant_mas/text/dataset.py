@@ -79,3 +79,57 @@ def build_synthetic_text_records(
             )
         )
     return records
+
+
+def build_text_records_from_features(
+    features: pd.DataFrame,
+    *,
+    date_col: str = "date",
+    symbol_col: str = "symbol",
+    source: str = "feature_aligned_smoke",
+    text_template: str = "{symbol} market headline for {date}",
+) -> list[FinancialTextRecord]:
+    """Build one text record per feature row for coverage-aligned smoke runs."""
+    _require_feature_columns(features, date_col=date_col, symbol_col=symbol_col)
+    sorted_frame = features[[date_col, symbol_col]].copy()
+    sorted_frame[date_col] = pd.to_datetime(sorted_frame[date_col])
+    sorted_frame = sorted_frame.sort_values([symbol_col, date_col]).reset_index(drop=True)
+
+    records: list[FinancialTextRecord] = []
+    for row in sorted_frame.itertuples(index=False):
+        day = getattr(row, date_col)
+        symbol = str(getattr(row, symbol_col))
+        day_str = day.date().isoformat() if hasattr(day, "date") else str(day)[:10]
+        records.append(
+            FinancialTextRecord(
+                date=day_str,
+                symbol=symbol,
+                source=source,
+                text=text_template.format(symbol=symbol, date=day_str),
+                metadata={"feature_aligned": True},
+            )
+        )
+    return records
+
+
+def write_text_records_jsonl(records: list[FinancialTextRecord], path: str | Path) -> Path:
+    """Write text records as JSONL."""
+    output = Path(path).expanduser()
+    output.parent.mkdir(parents=True, exist_ok=True)
+    with output.open("w", encoding="utf-8") as handle:
+        for record in records:
+            handle.write(json.dumps(record.to_dict(), ensure_ascii=False) + "\n")
+    return output
+
+
+def _require_feature_columns(
+    features: pd.DataFrame,
+    *,
+    date_col: str,
+    symbol_col: str,
+) -> None:
+    missing = [column for column in (date_col, symbol_col) if column not in features.columns]
+    if missing:
+        raise ValueError(f"features missing required columns: {missing}")
+    if features.empty:
+        raise ValueError("features frame is empty")
