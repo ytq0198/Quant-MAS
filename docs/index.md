@@ -158,8 +158,10 @@ Memory/RAG feeds **ResearchAgent** context — it does not execute trades.
 
 | Metric | Value | Experiment |
 |--------|-------|------------|
-| pytest | **294 passed** | EXP-035 本地（M12.2） |
-| RL policy export (M12.2) | policy_state → StrategyCandidate | EXP-035 ✅；OOS 走 M11.7 |
+| pytest | **308 passed** | EXP-036 本地（M12.4）；服务器 **296** @ M12.3 |
+| RL observation policy (M12.4) | `FeatureLinearPolicyAgent` | EXP-036 ✅；非恒定 exposure；OOS 待 EXP-POP-010 |
+| RL candidate OOS (M12.3) | `rl_grpo_policy_001_1` **oos.sharpe 0.0** | EXP-POP-009 ablation（全现金；≠ simulation 6.31） |
+| RL policy export (M12.2) | policy_state → StrategyCandidate | EXP-POP-008 ✅ |
 | Competitive learning (M11) | Elo mock dry-run | EXP-029 / EXP-POP-002 |
 | Population training (M11.5) | 3-gen loop dry-run | EXP-030 / EXP-POP-003 |
 | Candidate bridge (M11.6) | Top-K export + backtest smoke | EXP-POP-004 ✅ |

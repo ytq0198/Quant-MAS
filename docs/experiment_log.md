@@ -1,6 +1,6 @@
 # Quant MAS 实验记录
 
-更新时间：2026-06-04（v3 M12.2 ✅ **294 本地 + EXP-POP-008 服务器 export**）
+更新时间：2026-06-04（v3 M12.4 ✅ **308 本地 · EXP-036** · 服务器 feature_linear OOS 待 EXP-POP-010）
 
 本文件用于记录真实实验和重要验证。不要记录未经实际运行的数据结果；尚未真实运行的项目标记为「待验证」。
 
@@ -196,6 +196,84 @@
 
 ## 当前验证记录
 
+### EXP-20260602-036：v3 M12.4 Observation-aware RL Policy 本地验证 ✅
+
+- 日期：2026-06-04
+- 阶段：**M12.4** — `FeatureLinearPolicyAgent` + export + M11.7 adapter（训练仍 **不写 oos.***）
+- 环境：本地
+- 交付：
+  - `rl/feature_policy.py` — `FeatureLinearPolicyAgent`、`FeaturePolicyState`
+  - `run_rl_experiment.py --policy-type feature_linear`
+  - `policy_export.py` 识别 `FeaturePolicyState` → `agent_type="feature_linear_policy"`
+  - `candidate_validation.py` — `feature_linear_policy` 状态相关 `target_weight`
+  - `docs/rl_observation_policy.md`、`tests/test_rl_observation_policy.py` — **12** 项
+- 命令与结果：
+  - `python -m pytest tests/test_rl_observation_policy.py -v` → **12 passed**
+  - `python -m pytest tests/test_rl_training.py tests/test_rl_policy_export.py -v` → **28 passed**
+  - `python -m pytest tests/test_candidate_oos_validation.py tests/test_candidate_oos_batch.py -v` → **20 passed**
+  - 全量 `python -m pytest -v` → **308 passed**（296→308，+12）
+- 观测特征：`position_weight`、`last_return`、`rolling_vol_5`、`volume`、`close`
+- 边界：训练只写 `training.*` / `simulation.*`；`oos.*` 仅 M11.7/M11.8
+- 问题：无
+- 下一步：服务器 **EXP-POP-010**（feature_linear 训练 → export → walk-forward OOS）
+
+### EXP-POP-010：v3 M12.4 服务器 feature_linear RL → OOS ⏳
+
+- 日期：待跑
+- 阶段：**M12.4** 服务器 — observation-aware policy 真实 features walk-forward OOS
+- 环境：a6000-9961；conda `quant-mas`；前置 `git pull`（含 M12.4，预期 **308 pytest**）
+- 命令（模板）：
+
+```bash
+python -m pytest -v
+
+python scripts/run_rl_experiment.py \
+  --config configs/rl_training.yaml \
+  --policy-type feature_linear \
+  --algorithm grpo \
+  --max-steps 50 \
+  --no-dry-run
+
+python scripts/export_rl_policy_candidate.py \
+  --config configs/rl_policy_export.yaml \
+  --no-dry-run
+
+python scripts/validate_candidate_oos.py \
+  --candidate-json outputs/rl_candidates/candidates.json \
+  --features-path /mnt/localDisk3/weizian/datasets/features/features.parquet \
+  --config configs/candidate_oos.yaml \
+  --no-dry-run
+```
+
+- 成功标准（机制）：导出候选 **非**常数全现金；OOS adapter 产生状态相关 `target_weight`（Sharpe 高低为次要）
+- 科研边界：`simulation.*` **≠** `oos.*`；主 baseline 仍为 **0.586**
+- 问题：—
+
+### EXP-POP-009：v3 M12.3 服务器 RL 候选 walk-forward OOS ✅
+
+- 日期：2026-06-04
+- 阶段：**M12.3** — `grpo_policy` 候选经 M11.7 walk-forward OOS（**唯一写 oos.*** 的步骤）
+- 环境：a6000-9961；conda `quant-mas`；Python **3.11.15**；@ **`6e8c507`**
+- 数据：`/mnt/localDisk3/weizian/datasets/features/features.parquet`；候选 **`rl_grpo_policy_001_1`**（EXP-POP-008 导出）
+- 命令与结果：
+  - `python -m pytest -v` → **296 passed** in **45.05s** ✅
+  - `validate_candidate_oos.py ... --no-dry-run` → ✅（77 windows；4851 OOS samples）
+- **OOS 结果**（ablation；**非**论文主 baseline）：
+
+| 字段 | 值 | 说明 |
+|------|-----|------|
+| `oos.sharpe` | **0.0** | 常数 `target_weight=0.0`（全现金） |
+| `oos.total_return` | **0.0** | 无市场暴露 |
+| `oos.max_drawdown` | **0.0** | 无波动 |
+| `vs_baseline_sharpe` | **-0.586** | 相对 EXP-20260602-008 **0.586** |
+| `window_count` | **77** | 与 population 批量 OOS 同配置 |
+
+- **机制解释**：导出 `action_logits` argmax → index **0** → 默认 `action_levels[0]=0.0`；M12.1 policy 亦不看 observation，故 OOS 为全现金策略。**`simulation.sharpe_mean=6.31` 不可与 OOS 混报**。
+- 科研边界：本实验验证 **M12→M11.7 链路打通**；RL 1-step smoke 未产生可交易 OOS 信号，属预期内 ablation 结果
+- 产物：`outputs/candidate_oos/`（metrics.json、windows.csv、oos_equity_curve.csv 等）
+- 问题：无（OOS 全零为策略语义正确，非 pipeline bug）
+- 下一步：可选更长 RL 训练 / 状态相关 policy 后再 export+OOS；主 baseline 仍为 **0.586**
+
 ### EXP-POP-008：v3 M12.2 服务器 RL policy → StrategyCandidate export ✅
 
 - 日期：2026-06-04
@@ -209,11 +287,9 @@
   - `selection_metrics`: 仅 `training.*` / `simulation.*` / `summary.*`（**无 oos.***）✅
   - `simulation.sharpe_mean`: **6.31**（simulation only，**≠ OOS**）
 - 产物：`outputs/rl_candidates/candidates.json`、`candidates.csv`、`export_summary.md`
-- **OOS 适配（M12.3）**：`validate_candidate_oos.py` 曾报 `Unsupported agent_type`；已在 `CandidateStrategyAdapter` 增加 `grpo_policy` 分支（logits → 常数 `target_weight`）。服务器拉取后重跑 OOS 即可。
 - 科研边界：export 只写 selection_metrics；OOS 仅 M11.7 可写 `oos.*`
-- 下一步：M12.3 `grpo_policy` OOS adapter；可选 RL walk-forward OOS vs **0.586**
-- 问题：—
-- 下一步：export smoke 后可选 RL 候选 OOS vs **0.586**（ablation）
+- 问题：无
+- 下一步：~~M12.3 OOS adapter~~ ✅ **EXP-POP-009**；可选更长 RL 训练后再 OOS
 
 ### EXP-20260602-035：v3 M12.2 RL policy export bridge 本地验证 ✅
 
@@ -232,7 +308,7 @@
   - 全量 `python -m pytest -v` → **294 passed**（282→294，+12）
 - 边界：不训练、不 OOS、不 LLM、不联网；`source=rl_training`；OOS 须 M11.7/M11.8
 - 问题：无
-- 下一步：~~服务器 **EXP-POP-008**~~ ✅；M12.3 `grpo_policy` OOS adapter；可选 RL walk-forward OOS
+- 下一步：~~服务器 **EXP-POP-008**~~ ✅；~~M12.3 OOS~~ ✅ EXP-POP-009；EXP-TEXT-WF-002
 
 ### EXP-POP-007：v3 M12.1 服务器 RL training smoke ✅
 
@@ -250,7 +326,7 @@
 - **科研边界**：**simulation only**；`simulation.sharpe_mean` **不可**与 walk-forward **0.586** 混报为 OOS
 - 产物：`outputs/rl_training/rl_training_grpo_001/`（policy_state.json、metrics.json、summary.md）
 - 问题：无
-- 下一步：~~M12.2 export bridge~~ → **EXP-POP-008**；EXP-TEXT-WF-002
+- 下一步：~~M12.2 export bridge~~ ✅ EXP-POP-008；~~RL OOS~~ ✅ EXP-POP-009；EXP-TEXT-WF-002
 
 ### EXP-RL-003：v3 M12.1 RL experiment CLI 服务器 smoke ✅
 
@@ -1274,6 +1350,10 @@
 | EXP-20260602-010 | 2026-06-02 | Plus M1 服务器 pytest + 比较表 | **102 passed**；OOS sharpe 0.586 |
 | EXP-20260602-011 | 2026-06-02 | Plus M2 数据扩展本地 | **115 passed**（+13） |
 | EXP-20260602-035 | 2026-06-04 | v3 M12.2 本地 RL policy export | **294 passed**（+12）；export **12/12** |
+| EXP-20260602-036 | 2026-06-04 | v3 M12.4 本地 observation-aware RL | **308 passed**（+12）；feature-linear **12/12** |
+| EXP-POP-010 | — | v3 M12.4 服务器 feature_linear OOS | 待验证 |
+| EXP-POP-009 | 2026-06-04 | v3 M12.3 服务器 RL 候选 OOS | **296 passed**；`rl_grpo_policy_001_1` **oos.sharpe 0.0**（全现金 ablation）@ `6e8c507` |
+| EXP-POP-008 | 2026-06-04 | v3 M12.2 服务器 RL export | **294 passed**；export **`rl_grpo_policy_001_1`** @ `6e8c507` 前序 |
 | EXP-POP-007 | 2026-06-04 | v3 M12.1 服务器 RL smoke | **282 passed**；GRPO train **simulation.sharpe_mean 6.31**（≠ OOS）@ `e291cf9` |
 | EXP-RL-003 | 2026-06-04 | v3 M12.1 RL CLI 服务器 | 同 EXP-POP-007；checkpoint + Memory ✅ |
 | EXP-20260602-034 | 2026-06-04 | v3 M12.1 本地 RL training loop | **282 passed**（+16）；RL **16/16**；simulation only |

@@ -1,7 +1,7 @@
 # M12.2 RL Policy Export Bridge
 
 Updated: 2026-06-04  
-Status: M12.2 + M12.3 OOS adapter implemented; EXP-POP-008 server export ✅
+Status: M12.2 + M12.3 ✅ 双端；M12.4 ✅ 本地（308 pytest）；EXP-POP-010 服务器 OOS 待跑
 
 M12.2 converts M12.1 simulation-trained policy artifacts into the existing
 `StrategyCandidate` schema. It is a bridge only. It must not run walk-forward
@@ -172,6 +172,15 @@ python scripts/validate_candidate_oos.py \
 ```
 
 Only M11.7/M11.8 write `oos.*` metrics for these candidates.
+
+## M12.4 OOS Adapter (`feature_linear_policy`)
+
+M12.4 export emits `agent_type="feature_linear_policy"` with `feature_names`,
+`action_weights`, `action_bias`, and `action_levels`. M11.7 replays the same
+linear scoring on OHLCV bars to produce **state-dependent** `target_weight`.
+
+See [rl_observation_policy.md](rl_observation_policy.md) for training/export details.
+Server smoke template: **EXP-POP-010** in `docs/server_commands.md` §6.22.
 
 ## Test Plan
 

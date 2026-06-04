@@ -964,21 +964,30 @@ python scripts/run_rl_experiment.py \
 
 详见 [`docs/rl_experiment.md`](rl_experiment.md)。
 
-## 六点二十、v3 M12.2 RL Policy Export（EXP-035 / EXP-POP-008）⏳
+## 六点二十、v3 M12.2 RL Policy Export（EXP-035 / EXP-POP-008）✅
 
 ```bash
 cd /mnt/localDisk3/weizian/Quant-MAS
 conda activate /mnt/localDisk3/weizian/conda_envs/quant-mas
-git pull origin main   # 目标：含 M12.2，294 pytest 本地
+git pull origin main   # 含 M12.2+，296 pytest
 
-python -m pytest -v    # 预期 294 passed
+python -m pytest -v    # 预期 296 passed
 
 python scripts/export_rl_policy_candidate.py \
   --config configs/rl_policy_export.yaml \
   --no-dry-run
 ```
 
-**可选后续 OOS**（独立，M11.7 才写 `oos.*`）：
+**说明**：
+
+- M12.2 **只 export** `StrategyCandidate`（`source=rl_training`）；**不写 oos.***
+- 记录：**EXP-20260602-035** 本地 ✅；**EXP-POP-008** 服务器 ✅（`e7fea132af8a451ba9c999762d220ee6`；`rl_grpo_policy_001_1`）
+
+详见 [`docs/rl_policy_export.md`](rl_policy_export.md)。
+
+## 六点二十一、v3 M12.3 RL 候选 Walk-forward OOS（EXP-POP-009）✅
+
+前置：**EXP-POP-008** 已生成 `outputs/rl_candidates/candidates.json`。
 
 ```bash
 python scripts/validate_candidate_oos.py \
@@ -988,12 +997,54 @@ python scripts/validate_candidate_oos.py \
   --no-dry-run
 ```
 
+**已验证结果**（2026-06-04 @ `6e8c507`）：
+
+| 字段 | 值 | 说明 |
+|------|-----|------|
+| `candidate_id` | `rl_grpo_policy_001_1` | EXP-POP-008 导出 |
+| `window_count` | **77** | 与 population OOS 同配置 |
+| `oos.sharpe` | **0.0** | argmax logit → `target_weight=0.0`（全现金） |
+| `vs_baseline_sharpe` | **-0.586** | 相对 EXP-008 **0.586** |
+| `simulation.sharpe_mean` | **6.31** | M12.1 仿真，**不可混报为 OOS** |
+
+- 记录：**EXP-POP-009** ✅；**296 passed** in **45.05s**
+- 产物：`outputs/candidate_oos/`（metrics.json、windows.csv、oos_equity_curve.csv）
+
+## 六点二十二、v3 M12.4 Observation-Aware RL Policy（EXP-036 / EXP-POP-010）⏳
+
+前置：`git pull` 含 M12.4（预期 **308 pytest**）。
+
+```bash
+cd /mnt/localDisk3/weizian/Quant-MAS
+conda activate /mnt/localDisk3/weizian/conda_envs/quant-mas
+
+python -m pytest -v    # 预期 308 passed
+
+python scripts/run_rl_experiment.py \
+  --config configs/rl_training.yaml \
+  --policy-type feature_linear \
+  --algorithm grpo \
+  --max-steps 50 \
+  --no-dry-run
+
+python scripts/export_rl_policy_candidate.py \
+  --config configs/rl_policy_export.yaml \
+  --no-dry-run
+
+python scripts/validate_candidate_oos.py \
+  --candidate-json outputs/rl_candidates/candidates.json \
+  --features-path /mnt/localDisk3/weizian/datasets/features/features.parquet \
+  --config configs/candidate_oos.yaml \
+  --no-dry-run
+```
+
 **说明**：
 
-- M12.2 **只 export** `StrategyCandidate`（`source=rl_training`）；**不写 oos.***
-- 记录：**EXP-20260602-035** 本地 ✅；**EXP-POP-008** 服务器 export 待跑
+- M12.4 训练只写 `training.*` / `simulation.*`；OOS 仅 M11.7 写 `oos.*`
+- 与 EXP-POP-009（logits 全现金 `oos.sharpe=0.0`）对比：feature_linear 应产生**非恒定** `target_weight`
+- 记录：**EXP-20260602-036** 本地 ✅；**EXP-POP-010** 服务器待跑
 
-详见 [`docs/rl_policy_export.md`](rl_policy_export.md)。
+详见 [`docs/rl_observation_policy.md`](rl_observation_policy.md)。
 
 ## 七、删除旧部署（如曾在 ~/quant-mas 建过）
 

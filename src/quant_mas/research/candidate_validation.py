@@ -157,6 +157,8 @@ class CandidateStrategyAdapter(Strategy):
             elif self.candidate.agent_type == "grpo_policy":
                 weight = _grpo_policy_target_weight(self.candidate.params)
                 weights = pd.Series(weight, index=group.index, dtype=float)
+            elif self.candidate.agent_type == "feature_linear_policy":
+                weights = _feature_linear_policy_weights(group, self.candidate.params)
             else:
                 raise ValueError("Unsupported StrategyCandidate agent_type for OOS validation")
             rows.append(
@@ -334,6 +336,73 @@ def _grpo_policy_target_weight(params: dict[str, Any]) -> float:
             f"{action_index} >= {len(action_levels)}"
         )
     return float(action_levels[action_index])
+
+
+def _feature_linear_policy_weights(group: pd.DataFrame, params: dict[str, Any]) -> pd.Series:
+    feature_names = [str(value) for value in params.get("feature_names", [])]
+    action_weights = params.get("action_weights")
+    action_bias = params.get("action_bias")
+    action_levels = _grpo_action_levels(params)
+    if not feature_names:
+        raise ValueError("feature_linear_policy params.feature_names must be non-empty")
+    if not isinstance(action_weights, list) or not isinstance(action_bias, list):
+        raise ValueError("feature_linear_policy requires action_weights and action_bias")
+    if len(action_weights) != len(action_levels) or len(action_bias) != len(action_levels):
+        raise ValueError("feature_linear_policy action dimensions must match action_levels")
+
+    weights: list[float] = []
+    previous_weight = 0.0
+    close = group["close"].astype(float)
+    returns = close.pct_change().fillna(0.0)
+    rolling_vol = close.pct_change().rolling(5, min_periods=1).std(ddof=0).fillna(0.0)
+    for idx, row in group.reset_index(drop=True).iterrows():
+        observation = {
+            "position_weight": previous_weight,
+            "last_return": float(returns.iloc[idx]),
+            "rolling_vol_5": float(rolling_vol.iloc[idx]),
+            "volume": float(row["volume"]),
+            "close": float(row["close"]),
+        }
+        features = [
+            _normalize_observation_feature(name, observation.get(name, 0.0))
+            for name in feature_names
+        ]
+        scores = []
+        for action_index, weight_row in enumerate(action_weights):
+            if len(weight_row) != len(features):
+                raise ValueError("feature_linear_policy weight row length must match features")
+            score = float(action_bias[action_index]) + sum(
+                float(weight) * value for weight, value in zip(weight_row, features)
+            )
+            scores.append(score)
+        action_index = _resolve_grpo_action_index(scores)
+        target_weight = float(action_levels[action_index])
+        weights.append(target_weight)
+        previous_weight = target_weight
+    return pd.Series(weights, index=group.index, dtype=float)
+
+
+def _normalize_observation_feature(name: str, value: Any) -> float:
+    numeric = _safe_float(value, 0.0)
+    if name == "volume":
+        import math
+
+        return math.log1p(max(numeric, 0.0)) / 20.0
+    if name == "close":
+        import math
+
+        return math.log1p(max(numeric, 0.0)) / 10.0
+    return numeric
+
+
+def _safe_float(value: Any, default: float) -> float:
+    try:
+        numeric = float(value)
+    except (TypeError, ValueError):
+        return default
+    if pd.isna(numeric):
+        return default
+    return numeric
 
 
 def _slice_window(data, window) -> dict[str, pd.DataFrame]:

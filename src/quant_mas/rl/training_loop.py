@@ -10,6 +10,7 @@ from typing import Any
 import pandas as pd
 
 from quant_mas.rl.grpo_agent import GRPOPolicyAgent, PolicyState
+from quant_mas.rl.feature_policy import FeatureLinearPolicyAgent, FeaturePolicyState
 from quant_mas.rl.grpo_experiment import (
     CandidateRun,
     rank_candidates_by_group_relative_reward,
@@ -36,7 +37,7 @@ class TrainingRunResult:
 
     algorithm: str
     metrics: dict[str, Any]
-    policy_state: PolicyState
+    policy_state: PolicyState | FeaturePolicyState
     artifacts: dict[str, str] = field(default_factory=dict)
 
 
@@ -47,7 +48,7 @@ class RLTrainingLoop:
         self,
         *,
         env: TradingEnv,
-        policy: GRPOPolicyAgent,
+        policy: GRPOPolicyAgent | FeatureLinearPolicyAgent,
         config: dict[str, Any],
         risk_agent: Any | None = None,
     ) -> None:

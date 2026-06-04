@@ -6,7 +6,7 @@
 [![GitHub](https://img.shields.io/badge/GitHub-ytq0198%2FQuant--MAS-181717?logo=github)](https://github.com/ytq0198/Quant-MAS)
 [![Release](https://img.shields.io/badge/release-v0.1.0-blue)](https://github.com/ytq0198/Quant-MAS/releases/tag/v0.1.0)
 [![Python](https://img.shields.io/badge/python-3.11+-3776AB?logo=python&logoColor=white)](https://www.python.org/)
-[![Tests](https://img.shields.io/badge/tests-294%20passed-brightgreen)](docs/progress.md)
+[![Tests](https://img.shields.io/badge/tests-308%20passed-brightgreen)](docs/progress.md)
 [![Status](https://img.shields.io/badge/status-research%20platform-orange)](docs/progress.md)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![MAS Agent](https://img.shields.io/badge/MAS-Agent%20System-purple)](docs/architecture.md)
@@ -47,9 +47,9 @@
 > Quant Engine computes. Agent Layer explains, orchestrates, and reports.  
 > Quant Engine 做计算；Agent Layer 做编排、解释与报告。
 
-**Plus v2 status / 当前进度**：**M1–M8 ✅** · **v3 M9–M12.1 ✅** 双端（**282 pytest**）
+**Plus v2 status / 当前进度**：**M1–M8 ✅** · **v3 M9–M12.4 ✅** 本地（**308 pytest**；服务器 M12.4 OOS 待跑）
 
-**v3 next / 下一步**：EXP-POP-008 服务器 export · 可选 RL 候选 OOS · EXP-TEXT-WF-002
+**v3 next / 下一步**：EXP-POP-010 服务器 feature_linear OOS · EXP-TEXT-WF-002 · M13 编排
 
 ---
 
@@ -299,7 +299,9 @@ print(result.content)
 
 | Item | Value | Notes |
 |------|-------|-------|
-| **pytest** | **282 passed** | EXP-034 / EXP-POP-007 双端（46.70s 服务器） |
+| **pytest** | **308 passed** | EXP-036 本地（M12.4）；服务器 **296** @ M12.3 |
+| **RL observation policy (M12.4)** | `FeatureLinearPolicyAgent` | 状态相关 exposure；OOS 待 EXP-POP-010 |
+| **RL candidate OOS (M12.3)** | `rl_grpo_policy_001_1` walk-forward | **oos.sharpe 0.0**（全现金 ablation；**≠ simulation 6.31**）EXP-POP-009 ✅ |
 | **RL training (M12.1)** | GRPO loop + checkpoint | **simulation.sharpe_mean 6.31**（**≠ OOS 0.586**）EXP-POP-007 ✅ |
 | **batch candidate OOS (M11.8)** | 4 mean-reversion candidates | best **oos.sharpe 1.039** vs ML **0.586**（EXP-POP-006 ✅） |
 | **candidate OOS (M11.7)** | `cand_mean_rev_1` walk-forward OOS | **oos.sharpe 1.036** vs ML baseline **0.586**（EXP-POP-005 ✅） |
@@ -319,7 +321,7 @@ print(result.content)
 
 **English**
 
-> Built **Quant MAS**, a Python 3.11 multi-agent quantitative research platform with deterministic quant pipelines, walk-forward OOS evaluation (baseline sharpe 0.586), Memory/RAG, optional LangGraph, enterprise DB backends (Postgres/pgvector), **local vLLM ResearchAgent** (EXP-LLM-002), **competitive learning chain** (M11–M11.8: population → StrategyCandidate → walk-forward OOS → batch comparison), text signals, RL simulation, MCP-style protocol adapter, and mock-safe LLM defaults. Maintained **266 passing pytest** cases with strict safeguards preventing LLM agents from direct live trading.
+> Built **Quant MAS**, a Python 3.11 multi-agent quantitative research platform with deterministic quant pipelines, walk-forward OOS evaluation (baseline sharpe 0.586), Memory/RAG, optional LangGraph, enterprise DB backends (Postgres/pgvector), **local vLLM ResearchAgent** (EXP-LLM-002), **competitive learning chain** (M11–M11.8: population → StrategyCandidate → walk-forward OOS → batch comparison), **RL train→export→OOS ablation** (M12.1–M12.4, including observation-aware `FeatureLinearPolicyAgent`), text signals, MCP-style protocol adapter, and mock-safe LLM defaults. Maintained **308 passing pytest** cases with strict safeguards preventing LLM agents from direct live trading.
 
 **中文**
 
@@ -351,7 +353,7 @@ Quant-MAS/
 │   └── research/             # baseline registry (M1), StrategyCandidate (M11.6), candidate OOS (M11.7–M11.8)
 ├── scripts/                  # CLI entrypoints
 ├── configs/                  # YAML configs (+ llm.server.yaml.example)
-├── tests/                    # 282 pytest cases
+├── tests/                    # 308 pytest cases
 ├── docs/                     # architecture, progress, experiment log, server_commands
 ├── architecture.png          # architecture diagram
 ├── CONTRIBUTING.md
@@ -377,6 +379,8 @@ Quant-MAS/
 | [docs/strategy_candidate_bridge.md](docs/strategy_candidate_bridge.md) | M11.6 Top-K → Quant Engine bridge |
 | [docs/candidate_oos_batch.md](docs/candidate_oos_batch.md) | M11.8 batch candidate OOS comparison |
 | [docs/strategy_candidate_oos.md](docs/strategy_candidate_oos.md) | M11.7 candidate walk-forward OOS |
+| [docs/rl_policy_export.md](docs/rl_policy_export.md) | M12.2 RL policy → StrategyCandidate export |
+| [docs/rl_observation_policy.md](docs/rl_observation_policy.md) | M12.4 observation-aware `FeatureLinearPolicyAgent` |
 | [docs/competitive_learning.md](docs/competitive_learning.md) | M11 population / Elo |
 | [docs/context_engineering.md](docs/context_engineering.md) | LLM providers & ResearchAgent |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | How to contribute |
@@ -403,8 +407,10 @@ Quant-MAS/
 - [x] **M11.7** Candidate walk-forward OOS — real features **EXP-POP-005** ✅（`oos.sharpe` 1.036 vs 0.586）
 - [x] **M11.8** Batch candidate OOS comparison — **EXP-POP-006** ✅（best 1.039，4/4 > 0.586）
 - [x] **M12.1** RL training loop — **EXP-034 / EXP-POP-007** ✅（282 pytest 双端；simulation only）
-- [x] **M12.2** RL policy export bridge — local **EXP-035** ✅（294 pytest）
-- [ ] **M12.2** server export — **EXP-POP-008**
+- [x] **M12.2** RL policy export bridge — **EXP-035 / EXP-POP-008** ✅（294→296 pytest）
+- [x] **M12.3** RL candidate OOS adapter — **EXP-POP-009** ✅（`grpo_policy` walk-forward；oos.sharpe **0.0** ablation）
+- [x] **M12.4** Observation-aware RL policy — local **EXP-036** ✅（308 pytest；`FeatureLinearPolicyAgent`）
+- [ ] **M12.4** server feature_linear OOS — **EXP-POP-010** ⏳
 - [ ] **M13** Enterprise orchestration — multi-experiment DAG scheduler, audit log
 - [ ] FinBERT server smoke + text-enhanced walk-forward ablation (EXP-TEXT-WF-002)
 - [ ] Optional paper-trading sandbox (simulation only)

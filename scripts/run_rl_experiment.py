@@ -13,6 +13,7 @@ import yaml
 
 from quant_mas.memory import ExperimentMemory
 from quant_mas.rl import (
+    FeatureLinearPolicyAgent,
     GRPOPolicyAgent,
     RLTrainingLoop,
     RewardConfig,
@@ -28,6 +29,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--algorithm", choices=["grpo", "ppo"])
     parser.add_argument("--market-data-path")
     parser.add_argument("--max-steps", type=int)
+    parser.add_argument("--policy-type", choices=["logits", "feature_linear"])
     parser.add_argument("--seed", type=int)
     parser.add_argument("--output-dir")
     parser.add_argument("--memory-path")
@@ -41,6 +43,7 @@ def run_rl_experiment(
     algorithm: str | None = None,
     market_data_path: str | Path | None = None,
     max_steps: int | None = None,
+    policy_type: str | None = None,
     seed: int | None = None,
     output_dir: str | Path | None = None,
     memory_path: str | Path | None = None,
@@ -52,6 +55,7 @@ def run_rl_experiment(
         training_config["algorithm"] = algorithm
     selected_seed = int(seed if seed is not None else training_config.get("seed", 42))
     selected_max_steps = int(max_steps if max_steps is not None else training_config.get("max_steps", 10))
+    selected_policy_type = policy_type or config.get("policy", {}).get("type", "logits")
     n_groups = int(training_config.get("n_groups", 2))
     rollouts_per_group = int(training_config.get("rollouts_per_group", 2))
 
@@ -62,10 +66,11 @@ def run_rl_experiment(
         dry_run=dry_run,
     )
     env = TradingEnv(market_data, config=env_config, reward_config=reward_config)
-    policy = GRPOPolicyAgent(
-        agent_id="grpo_policy_001",
+    policy = _build_policy_agent(
+        policy_type=selected_policy_type,
         action_space_n=env.action_space_n,
         seed=selected_seed,
+        config=config,
     )
     loop = RLTrainingLoop(env=env, policy=policy, config=config)
     result = loop.run(
@@ -104,11 +109,7 @@ def run_rl_experiment(
     return {
         "algorithm": result.algorithm,
         "metrics": result.metrics,
-        "policy_state": {
-            "action_logits": result.policy_state.action_logits,
-            "step_count": result.policy_state.step_count,
-            "metadata": result.policy_state.metadata,
-        },
+        "policy_state": _policy_state_to_dict(result.policy_state),
         "artifacts": artifacts,
         "experiment_id": experiment_id,
         "dry_run": dry_run,
@@ -124,6 +125,7 @@ def main() -> int:
             algorithm=args.algorithm,
             market_data_path=args.market_data_path,
             max_steps=args.max_steps,
+            policy_type=args.policy_type,
             seed=args.seed,
             output_dir=args.output_dir,
             memory_path=args.memory_path,
@@ -151,6 +153,47 @@ def _load_market_data(path: str | Path | None, *, dry_run: bool) -> pd.DataFrame
     if dry_run or path is None:
         return build_synthetic_ohlcv(n_bars=40, symbol="SYN")
     raise FileNotFoundError(f"market data not found: {path}. Use --dry-run for synthetic data.")
+
+
+def _build_policy_agent(
+    *,
+    policy_type: str,
+    action_space_n: int,
+    seed: int,
+    config: dict[str, Any],
+):
+    normalized = str(policy_type).lower().strip()
+    if normalized in {"logits", "grpo", "grpo_policy"}:
+        return GRPOPolicyAgent(
+            agent_id="grpo_policy_001",
+            action_space_n=action_space_n,
+            seed=seed,
+        )
+    if normalized in {"feature_linear", "feature_linear_policy"}:
+        policy_config = config.get("policy", {})
+        return FeatureLinearPolicyAgent(
+            agent_id="feature_linear_policy_001",
+            action_space_n=action_space_n,
+            seed=seed,
+            feature_names=policy_config.get("feature_names"),
+        )
+    raise ValueError("policy_type must be logits or feature_linear")
+
+
+def _policy_state_to_dict(state) -> dict[str, Any]:
+    if hasattr(state, "action_logits"):
+        return {
+            "action_logits": state.action_logits,
+            "step_count": state.step_count,
+            "metadata": state.metadata,
+        }
+    return {
+        "feature_names": state.feature_names,
+        "action_weights": state.action_weights,
+        "action_bias": state.action_bias,
+        "step_count": state.step_count,
+        "metadata": state.metadata,
+    }
 
 
 def _configure_stdout() -> None:

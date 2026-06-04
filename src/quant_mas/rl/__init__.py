@@ -21,6 +21,12 @@ from quant_mas.rl.grpo_experiment import (
     rank_candidates_by_group_relative_reward,
     summarize_grpo_ranking,
 )
+from quant_mas.rl.feature_policy import (
+    DEFAULT_FEATURE_NAMES,
+    FeatureLinearPolicyAgent,
+    FeaturePolicyState,
+    normalize_observation_feature,
+)
 from quant_mas.rl.grpo_agent import GRPOPolicyAgent, PolicyState
 from quant_mas.rl.marl_stub import MARLTrainingStub, MultiAgentTrainingProtocol
 from quant_mas.rl.mock_data import build_synthetic_ml_signals, build_synthetic_ohlcv
@@ -50,6 +56,9 @@ __all__ = [
     "CandidateRun",
     "CompetitiveEpisodeRunner",
     "CompetitiveRunConfig",
+    "DEFAULT_FEATURE_NAMES",
+    "FeatureLinearPolicyAgent",
+    "FeaturePolicyState",
     "GRPOPolicyAgent",
     "GenerationSummary",
     "MARLTrainingStub",
@@ -79,6 +88,7 @@ __all__ = [
     "expected_score",
     "load_policy_state",
     "load_training_metrics",
+    "normalize_observation_feature",
     "rank_candidates_by_group_relative_reward",
     "run_candidate_backtest_smoke",
     "schedule_walk_forward_eval_stub",

@@ -173,7 +173,7 @@ collect_experiment_metrics → BaselineRegistry / comparison table
 
 ## 测试与部署
 
-- **pytest**：**294 passed** 本地（EXP-035 / M12.2）；**282 passed** 双端（M12.1 @ EXP-POP-007）
+- **pytest**：**308 passed** 本地（EXP-036）；**296 passed** 服务器（M12.3 @ `6e8c507`）
 - **服务器**：`/mnt/localDisk3/weizian/Quant-MAS`，conda `quant-mas`，Python 3.11.15
 - **GitHub**：https://github.com/ytq0198/Quant-MAS
 

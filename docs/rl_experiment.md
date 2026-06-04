@@ -98,7 +98,50 @@ trained policy
   -> ablation table
 ```
 
-### M12.3 Optional Server Smoke
+### M12.3 RL Candidate OOS（EXP-POP-009 ✅）
+
+After M12.2 export, run M11.7 walk-forward validation:
+
+```bash
+python scripts/validate_candidate_oos.py \
+  --candidate-json outputs/rl_candidates/candidates.json \
+  --features-path /path/to/features.parquet \
+  --config configs/candidate_oos.yaml \
+  --no-dry-run
+```
+
+Server result (2026-06-04): `rl_grpo_policy_001_1`, 77 windows, **`oos.sharpe=0.0`**
+(cash-only constant policy; argmax logit index 0). This validates the full
+M12→M11.7 pipeline; it is an ablation, not a replacement for ML baseline **0.586**.
+
+### M12.4 Observation-Aware Policy（本地 ✅ EXP-036）
+
+EXP-POP-009 showed that the logits-only policy can export a valid candidate
+but may collapse to all-cash because it does not read market observations.
+M12.4 implements an observation-aware linear policy:
+
+```text
+position_weight / last_return / rolling_vol_5 / volume / close
+  -> feature-linear action scores
+  -> action index
+  -> target_weight (state-dependent)
+```
+
+Docs: [rl_observation_policy.md](rl_observation_policy.md)
+
+M12.4 remains simulation-only during training. OOS validation must still go
+through M11.7/M11.8.
+
+Local validation (2026-06-04):
+
+- `FeatureLinearPolicyAgent` + `FeaturePolicyState` in `rl/feature_policy.py`
+- `--policy-type feature_linear` on `run_rl_experiment.py`
+- Export preserves feature weights, bias, action levels, feature names
+- `CandidateStrategyAdapter` supports `agent_type="feature_linear_policy"`
+- `tests/test_rl_observation_policy.py` → **12 passed**; full suite → **308 passed**
+- Server OOS smoke: **EXP-POP-010** (pending)
+
+### M12.x Optional Server Training Smoke (EXP-POP-007 ✅)
 
 Goal: ensure the CLI and checkpoints run on the server without making pytest slow.
 

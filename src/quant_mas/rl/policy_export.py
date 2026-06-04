@@ -8,12 +8,24 @@ from pathlib import Path
 from typing import Any
 
 from quant_mas.research import StrategyCandidate, assert_no_oos_metrics
+from quant_mas.rl.feature_policy import FeaturePolicyState
 from quant_mas.rl.grpo_agent import PolicyState
 
 
-def load_policy_state(path: str | Path) -> PolicyState:
+def load_policy_state(path: str | Path) -> PolicyState | FeaturePolicyState:
     """Load a serialized M12 policy state."""
     payload = json.loads(Path(path).expanduser().read_text(encoding="utf-8"))
+    if "feature_names" in payload:
+        return FeaturePolicyState(
+            feature_names=[str(value) for value in payload["feature_names"]],
+            action_weights=[
+                [float(item) for item in row]
+                for row in payload["action_weights"]
+            ],
+            action_bias=[float(value) for value in payload["action_bias"]],
+            step_count=int(payload.get("step_count", 0)),
+            metadata=dict(payload.get("metadata", {})),
+        )
     return PolicyState(
         action_logits=[float(value) for value in payload["action_logits"]],
         step_count=int(payload.get("step_count", 0)),
@@ -33,7 +45,7 @@ def export_policy_candidate(
     policy_state_path: str | Path,
     metrics_path: str | Path,
     candidate_id: str | None = None,
-    agent_type: str = "grpo_policy",
+    agent_type: str | None = None,
 ) -> StrategyCandidate:
     """Convert a policy checkpoint into a StrategyCandidate."""
     state_path = Path(policy_state_path).expanduser()
@@ -43,17 +55,13 @@ def export_policy_candidate(
     selected_candidate_id = candidate_id or f"rl_{_slug(agent_id)}_{state.step_count}"
     selection_metrics = _selection_metrics(metrics)
     assert_no_oos_metrics(selection_metrics)
+    selected_agent_type = agent_type or _agent_type_for_state(state)
     return StrategyCandidate(
         candidate_id=selected_candidate_id,
         source="rl_training",
         agent_id=agent_id,
-        agent_type=agent_type,
-        params={
-            "policy_state_path": str(state_path),
-            "action_logits": list(state.action_logits),
-            "step_count": int(state.step_count),
-            "action_policy": "discrete_logits",
-        },
+        agent_type=selected_agent_type,
+        params=_params_for_state(state, state_path),
         selection_metrics=selection_metrics,
         artifacts={"policy_state": str(state_path), "training_metrics": str(Path(metrics_path).expanduser())},
         notes="Exported from M12 RL simulation; requires M11.7/M11.8 OOS validation.",
@@ -122,6 +130,36 @@ def _selection_metrics(metrics: dict[str, Any]) -> dict[str, Any]:
                 selected[f"summary.{key}"] = summary[key]
     _reject_oos_metrics(selected)
     return selected
+
+
+def _agent_type_for_state(state: PolicyState | FeaturePolicyState) -> str:
+    if isinstance(state, FeaturePolicyState):
+        return "feature_linear_policy"
+    return "grpo_policy"
+
+
+def _params_for_state(
+    state: PolicyState | FeaturePolicyState,
+    state_path: Path,
+) -> dict[str, Any]:
+    if isinstance(state, FeaturePolicyState):
+        return {
+            "policy_state_path": str(state_path),
+            "policy_type": "feature_linear",
+            "feature_names": list(state.feature_names),
+            "action_weights": [list(row) for row in state.action_weights],
+            "action_bias": list(state.action_bias),
+            "step_count": int(state.step_count),
+            "action_levels": [0.0, 0.25, 0.5, 1.0],
+        }
+    return {
+        "policy_state_path": str(state_path),
+        "policy_type": "logits",
+        "action_logits": list(state.action_logits),
+        "step_count": int(state.step_count),
+        "action_policy": "discrete_logits",
+        "action_levels": [0.0, 0.25, 0.5, 1.0],
+    }
 
 
 def _reject_oos_metrics(metrics: dict[str, Any]) -> None:

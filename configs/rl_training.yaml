@@ -26,6 +26,15 @@ paths:
   market_data: null
   output_dir: outputs/rl_training
 
+policy:
+  type: logits
+  feature_names:
+    - position_weight
+    - last_return
+    - rolling_vol_5
+    - volume
+    - close
+
 experiment:
   name: rl_training_grpo_001
   family: rl_training

@@ -54,7 +54,7 @@ def export_rl_policy_candidate(
         policy_state_path=policy_path,
         metrics_path=metrics_path,
         candidate_id=candidate_id,
-        agent_type=agent_type or export_config.get("agent_type", "grpo_policy"),
+        agent_type=agent_type or export_config.get("agent_type"),
     )
     artifacts: dict[str, str] = {}
     experiment_id: str | None = None
