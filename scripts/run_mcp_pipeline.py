@@ -13,6 +13,9 @@ SRC_ROOT = PROJECT_ROOT / "src"
 if str(SRC_ROOT) not in sys.path:
     sys.path.insert(0, str(SRC_ROOT))
 
+from quant_mas.orchestration.langgraph_recipe_workflow import (  # noqa: E402
+    run_langgraph_recipe_workflow,
+)
 from quant_mas.orchestration.mcp_scheduler import MCPScheduler  # noqa: E402
 
 
@@ -29,6 +32,12 @@ def build_parser() -> argparse.ArgumentParser:
         "--list-recipes",
         action="store_true",
         help="List built-in dry-run recipes and exit.",
+    )
+    parser.add_argument(
+        "--backend",
+        choices=("scheduler", "langgraph"),
+        default="scheduler",
+        help="Execution backend. LangGraph remains dry-run only and falls back when unavailable.",
     )
     parser.add_argument(
         "--dry-run",
@@ -62,7 +71,14 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     try:
-        result = scheduler.run(args.recipe, output_dir=args.output_dir, dry_run=args.dry_run)
+        if args.backend == "langgraph":
+            result = run_langgraph_recipe_workflow(
+                args.recipe,
+                output_dir=args.output_dir,
+                dry_run=args.dry_run,
+            )
+        else:
+            result = scheduler.run(args.recipe, output_dir=args.output_dir, dry_run=args.dry_run)
     except Exception as exc:
         print(f"run_mcp_pipeline failed: {exc}", file=sys.stderr)
         return 1

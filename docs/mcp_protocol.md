@@ -158,7 +158,7 @@ M13 是批处理研究调度，不是对话路由器，也不是外部 MCP 服�
 
 ## 当前下一步
 
-**M13.1 双端已完成**（EXP-M13-002，349 pytest @ `2610612`）。下一步：**M13.2** LangGraph extended DAG。
+**M13.2 本地已完成**（EXP-M13-003，354 pytest）。下一步：服务器 LangGraph backend smoke，或 **M13.3** 论文级结果表与审计包导出。
 
 ## M13.0 Implementation Note
 
@@ -212,3 +212,38 @@ python scripts/run_mcp_pipeline.py --recipe configs/pipelines/rl_ablation.yaml.e
 ```
 
 M13.1 still does not run real server commands. Real execution remains a later explicit server experiment.
+
+## M13.2 Implementation Note
+
+M13.2 adds an optional LangGraph backend for YAML recipes.
+
+Delivered:
+
+- `src/quant_mas/orchestration/langgraph_recipe_workflow.py`
+- `scripts/run_mcp_pipeline.py --backend scheduler|langgraph`
+- `tests/test_langgraph_recipe_workflow.py`
+
+Behavior:
+
+- `--backend scheduler` remains the default.
+- `--backend langgraph` builds a LangGraph DAG when `langgraph` is installed.
+- If `langgraph` is unavailable, the backend falls back to the deterministic scheduler dry-run.
+- M4 `ResearchWorkflow` remains unchanged.
+- M13.2 still writes audit JSONL via the M13 scheduler and does not execute real server jobs.
+
+Verification:
+
+```bash
+python -m pytest tests/test_langgraph_recipe_workflow.py -v  # 5 passed
+python -m pytest -v                                          # 354 passed
+python scripts/run_mcp_pipeline.py \
+  --backend langgraph \
+  --recipe configs/pipelines/text_enhanced.yaml.example \
+  --dry-run
+python scripts/run_mcp_pipeline.py \
+  --backend langgraph \
+  --recipe configs/pipelines/rl_ablation.yaml.example \
+  --dry-run
+```
+
+M13.2 still does not run real server commands. Real execution remains a later explicit server experiment.
