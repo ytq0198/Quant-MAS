@@ -36,7 +36,7 @@
 | **M11.6** | 候选验证桥 | ✅ | 248 双端（EXP-031/POP-004） | [strategy_candidate_bridge.md](strategy_candidate_bridge.md) |
 | **M11.7** | 候选 Walk-forward OOS | ✅ | 259 双端 + EXP-POP-005 真实 OOS | [strategy_candidate_oos.md](strategy_candidate_oos.md) |
 | **M11.8** | 批量候选 OOS 比较 | ✅ | 266 双端 + EXP-POP-006（4/4 > 0.586） | [candidate_oos_batch.md](candidate_oos_batch.md) |
-| **M12** | RL 训练实验 | 📋 | GRPO/PPO training loop | [rl_plan.md](rl_plan.md) |
+| **M12** | RL 训练实验 | 📋 | GRPO/PPO training loop | [codex_prompt_M12.md](codex_prompt_M12.md) · [rl_plan.md](rl_plan.md) |
 | **M13** | 企业化编排 | 📋 | DAG scheduler | [protocols.md](protocols.md) |
 
 ## 阶段总览（v1 Prompt + Plus v2）
@@ -362,5 +362,5 @@ python scripts/export_agent_cards.py --help
 - **M9 服务器 DB smoke**：✅ EXP-026（2026-06-03）
 - ~~**EXP-LLM-002**~~ ✅（2026-06-03，local_vllm + ResearchAgent）
 - ~~**M11.8 服务器批量 OOS**~~ ✅ EXP-POP-006（266 pytest；best **1.039**）
-- **M12** RL 训练 loop
+- **M12** RL 训练 loop — [codex_prompt_M12.md](codex_prompt_M12.md)
 - **EXP-TEXT-WF-002**

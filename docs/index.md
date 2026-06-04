@@ -241,6 +241,8 @@ Server: [server_commands.md](server_commands.md)
 | [codex_prompt_M10.md](codex_prompt_M10.md) | **v3 M10** LLM / local_vllm Codex 任务 |
 | [population_training.md](population_training.md) | **v3 M11.5** 多代种群训练闭环 |
 | [strategy_candidate_bridge.md](strategy_candidate_bridge.md) | **v3 M11.6** Top-K → Quant Engine 候选桥 |
+| [candidate_oos_batch.md](candidate_oos_batch.md) | **v3 M11.8** 批量候选 OOS 比较 |
+| [codex_prompt_M12.md](codex_prompt_M12.md) | **v3 M12** RL 训练 loop Codex 任务（📋 待实现） |
 | [strategy_candidate_oos.md](strategy_candidate_oos.md) | **v3 M11.7** 候选 Walk-forward OOS |
 | [candidate_oos_batch.md](candidate_oos_batch.md) | **v3 M11.8** 批量候选 OOS 比较 |
 | [competitive_learning.md](competitive_learning.md) | **v3 M11** 竞争学习 / Elo |
