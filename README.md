@@ -49,7 +49,7 @@
 
 **Plus v2 status / 当前进度**：**M1–M8 ✅** · **v3 M9–M11.7 ✅** 双端（**259 pytest**）
 
-**v3 next / 下一步**：EXP-POP-005 真实 candidate OOS（先 `export --no-dry-run`）· M12 · EXP-TEXT-WF-002
+**v3 next / 下一步**：M12 RL 训练 · EXP-TEXT-WF-002
 
 ---
 
@@ -286,7 +286,7 @@ print(result.content)
 | Item | Value | Notes |
 |------|-------|-------|
 | **pytest** | **259 passed** | EXP-032 / EXP-POP-005 双端（48.32s 服务器） |
-| **candidate OOS (M11.7)** | walk-forward hook → `oos.*` | EXP-032 ✅；真实 OOS 待 export |
+| **candidate OOS (M11.7)** | `cand_mean_rev_1` walk-forward OOS | **oos.sharpe 1.036** vs ML baseline **0.586**（EXP-POP-005 ✅） |
 | **population training** | 3-gen loop dry-run | EXP-POP-003 ✅ |
 | **local vLLM smoke** | ResearchAgent `local_vllm` | EXP-LLM-002（Qwen2.5-7B @ a6000） |
 | **Postgres/pgvector smoke** | `query_memory` + `index_documents` | EXP-026（6 experiments, **443 chunks**） |
@@ -383,7 +383,7 @@ Quant-MAS/
 - [x] **M11** Competitive learning — StrategyAgent, PopulationManager, Elo **EXP-029/POP-002** ✅
 - [x] **M11.5** Population training loop — multi-generation **EXP-030/POP-003** ✅
 - [x] **M11.6** Strategy candidate bridge — Top-K export + backtest smoke **EXP-031/POP-004** ✅
-- [x] **M11.7** Candidate walk-forward OOS hook — synthetic WF OOS **EXP-032** ✅
+- [x] **M11.7** Candidate walk-forward OOS — real features **EXP-POP-005** ✅（`oos.sharpe` 1.036 vs 0.586）
 - [ ] **M12** RL training experiments (GRPO/PPO/MARL GPU smoke)
 - [ ] **M13** Enterprise orchestration — multi-experiment DAG scheduler, audit log
 - [ ] FinBERT server smoke + text-enhanced walk-forward ablation (EXP-TEXT-WF-002)

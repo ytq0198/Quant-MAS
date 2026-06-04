@@ -97,9 +97,20 @@ has completed and the artifacts are stored in ExperimentMemory.
 | Experiment | Environment | Result |
 | --- | --- | --- |
 | **EXP-20260602-032** | Local mock | **259 passed**; OOS tests **11/11** |
-| **EXP-POP-005** | Server @ `f804a95` | ✅ **259 passed** (48.32s); export ✅; OOS 待 server features 路径 |
+| **EXP-POP-005** | Server @ `ffef849` | ✅ **259 passed**; `cand_mean_rev_1` **oos.sharpe 1.036**（77 wf windows）vs baseline **0.586** |
 
-Local acceptance:
+## EXP-POP-005 Result (server, 2026-06-04)
+
+| Field | Value |
+| --- | --- |
+| Candidate | `cand_mean_rev_1` (mean_reversion) |
+| Windows | **77** |
+| OOS range | 2019-07-05 → 2025-12-08 |
+| **oos.sharpe** | **1.036** |
+| ML baseline (EXP-008) | **0.586** |
+| vs_baseline | **+0.450** |
+
+This is a **rule-based population candidate** OOS result. It does not replace the paper's ML walk-forward baseline.
 
 ```bash
 python -m pytest tests/test_candidate_oos_validation.py -v   # 11 passed

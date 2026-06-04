@@ -194,6 +194,6 @@ collect_experiment_metrics → BaselineRegistry / comparison table
 | **M11** 竞争学习 | StrategyAgent + Population + Elo | ✅ EXP-029/POP-002 |
 | **M11.5** 种群训练 | PopulationTrainingLoop | ✅ EXP-030/POP-003（237 双端） |
 | **M11.6** 候选验证桥 | StrategyCandidate → backtest smoke | ✅ EXP-031/POP-004（248 双端） |
-| **M11.7** 候选 OOS | Walk-forward OOS hook | ✅ EXP-032/POP-005 pytest 259 双端 |
+| **M11.7** 候选 OOS | Walk-forward OOS hook | ✅ EXP-032/POP-005（`oos.sharpe` 1.036） |
 
 详见 [项目plus设计.md](../项目plus设计.md)、[competitive_learning.md](competitive_learning.md)。**Plus v2 系统结构定稿**见 [`项目进度.md`](../项目进度.md) §Plus v2 收官。

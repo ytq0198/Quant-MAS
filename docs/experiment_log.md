@@ -1,6 +1,6 @@
 # Quant MAS 实验记录
 
-更新时间：2026-06-03（v3 M11.7 **259 passed 双端** · EXP-032 / EXP-POP-005 pytest）
+更新时间：2026-06-04（v3 M11.7 ✅ **259 双端 + EXP-POP-005 真实 OOS**）
 
 本文件用于记录真实实验和重要验证。不要记录未经实际运行的数据结果；尚未真实运行的项目标记为「待验证」。
 
@@ -178,32 +178,28 @@
 
 ## 当前验证记录
 
-### EXP-POP-005：v3 M11.7 服务器 candidate export + OOS 验证（进行中）📋
+### EXP-POP-005：v3 M11.7 服务器 candidate Walk-forward OOS ✅
 
-- 日期：2026-06-04（续 2026-06-03 pytest）
-- 阶段：**M11.7** 服务器 @ **`f804a95`** / docs **`08a9baf`**
+- 日期：2026-06-04
+- 阶段：**M11.7** 服务器 @ **`ffef849`**（label 列 fix）+ candidate export
 - 环境：a6000-9961；conda `quant-mas`；Python **3.11.15**
+- 数据：`/mnt/localDisk3/weizian/datasets/features/features.parquet`；候选 `cand_mean_rev_1`（mean_reversion）
 - 命令与结果：
-  - `python -m pytest -v` → **259 passed** in **48.32s** ✅（2026-06-03）
-  - `export_population_candidates.py ... --no-dry-run` → ✅
-    - `outputs/candidates/candidates.json`（1686 B）
-    - Top-2：`cand_mean_rev_1`、`cand_mean_rev_1_g1_1`
-    - `experiment_id`: `c1e96fbebbb9413bb52bad6239f0bfc2`
-    - `backtest.sharpe` ≈ **12.99**（smoke，**≠** OOS）
-  - `validate_candidate_oos.py ... --features-path data/features/features.parquet --dry-run` → ❌ `Parquet file does not exist`
-- 原因：服务器真实 features 在 **`/mnt/localDisk3/weizian/datasets/features/features.parquet`**（EXP-008 walk-forward 同路径），非 repo 相对路径 `data/features/features.parquet`
-- 修复命令：
-  ```bash
-  python scripts/validate_candidate_oos.py \
-    --candidate-json outputs/candidates/candidates.json \
-    --candidate-id cand_mean_rev_1 \
-    --features-path /mnt/localDisk3/weizian/datasets/features/features.parquet \
-    --config configs/candidate_oos.yaml \
-    --storage-config configs/storage.yaml \
-    --dry-run
-  ```
-- 问题：无代码缺陷；路径与 walk-forward 文档应对齐
-- 下一步：dry-run 通过后 `--no-dry-run`；记录 `oos.sharpe` vs baseline **0.586**
+  - `python -m pytest -v` → **259 passed** in **48.32s** ✅
+  - `export_population_candidates.py ... --no-dry-run` → ✅（`c1e96fbebbb9413bb52bad6239f0bfc2`）
+  - `validate_candidate_oos.py ... --dry-run` → ✅
+  - `validate_candidate_oos.py ... --no-dry-run` → ✅（artifacts + ExperimentMemory）
+- **OOS 结果**（77 windows，2019-07-05 → 2025-12-08）：
+  - `oos.sharpe`: **1.036**
+  - `oos.total_return`: **1.363**；`max_drawdown`: **-0.169**
+  - `summary.baseline_oos_sharpe`: **0.586**（EXP-20260602-008，ML walk-forward）
+  - `summary.vs_baseline_sharpe`: **+0.450**
+- **科研边界**：
+  - 此为 **Population 导出的规则型 mean-reversion 候选** OOS，**不是** ML LightGBM 主 baseline 的复现或替代
+  - 论文主指标仍为 **EXP-20260602-008** `oos.sharpe = 0.586`；候选 OOS 用于竞争学习链路闭环对照
+  - M11.6 `backtest.sharpe` ≈ 12.99 仍为 synthetic smoke，**≠** 本 OOS
+- 问题：无（`future_*` label 列已通过 `ffef849` 在信号前 drop）
+- 下一步：M12 RL 训练；EXP-TEXT-WF-002；可选 `cand_mean_rev_1_g1_1` 对照
 
 ### EXP-20260602-032：v3 M11.7 StrategyCandidate Walk-forward OOS 本地验证 ✅
 
@@ -260,7 +256,7 @@
 - 边界：无 broker / LLM / 网络 / 真实 walk-forward OOS；不写 `oos.*`；`backtest.*` 仅为 synthetic smoke
 - 链路：`M11 竞争评估 → M11.5 多代训练 → M11.6 Top-K 导出 + backtest smoke → 后续真实 Walk-forward OOS`
 - 问题：无
-- 下一步：~~M11.7 walk-forward hook~~ ✅ EXP-032；服务器 **EXP-POP-005**；M12 RL 训练；EXP-TEXT-WF-002
+- 下一步：~~M11.7 服务器 OOS~~ ✅ EXP-POP-005；M12 RL 训练；EXP-TEXT-WF-002
 
 ### EXP-POP-003：v3 M11.5 服务器 pytest + population training dry-run ✅
 
@@ -1131,7 +1127,7 @@
 | EXP-20260602-009 | 2026-06-02 | Plus M1 研究基线本地 | **102 passed**（+4 测试） |
 | EXP-20260602-010 | 2026-06-02 | Plus M1 服务器 pytest + 比较表 | **102 passed**；OOS sharpe 0.586 |
 | EXP-20260602-011 | 2026-06-02 | Plus M2 数据扩展本地 | **115 passed**（+13） |
-| EXP-POP-005 | 2026-06-03 | v3 M11.7 服务器 pytest | **259 passed**（48.32s @ `f804a95`）；真实 OOS 待 export |
+| EXP-POP-005 | 2026-06-04 | v3 M11.7 服务器 candidate OOS | `cand_mean_rev_1` **oos.sharpe 1.036** vs baseline **0.586**（77 窗）@ `ffef849` |
 | EXP-20260602-032 | 2026-06-03 | v3 M11.7 候选 Walk-forward OOS | **259 passed**（+11）；OOS **11/11** |
 | EXP-POP-004 | 2026-06-03 | v3 M11.6 服务器 | **248 passed**（55.15s）+ export dry-run @ `7ab510f` |
 | EXP-20260602-031 | 2026-06-03 | v3 M11.6 候选验证桥 | **248 passed**（+11）；bridge **11/11** |

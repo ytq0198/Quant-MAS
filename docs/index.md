@@ -162,7 +162,7 @@ Memory/RAG feeds **ResearchAgent** context — it does not execute trades.
 | Competitive learning (M11) | Elo mock dry-run | EXP-029 / EXP-POP-002 |
 | Population training (M11.5) | 3-gen loop dry-run | EXP-030 / EXP-POP-003 |
 | Candidate bridge (M11.6) | Top-K export + backtest smoke | EXP-POP-004 ✅ |
-| Candidate OOS (M11.7) | walk-forward hook → `oos.*` | EXP-032 ✅ |
+| Candidate OOS (M11.7) | `cand_mean_rev_1` OOS sharpe **1.036** | EXP-POP-005 vs ML baseline **0.586** |
 | local vLLM smoke | ResearchAgent `local_vllm` | EXP-LLM-002 |
 | **OOS sharpe (baseline)** | **0.586** | EXP-20260602-008 |
 | **OOS + FinBERT text** | **0.563** | EXP-TEXT-WF-001 · exploratory (200/6033 coverage) |

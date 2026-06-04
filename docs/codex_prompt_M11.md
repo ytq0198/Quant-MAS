@@ -1,8 +1,8 @@
 # Plus v3 M11：竞争学习 / 策略种群 — Codex 提示词
 
-**状态：✅ 已完成（M11–M11.7 pytest 259 双端，2026-06-03）**
+**状态：✅ 已完成（M11–M11.7 双端闭环，259 pytest，EXP-POP-005 OOS，2026-06-04）**
 
-更新时间：2026-06-03
+更新时间：2026-06-04
 
 > **用法**：先粘贴下方「固定前缀」，再粘贴「M11 主任务」整段交给 Codex。  
 > **设计依据**：[项目v3设计.md §M11](../项目v3设计.md#m11竞争学习--自博弈--策略种群) · 配套：新建 `docs/competitive_learning.md` · 前置：**M1–M8 ✅**、**M9/M10 ✅**（212 pytest，EXP-026 + EXP-LLM-002）· **M11.5** 见 [population_training.md](population_training.md)（237 pytest，EXP-030/POP-003）
@@ -406,7 +406,7 @@ python scripts/run_competitive_experiment.py --config configs/competitive.yaml -
 | **EXP-20260602-031** | M11.6 本地 candidate bridge | ✅ **248 passed**（bridge 11/11） |
 | **EXP-POP-004** | 服务器 candidate export dry-run | ✅ **248 passed** + dry-run（55.15s @ `7ab510f`） |
 | **EXP-20260602-032** | M11.7 本地 candidate walk-forward OOS | ✅ **259 passed**（OOS 11/11） |
-| **EXP-POP-005** | 服务器 pytest + OOS 前置 | ✅ **259 passed**（48.32s）；真实 OOS 待 `export --no-dry-run` |
+| **EXP-POP-005** | 服务器 candidate OOS | ✅ `cand_mean_rev_1` **oos.sharpe 1.036** vs **0.586**（77 窗 @ `ffef849`） |
 | （未来） | `--mode walk_forward` 真实 OOS 与 **0.586** 对照 — **Cursor 科研任务**，Codex 仅 stub |
 
 论文主指标仍为 **EXP-20260602-008**（oos.sharpe **0.586**）。

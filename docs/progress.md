@@ -1,10 +1,10 @@
 # Quant MAS 开发进度
 
-更新时间：2026-06-03（**v3 M11.7 ✅** 双端 **259 passed** · EXP-POP-005 pytest）
+更新时间：2026-06-04（**v3 M11.7 ✅** 双端 **259** · EXP-POP-005 真实 OOS）
 
-**Plus v2**：M1–M8 ✅ · **v3 M9–M11.7** ✅ 本地+服务器（pytest 259）
+**Plus v2**：M1–M8 ✅ · **v3 M9–M11.7** ✅ 双端闭环
 
-**pytest 基线**：**259 passed** 双端（EXP-032 / EXP-POP-005 @ `f804a95`）· **论文主指标**：Walk-forward OOS sharpe **0.586**
+**pytest 基线**：**259 passed** 双端 · **论文主指标**：Walk-forward ML OOS sharpe **0.586**（EXP-008）· **候选 OOS**：`cand_mean_rev_1` **1.036**（EXP-POP-005，规则型 mean-reversion，**非** ML 主 baseline 替代）
 
 ## Plus v2 八条主线（M1–M8）
 
@@ -34,7 +34,7 @@
 | **M11** | 竞争学习 / 策略种群 | ✅ | competitive CLI；225 双端（EXP-POP-002） | [competitive_learning.md](competitive_learning.md) |
 | **M11.5** | 种群训练闭环 | ✅ | 237 双端（EXP-030/POP-003） | [population_training.md](population_training.md) |
 | **M11.6** | 候选验证桥 | ✅ | 248 双端（EXP-031/POP-004） | [strategy_candidate_bridge.md](strategy_candidate_bridge.md) |
-| **M11.7** | 候选 Walk-forward OOS | ✅ | 259 双端 pytest；真实 OOS 待 export | [strategy_candidate_oos.md](strategy_candidate_oos.md) |
+| **M11.7** | 候选 Walk-forward OOS | ✅ | 259 双端 + EXP-POP-005 真实 OOS | [strategy_candidate_oos.md](strategy_candidate_oos.md) |
 | **M12** | RL 训练实验 | 📋 | GRPO/PPO training loop | [rl_plan.md](rl_plan.md) |
 | **M13** | 企业化编排 | 📋 | DAG scheduler | [protocols.md](protocols.md) |
 
