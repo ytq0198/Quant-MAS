@@ -1,6 +1,6 @@
 # Quant MAS 实验记录
 
-更新时间：2026-06-04（**EXP-M13-003 双端 ✅** · **354 pytest** · M13.2 LangGraph recipe backend @ `7f48486`）
+更新时间：2026-06-04（**EXP-M13-004 本地 ✅** · **361 pytest** · M13.3 paper artifact export）
 
 本文件用于记录真实实验和重要验证。不要记录未经实际运行的数据结果；尚未真实运行的项目标记为「待验证」。
 
@@ -200,6 +200,31 @@
 
 ## 当前验证记录
 
+### EXP-M13-004：M13.3 Paper Artifact Export（本地）✅
+
+- 日期：2026-06-04
+- 阶段：v3 **M13.3** — 从 ExperimentMemory + M13 audit JSONL 导出论文级表格（**非 OOS，不推断**）
+- 环境：本地 Windows；待服务器真实 `experiments.json` + `outputs/pipelines` 导出 smoke
+- 交付：
+  - `paper_artifacts.py`：`export_paper_artifacts(...)`
+  - `scripts/export_paper_artifacts.py` CLI
+  - `tests/test_paper_artifacts.py`（**7/7**，synthetic memory + 临时 audit JSONL）
+- 导出产物：
+  - `paper_main_results.csv` — 仅 `oos.*`；排除 simulation-only RL
+  - `paper_text_ablation.csv` — 含 coverage_ratio / aligned_count / dropped_count
+  - `paper_population_ablation.csv` / `paper_rl_ablation.csv` — OOS 与 simulation 分列
+  - `paper_experiment_index.md` / `audit_summary.json`
+- 命令与结果：
+  - `python -m pytest tests/test_paper_artifacts.py -v` → **7 passed**
+  - M13 相关测试（scheduler + recipes + langgraph recipe）→ **30 passed**
+  - `python scripts/export_paper_artifacts.py --help` → ✅
+  - `python -m pytest -v` → **361 passed**
+- **边界验证**：
+  - 主结果表只纳入 `oos.*`；缺失值留空，不虚构
+  - simulation-only RL 不进主结果表
+  - 不新增任何 OOS 研究结论
+- 下一步：服务器真实 memory + audit 导出 smoke → **M13 整体收口**
+
 ### EXP-M13-003：M13.2 LangGraph Recipe Backend（双端）✅
 
 - 日期：2026-06-04
@@ -225,7 +250,7 @@
   - LangGraph 已安装；不可用时自动回落 deterministic scheduler dry-run
   - 仅 dry-run；audit JSONL 仍由 M13 scheduler 写入
   - 不替换 M4 `ResearchWorkflow` / `SupervisorAgent`；不新增 OOS 指标
-- 下一步：**M13.3** 论文级结果表与审计包导出
+- 下一步：~~M13.3~~ ✅ → 服务器 EXP-M13-004 真实导出 smoke
 
 ### EXP-M13-002：M13.1 Pipeline Recipe Scheduler（双端）✅
 
@@ -1556,6 +1581,7 @@
 
 | 编号 | 日期 | 内容 | 关键结果 |
 |------|------|------|----------|
+| EXP-M13-004 | 2026-06-04 | M13.3 paper artifact export（本地） | **361 passed**；+7 paper tests；6 导出产物 |
 | EXP-M13-003 | 2026-06-04 | M13.2 LangGraph recipe backend（双端） | **354 passed**（61.37s 服务器）；langgraph + scheduler dry-run ✅ @ `7f48486` |
 | EXP-M13-002 | 2026-06-04 | M13.1 YAML pipeline recipe（双端） | **349 passed**（54.00s 服务器）；4 yaml.example dry-run ✅ @ `2610612` |
 | EXP-M13-001 | 2026-06-04 | M13.0 MCP Scheduler 双端 | **342 passed**；dry-run audit JSONL @ `605fa66` |

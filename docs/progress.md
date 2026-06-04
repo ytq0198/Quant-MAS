@@ -414,9 +414,9 @@ M13 is split into four incremental stages so implementation can stay small and t
 | **M13.0 MCP Scheduler Minimal** | ✅ | Internal dry-run scheduler, audit JSONL, ToolPolicy | [mcp_protocol.md](mcp_protocol.md) |
 | **M13.1 Pipeline Recipe Scheduler** | ✅ | YAML recipes for ML/Text/Population/RL | [mcp_protocol.md](mcp_protocol.md) |
 | **M13.2 LangGraph Extended DAG** | done | Optional LangGraph backend for population, RL, and batch walk-forward nodes | [mcp_protocol.md](mcp_protocol.md) |
-| **M13.3 Paper Artifact Export** | Later | Paper-grade result tables, ablation tables, and audit package | [mcp_protocol.md](mcp_protocol.md) |
+| **M13.3 Paper Artifact Export** | done | Paper-grade result tables, ablation tables, and audit package | [mcp_protocol.md](mcp_protocol.md) |
 
-Current next target: **M13.3** Paper artifact export (EXP-M13-003 dual-end done @ 7f48486 ? @ `2610612`).
+Current next target: **M13 closeout** — server EXP-M13-004 real export smoke (EXP-M13-003 dual-end done @ 7f48486 ? @ `2610612`).
 
 ### M13.0 completion note（EXP-M13-001 ✅ 双端）
 
@@ -449,3 +449,30 @@ Delivered: pipeline_recipe + 4 yaml.example + test_mcp_pipeline_recipes（7/7）
 Delivered: langgraph_recipe_workflow + --backend CLI + test_langgraph_recipe_workflow（5/5）
 
 M13.2 remains dry-run only. It maps YAML recipes to an optional LangGraph DAG when LangGraph is installed, and falls back to the deterministic scheduler backend when unavailable.
+
+### M13.3 completion note
+
+M13.3 Paper Artifact Export has been implemented locally.
+
+Delivered:
+
+- `src/quant_mas/research/paper_artifacts.py`
+- `scripts/export_paper_artifacts.py`
+- `tests/test_paper_artifacts.py`
+
+Exports:
+
+- `paper_main_results.csv`
+- `paper_text_ablation.csv`
+- `paper_population_ablation.csv`
+- `paper_rl_ablation.csv`
+- `paper_experiment_index.md`
+- `audit_summary.json`
+
+Verification:
+
+- `python -m pytest tests/test_paper_artifacts.py -v` �� **7 passed**
+
+- python -m pytest -v -> **361 passed**
+
+M13.3 does not infer missing experiment results. Main-result tables use OOS metrics only; simulation/training/population metrics remain ablation context.

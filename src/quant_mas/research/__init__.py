@@ -15,6 +15,7 @@ from quant_mas.research.metrics_table import (
     build_comparison_table,
     collect_experiment_metrics,
 )
+from quant_mas.research.paper_artifacts import export_paper_artifacts
 from quant_mas.research.strategy_candidate import StrategyCandidate, assert_no_oos_metrics
 
 __all__ = [
@@ -28,6 +29,7 @@ __all__ = [
     "build_candidate_oos_comparison",
     "build_comparison_table",
     "collect_experiment_metrics",
+    "export_paper_artifacts",
     "run_candidate_batch_walk_forward",
     "run_candidate_walk_forward",
     "save_candidate_batch_validation_report",

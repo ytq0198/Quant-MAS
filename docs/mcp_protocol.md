@@ -158,7 +158,7 @@ M13 是批处理研究调度，不是对话路由器，也不是外部 MCP 服�
 
 ## 当前下一步
 
-**M13.2 双端已完成**（EXP-M13-003，354 pytest @ `7f48486`）。下一步：**M13.3** 论文级结果表与审计包导出。
+**M13.3 本地已完成**（EXP-M13-004，361 pytest）。M13 编排四阶段（0→3）代码交付完毕；下一步：服务器真实 `experiments.json` + `outputs/pipelines` 导出 smoke，然后 **M13 整体收口**。
 
 ## M13.0 Implementation Note
 
@@ -248,4 +248,42 @@ python scripts/run_mcp_pipeline.py \
   --dry-run
 ```
 
-M13.2 still does not run real server commands. Real execution remains a later explicit server experiment.
+## M13.3 Implementation Note
+
+M13.3 exports paper-grade tables and an audit summary from existing experiment records.
+
+Delivered:
+
+- `src/quant_mas/research/paper_artifacts.py`
+- `scripts/export_paper_artifacts.py`
+- `tests/test_paper_artifacts.py`
+
+Outputs:
+
+- `paper_main_results.csv`
+- `paper_text_ablation.csv`
+- `paper_population_ablation.csv`
+- `paper_rl_ablation.csv`
+- `paper_experiment_index.md`
+- `audit_summary.json`
+
+Boundaries:
+
+- Main-result exports include only experiments with `oos.*`.
+- Simulation-only RL runs are excluded from the main result table.
+- Text ablation rows keep coverage, aligned count, and dropped count columns.
+- RL ablation rows keep OOS and simulation metrics in separate columns.
+- Missing values are left blank; the exporter does not infer or invent results.
+
+Verification:
+
+```bash
+python -m pytest tests/test_paper_artifacts.py -v  # 7 passed
+python -m pytest -v                                 # 361 passed
+python scripts/export_paper_artifacts.py \
+  --memory-path outputs/reports/experiments.json \
+  --audit-dir outputs/pipelines \
+  --output-dir outputs/paper
+```
+
+M13.3 does not create new OOS metrics. It only organizes existing ExperimentMemory records and optional M13 audit JSONL into paper-grade tables.
