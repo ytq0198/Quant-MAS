@@ -208,7 +208,7 @@
 - 命令与结果：
   - `python -m pytest tests/test_text_signals.py -v` → **15 passed**
   - `python scripts/audit_text_signals.py --help` → ✅
-  - `python -m pytest -v` → **314 passed**
+  - 全量 `python -m pytest -v` → **314 passed**（本地 + 服务器 **50.97s** @ `8ad636a`）
 - 科研边界：
   - 覆盖率审计不是收益结果，不写 `oos.*`
   - EXP-TEXT-WF-002 真正结论必须来自 `run_walk_forward.py`

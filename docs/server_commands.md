@@ -516,14 +516,23 @@ python scripts/compare_experiments.py \
 
 ### EXP-TEXT-WF-002：高覆盖文本信号 + 覆盖率审计 + Walk-forward（待服务器跑数）
 
+**注意**：`signals_finbert_wf002.parquet` 须先用步骤 1 生成；**不要**使用文档占位路径 `/path/to/...`。  
+可先对 EXP-TEXT-001 产物做 baseline 审计（步骤 0），再与高覆盖 wf002 对比。
+
 ```bash
 cd /mnt/localDisk3/weizian/Quant-MAS
 git pull origin main
 conda activate /mnt/localDisk3/weizian/conda_envs/quant-mas
 python -m pip install -e ".[ml,text]"
-python -m pytest tests/test_text_signals.py -v
+python -m pytest -v   # 预期 314 passed
 
-# 1) 生成或准备更高覆盖率的文本信号
+# 0) 可选：审计 EXP-TEXT-001 已有信号（baseline 覆盖率 ~200/6033）
+python scripts/audit_text_signals.py \
+  --features-path /mnt/localDisk3/weizian/datasets/features/features.parquet \
+  --signals-path /mnt/localDisk3/weizian/datasets/text/signals_finbert.parquet \
+  --output-dir /mnt/localDisk3/weizian/reports/text_signal_audit_wf001
+
+# 1) 生成或准备更高覆盖率的文本信号（wf002 尚不存在则必须先跑本步）
 # 输出建议命名为 signals_finbert_wf002.parquet，避免覆盖 EXP-TEXT-001 产物
 python scripts/train_text_model.py --mode finbert_baseline \
   --config configs/text_model.server.yaml \
