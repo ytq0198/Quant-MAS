@@ -1,6 +1,6 @@
 # Plus v3 M11：竞争学习 / 策略种群 — Codex 提示词
 
-**状态：✅ 已完成（M11–M11.7 本地，259 passed，M11–M11.6 双端 248，2026-06-03）**
+**状态：✅ 已完成（M11–M11.7 pytest 259 双端，2026-06-03）**
 
 更新时间：2026-06-03
 
@@ -15,7 +15,7 @@
 你正在开发 Quant MAS 科研项目（v3 阶段）。
 路径：D:\scientific reasearch and work\SRTP\Quant MAS
 
-测试基线：本地 **259 passed**（v3 M11.7，EXP-032）；M11.6 双端 **248**（EXP-POP-004 @ `7ab510f`）。
+测试基线：本地+服务器 **259 passed**（v3 M11.7，EXP-032 / EXP-POP-005 @ `f804a95`）。
 OOS 主 baseline：EXP-20260602-008，oos.sharpe **0.586**（walk-forward，19 窗）。
 M6 text OOS exploratory：EXP-TEXT-WF-001，oos.sharpe **0.563** vs baseline **0.586**（不可替代主指标）。
 M7 RL：simulation only；`simulation.*` / Population Elo **不得**与 `oos.*` 混比或替代论文主指标。
@@ -406,7 +406,7 @@ python scripts/run_competitive_experiment.py --config configs/competitive.yaml -
 | **EXP-20260602-031** | M11.6 本地 candidate bridge | ✅ **248 passed**（bridge 11/11） |
 | **EXP-POP-004** | 服务器 candidate export dry-run | ✅ **248 passed** + dry-run（55.15s @ `7ab510f`） |
 | **EXP-20260602-032** | M11.7 本地 candidate walk-forward OOS | ✅ **259 passed**（OOS 11/11） |
-| **EXP-POP-005** | 服务器真实 features candidate OOS | 📋 待做 |
+| **EXP-POP-005** | 服务器 pytest + OOS 前置 | ✅ **259 passed**（48.32s）；真实 OOS 待 `export --no-dry-run` |
 | （未来） | `--mode walk_forward` 真实 OOS 与 **0.586** 对照 — **Cursor 科研任务**，Codex 仅 stub |
 
 论文主指标仍为 **EXP-20260602-008**（oos.sharpe **0.586**）。

@@ -58,11 +58,27 @@ their difference. It is still research output, not investment advice.
 
 ## Server Workflow
 
-1. Export population candidates with M11.6.
-2. Point `--candidate-json` to the generated `candidates.json`.
+1. Export population candidates with M11.6 (**`--no-dry-run`** writes `candidates.json`; `--dry-run` does not).
+2. Point `--candidate-json` to `outputs/candidates/candidates.json`.
 3. Point `--features-path` to the real server feature parquet.
 4. Run `validate_candidate_oos.py --no-dry-run`.
 5. Compare resulting `oos.sharpe` against `EXP-20260602-008`.
+
+```bash
+# Step 1 — required before validate_candidate_oos
+python scripts/export_population_candidates.py \
+  --population-config configs/population_training.yaml \
+  --top-k 2 \
+  --run-backtest-smoke \
+  --no-dry-run
+
+# Step 2 — OOS validation
+python scripts/validate_candidate_oos.py \
+  --candidate-json outputs/candidates/candidates.json \
+  --features-path data/features/features.parquet \
+  --config configs/candidate_oos.yaml \
+  --dry-run
+```
 
 Do not record candidate claims in papers until the real server walk-forward run
 has completed and the artifacts are stored in ExperimentMemory.
@@ -72,7 +88,7 @@ has completed and the artifacts are stored in ExperimentMemory.
 | Experiment | Environment | Result |
 | --- | --- | --- |
 | **EXP-20260602-032** | Local mock | **259 passed**; OOS tests **11/11** |
-| **EXP-POP-005** | Server real features | 📋 pending — compare `oos.sharpe` vs **0.586** |
+| **EXP-POP-005** | Server @ `f804a95` | ✅ **259 passed** (48.32s); real OOS pending (`candidates.json` needs M11.6 `--no-dry-run`) |
 
 Local acceptance:
 

@@ -47,9 +47,9 @@
 > Quant Engine computes. Agent Layer explains, orchestrates, and reports.  
 > Quant Engine 做计算；Agent Layer 做编排、解释与报告。
 
-**Plus v2 status / 当前进度**：**M1–M8 ✅** · **v3 M9–M11.7 ✅** 本地（**259 pytest** · M11–M11.6 双端 **248**）
+**Plus v2 status / 当前进度**：**M1–M8 ✅** · **v3 M9–M11.7 ✅** 双端（**259 pytest**）
 
-**v3 next / 下一步**：服务器 **EXP-POP-005** 真实 candidate OOS · M12 RL 训练 · EXP-TEXT-WF-002
+**v3 next / 下一步**：EXP-POP-005 真实 candidate OOS（先 `export --no-dry-run`）· M12 · EXP-TEXT-WF-002
 
 ---
 
@@ -121,7 +121,7 @@ python -m pip install -e ".[llm]"                 # HTTP LLM client
 python -m pip install -e ".[text]"                # FinBERT / LoRA (server manual)
 ```
 
-**Verified baseline / 已验证基线**：**259 passed** 本地（EXP-032）；M11–M11.6 双端 **248**（EXP-POP-004 @ `7ab510f`）
+**Verified baseline / 已验证基线**：**259 passed** 双端（EXP-032 / EXP-POP-005 @ `f804a95`）；M11.6 双端 **248**
 
 ---
 
@@ -211,6 +211,12 @@ python scripts/export_population_candidates.py \
 ### Validate candidate OOS (M11.7) / 候选 Walk-forward OOS
 
 ```bash
+python scripts/export_population_candidates.py \
+  --population-config configs/population_training.yaml \
+  --top-k 2 \
+  --run-backtest-smoke \
+  --no-dry-run   # writes outputs/candidates/candidates.json
+
 python scripts/validate_candidate_oos.py \
   --candidate-json outputs/candidates/candidates.json \
   --features-path data/features/features.parquet \
@@ -277,8 +283,8 @@ print(result.content)
 
 | Item | Value | Notes |
 |------|-------|-------|
-| **pytest** | **259 passed** | EXP-032 本地（+11）；M11.6 双端 248 |
-| **candidate OOS (M11.7)** | walk-forward hook → `oos.*` | EXP-032 ✅ 本地 mock |
+| **pytest** | **259 passed** | EXP-032 / EXP-POP-005 双端（48.32s 服务器） |
+| **candidate OOS (M11.7)** | walk-forward hook → `oos.*` | EXP-032 ✅；真实 OOS 待 export |
 | **population training** | 3-gen loop dry-run | EXP-POP-003 ✅ |
 | **local vLLM smoke** | ResearchAgent `local_vllm` | EXP-LLM-002（Qwen2.5-7B @ a6000） |
 | **Postgres/pgvector smoke** | `query_memory` + `index_documents` | EXP-026（6 experiments, **443 chunks**） |

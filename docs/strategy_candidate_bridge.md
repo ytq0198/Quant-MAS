@@ -39,8 +39,10 @@ python scripts/export_population_candidates.py \
   --population-config configs/population_training.yaml \
   --top-k 2 \
   --run-backtest-smoke \
-  --dry-run
+  --no-dry-run
 ```
+
+`--dry-run` 仅 stdout；M11.7 需要磁盘上的 `outputs/candidates/candidates.json` 时须 **`--no-dry-run`**。
 
 Write artifacts and ExperimentMemory:
 

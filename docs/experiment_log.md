@@ -1,6 +1,6 @@
 # Quant MAS 实验记录
 
-更新时间：2026-06-03（v3 M11.7 ✅ **259 passed 本地** · EXP-032）
+更新时间：2026-06-03（v3 M11.7 **259 passed 双端** · EXP-032 / EXP-POP-005 pytest）
 
 本文件用于记录真实实验和重要验证。不要记录未经实际运行的数据结果；尚未真实运行的项目标记为「待验证」。
 
@@ -178,6 +178,30 @@
 
 ## 当前验证记录
 
+### EXP-POP-005：v3 M11.7 服务器 pytest + candidate OOS 前置检查（部分）📋
+
+- 日期：2026-06-03
+- 阶段：**M11.7** 服务器 pull @ **`f804a95`**
+- 环境：a6000-9961；conda `quant-mas`；Python **3.11.15**
+- 命令与结果：
+  - `python -m pytest -v` → **259 passed** in **48.32s** ✅
+  - `python scripts/validate_candidate_oos.py --candidate-json outputs/candidates/candidates.json ... --dry-run` → ❌ `[Errno 2] No such file or directory: outputs/candidates/candidates.json`
+- 原因：M11.6 `export_population_candidates.py` 默认 **`--dry-run`** 不写磁盘；需先 **`--no-dry-run`** 导出 `candidates.json`
+- 修复步骤：
+  ```bash
+  python scripts/export_population_candidates.py \
+    --population-config configs/population_training.yaml \
+    --top-k 2 --run-backtest-smoke --no-dry-run
+
+  python scripts/validate_candidate_oos.py \
+    --candidate-json outputs/candidates/candidates.json \
+    --features-path data/features/features.parquet \
+    --config configs/candidate_oos.yaml \
+    --dry-run
+  ```
+- 问题：无代码缺陷；工作流文档已强调 `--no-dry-run`
+- 下一步：完成 export + 真实 features OOS；对比 **oos.sharpe** vs **0.586**
+
 ### EXP-20260602-032：v3 M11.7 StrategyCandidate Walk-forward OOS 本地验证 ✅
 
 - 日期：2026-06-03
@@ -196,7 +220,7 @@
 - 边界：M11.6 不写 `oos.*`；**M11.7 才允许** walk-forward 产出 `oos.*`；无 broker / LLM / 网络 / 模型训练；信号禁止 `future_*`
 - metrics 含 `summary.baseline_oos_sharpe`（0.586）、`summary.vs_baseline_sharpe`
 - 问题：无
-- 下一步：服务器 **EXP-POP-005** 真实 `features.parquet` candidate OOS vs **0.586**；M12 RL 训练
+- 下一步：~~服务器 pytest~~ ✅ EXP-POP-005（259）；完成 export `--no-dry-run` + 真实 OOS vs **0.586**
 
 ### EXP-POP-004：v3 M11.6 服务器 pytest + candidate export dry-run ✅
 
@@ -1104,6 +1128,7 @@
 | EXP-20260602-009 | 2026-06-02 | Plus M1 研究基线本地 | **102 passed**（+4 测试） |
 | EXP-20260602-010 | 2026-06-02 | Plus M1 服务器 pytest + 比较表 | **102 passed**；OOS sharpe 0.586 |
 | EXP-20260602-011 | 2026-06-02 | Plus M2 数据扩展本地 | **115 passed**（+13） |
+| EXP-POP-005 | 2026-06-03 | v3 M11.7 服务器 pytest | **259 passed**（48.32s @ `f804a95`）；真实 OOS 待 export |
 | EXP-20260602-032 | 2026-06-03 | v3 M11.7 候选 Walk-forward OOS | **259 passed**（+11）；OOS **11/11** |
 | EXP-POP-004 | 2026-06-03 | v3 M11.6 服务器 | **248 passed**（55.15s）+ export dry-run @ `7ab510f` |
 | EXP-20260602-031 | 2026-06-03 | v3 M11.6 候选验证桥 | **248 passed**（+11）；bridge **11/11** |

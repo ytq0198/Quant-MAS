@@ -1,7 +1,7 @@
 # Quant MAS Documentation / 项目文档
 
 **Research-first multi-agent quantitative platform · 多智能体量化研究平台**  
-**Release**: [v0.1.0](https://github.com/ytq0198/Quant-MAS/releases/tag/v0.1.0) · **Tests**: 259 passed（本地）· **GitHub**: [ytq0198/Quant-MAS](https://github.com/ytq0198/Quant-MAS)
+**Release**: [v0.1.0](https://github.com/ytq0198/Quant-MAS/releases/tag/v0.1.0) · **Tests**: 259 passed（双端）· **GitHub**: [ytq0198/Quant-MAS](https://github.com/ytq0198/Quant-MAS)
 
 > Documentation hub for students, researchers, and contributors.  
 > 面向学生、科研者与贡献者的文档入口，与 [README](../README.md) 结构对应。
@@ -158,7 +158,7 @@ Memory/RAG feeds **ResearchAgent** context — it does not execute trades.
 
 | Metric | Value | Experiment |
 |--------|-------|------------|
-| pytest | **259 passed** | EXP-032 本地；M11.6 双端 248 |
+| pytest | **259 passed** | EXP-032 / EXP-POP-005 双端 |
 | Competitive learning (M11) | Elo mock dry-run | EXP-029 / EXP-POP-002 |
 | Population training (M11.5) | 3-gen loop dry-run | EXP-030 / EXP-POP-003 |
 | Candidate bridge (M11.6) | Top-K export + backtest smoke | EXP-POP-004 ✅ |

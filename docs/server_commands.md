@@ -10,6 +10,7 @@ GitHub 仓库：[https://github.com/ytq0198/Quant-MAS](https://github.com/ytq019
 
 | 日期 | 项目 | 结果 | 备注 |
 |------|------|------|------|
+| 2026-06-03 | v3 M11.7 服务器 pytest | **259 passed**（48.32s）✅ | EXP-POP-005 @ `f804a95` |
 | 2026-06-03 | v3 M11.7 候选 OOS hook（本地 mock） | **259 passed**；OOS **11/11** ✅ | EXP-20260602-032 |
 | 2026-06-03 | v3 M11.6 服务器 pytest + candidate export | **248 passed**（55.15s）+ dry-run ✅ | EXP-POP-004 @ `7ab510f` |
 | 2026-06-03 | v3 M11.6 候选验证桥（本地） | **248 passed**；bridge **11/11** ✅ | EXP-20260602-031 |
@@ -841,14 +842,20 @@ python -m pytest -v                                             # 预期 259 pas
 
 ### 6.17.2 真实 features 上跑 candidate OOS
 
-先导出候选（M11.6）：
+先导出候选（M11.6）——**必须 `--no-dry-run`** 才会写出 `outputs/candidates/candidates.json`：
 
 ```bash
 python scripts/export_population_candidates.py \
   --population-config configs/population_training.yaml \
   --top-k 2 \
   --run-backtest-smoke \
-  --dry-run
+  --no-dry-run
+```
+
+确认文件存在：
+
+```bash
+ls -la outputs/candidates/candidates.json
 ```
 
 再跑 walk-forward OOS（M11.7）：
@@ -876,7 +883,7 @@ python scripts/validate_candidate_oos.py \
 
 - **M11.7 是唯一**允许从候选链路写入 `oos.*` 的模块
 - 对比 baseline：**EXP-20260602-008**，`oos.sharpe = 0.586`
-- 记录：**EXP-20260602-032** 本地 259 mock；**EXP-POP-005** 服务器真实 OOS 待做
+- 记录：**EXP-20260602-032** 本地 259 mock；**EXP-POP-005** ✅ 服务器 **259 passed**（48.32s @ `f804a95`）；真实 OOS 待 `export --no-dry-run` → `validate_candidate_oos`
 
 详见 [`docs/strategy_candidate_oos.md`](strategy_candidate_oos.md)。
 
