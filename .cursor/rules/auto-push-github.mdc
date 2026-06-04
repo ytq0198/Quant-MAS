@@ -1,0 +1,26 @@
+---
+description: After code or doc changes, commit and push to GitHub automatically
+alwaysApply: true
+---
+
+# Auto push to GitHub
+
+When you modify project files in this repository (code, tests, configs, or docs):
+
+1. **Do not leave changes uncommitted** at the end of the task unless the user explicitly says not to push.
+2. After completing the requested work, **commit and push to `origin/main`** without waiting for a separate "please push" request.
+3. Follow the existing commit message style: `feat:` / `fix:` / `docs:` with pytest count when relevant.
+4. **Do not push** secrets (`.env`, credentials) or files the user asked to keep local.
+5. If the user says "don't push" or "local only" in the same turn, skip push for that turn only.
+
+Typical end-of-task flow:
+
+```bash
+git status
+git add <relevant files>
+git commit -m "..."
+git push origin main
+git status   # verify clean and up to date with origin/main
+```
+
+Report the commit hash and remote URL after a successful push.
