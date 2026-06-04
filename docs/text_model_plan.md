@@ -1,6 +1,6 @@
 # 金融文本模型计划（Plus M6）
 
-更新时间：2026-06-03（EXP-TEXT-001 / EXP-TEXT-WF-001 服务器 ✅）
+更新时间：2026-06-04（EXP-TEXT-001 / EXP-TEXT-WF-001 服务器 ✅；EXP-TEXT-WF-002 审计工具 ✅）
 
 > Codex 任务：[codex_prompt_M6.md](codex_prompt_M6.md) · 设计：[项目plus设计.md §M6](../项目plus设计.md#m6金融文本大模型--开源模型微调)
 
@@ -21,6 +21,32 @@ FinancialTextRecord → sentiment/classifier → TextSignalRecord
 | **EXP-TEXT-WF-001** | `features_with_text.parquet` 6033×20；OOS sharpe **0.563** vs baseline **0.586**（Δ **-0.023**） |
 
 **Exploratory 结论**：200/6033 文本覆盖 + fillna(0) 下略低于 baseline；**不能**据此否定 text 特征；需扩大新闻覆盖后再评估。
+
+## EXP-TEXT-WF-002 设计
+
+EXP-TEXT-WF-002 的目标不是直接证明文本信号一定有效，而是用更高覆盖率、更清晰时间对齐和同一 walk-forward 协议，重新检验文本增强是否能超过 EXP-20260602-008 的 **0.586** 主基线。
+
+第一步必须先做覆盖率审计：
+
+```bash
+python scripts/audit_text_signals.py \
+  --features-path /mnt/localDisk3/weizian/datasets/features/features.parquet \
+  --signals-path /mnt/localDisk3/weizian/datasets/text/signals_finbert_wf002.parquet \
+  --output-dir /mnt/localDisk3/weizian/reports/text_signal_audit_wf002
+```
+
+审计输出：
+
+- `metrics.json`：`feature_rows`、`signal_rows`、`matched_rows`、`coverage_ratio`、日期范围、symbol 覆盖
+- `summary.md`：可直接写入实验日志的覆盖率摘要
+
+论文记录时必须同时报告：
+
+- 文本覆盖率 `coverage_ratio`
+- 覆盖 symbol 数量
+- 文本信号日期范围
+- OOS sharpe 与 baseline **0.586** 的差值
+- 是否仍使用 `fillna(0)` 或其他缺失值策略
 
 ## 服务器配置示例（不入库 secrets）
 
@@ -78,7 +104,7 @@ python scripts/compare_experiments.py \
 | 编号 | 内容 |
 |------|------|
 | EXP-TEXT-002 | LoRA 小样本 |
-| EXP-TEXT-WF-002 | 全量/高覆盖 text + walk-forward |
+| EXP-TEXT-WF-002 | 高覆盖 text + coverage audit + walk-forward |
 
 ## 相关文档
 

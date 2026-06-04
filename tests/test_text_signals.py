@@ -8,7 +8,7 @@ from pathlib import Path
 import pandas as pd
 import pytest
 
-from quant_mas.features import merge_text_signals_into_features
+from quant_mas.features import merge_text_signals_into_features, summarize_text_signal_coverage
 from quant_mas.text import (
     FinancialTextRecord,
     MockSentimentClassifier,
@@ -136,6 +136,36 @@ def test_merge_text_signals_rejects_duplicate_keys() -> None:
         merge_text_signals_into_features(features, signals)
 
 
+def test_summarize_text_signal_coverage_reports_match_rate() -> None:
+    features = pd.DataFrame(
+        {
+            "date": pd.to_datetime(
+                ["2024-01-01", "2024-01-02", "2024-01-01", "2024-01-02"]
+            ),
+            "symbol": ["AAA", "AAA", "BBB", "BBB"],
+            "close": [10.0, 11.0, 20.0, 21.0],
+        }
+    )
+    signals = pd.DataFrame(
+        {
+            "date": ["2024-01-01", "2024-01-02"],
+            "symbol": ["AAA", "BBB"],
+            "signal_name": ["finbert_sentiment", "finbert_sentiment"],
+            "value": [0.4, -0.3],
+            "model_id": ["mock", "mock"],
+        }
+    )
+
+    summary = summarize_text_signal_coverage(features, signals)
+
+    assert summary["feature_rows"] == 4
+    assert summary["signal_rows"] == 2
+    assert summary["matched_rows"] == 2
+    assert summary["coverage_ratio"] == 0.5
+    assert summary["matched_symbols"] == ["AAA", "BBB"]
+    assert summary["column_coverage"]["finbert_sentiment"]["matched_rows"] == 2
+
+
 def test_load_text_records_jsonl_and_write_signal_parquet(tmp_path: Path) -> None:
     records = build_synthetic_text_records(4, symbol="AAA")
     jsonl_path = tmp_path / "records.jsonl"
@@ -175,6 +205,99 @@ def test_train_text_model_cli_help() -> None:
 
     assert result.returncode == 0
     assert "--mode" in result.stdout
+
+
+def test_audit_text_signals_cli_help() -> None:
+    result = subprocess.run(
+        [sys.executable, "scripts/audit_text_signals.py", "--help"],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    assert result.returncode == 0
+    assert "--features-path" in result.stdout
+
+
+def test_audit_text_signals_cli_writes_artifacts(tmp_path: Path) -> None:
+    features_path = tmp_path / "features.parquet"
+    signals_path = tmp_path / "signals.parquet"
+    output_dir = tmp_path / "audit"
+    pd.DataFrame(
+        {
+            "date": pd.to_datetime(["2024-01-01", "2024-01-02"]),
+            "symbol": ["AAA", "AAA"],
+            "close": [10.0, 11.0],
+        }
+    ).to_parquet(features_path, index=False)
+    pd.DataFrame(
+        {
+            "date": ["2024-01-01"],
+            "symbol": ["AAA"],
+            "finbert_sentiment": [0.25],
+        }
+    ).to_parquet(signals_path, index=False)
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            "scripts/audit_text_signals.py",
+            "--features-path",
+            str(features_path),
+            "--signals-path",
+            str(signals_path),
+            "--output-dir",
+            str(output_dir),
+        ],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    assert result.returncode == 0
+    metrics = json.loads((output_dir / "metrics.json").read_text(encoding="utf-8"))
+    assert metrics["coverage_ratio"] == 0.5
+    assert (output_dir / "summary.md").exists()
+
+
+def test_audit_text_signals_cli_fails_under_coverage_threshold(tmp_path: Path) -> None:
+    features_path = tmp_path / "features.parquet"
+    signals_path = tmp_path / "signals.parquet"
+    pd.DataFrame(
+        {
+            "date": pd.to_datetime(["2024-01-01", "2024-01-02"]),
+            "symbol": ["AAA", "AAA"],
+            "close": [10.0, 11.0],
+        }
+    ).to_parquet(features_path, index=False)
+    pd.DataFrame(
+        {
+            "date": ["2024-01-01"],
+            "symbol": ["AAA"],
+            "finbert_sentiment": [0.25],
+        }
+    ).to_parquet(signals_path, index=False)
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            "scripts/audit_text_signals.py",
+            "--features-path",
+            str(features_path),
+            "--signals-path",
+            str(signals_path),
+            "--output-dir",
+            str(tmp_path / "audit"),
+            "--fail-under-coverage",
+            "0.75",
+        ],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    assert result.returncode != 0
+    assert "coverage below threshold" in result.stderr
 
 
 def test_train_text_model_mock_dry_run(tmp_path: Path) -> None:

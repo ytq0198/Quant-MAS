@@ -514,6 +514,60 @@ python scripts/compare_experiments.py \
 
 详见 [`docs/text_model_plan.md`](text_model_plan.md)。
 
+### EXP-TEXT-WF-002：高覆盖文本信号 + 覆盖率审计 + Walk-forward（待服务器跑数）
+
+```bash
+cd /mnt/localDisk3/weizian/Quant-MAS
+git pull origin main
+conda activate /mnt/localDisk3/weizian/conda_envs/quant-mas
+python -m pip install -e ".[ml,text]"
+python -m pytest tests/test_text_signals.py -v
+
+# 1) 生成或准备更高覆盖率的文本信号
+# 输出建议命名为 signals_finbert_wf002.parquet，避免覆盖 EXP-TEXT-001 产物
+python scripts/train_text_model.py --mode finbert_baseline \
+  --config configs/text_model.server.yaml \
+  --text-path /mnt/localDisk3/weizian/datasets/text/news_wf002.jsonl \
+  --output-dir /mnt/localDisk3/weizian/models/text/exp_text_wf002 \
+  --signals-output /mnt/localDisk3/weizian/datasets/text/signals_finbert_wf002.parquet \
+  2>&1 | tee /mnt/localDisk3/weizian/logs/exp_text_wf002_finbert.log
+
+# 2) 先审计覆盖率，不直接跑 OOS
+python scripts/audit_text_signals.py \
+  --features-path /mnt/localDisk3/weizian/datasets/features/features.parquet \
+  --signals-path /mnt/localDisk3/weizian/datasets/text/signals_finbert_wf002.parquet \
+  --output-dir /mnt/localDisk3/weizian/reports/text_signal_audit_wf002 \
+  2>&1 | tee /mnt/localDisk3/weizian/logs/exp_text_wf002_audit.log
+
+# 3) 用高覆盖 signals 构建 features_with_text_wf002.parquet
+# 将 configs/features.text.yaml 中 text_signals_path 指向 signals_finbert_wf002.parquet
+python scripts/build_features.py \
+  --config configs/features.text.yaml \
+  --storage-config configs/storage.server.yaml \
+  --input /mnt/localDisk3/weizian/datasets/raw/market_data.parquet \
+  --output /mnt/localDisk3/weizian/datasets/features/features_with_text_wf002.parquet
+
+# 4) 用同一 walk-forward 协议对比 EXP-20260602-008 baseline 0.586
+python scripts/run_walk_forward.py \
+  --config configs/walk_forward.yaml \
+  --storage-config configs/storage.server.yaml \
+  --features-path /mnt/localDisk3/weizian/datasets/features/features_with_text_wf002.parquet \
+  --experiment-name server_walk_forward_text_002 \
+  --output-dir /mnt/localDisk3/weizian/reports/walk_forward_text_002
+
+python scripts/compare_experiments.py \
+  --storage-config configs/storage.server.yaml \
+  --memory-path /mnt/localDisk3/weizian/reports/experiments.json \
+  --output-dir /mnt/localDisk3/weizian/reports/research
+```
+
+记录要求：
+
+- `text_signal_audit_wf002/metrics.json`：必须记录 `coverage_ratio`、`matched_rows`、`matched_symbol_count`
+- `walk_forward_text_002/metrics.json`：只报告 `oos.*`，并与 **0.586** 对比
+- 若 coverage 仍接近 WF-001 的 `200/6033`，结论仍应写成 exploratory
+- `simulation.*`、LLM 解释、单段回测不得替代 OOS
+
 ## 六点十、Plus M7 RL 模拟（EXP-20260602-021 / EXP-20260602-022）✅
 
 ```bash

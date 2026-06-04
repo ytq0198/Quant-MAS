@@ -11,7 +11,7 @@ M12.4 has been implemented as the first observation-aware RL policy path:
 - `run_rl_experiment.py` supports `--policy-type logits|feature_linear`.
 - RL policy export now supports `FeaturePolicyState` and emits `agent_type="feature_linear_policy"`.
 - M11.7 `CandidateStrategyAdapter` can replay the exported feature-linear policy on OHLCV bars and generate state-dependent `target_weight`.
-- Local validation: `python -m pytest tests/test_rl_observation_policy.py -v` -> **12 passed**.
+- Local validation: `python -m pytest tests/test_rl_observation_policy.py -v` -> **14 passed**.
 - Full local validation: `python -m pytest -v` -> **308 passed**.
 
 The current implementation still follows the M12 boundary: training metrics remain `training.*` / `simulation.*`; only M11.7/M11.8 may write `oos.*`.
@@ -178,7 +178,7 @@ M11.7/M11.8.
 
 | Suite | Result |
 |-------|--------|
-| `tests/test_rl_observation_policy.py` | **12 passed** |
+| `tests/test_rl_observation_policy.py` | **14 passed** |
 | `tests/test_rl_training.py` + `tests/test_rl_policy_export.py` | **28 passed** |
 | `tests/test_candidate_oos_validation.py` + `tests/test_candidate_oos_batch.py` | **20 passed** |
 | Full `python -m pytest -v` | **308 passed** |
@@ -208,6 +208,33 @@ M12.4 should be reported as:
 It should not be reported as:
 
 > a production RL trading strategy.
+
+## Server OOS Result (EXP-POP-010)
+
+EXP-POP-010 validates the full M12.4 path on the server:
+
+```text
+feature_linear RL training
+  -> StrategyCandidate export
+  -> M11.7 walk-forward OOS validation
+```
+
+| Candidate family | Candidate | OOS Sharpe | Total Return | vs ML baseline 0.586 | Interpretation |
+|------------------|-----------|------------|--------------|----------------------|----------------|
+| RL logits (M12.3) | `rl_grpo_policy_001_1` | **0.0** | **0.0** | **-0.586** | all-cash ablation |
+| RL feature-linear (M12.4) | `rl_feature_linear_policy_001_1` | **0.387** | **0.338** | **-0.199** | state-dependent exposure |
+| ML walk-forward baseline | EXP-20260602-008 | **0.586** | **0.443** | baseline | paper main baseline |
+| Population mean-reversion | EXP-POP-006 best | **~1.04** | n/a | **~+0.45** | rule-based candidate ablation |
+
+Key interpretation:
+
+- M12.4 achieved the mechanism goal: the exported RL candidate no longer stays fully in cash.
+- `oos.sharpe=0.387` improves over the M12.3 all-cash RL candidate (`0.0`) but remains below the ML baseline (`0.586`).
+- `simulation.sharpe_mean=12.13` is a training/simulation metric and must not be reported as OOS.
+
+Paper-ready wording:
+
+> The observation-aware RL policy improved the exported RL candidate from an all-cash OOS result (`Sharpe = 0.0`) to a state-dependent trading policy (`Sharpe = 0.387`). However, it still underperformed the primary ML walk-forward baseline (`Sharpe = 0.586`), so the current RL result should be interpreted as a mechanism ablation rather than a replacement for the main baseline.
 
 ## Success Criteria
 

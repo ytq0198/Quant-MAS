@@ -182,6 +182,8 @@ linear scoring on OHLCV bars to produce **state-dependent** `target_weight`.
 See [rl_observation_policy.md](rl_observation_policy.md) for training/export details.
 Server smoke template: **EXP-POP-010** in `docs/server_commands.md` §6.22.
 
+EXP-POP-010 note: one server summary still shows `agent_type="grpo_policy"` from an older export label, while the OOS replay used `params.policy_type=feature_linear` correctly. Treat this as a metadata cleanup issue, not an OOS replay bug. Future exports should prefer auto-detected `agent_type="feature_linear_policy"` for feature-policy checkpoints.
+
 ## Test Plan
 
 `tests/test_rl_policy_export.py` should cover:

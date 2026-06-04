@@ -1,10 +1,10 @@
 # Quant MAS 开发进度
 
-更新时间：2026-06-04（**v3 M12.4 ✅** 双端闭环 · **310 pytest** · EXP-POP-010 OOS **0.387**）
+更新时间：2026-06-04（**EXP-TEXT-WF-002 prep ✅** · **314 pytest** · M12.4 双端闭环）
 
 **Plus v2**：M1–M8 ✅ · **v3 M9–M12.4** ✅ 双端 · RL observation-aware policy 全链路
 
-**pytest 基线**：**310 passed** 本地 · **308 passed** 服务器 · **论文主指标**：**0.586**（EXP-008）· **RL feature_linear OOS**：**0.387**（EXP-POP-010 ablation）· **RL logits OOS**：**0.0**（EXP-POP-009）
+**pytest 基线**：**314 passed** 本地 · **308 passed** 服务器 · **论文主指标**：**0.586**（EXP-008）· **RL feature_linear OOS**：**0.387**（EXP-POP-010 ablation）· **RL logits OOS**：**0.0**（EXP-POP-009）
 
 ## Plus v2 八条主线（M1–M8）
 
@@ -188,7 +188,7 @@ M1/M2 已完成；**M3 本地 ✅**（见下两节）；下一步 **M4**。
 
 | 环境 | Python | 结果 | 日期 | 实验 |
 |------|--------|------|------|------|
-| 本地 Windows | 3.11+ | **308 passed** | 2026-06-04 | EXP-20260602-036（M12.4） |
+| 本地 Windows | 3.11+ | **314 passed** | 2026-06-04 | EXP-TEXT-WF-002 prep |
 | 服务器 a6000-9961 | 3.11.15 | **308 passed** | 2026-06-04 | EXP-POP-010 @ `f034e0b` |
 
 命令：`python -m pytest -v`（勿裸敲 `pytest` / `pip`）。
@@ -372,7 +372,8 @@ python scripts/export_agent_cards.py --help
 - ~~**M12.2 服务器 export**~~ ✅ EXP-POP-008
 - ~~**M12.3 RL 候选 OOS**~~ ✅ EXP-POP-009（**296 pytest**；`oos.sharpe=0.0` 全现金 ablation）
 - ~~**M12.4 Observation-aware RL policy**~~ ✅ 双端 EXP-036 / **EXP-POP-010**（OOS **0.387**）
-- **EXP-TEXT-WF-002** · M13 编排
+- ~~**EXP-TEXT-WF-002** coverage audit tool~~ ✅ EXP-TEXT-WF-002-PREP（**314 pytest**）
+- **EXP-TEXT-WF-002** 服务器 walk-forward OOS · M13 编排
 
 ## Quant MAS v3：M12.4 Observation-aware RL
 
@@ -382,10 +383,20 @@ Validation status:
 
 | Item | Status |
 |------|--------|
-| Feature policy tests | ✅ **12 passed** |
+| Feature policy tests | ✅ **14 passed** |
 | RL training/export regression | ✅ **28 passed** |
 | Candidate OOS regression | ✅ **20 passed** |
 | Full pytest | ✅ **308 passed** |
 | Server OOS smoke | ✅ **EXP-POP-010**（`oos.sharpe=0.387`） |
 
 Boundary: M12.4 training still writes only `training.*` / `simulation.*`; `oos.*` remains owned by M11.7/M11.8.
+
+Research interpretation: M12.4 improves the RL ablation from all-cash (`oos.sharpe=0.0`) to state-dependent exposure (`oos.sharpe=0.387`), but it remains below the ML walk-forward baseline (`0.586`). Keep it as an RL mechanism ablation, not the paper main result.
+
+Recommended next steps:
+
+1. **EXP-TEXT-WF-002**: improve text coverage and rerun walk-forward against the 0.586 baseline.
+2. **M13 orchestration**: consolidate repeated research flows into a controlled DAG/scheduler.
+3. **Optional RL ablation**: longer feature-linear RL training with multi-seed export + M11.8 batch OOS.
+
+EXP-TEXT-WF-002 preparation adds `summarize_text_signal_coverage()` and `scripts/audit_text_signals.py` so coverage can be reported before the next text-enhanced OOS run.

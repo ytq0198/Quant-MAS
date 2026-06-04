@@ -8,6 +8,7 @@ from quant_mas.features.pipelines import (
 from quant_mas.features.text_signals import (
     assert_no_future_text_leakage,
     merge_text_signals_into_features,
+    summarize_text_signal_coverage,
 )
 from quant_mas.features.technical import (
     add_ma_distance,
@@ -30,4 +31,5 @@ __all__ = [
     "build_feature_table_from_config",
     "assert_no_future_text_leakage",
     "merge_text_signals_into_features",
+    "summarize_text_signal_coverage",
 ]

@@ -1,6 +1,6 @@
 # Quant MAS 实验记录
 
-更新时间：2026-06-04（v3 M12.4 ✅ **双端闭环** · EXP-POP-010 feature_linear OOS **0.387**）
+更新时间：2026-06-04（**EXP-TEXT-WF-002-PREP ✅** · **314 pytest** · M12.4 双端 · EXP-POP-010 OOS **0.387**）
 
 本文件用于记录真实实验和重要验证。不要记录未经实际运行的数据结果；尚未真实运行的项目标记为「待验证」。
 
@@ -196,6 +196,25 @@
 
 ## 当前验证记录
 
+### EXP-TEXT-WF-002-PREP：文本信号覆盖率审计工具 ✅
+
+- 日期：2026-06-04
+- 阶段：EXP-TEXT-WF-002 本地准备；**不是 OOS 结果**
+- 环境：本地 Windows
+- 交付：
+  - `summarize_text_signal_coverage()`：统计 feature rows、signal rows、matched rows、coverage ratio、symbol 覆盖、日期范围
+  - `scripts/audit_text_signals.py`：输出 `metrics.json` / `summary.md`
+  - `docs/text_model_plan.md` / `docs/server_commands.md`：补充 EXP-TEXT-WF-002 标准流程
+- 命令与结果：
+  - `python -m pytest tests/test_text_signals.py -v` → **15 passed**
+  - `python scripts/audit_text_signals.py --help` → ✅
+  - `python -m pytest -v` → **314 passed**
+- 科研边界：
+  - 覆盖率审计不是收益结果，不写 `oos.*`
+  - EXP-TEXT-WF-002 真正结论必须来自 `run_walk_forward.py`
+  - 结果必须与 EXP-20260602-008 `oos.sharpe=0.586` 对比
+- 下一步：服务器生成高覆盖 `signals_finbert_wf002.parquet` → audit → build features → walk-forward
+
 ### EXP-20260602-036：v3 M12.4 Observation-aware RL Policy 本地验证 ✅
 
 - 日期：2026-06-04
@@ -208,7 +227,7 @@
   - `candidate_validation.py` — `feature_linear_policy` 状态相关 `target_weight`
   - `docs/rl_observation_policy.md`、`tests/test_rl_observation_policy.py` — **12** 项
 - 命令与结果：
-  - `python -m pytest tests/test_rl_observation_policy.py -v` → **12 passed**
+  - `python -m pytest tests/test_rl_observation_policy.py -v` → **14 passed**
   - `python -m pytest tests/test_rl_training.py tests/test_rl_policy_export.py -v` → **28 passed**
   - `python -m pytest tests/test_candidate_oos_validation.py tests/test_candidate_oos_batch.py -v` → **20 passed**
   - 全量 `python -m pytest -v` → **308 passed**（296→308，+12）
@@ -244,7 +263,7 @@
 - 科研边界：`simulation.sharpe_mean=12.13` **不可**混报为 OOS；论文主 baseline 仍为 **0.586**
 - 产物：`outputs/candidate_oos/`
 - 问题：无
-- 下一步：EXP-TEXT-WF-002；可选更长 RL 训练 / M13 编排
+- 下一步：~~EXP-TEXT-WF-002 prep~~ ✅；服务器 EXP-TEXT-WF-002 walk-forward
 
 ### EXP-POP-009：v3 M12.3 服务器 RL 候选 walk-forward OOS ✅
 
@@ -1338,6 +1357,7 @@
 
 | 编号 | 日期 | 内容 | 关键结果 |
 |------|------|------|----------|
+| EXP-TEXT-WF-002-PREP | 2026-06-04 | 文本信号覆盖率审计工具 | **314 passed**；`audit_text_signals.py` **15/15**（**非 OOS**） |
 | EXP-20260601-004 | 2026-06-01 | Stooq 真实数据 + ma_cross | 6033 rows，sharpe ≈ 1.00 |
 | EXP-20260601-006 | 2026-06-01 | CPU LightGBM 训练 | test AUC 0.466 |
 | EXP-20260602-004 | 2026-06-02 | GPU LightGBM 训练 | device=cuda，test AUC 0.479 |
