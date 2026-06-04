@@ -158,7 +158,7 @@ M13 是批处理研究调度，不是对话路由器，也不是外部 MCP 服�
 
 ## 当前下一步
 
-**M13.1 本地已完成**（EXP-M13-002，349 pytest）。下一步：服务器 YAML dry-run smoke，或 **M13.2** LangGraph 扩展。
+**M13.1 双端已完成**（EXP-M13-002，349 pytest @ `2610612`）。下一步：**M13.2** LangGraph extended DAG。
 
 ## M13.0 Implementation Note
 
@@ -197,14 +197,18 @@ Recipe behavior:
 - Text recipes require `audit_text_signals` before `walk_forward_eval`.
 - RL recipes keep `rl_train` under `simulation` / `training`; OOS is only allowed at candidate validation.
 
+M13.1 implemented @ `2610612`. **Server verified 2026-06-04**（54.00s，349 passed；4 yaml.example dry-run ✅）.
+
 Verification:
 
 ```bash
 python -m pytest tests/test_mcp_pipeline_recipes.py -v  # 7 passed
 python -m pytest tests/test_mcp_scheduler.py -v         # 11 passed
-python scripts/run_mcp_pipeline.py \
-  --recipe configs/pipelines/text_enhanced.yaml.example \
-  --dry-run
+python -m pytest -v                                     # 349 passed
+python scripts/run_mcp_pipeline.py --recipe configs/pipelines/ml_baseline.yaml.example --dry-run
+python scripts/run_mcp_pipeline.py --recipe configs/pipelines/text_enhanced.yaml.example --dry-run
+python scripts/run_mcp_pipeline.py --recipe configs/pipelines/population_oos.yaml.example --dry-run
+python scripts/run_mcp_pipeline.py --recipe configs/pipelines/rl_ablation.yaml.example --dry-run
 ```
 
 M13.1 still does not run real server commands. Real execution remains a later explicit server experiment.

@@ -416,7 +416,7 @@ M13 is split into four incremental stages so implementation can stay small and t
 | **M13.2 LangGraph Extended DAG** | Later | Optional LangGraph backend for population, RL, and batch walk-forward nodes | [mcp_protocol.md](mcp_protocol.md) |
 | **M13.3 Paper Artifact Export** | Later | Paper-grade result tables, ablation tables, and audit package | [mcp_protocol.md](mcp_protocol.md) |
 
-Current next target: **M13.2** LangGraph extended DAG or server M13.1 YAML smoke (EXP-M13-002).
+Current next target: **M13.2** LangGraph extended DAG (EXP-M13-002 dual-end ? @ `2610612`).
 
 ### M13.0 completion note（EXP-M13-001 ✅ 双端）
 
@@ -429,24 +429,12 @@ Delivered: agent_communication / audit_log / mcp_scheduler / run_mcp_pipeline / 
 
 M13.0 remains dry-run only and does not create new OOS research metrics.
 
-### M13.1 completion note
+### M13.1 completion note（EXP-M13-002 ✅ 双端）
 
-M13.1 Pipeline Recipe Scheduler has been implemented locally.
+| 环境 | 结果 |
+|------|------|
+| 本地 | **349 passed**；4 yaml.example dry-run ✅ |
+| 服务器 a6000-9961 | **349 passed**（54.00s）；4 yaml.example dry-run ✅ @ 2610612 |
 
-Delivered:
+Delivered: pipeline_recipe + 4 yaml.example + test_mcp_pipeline_recipes（7/7）
 
-- `src/quant_mas/orchestration/pipeline_recipe.py`
-- `configs/pipelines/ml_baseline.yaml.example`
-- `configs/pipelines/text_enhanced.yaml.example`
-- `configs/pipelines/population_oos.yaml.example`
-- `configs/pipelines/rl_ablation.yaml.example`
-- `tests/test_mcp_pipeline_recipes.py`
-
-Verification:
-
-- `python -m pytest tests/test_mcp_pipeline_recipes.py -v` �� **7 passed**
-- `python -m pytest tests/test_mcp_scheduler.py -v` �� **11 passed**
-
-- python -m pytest -v → **349 passed**
-
-M13.1 keeps execution dry-run only. It converts mature ML/Text/Population/RL research flows into auditable YAML recipes without running real GPU, network, or LLM jobs in pytest.

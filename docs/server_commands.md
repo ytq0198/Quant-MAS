@@ -11,6 +11,7 @@ GitHub ???[https://github.com/ytq0198/Quant-MAS](https://github.com/ytq0198/Quan
 | ?? | ?? | ?? | ?? |
 |------|------|------|------|
 | 2026-06-04 | v3 M13.0 ??? pytest + pipeline smoke | **342 passed**?53.99s?+ dry-run ? | EXP-M13-001 @ `605fa66` |
+| 2026-06-04 | v3 M13.1 YAML recipe dry-run smoke | **349 passed**ï¼ˆ54.00sï¼‰+ 4 yaml.example âœ… | EXP-M13-002 @ 2610612 |
 | 2026-06-04 | v3 M12.1 ??? RL training smoke | GRPO **simulation.sharpe_mean 6.31** ? | EXP-POP-007 @ `e291cf9` |
 | 2026-06-04 | v3 M11.8 ??? pytest | **266 passed**?45.63s?? | EXP-POP-006 |
 | 2026-06-04 | v3 M11.7 ??? candidate OOS | `cand_mean_rev_1` **oos.sharpe 1.036** vs **0.586** ? | EXP-POP-005 @ `ffef849` |
@@ -260,7 +261,7 @@ python -m pip install --no-binary lightgbm \
 python -c "from lightgbm import LGBMClassifier; LGBMClassifier(device='cuda').fit([[0],[1]], [0,1])"
 ```
 
-???4× NVIDIA RTX A6000??? 580?CUDA 13.0?2026-06-02 ?????
+???4ï¿½ NVIDIA RTX A6000??? 580?CUDA 13.0?2026-06-02 ?????
 
 #### 1. ??
 
@@ -543,7 +544,7 @@ python scripts/audit_text_signals.py \
 ls -la /mnt/localDisk3/weizian/datasets/text/news_wf002.jsonl
 ls -la data/text/smoke_from_features.jsonl   # EXP-TEXT-001 ?? 200 ? smoke
 #
-# 1b) ? news_wf002.jsonl ?????? features ???????? JSONL?6033 ? × 3 symbol?
+# 1b) ? news_wf002.jsonl ?????? features ???????? JSONL?6033 ? ï¿½ 3 symbol?
 python scripts/build_text_records_from_features.py \
   --features-path /mnt/localDisk3/weizian/datasets/features/features.parquet \
   --output-path /mnt/localDisk3/weizian/datasets/text/news_wf002.jsonl \
@@ -794,7 +795,7 @@ docker exec quant-mas-postgres psql -U quant_mas -d quant_mas \
 - `--best-metric oos.sharpe` ?? Postgres ??????? ? ?? **seed**??? JSON ???????????????? `reports/experiments.json`?
 - ???**EXP-025** ?? 207?**EXP-027/028** 212?**EXP-LLM-002** ??**EXP-026** ??2026-06-03?6 exp, 443 chunks, OOS 0.586 @ `02bdb8a`?
 
-?? [`docs/database_setup.md`](database_setup.md) §M9 · [`docs/context_engineering.md`](context_engineering.md) M10?
+?? [`docs/database_setup.md`](database_setup.md) ï¿½M9 ï¿½ [`docs/context_engineering.md`](context_engineering.md) M10?
 
 ## ?????v3 M10 LLM?EXP-027 / EXP-028 / EXP-LLM-002??
 
@@ -1222,7 +1223,7 @@ git commit -m "your message"
 git push origin main
 ```
 
-## M13 ???M13.0 ? · M13.1 ??
+## M13 ???M13.0 ? ï¿½ M13.1 ??
 
 ### M13.0 smoke?EXP-M13-001??? 342 pytest?
 
@@ -1239,7 +1240,7 @@ python scripts/run_mcp_pipeline.py --recipe mock_research --dry-run
 python scripts/run_mcp_pipeline.py --recipe text_smoke --dry-run
 ```
 
-### M13.1 YAML recipe dry-run?EXP-M13-002??? ? · ???? smoke?
+### M13.1 YAML recipe dry-run?EXP-M13-002??? ? ï¿½ ???? smoke?
 
 ```bash
 python scripts/run_mcp_pipeline.py --recipe configs/pipelines/ml_baseline.yaml.example --dry-run

@@ -1,6 +1,6 @@
 # Quant MAS 实验记录
 
-更新时间：2026-06-04（**EXP-M13-002 本地 ✅** · **349 pytest** · M13.1 YAML recipe）
+更新时间：2026-06-04（**EXP-M13-002 双端 ✅** · **349 pytest** · M13.1 YAML recipe @ `2610612`）
 
 本文件用于记录真实实验和重要验证。不要记录未经实际运行的数据结果；尚未真实运行的项目标记为「待验证」。
 
@@ -200,27 +200,34 @@
 
 ## 当前验证记录
 
-### EXP-M13-002：M13.1 Pipeline Recipe Scheduler（本地）✅
+### EXP-M13-002：M13.1 Pipeline Recipe Scheduler（双端）✅
 
 - 日期：2026-06-04
 - 阶段：v3 **M13.1** — YAML recipe dry-run 编排（**非 OOS**）
-- 环境：本地；待服务器 smoke（同 EXP 编号或另记）
+- 环境：本地 Windows + 服务器 a6000-9961；git **`2610612`**
 - 交付：
   - `pipeline_recipe.py`：`PipelineRecipe` / `PipelineNode` / `load_recipe_yaml`
   - `configs/pipelines/*.yaml.example`（4 条：ml_baseline / text_enhanced / population_oos / rl_ablation）
   - `mcp_scheduler.py` 扩展：内置名 + YAML 路径 + `PipelineRecipe` 对象
   - `tests/test_mcp_pipeline_recipes.py`（**7/7**）
 - 命令与结果：
-  - `python -m pytest tests/test_mcp_pipeline_recipes.py -v` → **7 passed**
-  - `python -m pytest tests/test_mcp_scheduler.py -v` → **11 passed**
-  - `python -m pytest -v` → **349 passed**
-  - `python scripts/run_mcp_pipeline.py --recipe configs/pipelines/text_enhanced.yaml.example --dry-run` → ✅
-  - `python scripts/run_mcp_pipeline.py --recipe configs/pipelines/rl_ablation.yaml.example --dry-run` → ✅
+
+| 环境 | pytest | YAML dry-run |
+|------|--------|--------------|
+| 本地 | **349 passed** | text_enhanced + rl_ablation ✅ |
+| 服务器 a6000-9961 | **349 passed**（54.00s） | 4/4 yaml.example ✅ |
+
+- 服务器四条 recipe dry-run（2026-06-04）：
+  - `ml_baseline` → 6 nodes；metric_families：audit / training / walk_forward
+  - `text_enhanced` → 7 nodes；`audit_text_signals` 在 `walk_forward_eval` 前 ✅
+  - `population_oos` → 3 nodes；metric_families：audit / population / walk_forward
+  - `rl_ablation` → 4 nodes；`rl_train` 为 simulation 族（非 walk_forward）✅
+- audit 产物示例：`outputs/pipelines/text_enhanced_20260604_132402_ae11e915/audit.jsonl`
 - **边界验证**：
   - `text_enhanced`：`audit_text_signals` 在 `walk_forward_eval` 前
   - `rl_ablation`：`rl_train` 为 simulation/training 族，非 walk_forward
   - 仅 dry-run；不跑 GPU / 网络 / LLM / 真实 walk-forward
-- 下一步：服务器四条 YAML dry-run smoke；或 **M13.2** LangGraph 扩展
+- 下一步：**M13.2** LangGraph extended DAG
 
 ### EXP-M13-001：M13.0 MCP Scheduler Minimal（双端）✅
 
@@ -1522,7 +1529,7 @@
 
 | 编号 | 日期 | 内容 | 关键结果 |
 |------|------|------|----------|
-| EXP-M13-002 | 2026-06-04 | M13.1 YAML pipeline recipe（本地） | **349 passed**；4 yaml.example + **7** recipe tests |
+| EXP-M13-002 | 2026-06-04 | M13.1 YAML pipeline recipe（双端） | **349 passed**（54.00s 服务器）；4 yaml.example dry-run ✅ @ `2610612` |
 | EXP-M13-001 | 2026-06-04 | M13.0 MCP Scheduler 双端 | **342 passed**；dry-run audit JSONL @ `605fa66` |
 | EXP-TEXT-WF-003 | 2026-06-04 | 真实 Finnhub 新闻 + walk-forward OOS | coverage **2.42%**；oos.sharpe **0.565** vs baseline **0.586**（Δ **-0.021**） |
 | EXP-TEXT-WF-003-PREP | 2026-06-04 | 真实新闻 JSONL 对齐工具 | **326 passed**；`align_real_news.py`（**非 OOS**） |
