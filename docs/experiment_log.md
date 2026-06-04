@@ -204,7 +204,7 @@
 
 - 日期：2026-06-04
 - 阶段：v3 **M13.2** — YAML recipe → 可选 LangGraph DAG dry-run（**非 OOS**）
-- 环境：本地；待服务器 smoke（同 EXP 编号）
+- 环境：本地 Windows；git **`1e79c07`**；待服务器 smoke
 - 交付：
   - `langgraph_recipe_workflow.py`：`build_langgraph_from_recipe` / `run_langgraph_recipe_workflow`
   - `run_mcp_pipeline.py --backend scheduler|langgraph`（默认 scheduler）
