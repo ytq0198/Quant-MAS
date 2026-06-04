@@ -1,10 +1,10 @@
 # Quant MAS 开发进度
 
-更新时间：2026-06-04（**v3 M12.4 ✅** 本地实现 · **308 pytest** · 服务器 feature_linear OOS 待跑）
+更新时间：2026-06-04（**v3 M12.4 ✅** 双端闭环 · **310 pytest** · EXP-POP-010 OOS **0.387**）
 
-**Plus v2**：M1–M8 ✅ · **v3 M9–M12.4** 本地闭环 · RL observation-aware policy + 既有 export/OOS 链路
+**Plus v2**：M1–M8 ✅ · **v3 M9–M12.4** ✅ 双端 · RL observation-aware policy 全链路
 
-**pytest 基线**：**308 passed** 本地 · **296 passed** 服务器（M12.3 @ `6e8c507`）· **论文主指标**：Walk-forward ML OOS sharpe **0.586**（EXP-008）· **RL logits OOS**：EXP-POP-009 **0.0** 全现金 ablation · **M12.4 OOS**：待 EXP-POP-010
+**pytest 基线**：**310 passed** 本地 · **308 passed** 服务器 · **论文主指标**：**0.586**（EXP-008）· **RL feature_linear OOS**：**0.387**（EXP-POP-010 ablation）· **RL logits OOS**：**0.0**（EXP-POP-009）
 
 ## Plus v2 八条主线（M1–M8）
 
@@ -39,7 +39,7 @@
 | **M12.1** | RL 训练实验 | ✅ 双端 | GRPOPolicyAgent、RLTrainingLoop；282 双端 + EXP-POP-007 | [rl_experiment.md](rl_experiment.md) |
 | **M12.2** | RL 候选导出桥 | ✅ 双端 | policy_state → StrategyCandidate；EXP-POP-008 | [rl_policy_export.md](rl_policy_export.md) |
 | **M12.3** | RL 候选 OOS 适配 | ✅ 双端 | `grpo_policy` → walk-forward OOS；EXP-POP-009 | [rl_policy_export.md](rl_policy_export.md) §M12.3 |
-| **M12.4** | Observation-aware RL | ✅ 本地 | `FeatureLinearPolicyAgent`；308 passed；OOS 待 EXP-POP-010 | [rl_observation_policy.md](rl_observation_policy.md) |
+| **M12.4** | Observation-aware RL | ✅ 双端 | EXP-036 / **EXP-POP-010**；OOS **0.387** | [rl_observation_policy.md](rl_observation_policy.md) |
 | **M13** | 企业化编排 | 📋 | DAG scheduler | [protocols.md](protocols.md) |
 
 ## 阶段总览（v1 Prompt + Plus v2）
@@ -189,7 +189,7 @@ M1/M2 已完成；**M3 本地 ✅**（见下两节）；下一步 **M4**。
 | 环境 | Python | 结果 | 日期 | 实验 |
 |------|--------|------|------|------|
 | 本地 Windows | 3.11+ | **308 passed** | 2026-06-04 | EXP-20260602-036（M12.4） |
-| 服务器 a6000-9961 | 3.11.15 | **296 passed** | 2026-06-04 | EXP-POP-008/009 @ `6e8c507`（M12.4 待 pull） |
+| 服务器 a6000-9961 | 3.11.15 | **308 passed** | 2026-06-04 | EXP-POP-010 @ `f034e0b` |
 
 命令：`python -m pytest -v`（勿裸敲 `pytest` / `pip`）。
 
@@ -371,8 +371,8 @@ python scripts/export_agent_cards.py --help
 - ~~**M12.2 本地 export bridge**~~ ✅ EXP-035（**294→296 pytest**）
 - ~~**M12.2 服务器 export**~~ ✅ EXP-POP-008
 - ~~**M12.3 RL 候选 OOS**~~ ✅ EXP-POP-009（**296 pytest**；`oos.sharpe=0.0` 全现金 ablation）
-- ~~**M12.4 Observation-aware RL policy**~~ ✅ 本地 EXP-036（**308 pytest**；+12 tests）
-- **EXP-POP-010** 服务器 feature_linear train → export → OOS；**EXP-TEXT-WF-002**
+- ~~**M12.4 Observation-aware RL policy**~~ ✅ 双端 EXP-036 / **EXP-POP-010**（OOS **0.387**）
+- **EXP-TEXT-WF-002** · M13 编排
 
 ## Quant MAS v3：M12.4 Observation-aware RL
 
@@ -386,6 +386,6 @@ Validation status:
 | RL training/export regression | ✅ **28 passed** |
 | Candidate OOS regression | ✅ **20 passed** |
 | Full pytest | ✅ **308 passed** |
-| Server OOS smoke | 待验证 |
+| Server OOS smoke | ✅ **EXP-POP-010**（`oos.sharpe=0.387`） |
 
 Boundary: M12.4 training still writes only `training.*` / `simulation.*`; `oos.*` remains owned by M11.7/M11.8.

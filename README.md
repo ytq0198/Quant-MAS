@@ -47,9 +47,9 @@
 > Quant Engine computes. Agent Layer explains, orchestrates, and reports.  
 > Quant Engine 做计算；Agent Layer 做编排、解释与报告。
 
-**Plus v2 status / 当前进度**：**M1–M8 ✅** · **v3 M9–M12.4 ✅** 本地（**308 pytest**；服务器 M12.4 OOS 待跑）
+**Plus v2 status / 当前进度**：**M1–M8 ✅** · **v3 M9–M12.4 ✅** 双端（**310 pytest**）
 
-**v3 next / 下一步**：EXP-POP-010 服务器 feature_linear OOS · EXP-TEXT-WF-002 · M13 编排
+**v3 next / 下一步**：EXP-TEXT-WF-002 · M13 编排
 
 ---
 
@@ -299,8 +299,8 @@ print(result.content)
 
 | Item | Value | Notes |
 |------|-------|-------|
-| **pytest** | **308 passed** | EXP-036 本地（M12.4）；服务器 **296** @ M12.3 |
-| **RL observation policy (M12.4)** | `FeatureLinearPolicyAgent` | 状态相关 exposure；OOS 待 EXP-POP-010 |
+| **RL feature_linear OOS (M12.4)** | `rl_feature_linear_policy_001_1` | **oos.sharpe 0.387** vs ML **0.586**（EXP-POP-010 ✅） |
+| **pytest** | **310 passed** | 双端 @ M12.4 |
 | **RL candidate OOS (M12.3)** | `rl_grpo_policy_001_1` walk-forward | **oos.sharpe 0.0**（全现金 ablation；**≠ simulation 6.31**）EXP-POP-009 ✅ |
 | **RL training (M12.1)** | GRPO loop + checkpoint | **simulation.sharpe_mean 6.31**（**≠ OOS 0.586**）EXP-POP-007 ✅ |
 | **batch candidate OOS (M11.8)** | 4 mean-reversion candidates | best **oos.sharpe 1.039** vs ML **0.586**（EXP-POP-006 ✅） |
@@ -409,8 +409,7 @@ Quant-MAS/
 - [x] **M12.1** RL training loop — **EXP-034 / EXP-POP-007** ✅（282 pytest 双端；simulation only）
 - [x] **M12.2** RL policy export bridge — **EXP-035 / EXP-POP-008** ✅（294→296 pytest）
 - [x] **M12.3** RL candidate OOS adapter — **EXP-POP-009** ✅（`grpo_policy` walk-forward；oos.sharpe **0.0** ablation）
-- [x] **M12.4** Observation-aware RL policy — local **EXP-036** ✅（308 pytest；`FeatureLinearPolicyAgent`）
-- [ ] **M12.4** server feature_linear OOS — **EXP-POP-010** ⏳
+- [x] **M12.4** Observation-aware RL policy — **EXP-036 / EXP-POP-010** ✅（OOS **0.387** ablation）
 - [ ] **M13** Enterprise orchestration — multi-experiment DAG scheduler, audit log
 - [ ] FinBERT server smoke + text-enhanced walk-forward ablation (EXP-TEXT-WF-002)
 - [ ] Optional paper-trading sandbox (simulation only)

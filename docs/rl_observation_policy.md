@@ -1,7 +1,7 @@
 # M12.4 Observation-Aware RL Policy
 
 Updated: 2026-06-04  
-Status: implemented locally (EXP-036); server OOS pending (EXP-POP-010)
+Status: M12.4 ✅ dual-end; EXP-POP-010 OOS sharpe **0.387** (ablation vs baseline **0.586**)
 
 ## Implementation Status
 

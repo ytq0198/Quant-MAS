@@ -1,7 +1,7 @@
 # M12.2 RL Policy Export Bridge
 
 Updated: 2026-06-04  
-Status: M12.2 + M12.3 ✅ 双端；M12.4 ✅ 本地（308 pytest）；EXP-POP-010 服务器 OOS 待跑
+Status: M12.4 ✅ dual-end; EXP-POP-010 OOS sharpe **0.387**
 
 M12.2 converts M12.1 simulation-trained policy artifacts into the existing
 `StrategyCandidate` schema. It is a bridge only. It must not run walk-forward

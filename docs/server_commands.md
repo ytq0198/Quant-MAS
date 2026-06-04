@@ -1010,7 +1010,7 @@ python scripts/validate_candidate_oos.py \
 - 记录：**EXP-POP-009** ✅；**296 passed** in **45.05s**
 - 产物：`outputs/candidate_oos/`（metrics.json、windows.csv、oos_equity_curve.csv）
 
-## 六点二十二、v3 M12.4 Observation-Aware RL Policy（EXP-036 / EXP-POP-010）⏳
+## 六点二十二、v3 M12.4 Observation-Aware RL Policy（EXP-036 / EXP-POP-010）✅
 
 前置：`git pull` 含 M12.4（预期 **308 pytest**）。
 
@@ -1042,7 +1042,7 @@ python scripts/validate_candidate_oos.py \
 
 - M12.4 训练只写 `training.*` / `simulation.*`；OOS 仅 M11.7 写 `oos.*`
 - 与 EXP-POP-009（logits 全现金 `oos.sharpe=0.0`）对比：feature_linear 应产生**非恒定** `target_weight`
-- 记录：**EXP-20260602-036** 本地 ✅；**EXP-POP-010** 服务器待跑
+- 记录：**EXP-20260602-036** 本地 ✅；**EXP-POP-010** 服务器 ✅（`rl_feature_linear_policy_001_1` **oos.sharpe 0.387** vs baseline **0.586**）
 
 详见 [`docs/rl_observation_policy.md`](rl_observation_policy.md)。
 

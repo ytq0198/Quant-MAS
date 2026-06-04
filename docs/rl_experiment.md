@@ -139,7 +139,7 @@ Local validation (2026-06-04):
 - Export preserves feature weights, bias, action levels, feature names
 - `CandidateStrategyAdapter` supports `agent_type="feature_linear_policy"`
 - `tests/test_rl_observation_policy.py` → **12 passed**; full suite → **308 passed**
-- Server OOS smoke: **EXP-POP-010** (pending)
+- Server OOS smoke: **EXP-POP-010** ✅ — `rl_feature_linear_policy_001_1`, **`oos.sharpe=0.387`**, 77 windows (ablation; below ML baseline **0.586**)
 
 ### M12.x Optional Server Training Smoke (EXP-POP-007 ✅)
 
