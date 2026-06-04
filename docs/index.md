@@ -169,7 +169,8 @@ Memory/RAG feeds **ResearchAgent** context — it does not execute trades.
 | Batch candidate OOS (M11.8) | best **1.039**；4/4 > **0.586** | EXP-POP-006（ablation） |
 | local vLLM smoke | ResearchAgent `local_vllm` | EXP-LLM-002 |
 | **OOS sharpe (baseline)** | **0.586** | EXP-20260602-008 |
-| **OOS + FinBERT text** | **0.563** | EXP-TEXT-WF-001 · exploratory (200/6033 coverage) |
+| **OOS + FinBERT text (wf001)** | **0.563** | EXP-TEXT-WF-001 · exploratory (3.32% coverage) |
+| **OOS + FinBERT text (wf002)** | **0.579** | EXP-TEXT-WF-002 · 100% coverage, placeholder text |
 | Single-segment ML sharpe | 2.78 | ⚠️ in-sample only |
 | DeepSeek ResearchAgent smoke | verified | EXP-LLM-001 |
 | local vLLM ResearchAgent smoke (a6000) | verified | EXP-LLM-002 |

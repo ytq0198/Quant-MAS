@@ -1,6 +1,6 @@
 # Quant MAS 实验记录
 
-更新时间：2026-06-04（**EXP-TEXT-WF-002-PREP ✅** · **314 pytest** · M12.4 双端 · EXP-POP-010 OOS **0.387**）
+更新时间：2026-06-04（**EXP-TEXT-WF-002 ✅** · **314 pytest** · M12.4 双端 · EXP-POP-010 OOS **0.387**）
 
 本文件用于记录真实实验和重要验证。不要记录未经实际运行的数据结果；尚未真实运行的项目标记为「待验证」。
 
@@ -70,13 +70,15 @@
 | server_ml_backtest_001 | ml_backtest | **2.781** | — | 68.27 | — | -0.246 | — | ⚠️ in-sample | EXP-20260602-005 |
 | server_walk_forward_001 | walk_forward | — | **0.586** | — | 0.443 | — | — | **baseline** | EXP-20260602-008 |
 | server_walk_forward_text_001 | walk_forward | — | **0.563** | — | 0.420 | — | — | ↓ -0.023 | EXP-TEXT-WF-001 |
+| server_walk_forward_text_002 | walk_forward | — | **0.579** | — | 0.443 | — | — | ↓ -0.007 | EXP-TEXT-WF-002 |
 
 **说明：**
 
 - CLI 输出 `oos.sharpe` 精确值 **0.585673** ≈ 报告 **0.586**，与 EXP-20260602-008 一致。
 - 仅 **walk_forward** 行可用于论文主结论。
 - EXP-TEXT-WF-001：200/6033 text 覆盖 + fillna(0)，**exploratory**；Δ oos.sharpe **-0.023**。
-- 产物：`/mnt/localDisk3/weizian/reports/research/comparison.md`
+- EXP-TEXT-WF-002：100% 覆盖 + `feature_aligned_smoke` 占位文本；Δ oos.sharpe **-0.007**（较 wf001 **+0.016**，仍略低于 baseline）。
+- 产物：`/mnt/localDisk3/weizian/reports/research/comparison.md`（**7 rows**）
 
 ### 历史快照：COMP-20260602-002（5 rows，EXP-20260602-010，text 实验前）
 
@@ -196,6 +198,47 @@
 
 ## 当前验证记录
 
+### EXP-TEXT-WF-002：高覆盖 text + Walk-forward OOS（服务器）✅
+
+- 日期：2026-06-04
+- 阶段：Plus **M6 科研** — 100% 文本覆盖 + walk-forward OOS
+- 环境：a6000-9961；git **`d25ad0f`** / **`499a2d8`**
+- 文本来源：`feature_aligned_smoke` 占位 JSONL（**6033** 行 × **3** symbol；**非真实新闻**）
+- 覆盖率审计：**coverage_ratio = 1.0**（6033/6033；AAPL/MSFT/SPY；2018-01-02 ~ 2025-12-31）
+- 数据：
+  - `features_with_text_wf002.parquet`：**6033 rows**，**16 cols**（+`finbert_sentiment`）
+  - `text_signals_path`: `signals_finbert_wf002.parquet`
+- 命令：
+  ```bash
+  python scripts/build_text_records_from_features.py ...
+  python scripts/train_text_model.py --mode finbert_baseline ...
+  python scripts/audit_text_signals.py ...
+  python scripts/build_features.py --config configs/features.text.yaml ...
+  python scripts/run_walk_forward.py --experiment-name server_walk_forward_text_002 ...
+  python scripts/compare_experiments.py ...
+  ```
+- **OOS 对比**（vs **EXP-20260602-008** / `server_walk_forward_001`）：
+
+  | 指标 | baseline | wf001 (+text) | wf002 (+text) | wf002 Δ vs baseline |
+  |------|----------|---------------|---------------|---------------------|
+  | **oos.sharpe** | **0.586** | 0.563 | **0.579** | **-0.007** |
+  | oos.total_return | 0.443 | 0.420 | **0.443** | ≈ 0 |
+  | oos.max_drawdown | -0.255 | -0.259 | -0.265 | — |
+  | oos.auc_mean | 0.472 | 0.473 | 0.476 | +0.004 |
+  | text coverage | — | 3.32% | **100%** | — |
+  | feature_count | 15 | 16 | 16 | +1 |
+  | window_count | 19 | 19 | 19 | — |
+
+- 产物：
+  - `/mnt/localDisk3/weizian/reports/text_signal_audit_wf002/`
+  - `/mnt/localDisk3/weizian/reports/walk_forward_text_002/`
+  - `reports/research/comparison.md` **7 rows**
+- **结论（exploratory）**：
+  - 将覆盖率从 3.32% 提升到 100% 后，OOS sharpe 从 **0.563** 回升至 **0.579**，与 baseline 差距从 **-0.023** 收窄至 **-0.007**
+  - 仍**略低于**主基线 **0.586**；占位文本非真实新闻，**不能**据此宣称 text 特征已超越 ML baseline
+  - 说明 wf001 的部分劣势来自**低覆盖 + fillna(0)**，而非 FinBERT 通道本身完全无效
+- 下一步：真实新闻 JSONL + 同一 WF 协议；可选 EXP-TEXT-002 LoRA
+
 ### EXP-TEXT-WF-002-PREP：文本信号覆盖率审计工具 ✅
 
 - 日期：2026-06-04
@@ -228,30 +271,7 @@
 
 与 EXP-TEXT-WF-001（oos.sharpe **0.563**）一致：低覆盖 smoke 级信号，不能代表高覆盖结论。
 
-**CLI 注意**：`train_text_model.py` 使用 `--text-path`、`--signals-output`、`--output-dir`（**不是** `--records-path` / `--output-path`）。步骤 1 前须确认 `news_wf002.jsonl` 已存在；可用 `scripts/build_text_records_from_features.py` 从 `features.parquet` 生成全量对齐占位 JSONL。
-
-### EXP-TEXT-WF-002：高覆盖信号 + 覆盖率审计（服务器，进行中）
-
-- 日期：2026-06-04
-- 阶段：EXP-TEXT-WF-002 步骤 1–2 完成；**OOS 待跑**
-- 环境：a6000-9961；git **`d25ad0f`**
-- 文本来源：`feature_aligned_smoke` 占位 JSONL（6033 行 × 3 symbol，非真实新闻）
-- 命令与结果：
-  - `build_text_records_from_features.py` → `news_wf002.jsonl`（**6033** records，**3** symbols）
-  - `train_text_model.py --mode finbert_baseline` → `signals_finbert_wf002.parquet`（**6033** rows）
-  - `audit_text_signals.py` → **coverage_ratio = 1.0**（6033/6033；AAPL/MSFT/SPY；2018-01-02 ~ 2025-12-31）
-  - 产物：`/mnt/localDisk3/weizian/reports/text_signal_audit_wf002/`
-- 对比 wf001 审计：
-
-| 指标 | wf001（EXP-TEXT-001） | wf002（当前） |
-|------|----------------------|---------------|
-| coverage_ratio | 3.32% | **100%** |
-| signal_rows | 200 | 6033 |
-| symbols | 仅 AAPL | AAPL / MSFT / SPY |
-| 日期范围 | 至 2018-10-16 | 至 2025-12-31 |
-
-- 科研边界：覆盖率审计 **≠ OOS**；结论须等 `run_walk_forward.py` 并与 **0.586** 对比
-- 下一步：`build_features.py` → `features_with_text_wf002.parquet` → `server_walk_forward_text_002`
+**CLI 注意**：`train_text_model.py` 使用 `--text-path`、`--signals-output`、`--output-dir`（**不是** `--records-path` / `--output-path`）。步骤 1 前须确认 `news_wf002.jsonl` 已存在；可用 `scripts/build_text_records_from_features.py` 从 `features.parquet` 生成全量对齐占位 JSONL。OOS 结果见上方 **EXP-TEXT-WF-002 ✅**。
 
 ### EXP-20260602-036：v3 M12.4 Observation-aware RL Policy 本地验证 ✅
 
@@ -301,7 +321,7 @@
 - 科研边界：`simulation.sharpe_mean=12.13` **不可**混报为 OOS；论文主 baseline 仍为 **0.586**
 - 产物：`outputs/candidate_oos/`
 - 问题：无
-- 下一步：~~EXP-TEXT-WF-002 prep~~ ✅；服务器 EXP-TEXT-WF-002 walk-forward
+- 下一步：~~EXP-TEXT-WF-002 prep~~ ✅；~~服务器 EXP-TEXT-WF-002 walk-forward~~ ✅
 
 ### EXP-POP-009：v3 M12.3 服务器 RL 候选 walk-forward OOS ✅
 
@@ -1395,6 +1415,7 @@
 
 | 编号 | 日期 | 内容 | 关键结果 |
 |------|------|------|----------|
+| EXP-TEXT-WF-002 | 2026-06-04 | 高覆盖 text + walk-forward OOS | coverage **100%**；oos.sharpe **0.579** vs baseline **0.586**（Δ **-0.007**） |
 | EXP-TEXT-WF-002-PREP | 2026-06-04 | 文本信号覆盖率审计工具 | **314 passed**；`audit_text_signals.py` **15/15**（**非 OOS**） |
 | EXP-20260601-004 | 2026-06-01 | Stooq 真实数据 + ma_cross | 6033 rows，sharpe ≈ 1.00 |
 | EXP-20260601-006 | 2026-06-01 | CPU LightGBM 训练 | test AUC 0.466 |

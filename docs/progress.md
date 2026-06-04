@@ -1,6 +1,6 @@
 # Quant MAS 开发进度
 
-更新时间：2026-06-04（**EXP-TEXT-WF-002 prep ✅** · **314 pytest** · M12.4 双端闭环）
+更新时间：2026-06-04（**EXP-TEXT-WF-002 ✅** · **314 pytest** · M12.4 双端闭环）
 
 **Plus v2**：M1–M8 ✅ · **v3 M9–M12.4** ✅ 双端 · RL observation-aware policy 全链路
 
@@ -255,7 +255,8 @@ python scripts/export_agent_cards.py --help
 | EXP-20260602-005 | ML 单段回测 sharpe **2.78** | **非 OOS，勿混用** |
 | EXP-20260602-008 | Walk-forward **OOS sharpe 0.586** | **报告主指标** |
 | EXP-TEXT-001 | FinBERT smoke（ModelScope） | 200 signals；6033 行 features 中 134 非零 |
-| EXP-TEXT-WF-001 | Walk-forward + text | OOS sharpe **0.563** vs baseline **0.586**（exploratory） |
+| EXP-TEXT-WF-001 | Walk-forward + text | OOS sharpe **0.563** vs baseline **0.586**（exploratory；3.32% 覆盖） |
+| EXP-TEXT-WF-002 | Walk-forward + 100% text | OOS sharpe **0.579** vs baseline **0.586**（Δ **-0.007**；占位文本） |
 | EXP-POP-005 | 单候选 OOS（M11.7） | `cand_mean_rev_1` **oos.sharpe 1.036** vs **0.586**（77 窗） |
 | EXP-POP-007 | RL training smoke（M12.1） | **simulation.sharpe_mean 6.31**（**≠ OOS 0.586**） |
 | EXP-POP-006 | 批量候选 OOS（M11.8） | 4/4 超 baseline；best **1.039** |
@@ -266,7 +267,7 @@ python scripts/export_agent_cards.py --help
 2. OOS auc_mean 0.472 与 val/test AUC ≈ 0.46–0.48 一致；模型调参留作后续研究。
 3. Agent 可编排 ML 回测、风控、pipeline；Memory/RAG 可检索历史实验与文档。
 4. **Plus M1**：任何新实验写入 ExperimentMemory 后，须用 `compare_experiments.py` 生成比较表，并与 **EXP-20260602-008** 对照后再下结论。
-5. **Plus M6 text**：EXP-TEXT-WF-001 在 200/6033 覆盖 + fillna(0) 下 OOS sharpe **略低于** baseline；属 smoke 探索，需扩大新闻覆盖后再评估。
+5. **Plus M6 text**：EXP-TEXT-WF-001（3.32% 覆盖）OOS sharpe **0.563**；EXP-TEXT-WF-002（100% 覆盖，占位文本）**0.579**（Δ vs baseline **-0.007**）。仍略低于主基线 **0.586**；需真实新闻验证。
 
 ## Quant MAS v2：M6 文本信号
 
@@ -373,7 +374,8 @@ python scripts/export_agent_cards.py --help
 - ~~**M12.3 RL 候选 OOS**~~ ✅ EXP-POP-009（**296 pytest**；`oos.sharpe=0.0` 全现金 ablation）
 - ~~**M12.4 Observation-aware RL policy**~~ ✅ 双端 EXP-036 / **EXP-POP-010**（OOS **0.387**）
 - ~~**EXP-TEXT-WF-002** coverage audit tool~~ ✅ EXP-TEXT-WF-002-PREP（**314 pytest**）
-- **EXP-TEXT-WF-002** 服务器 walk-forward OOS · M13 编排
+- ~~**EXP-TEXT-WF-002** 服务器 walk-forward OOS~~ ✅ oos.sharpe **0.579** vs **0.586**
+- M13 编排
 
 ## Quant MAS v3：M12.4 Observation-aware RL
 

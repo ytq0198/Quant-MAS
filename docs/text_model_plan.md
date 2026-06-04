@@ -1,6 +1,6 @@
 # 金融文本模型计划（Plus M6）
 
-更新时间：2026-06-04（EXP-TEXT-001 / EXP-TEXT-WF-001 服务器 ✅；EXP-TEXT-WF-002 审计工具 ✅）
+更新时间：2026-06-04（EXP-TEXT-001 / EXP-TEXT-WF-001 / **EXP-TEXT-WF-002 ✅** 服务器）
 
 > Codex 任务：[codex_prompt_M6.md](codex_prompt_M6.md) · 设计：[项目plus设计.md §M6](../项目plus设计.md#m6金融文本大模型--开源模型微调)
 
@@ -18,9 +18,10 @@ FinancialTextRecord → sentiment/classifier → TextSignalRecord
 | 实验 | 结果 |
 |------|------|
 | **EXP-TEXT-001** | ModelScope 本地 FinBERT；200 signals → `signals_finbert.parquet` |
-| **EXP-TEXT-WF-001** | `features_with_text.parquet` 6033×20；OOS sharpe **0.563** vs baseline **0.586**（Δ **-0.023**） |
+| **EXP-TEXT-WF-001** | `features_with_text.parquet` 6033×20；OOS sharpe **0.563** vs baseline **0.586**（Δ **-0.023**；3.32% 覆盖） |
+| **EXP-TEXT-WF-002** | 100% 覆盖 + 占位 JSONL；OOS sharpe **0.579** vs baseline **0.586**（Δ **-0.007**） |
 
-**Exploratory 结论**：200/6033 文本覆盖 + fillna(0) 下略低于 baseline；**不能**据此否定 text 特征；需扩大新闻覆盖后再评估。
+**Exploratory 结论**：wf001 低覆盖（200/6033）下 OOS sharpe **0.563**；wf002 将覆盖率提至 **100%** 后回升至 **0.579**，仍略低于 baseline **0.586**。占位文本非真实新闻；覆盖率是重要因素，但尚不足以超越 ML 主基线。
 
 ## EXP-TEXT-WF-002 设计
 
@@ -109,7 +110,7 @@ python scripts/compare_experiments.py \
 | 编号 | 内容 |
 |------|------|
 | EXP-TEXT-002 | LoRA 小样本 |
-| EXP-TEXT-WF-002 | 高覆盖 text + coverage audit + walk-forward |
+| EXP-TEXT-WF-002 | 高覆盖 text + coverage audit + walk-forward | ✅ oos.sharpe **0.579** |
 
 ## 相关文档
 

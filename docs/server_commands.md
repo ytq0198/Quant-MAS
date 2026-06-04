@@ -508,13 +508,15 @@ python scripts/compare_experiments.py \
 
 **EXP-TEXT-WF-001 结果**：oos.sharpe **0.563** vs baseline **0.586**（Δ -0.023）；200/6033 text 覆盖 + fillna(0)，exploratory。
 
+**EXP-TEXT-WF-002 结果**：oos.sharpe **0.579** vs baseline **0.586**（Δ **-0.007**）；100% 覆盖 + `feature_aligned_smoke` 占位文本；19 窗；comparison **7 rows**。
+
 **注意**：勿覆盖 `market_data.parquet` 为小样本（见 **M-019**）；应用 `merge_parquet.py` 恢复 6033 行。
 
 记录：**EXP-20260602-020**（pytest 161）；**EXP-TEXT-001**；**EXP-TEXT-WF-001**。
 
 详见 [`docs/text_model_plan.md`](text_model_plan.md)。
 
-### EXP-TEXT-WF-002：高覆盖文本信号 + 覆盖率审计 + Walk-forward（待服务器跑数）
+### EXP-TEXT-WF-002：高覆盖文本信号 + 覆盖率审计 + Walk-forward ✅
 
 **注意**：`signals_finbert_wf002.parquet` 须先用步骤 1 生成；**不要**使用文档占位路径 `/path/to/...`。  
 可先对 EXP-TEXT-001 产物做 baseline 审计（步骤 0），再与高覆盖 wf002 对比。
