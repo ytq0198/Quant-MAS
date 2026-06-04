@@ -1,6 +1,6 @@
 # Quant MAS 实验记录
 
-更新时间：2026-06-04（**EXP-M13-003 本地 ✅** · **354 pytest** · M13.2 LangGraph recipe backend）
+更新时间：2026-06-04（**EXP-M13-003 双端 ✅** · **354 pytest** · M13.2 LangGraph recipe backend @ `7f48486`）
 
 本文件用于记录真实实验和重要验证。不要记录未经实际运行的数据结果；尚未真实运行的项目标记为「待验证」。
 
@@ -200,26 +200,32 @@
 
 ## 当前验证记录
 
-### EXP-M13-003：M13.2 LangGraph Recipe Backend（本地）✅
+### EXP-M13-003：M13.2 LangGraph Recipe Backend（双端）✅
 
 - 日期：2026-06-04
 - 阶段：v3 **M13.2** — YAML recipe → 可选 LangGraph DAG dry-run（**非 OOS**）
-- 环境：本地 Windows；git **`1e79c07`**；待服务器 smoke
+- 环境：本地 Windows + 服务器 a6000-9961；git **`7f48486`**
 - 交付：
   - `langgraph_recipe_workflow.py`：`build_langgraph_from_recipe` / `run_langgraph_recipe_workflow`
   - `run_mcp_pipeline.py --backend scheduler|langgraph`（默认 scheduler）
   - `tests/test_langgraph_recipe_workflow.py`（**5/5**）
 - 命令与结果：
-  - `python -m pytest tests/test_langgraph_recipe_workflow.py -v` → **5 passed**
-  - `python -m pytest tests/test_mcp_pipeline_recipes.py tests/test_langgraph_workflow.py -v` → **19 passed**
-  - `python scripts/run_mcp_pipeline.py --backend langgraph --recipe configs/pipelines/text_enhanced.yaml.example --dry-run` → ✅
-  - `python -m pytest -v` → **354 passed**
+
+| 环境 | pytest | backend dry-run |
+|------|--------|-----------------|
+| 本地 | **354 passed** | langgraph：`text_enhanced` ✅ |
+| 服务器 a6000-9961 | **354 passed**（61.37s） | langgraph：`text_enhanced` + `rl_ablation` ✅；scheduler：`ml_baseline` ✅ |
+
+- 服务器 LangGraph backend dry-run（2026-06-04）：
+  - `text_enhanced` → 7 nodes；`audit_text_signals` 在 `walk_forward_eval` 前 ✅
+  - `rl_ablation` → 4 nodes；`rl_train` 为 simulation 族 ✅
+  - `ml_baseline`（scheduler backend）→ 6 nodes ✅
+- audit 产物示例：`outputs/pipelines/text_enhanced_20260604_134639_3cb60e1d/audit.jsonl`
 - **边界验证**：
-  - LangGraph 不可用时自动回落 deterministic scheduler dry-run
-  - `text_enhanced`：`audit_text_signals` 在 `walk_forward_eval` 前（LangGraph 构图顺序保持）
+  - LangGraph 已安装；不可用时自动回落 deterministic scheduler dry-run
   - 仅 dry-run；audit JSONL 仍由 M13 scheduler 写入
   - 不替换 M4 `ResearchWorkflow` / `SupervisorAgent`；不新增 OOS 指标
-- 下一步：服务器 `--backend langgraph` smoke；或 **M13.3** 论文级结果表与审计包导出
+- 下一步：**M13.3** 论文级结果表与审计包导出
 
 ### EXP-M13-002：M13.1 Pipeline Recipe Scheduler（双端）✅
 
@@ -1550,7 +1556,7 @@
 
 | 编号 | 日期 | 内容 | 关键结果 |
 |------|------|------|----------|
-| EXP-M13-003 | 2026-06-04 | M13.2 LangGraph recipe backend（本地） | **354 passed**；+5 langgraph tests；`--backend langgraph` dry-run ✅ |
+| EXP-M13-003 | 2026-06-04 | M13.2 LangGraph recipe backend（双端） | **354 passed**（61.37s 服务器）；langgraph + scheduler dry-run ✅ @ `7f48486` |
 | EXP-M13-002 | 2026-06-04 | M13.1 YAML pipeline recipe（双端） | **349 passed**（54.00s 服务器）；4 yaml.example dry-run ✅ @ `2610612` |
 | EXP-M13-001 | 2026-06-04 | M13.0 MCP Scheduler 双端 | **342 passed**；dry-run audit JSONL @ `605fa66` |
 | EXP-TEXT-WF-003 | 2026-06-04 | 真实 Finnhub 新闻 + walk-forward OOS | coverage **2.42%**；oos.sharpe **0.565** vs baseline **0.586**（Δ **-0.021**） |

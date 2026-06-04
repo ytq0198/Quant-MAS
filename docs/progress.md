@@ -416,7 +416,7 @@ M13 is split into four incremental stages so implementation can stay small and t
 | **M13.2 LangGraph Extended DAG** | done | Optional LangGraph backend for population, RL, and batch walk-forward nodes | [mcp_protocol.md](mcp_protocol.md) |
 | **M13.3 Paper Artifact Export** | Later | Paper-grade result tables, ablation tables, and audit package | [mcp_protocol.md](mcp_protocol.md) |
 
-Current next target: **M13.3** Paper artifact export or server M13.2 smoke (EXP-M13-003 ? @ `2610612`).
+Current next target: **M13.3** Paper artifact export (EXP-M13-003 dual-end done @ 7f48486 ? @ `2610612`).
 
 ### M13.0 completion note（EXP-M13-001 ✅ 双端）
 
@@ -439,21 +439,13 @@ M13.0 remains dry-run only and does not create new OOS research metrics.
 Delivered: pipeline_recipe + 4 yaml.example + test_mcp_pipeline_recipes（7/7）
 
 
-### M13.2 completion note
+### M13.2 completion note（EXP-M13-003 ✅ 双端）
 
-M13.2 LangGraph Recipe Backend has been implemented locally.
+| 环境 | 结果 |
+|------|------|
+| 本地 | **354 passed**；langgraph backend dry-run ✅ |
+| 服务器 a6000-9961 | **354 passed**（61.37s）；langgraph + scheduler dry-run ✅ @ 7f48486 |
 
-Delivered:
-
-- `src/quant_mas/orchestration/langgraph_recipe_workflow.py`
-- `scripts/run_mcp_pipeline.py --backend scheduler|langgraph`
-- `tests/test_langgraph_recipe_workflow.py`
-
-Verification:
-
-- `python -m pytest tests/test_langgraph_recipe_workflow.py -v` �� **5 passed**
-- `python -m pytest tests/test_mcp_pipeline_recipes.py tests/test_langgraph_workflow.py -v` �� **19 passed**
-
-- python -m pytest -v -> **354 passed**
+Delivered: langgraph_recipe_workflow + --backend CLI + test_langgraph_recipe_workflow（5/5）
 
 M13.2 remains dry-run only. It maps YAML recipes to an optional LangGraph DAG when LangGraph is installed, and falls back to the deterministic scheduler backend when unavailable.

@@ -158,7 +158,7 @@ M13 是批处理研究调度，不是对话路由器，也不是外部 MCP 服�
 
 ## 当前下一步
 
-**M13.2 本地已完成**（EXP-M13-003，354 pytest）。下一步：服务器 LangGraph backend smoke，或 **M13.3** 论文级结果表与审计包导出。
+**M13.2 双端已完成**（EXP-M13-003，354 pytest @ `7f48486`）。下一步：**M13.3** 论文级结果表与审计包导出。
 
 ## M13.0 Implementation Note
 
@@ -230,6 +230,8 @@ Behavior:
 - If `langgraph` is unavailable, the backend falls back to the deterministic scheduler dry-run.
 - M4 `ResearchWorkflow` remains unchanged.
 - M13.2 still writes audit JSONL via the M13 scheduler and does not execute real server jobs.
+
+M13.2 implemented @ `7f48486`. **Server verified 2026-06-04**（61.37s，354 passed；langgraph + scheduler dry-run ✅）.
 
 Verification:
 

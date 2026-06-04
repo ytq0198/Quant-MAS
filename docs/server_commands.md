@@ -12,7 +12,7 @@ GitHub ???[https://github.com/ytq0198/Quant-MAS](https://github.com/ytq0198/Quan
 |------|------|------|------|
 | 2026-06-04 | v3 M13.0 ??? pytest + pipeline smoke | **342 passed**?53.99s?+ dry-run ? | EXP-M13-001 @ `605fa66` |
 | 2026-06-04 | v3 M13.1 YAML recipe dry-run smoke | **349 passed**（54.00s）+ 4 yaml.example ✅ | EXP-M13-002 @ 2610612 |
-| 2026-06-04 | v3 M13.2 LangGraph backend smoke | **354 passed** + langgraph dry-run（待跑） | EXP-M13-003 |
+| 2026-06-04 | v3 M13.2 LangGraph backend smoke | **354 passed**（61.37s）+ langgraph/scheduler dry-run ✅ | EXP-M13-003 |
 | 2026-06-04 | v3 M12.1 ??? RL training smoke | GRPO **simulation.sharpe_mean 6.31** ? | EXP-POP-007 @ `e291cf9` |
 | 2026-06-04 | v3 M11.8 ??? pytest | **266 passed**?45.63s?? | EXP-POP-006 |
 | 2026-06-04 | v3 M11.7 ??? candidate OOS | `cand_mean_rev_1` **oos.sharpe 1.036** vs **0.586** ? | EXP-POP-005 @ `ffef849` |
@@ -1261,7 +1261,7 @@ python scripts/run_mcp_pipeline.py --recipe configs/pipelines/rl_ablation.yaml.e
 
 
 
-### M13.2 LangGraph backend smoke（EXP-M13-003，待跑 · 354 pytest）
+### M13.2 LangGraph backend smoke（EXP-M13-003 ✅ · 354 pytest）
 
 `ash
 python -m pytest tests/test_langgraph_recipe_workflow.py -v  # 5 passed
