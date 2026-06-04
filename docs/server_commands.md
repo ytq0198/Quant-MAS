@@ -1220,3 +1220,28 @@ git add .
 git commit -m "your message"
 git push origin main
 ```
+
+## M13.0 MCP Scheduler Minimal（待实现）
+
+M13.0 的服务器 smoke 目标是验证调度与审计，不跑真实 GPU 长任务，不联网，不调用真实 LLM。
+
+本地或服务器合并 M13.0 后可运行：
+
+```bash
+python scripts/run_mcp_pipeline.py --help
+python scripts/run_mcp_pipeline.py --list-recipes
+python scripts/run_mcp_pipeline.py --recipe mock_research --dry-run
+```
+
+预期产物：
+
+```text
+outputs/pipelines/<run_id>/audit.jsonl
+```
+
+边界：
+
+- 仅 dry-run 调度 mock 实验节点。
+- `ToolPolicy` 必须继续拒绝 shell / broker / order / secrets。
+- 不启动外部 MCP server listener。
+- 不写入新的 OOS 研究结论。

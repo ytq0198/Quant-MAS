@@ -1,6 +1,6 @@
 # Plus v3 M13：企业化编排与协议扩展 — Codex 提示词
 
-**状态：📋 待实现（前置 M4/M8/M9–M12.4 ✅ · EXP-TEXT-WF-003 ✅ · pytest **331**）**
+**状态：✅ M13.0 已完成（342 pytest · dry-run scheduler + audit JSONL）· M13.1 recipe YAML 待做**
 
 更新时间：2026-06-04
 

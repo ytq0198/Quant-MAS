@@ -404,3 +404,37 @@ Recommended next steps:
 3. **Optional RL ablation**: longer feature-linear RL training with multi-seed export + M11.8 batch OOS.
 
 EXP-TEXT-WF-003 completed real Finnhub news alignment and walk-forward OOS (`oos.sharpe = 0.565`, 2.42% coverage). See [real_news_text_experiment.md](real_news_text_experiment.md).
+
+## M13 planning update: enterprise orchestration roadmap
+
+M13 is split into four incremental stages so implementation can stay small and testable.
+
+| Stage | Status | Purpose | Document |
+|------|--------|---------|----------|
+| **M13.0 MCP Scheduler Minimal** | Next | Internal dry-run scheduler, Agent messages, audit JSONL, ToolPolicy safety checks | [mcp_protocol.md](mcp_protocol.md) |
+| **M13.1 Pipeline Recipe Scheduler** | Later | YAML recipes for ML/Text/Population/RL research pipelines | [mcp_protocol.md](mcp_protocol.md) |
+| **M13.2 LangGraph Extended DAG** | Later | Optional LangGraph backend for population, RL, and batch walk-forward nodes | [mcp_protocol.md](mcp_protocol.md) |
+| **M13.3 Paper Artifact Export** | Later | Paper-grade result tables, ablation tables, and audit package | [mcp_protocol.md](mcp_protocol.md) |
+
+Current next implementation target: **M13.0** only. It must not replace M4 ResearchWorkflow or SupervisorAgent, must default to dry-run, must not start an external MCP listener, and must keep `ToolPolicy` denying shell/broker/order/secrets.
+
+### M13.0 completion note
+
+M13.0 MCP Scheduler Minimal has been implemented locally.
+
+Delivered:
+
+- `src/quant_mas/orchestration/agent_communication.py`
+- `src/quant_mas/orchestration/audit_log.py`
+- `src/quant_mas/orchestration/mcp_scheduler.py`
+- `scripts/run_mcp_pipeline.py`
+- `tests/test_mcp_scheduler.py`
+
+Verification:
+
+- `python -m pytest tests/test_mcp_scheduler.py -v` ¡ú **11 passed**
+- `python scripts/run_mcp_pipeline.py --help` ¡ú OK
+- `python scripts/run_mcp_pipeline.py --list-recipes` ¡ú `mock_research`, `text_smoke`
+- `python -m pytest -v` ¡ú **342 passed**
+
+M13.0 remains dry-run only and does not create new OOS research metrics.

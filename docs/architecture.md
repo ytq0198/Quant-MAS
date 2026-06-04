@@ -200,3 +200,23 @@ collect_experiment_metrics → BaselineRegistry / comparison table
 | **M12.2** RL export bridge | policy_state → StrategyCandidate | ✅ EXP-035 本地（294） |
 
 详见 [项目plus设计.md](../项目plus设计.md)、[competitive_learning.md](competitive_learning.md)。**Plus v2 系统结构定稿**见 [`项目进度.md`](../项目进度.md) §Plus v2 收官。
+
+## M13 Orchestration Roadmap
+
+M13 extends the existing orchestration and protocol layers with an internal research scheduler. It does not replace M4 `ResearchWorkflow`, `SupervisorAgent`, or the Quant Engine.
+
+The first implementation target is **M13.0 MCP Scheduler Minimal**:
+
+- `agent_communication.py`: internal `AgentMessage` / `PlanMessage` / `NodeResultMessage` / `AuditMessage` and in-memory bus.
+- `mcp_scheduler.py`: dry-run scheduler for mock research nodes.
+- `audit_log.py`: append-only JSONL audit trail.
+- `run_mcp_pipeline.py`: CLI entry point, dry-run by default.
+- `tests/test_mcp_scheduler.py`: mock-only tests.
+
+Later stages:
+
+- **M13.1**: YAML recipe scheduler for ML/Text/Population/RL pipelines.
+- **M13.2**: optional LangGraph extended DAG.
+- **M13.3**: paper-grade experiment tables and audit package.
+
+Safety boundary: M13 does not start an external MCP server, does not call real LLM APIs by default, does not touch broker/order tools, and keeps `ToolPolicy` denying shell/broker/order/secrets.
