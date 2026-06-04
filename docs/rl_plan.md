@@ -58,6 +58,43 @@ python scripts/run_rl_baseline.py --config configs/rl.yaml --policy random --dry
 | EXP-20260602-022 | 服务器 pytest 180 + `run_rl_baseline.py --dry-run` | ✅ |
 | EXP-RL-003 | 可选：真实 features 上 MLCopy vs buy_hold（仍 simulation） |
 
+## M12 延伸设计
+
+M12.1 已在本地实现最小训练闭环。M12 不重写 M7 环境，而是在 M7 的 `TradingEnv`、baseline policies 和
+`rank_candidates_by_group_relative_reward` 上增加最小训练闭环。
+
+```text
+M7 TradingEnv + GRPO ranking
+    -> M12 GRPOPolicyAgent
+    -> short RLTrainingLoop
+    -> training.* / simulation.* metrics
+    -> optional StrategyCandidate export stub
+    -> M11.7 / M11.8 OOS validation after the training stage
+```
+
+M12.1 第一版边界：
+
+- simulation only，不接 broker。
+- pytest 只跑 synthetic data 和短训练。
+- PPO / MARL 先做 stub，不引入重依赖。
+- 训练 loop 禁止写 `oos.*`；若要 OOS，必须走 M11.7/M11.8。
+- 论文主 baseline 仍是 `EXP-20260602-008` 的 `oos.sharpe = 0.586`。
+
+M12.1 本地交付：
+
+| 组件 | 路径 |
+|------|------|
+| GRPO policy | `src/quant_mas/rl/grpo_agent.py` |
+| Training loop | `src/quant_mas/rl/training_loop.py` |
+| PPO stub | `src/quant_mas/rl/ppo_trainer.py` |
+| MARL stub | `src/quant_mas/rl/marl_stub.py` |
+| CLI | `scripts/run_rl_experiment.py` |
+| 配置 | `configs/rl_training.yaml` |
+| 测试 | `tests/test_rl_training.py` |
+
+设计文档：[rl_experiment.md](rl_experiment.md)  
+实现提示词：[codex_prompt_M12.md](codex_prompt_M12.md)
+
 ## 相关文档
 
 - [experiment_log.md](experiment_log.md)

@@ -931,6 +931,39 @@ python scripts/batch_validate_candidates.py \
 
 详见 [`docs/candidate_oos_batch.md`](candidate_oos_batch.md)。
 
+## 六点十九、v3 M12.1 RL Training Loop（EXP-034 / EXP-POP-007）⏳
+
+```bash
+cd /mnt/localDisk3/weizian/Quant-MAS
+conda activate /mnt/localDisk3/weizian/conda_envs/quant-mas
+git pull origin main   # 目标：含 M12.1，282 pytest 本地
+
+python -m pytest -v    # 预期 282 passed
+
+python scripts/run_rl_experiment.py --help
+
+python scripts/run_rl_experiment.py \
+  --config configs/rl_training.yaml \
+  --algorithm grpo \
+  --max-steps 10 \
+  --dry-run
+
+python scripts/run_rl_experiment.py \
+  --config configs/rl_training.yaml \
+  --algorithm grpo \
+  --max-steps 50 \
+  --no-dry-run
+```
+
+**说明**：
+
+- **simulation only**；metrics 为 `training.*` / `simulation.*`，**禁止**写成 OOS
+- 对照 baseline 仅在文档/summary 引用 **EXP-20260602-008** `oos.sharpe = 0.586`
+- 记录：**EXP-20260602-034** 本地 ✅；**EXP-POP-007** / **EXP-RL-003** 服务器 smoke 待跑
+- OOS 评估须事后：M11.6 export → M11.7/M11.8 validate
+
+详见 [`docs/rl_experiment.md`](rl_experiment.md)。
+
 ## 七、删除旧部署（如曾在 ~/quant-mas 建过）
 
 ```bash

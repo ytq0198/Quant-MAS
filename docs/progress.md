@@ -1,10 +1,10 @@
 # Quant MAS 开发进度
 
-更新时间：2026-06-04（**v3 M11.8 ✅** 双端 **266** · EXP-POP-006 批量 OOS）
+更新时间：2026-06-04（**v3 M12.1 ✅** 本地实现 · **282** pytest · 服务器 smoke 待跑）
 
-**Plus v2**：M1–M8 ✅ · **v3 M9–M11.8** ✅ 双端闭环
+**Plus v2**：M1–M8 ✅ · **v3 M9–M11.8** ✅ 双端闭环 · **M12.1** ✅ 本地 RL training loop
 
-**pytest 基线**：**266 passed** 双端 · **论文主指标**：Walk-forward ML OOS sharpe **0.586**（EXP-008）· **候选 OOS（单）**：`cand_mean_rev_1` **1.036**（EXP-POP-005）· **批量 best**：**1.039**（EXP-POP-006，`cand_mean_rev_1_g1_1_g2_2`，规则型 mean-reversion，**非** ML 主 baseline 替代）
+**pytest 基线**：**282 passed** 本地 · **论文主指标**：Walk-forward ML OOS sharpe **0.586**（EXP-008）· **候选 OOS（单）**：`cand_mean_rev_1` **1.036**（EXP-POP-005）· **批量 best**：**1.039**（EXP-POP-006，`cand_mean_rev_1_g1_1_g2_2`，规则型 mean-reversion，**非** ML 主 baseline 替代）
 
 ## Plus v2 八条主线（M1–M8）
 
@@ -36,7 +36,7 @@
 | **M11.6** | 候选验证桥 | ✅ | 248 双端（EXP-031/POP-004） | [strategy_candidate_bridge.md](strategy_candidate_bridge.md) |
 | **M11.7** | 候选 Walk-forward OOS | ✅ | 259 双端 + EXP-POP-005 真实 OOS | [strategy_candidate_oos.md](strategy_candidate_oos.md) |
 | **M11.8** | 批量候选 OOS 比较 | ✅ | 266 双端 + EXP-POP-006（4/4 > 0.586） | [candidate_oos_batch.md](candidate_oos_batch.md) |
-| **M12** | RL 训练实验 | 📋 | GRPO/PPO training loop | [codex_prompt_M12.md](codex_prompt_M12.md) · [rl_plan.md](rl_plan.md) |
+| **M12.1** | RL 训练实验 | ✅ 本地 | GRPOPolicyAgent、RLTrainingLoop、PPO/MARL stub；282 passed | [rl_experiment.md](rl_experiment.md) · [rl_plan.md](rl_plan.md) |
 | **M13** | 企业化编排 | 📋 | DAG scheduler | [protocols.md](protocols.md) |
 
 ## 阶段总览（v1 Prompt + Plus v2）
@@ -362,5 +362,6 @@ python scripts/export_agent_cards.py --help
 - **M9 服务器 DB smoke**：✅ EXP-026（2026-06-03）
 - ~~**EXP-LLM-002**~~ ✅（2026-06-03，local_vllm + ResearchAgent）
 - ~~**M11.8 服务器批量 OOS**~~ ✅ EXP-POP-006（266 pytest；best **1.039**）
-- **M12** RL 训练 loop — [codex_prompt_M12.md](codex_prompt_M12.md)
+- ~~**M12.1 本地 RL training loop**~~ ✅ EXP-034（**282 pytest**）
+- **M12.1 服务器 RL smoke** — EXP-POP-007 / EXP-RL-003
 - **EXP-TEXT-WF-002**
