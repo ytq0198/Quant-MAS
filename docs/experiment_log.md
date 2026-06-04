@@ -1,6 +1,6 @@
 # Quant MAS 实验记录
 
-更新时间：2026-06-04（**EXP-TEXT-WF-003 ✅** · **331 pytest** · 文本三线消融闭环）
+更新时间：2026-06-04（**EXP-M13-001 ✅** · **342 pytest 双端** · M13.0 闭环）
 
 本文件用于记录真实实验和重要验证。不要记录未经实际运行的数据结果；尚未真实运行的项目标记为「待验证」。
 
@@ -199,6 +199,31 @@
 ```
 
 ## 当前验证记录
+
+### EXP-M13-001：M13.0 MCP Scheduler Minimal（双端）✅
+
+- 日期：2026-06-04
+- 阶段：v3 **M13.0** — 内部 dry-run 调度 + audit JSONL（**非 OOS**）
+- 环境：本地 Windows + 服务器 a6000-9961；git **`605fa66`**
+- 交付：
+  - `agent_communication.py` / `audit_log.py` / `mcp_scheduler.py`
+  - `scripts/run_mcp_pipeline.py`
+  - `tests/test_mcp_scheduler.py`（**11/11**）
+  - `docs/mcp_protocol.md`
+- 命令与结果：
+  - `python -m pytest -v` → **342 passed**（服务器 **53.99s**）
+  - `python -m pytest tests/test_mcp_scheduler.py -v` → **11 passed**
+  - `python scripts/run_mcp_pipeline.py --list-recipes` → `mock_research`, `text_smoke`
+  - `python scripts/run_mcp_pipeline.py --recipe mock_research --dry-run` → audit JSONL ✅
+  - `python scripts/run_mcp_pipeline.py --recipe text_smoke --dry-run` → 3 nodes；`audit` 在 `walk_forward` 前 ✅
+- 产物示例：
+  - `outputs/pipelines/mock_research_20260604_130030_e23f042b/audit.jsonl`
+  - `outputs/pipelines/text_smoke_20260604_130042_de74503c/audit.jsonl`
+- **科研边界**：
+  - M13.0 **只**做调度与审计；**不写** `oos.*`
+  - **不替代** M4 ResearchWorkflow / SupervisorAgent / Quant Engine
+  - 复用 M8 `ToolPolicy`（deny shell/broker/order）
+- 下一步：**M13.1** YAML recipe（ML / Text / Population / RL 四条服务器手工流程）
 
 ### EXP-TEXT-WF-003：真实 Finnhub 新闻 + Walk-forward OOS（服务器）✅
 
@@ -1475,6 +1500,7 @@
 
 | 编号 | 日期 | 内容 | 关键结果 |
 |------|------|------|----------|
+| EXP-M13-001 | 2026-06-04 | M13.0 MCP Scheduler Minimal 双端 | **342 passed**；dry-run pipeline + audit JSONL @ `605fa66` |
 | EXP-TEXT-WF-003 | 2026-06-04 | 真实 Finnhub 新闻 + walk-forward OOS | coverage **2.42%**；oos.sharpe **0.565** vs baseline **0.586**（Δ **-0.021**） |
 | EXP-TEXT-WF-003-PREP | 2026-06-04 | 真实新闻 JSONL 对齐工具 | **326 passed**；`align_real_news.py`（**非 OOS**） |
 | EXP-TEXT-WF-002 | 2026-06-04 | 高覆盖 text + walk-forward OOS | coverage **100%**；oos.sharpe **0.579** vs baseline **0.586**（Δ **-0.007**） |

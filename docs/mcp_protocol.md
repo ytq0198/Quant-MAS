@@ -158,25 +158,20 @@ M13 是批处理研究调度，不是对话路由器，也不是外部 MCP 服�
 
 ## 当前下一步
 
-先实现 **M13.0：MCP Scheduler Minimal**。完成后再进入 M13.1 的 YAML recipe 化。
+**M13.0 已完成**（EXP-M13-001，342 pytest 双端）。下一步：**M13.1** YAML recipe 化。
 
 ## M13.0 Implementation Note
 
-M13.0 has been implemented locally with the following files:
+M13.0 implemented @ `605fa66`. **Server verified 2026-06-04**（53.99s，342 passed）.
 
-- `src/quant_mas/orchestration/agent_communication.py`
-- `src/quant_mas/orchestration/audit_log.py`
-- `src/quant_mas/orchestration/mcp_scheduler.py`
-- `scripts/run_mcp_pipeline.py`
-- `tests/test_mcp_scheduler.py`
-
-Local verification:
+Local + server verification:
 
 ```bash
 python -m pytest tests/test_mcp_scheduler.py -v  # 11 passed
-python scripts/run_mcp_pipeline.py --help        # OK
 python scripts/run_mcp_pipeline.py --list-recipes
 python scripts/run_mcp_pipeline.py --recipe mock_research --dry-run
+python scripts/run_mcp_pipeline.py --recipe text_smoke --dry-run
+python -m pytest -v  # 342 passed
 ```
 
 This implementation remains mock-first and dry-run only. It does not create new OOS metrics or replace existing research workflows.

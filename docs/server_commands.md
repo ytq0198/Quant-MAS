@@ -1,51 +1,52 @@
-# Quant MAS 服务器操作指令
+# Quant MAS ???????
 
-GitHub 仓库：[https://github.com/ytq0198/Quant-MAS](https://github.com/ytq0198/Quant-MAS)
+GitHub ???[https://github.com/ytq0198/Quant-MAS](https://github.com/ytq0198/Quant-MAS)
 
-**推荐服务器路径**：`/mnt/localDisk3/weizian/Quant-MAS`
+**???????**?`/mnt/localDisk3/weizian/Quant-MAS`
 
-> **重要**：必须先 `conda activate quant-mas`，再用 `python -m pytest` 和 `python -m pip`，不要裸敲 `pytest` / `pip`。
+> **??**???? `conda activate quant-mas`??? `python -m pytest` ? `python -m pip`????? `pytest` / `pip`?
 
-## 验证记录
+## ????
 
-| 日期 | 项目 | 结果 | 备注 |
+| ?? | ?? | ?? | ?? |
 |------|------|------|------|
-| 2026-06-04 | v3 M12.1 服务器 RL training smoke | GRPO **simulation.sharpe_mean 6.31** ✅ | EXP-POP-007 @ `e291cf9` |
-| 2026-06-04 | v3 M11.8 服务器 pytest | **266 passed**（45.63s）✅ | EXP-POP-006 |
-| 2026-06-04 | v3 M11.7 服务器 candidate OOS | `cand_mean_rev_1` **oos.sharpe 1.036** vs **0.586** ✅ | EXP-POP-005 @ `ffef849` |
-| 2026-06-03 | v3 M11.7 服务器 pytest | **259 passed**（48.32s）✅ | EXP-POP-005 @ `f804a95` |
-| 2026-06-03 | v3 M11.7 候选 OOS hook（本地 mock） | **259 passed**；OOS **11/11** ✅ | EXP-20260602-032 |
-| 2026-06-03 | v3 M11.6 服务器 pytest + candidate export | **248 passed**（55.15s）+ dry-run ✅ | EXP-POP-004 @ `7ab510f` |
-| 2026-06-03 | v3 M11.6 候选验证桥（本地） | **248 passed**；bridge **11/11** ✅ | EXP-20260602-031 |
-| 2026-06-03 | v3 M11.5 服务器 pytest + population training | **237 passed**（41.83s）+ 3-gen dry-run ✅ | EXP-POP-003 @ `aa841d4` |
-| 2026-06-03 | v3 M11 服务器 pytest + competitive mock | **225 passed**（17.32s）+ dry-run ✅ | EXP-POP-002 @ `64a5b2a` |
-| 2026-06-03 | v3 M10 local_vLLM smoke | ResearchAgent `local_vllm` ✅ | EXP-LLM-002 |
-| 2026-06-01 | v3 M9/M10 服务器 pytest | **212 passed**（11.39s） | EXP-20260602-028 |
-| 2026-06-01 | v3 M9 企业 DB（本地） | **207 passed**（+12）；enterprise **12/12** | EXP-20260602-025 |
-| 2026-06-01 | Plus M8 MCP/A2A 服务器 | **195 passed**（12.41s）；export_agent_cards ✅ | EXP-20260602-024 |
-| 2026-06-01 | Plus M7 服务器 | **180 passed**（10.15s）；RL dry-run ✅ | EXP-20260602-022 |
-| 2026-06-01 | Plus M8 MCP/A2A（本地） | **195 passed**（+15） | EXP-20260602-023 |
-| 2026-06-01 | Plus M7 RL 模拟（本地） | **180 passed**（+19） | EXP-20260602-021 |
+| 2026-06-04 | v3 M13.0 ??? pytest + pipeline smoke | **342 passed**?53.99s?+ dry-run ? | EXP-M13-001 @ `605fa66` |
+| 2026-06-04 | v3 M12.1 ??? RL training smoke | GRPO **simulation.sharpe_mean 6.31** ? | EXP-POP-007 @ `e291cf9` |
+| 2026-06-04 | v3 M11.8 ??? pytest | **266 passed**?45.63s?? | EXP-POP-006 |
+| 2026-06-04 | v3 M11.7 ??? candidate OOS | `cand_mean_rev_1` **oos.sharpe 1.036** vs **0.586** ? | EXP-POP-005 @ `ffef849` |
+| 2026-06-03 | v3 M11.7 ??? pytest | **259 passed**?48.32s?? | EXP-POP-005 @ `f804a95` |
+| 2026-06-03 | v3 M11.7 ?? OOS hook??? mock? | **259 passed**?OOS **11/11** ? | EXP-20260602-032 |
+| 2026-06-03 | v3 M11.6 ??? pytest + candidate export | **248 passed**?55.15s?+ dry-run ? | EXP-POP-004 @ `7ab510f` |
+| 2026-06-03 | v3 M11.6 ????????? | **248 passed**?bridge **11/11** ? | EXP-20260602-031 |
+| 2026-06-03 | v3 M11.5 ??? pytest + population training | **237 passed**?41.83s?+ 3-gen dry-run ? | EXP-POP-003 @ `aa841d4` |
+| 2026-06-03 | v3 M11 ??? pytest + competitive mock | **225 passed**?17.32s?+ dry-run ? | EXP-POP-002 @ `64a5b2a` |
+| 2026-06-03 | v3 M10 local_vLLM smoke | ResearchAgent `local_vllm` ? | EXP-LLM-002 |
+| 2026-06-01 | v3 M9/M10 ??? pytest | **212 passed**?11.39s? | EXP-20260602-028 |
+| 2026-06-01 | v3 M9 ?? DB???? | **207 passed**?+12??enterprise **12/12** | EXP-20260602-025 |
+| 2026-06-01 | Plus M8 MCP/A2A ??? | **195 passed**?12.41s??export_agent_cards ? | EXP-20260602-024 |
+| 2026-06-01 | Plus M7 ??? | **180 passed**?10.15s??RL dry-run ? | EXP-20260602-022 |
+| 2026-06-01 | Plus M8 MCP/A2A???? | **195 passed**?+15? | EXP-20260602-023 |
+| 2026-06-01 | Plus M7 RL ?????? | **180 passed**?+19? | EXP-20260602-021 |
 | 2026-06-03 | EXP-TEXT-WF-001 text + walk-forward | oos.sharpe **0.563** vs **0.586** | EXP-TEXT-001 |
-| 2026-06-03 | Plus M6 文本信号（服务器） | **161 passed**（22.14s） | EXP-20260602-020 |
-| 2026-06-03 | Plus M6 文本信号（本地） | **161 passed** | EXP-20260602-019 |
-| 2026-06-03 | Plus M5 上下文/LLM（服务器） | **150 passed**（7.24s） | EXP-20260602-018 |
-| 2026-06-03 | Plus M5 上下文/LLM（本地） | **150+1 warning** | EXP-20260602-017 |
-| 2026-06-03 | Plus M4 LangGraph 服务器 | langgraph dry-run ✅ | EXP-20260602-016 |
-| 2026-06-02 | Plus M3 Memory/RAG v2（本地+服务器） | **126 passed** | EXP-20260602-013/014 |
-| 2026-06-02 | Plus M2 数据扩展（本地+服务器） | **115 passed** / test_data_sources **13/13** | EXP-20260602-011/012 |
+| 2026-06-03 | Plus M6 ????????? | **161 passed**?22.14s? | EXP-20260602-020 |
+| 2026-06-03 | Plus M6 ???????? | **161 passed** | EXP-20260602-019 |
+| 2026-06-03 | Plus M5 ???/LLM????? | **150 passed**?7.24s? | EXP-20260602-018 |
+| 2026-06-03 | Plus M5 ???/LLM???? | **150+1 warning** | EXP-20260602-017 |
+| 2026-06-03 | Plus M4 LangGraph ??? | langgraph dry-run ? | EXP-20260602-016 |
+| 2026-06-02 | Plus M3 Memory/RAG v2???+???? | **126 passed** | EXP-20260602-013/014 |
+| 2026-06-02 | Plus M2 ???????+???? | **115 passed** / test_data_sources **13/13** | EXP-20260602-011/012 |
 | 2026-06-02 | Plus M1 research baseline (local) | **102 passed** | EXP-20260602-009 |
-| 2026-06-01 | pytest（Prompt 20 后，服务器） | **98 passed**（1.93s） | EXP-20260601-014 |
-| 2026-06-01 | pytest（Prompt 20 后，本地） | **98 passed** | EXP-20260601-013 |
-| 2026-06-02 | Walk-forward 服务器 | `server_walk_forward_001`；OOS sharpe **0.586** | Prompt 17 ✅ |
-| 2026-06-02 | pytest | **71 passed**（Prompt 17 后） |
-| 2026-06-02 | Walk-forward 本地 | **71 passed**；Prompt 17 代码 ✅ | 无 |
-| 2026-06-02 | GPU 训练 | `server_lgbm_gpu_001`；device=cuda；test AUC 0.479 | 见 M-010 |
-| 2026-06-02 | ML 回测 | `server_ml_backtest_001`；sharpe **2.78** | Prompt 16 ✅ |
-| 2026-06-02 | pytest（旧） | **44 passed**（Python 3.11.15，1.19s） |
-| 2026-06-01 | LightGBM 训练 | `server_lgbm_001`；test AUC 0.466 | 过拟合基线 |
-| 2026-06-01 | Prompt 16 + GPU 本地 | **68 passed**；`--device` 可用 | 无 |
-| 2026-06-01 | 真实数据 + pipeline | Stooq 6033 rows；`server_ma_cross_real_001` | — |
+| 2026-06-01 | pytest?Prompt 20 ?????? | **98 passed**?1.93s? | EXP-20260601-014 |
+| 2026-06-01 | pytest?Prompt 20 ????? | **98 passed** | EXP-20260601-013 |
+| 2026-06-02 | Walk-forward ??? | `server_walk_forward_001`?OOS sharpe **0.586** | Prompt 17 ? |
+| 2026-06-02 | pytest | **71 passed**?Prompt 17 ?? |
+| 2026-06-02 | Walk-forward ?? | **71 passed**?Prompt 17 ?? ? | ? |
+| 2026-06-02 | GPU ?? | `server_lgbm_gpu_001`?device=cuda?test AUC 0.479 | ? M-010 |
+| 2026-06-02 | ML ?? | `server_ml_backtest_001`?sharpe **2.78** | Prompt 16 ? |
+| 2026-06-02 | pytest??? | **44 passed**?Python 3.11.15?1.19s? |
+| 2026-06-01 | LightGBM ?? | `server_lgbm_001`?test AUC 0.466 | ????? |
+| 2026-06-01 | Prompt 16 + GPU ?? | **68 passed**?`--device` ?? | ? |
+| 2026-06-01 | ???? + pipeline | Stooq 6033 rows?`server_ma_cross_real_001` | ? |
 
 ### pytest
 
@@ -55,60 +56,60 @@ cd /mnt/localDisk3/weizian/Quant-MAS
 python -m pytest -v
 ```
 
-## 一、首次部署
+## ??????
 
 ```bash
-# 1. 创建目录并克隆
+# 1. ???????
 mkdir -p /mnt/localDisk3/weizian/conda_envs
 cd /mnt/localDisk3/weizian
 git clone https://github.com/ytq0198/Quant-MAS.git
 cd Quant-MAS
 
-# 2. 创建数据目录
+# 2. ??????
 mkdir -p /mnt/localDisk3/weizian/datasets/{raw,processed,features}
 mkdir -p /mnt/localDisk3/weizian/{models,reports,logs}
 
-# 3. 配置服务器路径
+# 3. ???????
 cp configs/storage.server.yaml.example configs/storage.server.yaml
 
-# 4. 创建 Python 3.11 环境（必须用 3.11，不能用 3.9）
-# 若已有错误版本的 env，先删除：
+# 4. ?? Python 3.11 ?????? 3.11???? 3.9?
+# ???????? env?????
 # rm -rf /mnt/localDisk3/weizian/conda_envs/quant-mas
 
 CONDA_ENV_PREFIX=/mnt/localDisk3/weizian/conda_envs/quant-mas bash server/setup_server.sh
 
-# 5. 激活并验证
+# 5. ?????
 conda activate /mnt/localDisk3/weizian/conda_envs/quant-mas
-python --version              # 必须 3.11.x
-python -m pip --version       # 必须也是 3.11，不能是 3.9
+python --version              # ?? 3.11.x
+python -m pip --version       # ???? 3.11???? 3.9
 
-# 6. 若 setup 失败，手动安装（不要用 bare pip）
+# 6. ? setup ??????????? bare pip?
 python -m pip install --upgrade pip setuptools wheel
 python -m pip install -r requirements.txt
 python -m pip install -e .
-python -m pip install -r requirements-data.txt   # 下载行情数据需要
-python -m pip install -r requirements-ml.txt     # ML 训练需要
+python -m pip install -r requirements-data.txt   # ????????
+python -m pip install -r requirements-ml.txt     # ML ????
 python -m pytest -v
 ```
 
-> **常见错误 A**：`Python 3.9.13 not in '>=3.11'` → 环境是 3.9，需 `rm -rf .../conda_envs/quant-mas` 后重建。
+> **???? A**?`Python 3.9.13 not in '>=3.11'` ? ??? 3.9?? `rm -rf .../conda_envs/quant-mas` ????
 >
-> **常见错误 B**：`python` 是 3.11 但 `pip` 来自 `~/.local` 的 3.9 → **永远用 `python -m pip`**，不要直接敲 `pip`：
+> **???? B**?`python` ? 3.11 ? `pip` ?? `~/.local` ? 3.9 ? **??? `python -m pip`**?????? `pip`?
 >
 > ```bash
 > conda activate /mnt/localDisk3/weizian/conda_envs/quant-mas
 > python -m pip install -e ".[data,ml]"
 > ```
 
-自检：
+???
 
 ```bash
-which python      # 应指向 /mnt/localDisk3/weizian/conda_envs/quant-mas/bin/python
-python --version  # 必须为 3.11.x（不能是 3.9）
-which pytest      # 应在同一 conda env 内
+which python      # ??? /mnt/localDisk3/weizian/conda_envs/quant-mas/bin/python
+python --version  # ??? 3.11.x???? 3.9?
+which pytest      # ???? conda env ?
 ```
 
-## 二、日常同步代码
+## ????????
 
 ```bash
 cd /mnt/localDisk3/weizian/Quant-MAS
@@ -121,23 +122,23 @@ python -m pip install -r requirements-ml.txt
 python -m pytest -v
 ```
 
-## 三、下载真实行情数据
+## ??????????
 
-**yfinance 限流**：出现 `YFRateLimitError` 时不是配置错误。推荐改用 **Stooq + API Key**。
+**yfinance ??**??? `YFRateLimitError` ???????????? **Stooq + API Key**?
 
-### 0. 申请 Stooq API Key（一次性）
+### 0. ?? Stooq API Key?????
 
-1. 浏览器打开：https://stooq.com/q/d/?s=aapl.us&get_apikey  
-2. 完成 captcha，复制 32 位 apikey  
-3. 在服务器项目根目录：
+1. ??????https://stooq.com/q/d/?s=aapl.us&get_apikey  
+2. ?? captcha??? 32 ? apikey  
+3. ??????????
 
 ```bash
 cd /mnt/localDisk3/weizian/Quant-MAS
 cp .env.example .env
-nano .env   # 设置 STOOQ_API_KEY=你的key（勿 commit）
+nano .env   # ?? STOOQ_API_KEY=??key?? commit?
 ```
 
-验证：
+???
 
 ```bash
 python scripts/download_data.py \
@@ -148,7 +149,7 @@ python scripts/download_data.py \
   --filename AAPL_2018.parquet
 ```
 
-### 方式 A：一键 resilient 脚本（推荐）
+### ?? A??? resilient ??????
 
 ```bash
 cd /mnt/localDisk3/weizian/Quant-MAS
@@ -156,23 +157,23 @@ conda activate /mnt/localDisk3/weizian/conda_envs/quant-mas
 git pull origin main
 python -m pip install -e .
 
-# 需已在 .env 中设置 STOOQ_API_KEY
+# ??? .env ??? STOOQ_API_KEY
 SOURCE=stooq SYMBOLS="AAPL" bash server/download_data_resilient.sh
 SOURCE=stooq SYMBOLS="AAPL MSFT SPY" bash server/download_data_resilient.sh
 
-# Yahoo 限流后若坚持用 yfinance，需等 30–60 分钟：
+# Yahoo ??????? yfinance??? 30?60 ???
 # INITIAL_COOLDOWN_SECONDS=1800 SOURCE=yfinance SYMBOLS="AAPL" bash server/download_data_resilient.sh
 ```
 
-脚本会：
-1. 自动 `source .env` 读取 `STOOQ_API_KEY`
-2. 每个标的 **按年** 单独下载（`AAPL_2018.parquet` …）
-3. 已存在文件 **自动跳过**（中断可续传）
-4. 最后合并为 `datasets/raw/market_data.parquet`
+????
+1. ?? `source .env` ?? `STOOQ_API_KEY`
+2. ???? **??** ?????`AAPL_2018.parquet` ??
+3. ????? **????**???????
+4. ????? `datasets/raw/market_data.parquet`
 
-### 方式 B：手动单条下载
+### ?? B???????
 
-`download_data.py` 启动时会自动加载项目根 `.env`（`STOOQ_API_KEY`）。
+`download_data.py` ??????????? `.env`?`STOOQ_API_KEY`??
 
 ```bash
 python scripts/download_data.py \
@@ -185,7 +186,7 @@ python scripts/download_data.py \
 sleep 30
 ```
 
-合并：
+???
 
 ```bash
 python scripts/merge_parquet.py \
@@ -195,13 +196,13 @@ python scripts/merge_parquet.py \
   --output /mnt/localDisk3/weizian/datasets/raw/market_data.parquet
 ```
 
-### 方式 C：手动 CSV（限流严重时）
+### ?? C??? CSV???????
 
-把 CSV 放到 `/mnt/localDisk3/weizian/datasets/raw/manual/`，再自行转为 parquet（Phase 3 可接）。
+? CSV ?? `/mnt/localDisk3/weizian/datasets/raw/manual/`?????? parquet?Phase 3 ????
 
-## 四、端到端 Pipeline
+## ????? Pipeline
 
-真实数据已下载时（`market_data.parquet` 已存在）：
+?????????`market_data.parquet` ?????
 
 ```bash
 cd /mnt/localDisk3/weizian/Quant-MAS
@@ -216,13 +217,13 @@ python scripts/run_pipeline.py \
   --experiment-name server_ma_cross_real_001
 ```
 
-**已验证（2026-06-01）**：6033 feature rows；sharpe ≈ 1.00；产物 `/mnt/localDisk3/weizian/reports/server_ma_cross_real_001/`。
+**????2026-06-01?**?6033 feature rows?sharpe ? 1.00??? `/mnt/localDisk3/weizian/reports/server_ma_cross_real_001/`?
 
-Synthetic / 小数据 smoke test：`bash server/run_small_pipeline.sh`
+Synthetic / ??? smoke test?`bash server/run_small_pipeline.sh`
 
-## 五、ML 训练（Prompt 15 + GPU）
+## ??ML ???Prompt 15 + GPU?
 
-### CPU 训练（默认 / 对照）
+### CPU ????? / ???
 
 ```bash
 conda activate /mnt/localDisk3/weizian/conda_envs/quant-mas
@@ -235,17 +236,17 @@ python scripts/train_model.py \
   --experiment-name server_lgbm_001
 ```
 
-### GPU / CUDA 训练（A6000）
+### GPU / CUDA ???A6000?
 
-**首次 GPU 训练前**必须确认 LightGBM 为 CUDA 编译版。PyPI 默认 wheel 常为 **CPU-only**；仅 `nvidia-smi` 可见 **不能** 保证 `--device cuda` 可用。若未编译 CUDA 版，`fit()` 会直接报错且 **不会** 自动 fallback：
+**?? GPU ???**???? LightGBM ? CUDA ????PyPI ?? wheel ?? **CPU-only**?? `nvidia-smi` ?? **??** ?? `--device cuda` ??????? CUDA ??`fit()` ?????? **??** ?? fallback?
 
 ```text
 [LightGBM] [Fatal] CUDA Tree Learner was not enabled in this build.
 ```
 
-详见 [`mistakes.md` M-010](../mistakes.md#m-010-lightgbm-pypi-wheel-为-cpu-only)。
+?? [`mistakes.md` M-010](../mistakes.md#m-010-lightgbm-pypi-wheel-?-cpu-only)?
 
-#### 0. 安装 CUDA 版 LightGBM（服务器首次必做，约 5 分钟）
+#### 0. ?? CUDA ? LightGBM?????????? 5 ???
 
 ```bash
 conda activate /mnt/localDisk3/weizian/conda_envs/quant-mas
@@ -255,13 +256,13 @@ python -m pip uninstall -y lightgbm
 python -m pip install --no-binary lightgbm \
   --config-settings=cmake.define.USE_CUDA=ON 'lightgbm==4.6.0'
 
-# 冒烟：应不报错
+# ???????
 python -c "from lightgbm import LGBMClassifier; LGBMClassifier(device='cuda').fit([[0],[1]], [0,1])"
 ```
 
-环境：4× NVIDIA RTX A6000，驱动 580，CUDA 13.0（2026-06-02 已验证）。
+???4� NVIDIA RTX A6000??? 580?CUDA 13.0?2026-06-02 ?????
 
-#### 1. 训练
+#### 1. ??
 
 ```bash
 nvidia-smi
@@ -272,12 +273,12 @@ python scripts/train_model.py \
   --device cuda \
   --experiment-name server_lgbm_gpu_001
 
-# 确认 device 字段（应为 cuda 且 fallback=false）
+# ?? device ????? cuda ? fallback=false?
 grep device /mnt/localDisk3/weizian/models/lightgbm_direction_latest/metadata.json
 grep device /mnt/localDisk3/weizian/models/lightgbm_direction_latest/metrics.json
 ```
 
-#### CPU 对照（可选，与 EXP-20260601-006 对比）
+#### CPU ??????? EXP-20260601-006 ???
 
 ```bash
 python scripts/train_model.py \
@@ -287,13 +288,13 @@ python scripts/train_model.py \
   --experiment-name server_lgbm_cpu_001
 ```
 
-~6k 行数据上 GPU 加速可能不明显；对照重点为 metrics 是否一致、metadata 中 `device_resolved` 是否正确。
+~6k ???? GPU ????????????? metrics ?????metadata ? `device_resolved` ?????
 
-无 GPU 或 CUDA 不可用时，Quant MAS 在 **设备检测阶段** 可 fallback 到 CPU；但若 `device=cuda` 且 LightGBM 本身无 CUDA 支持，会在 `fit()` 时 **Fatal**（见 M-010）。
+? GPU ? CUDA ?????Quant MAS ? **??????** ? fallback ? CPU??? `device=cuda` ? LightGBM ??? CUDA ????? `fit()` ? **Fatal**?? M-010??
 
-## 六、ML 回测 / Walk-forward
+## ??ML ?? / Walk-forward
 
-**ML 回测（Prompt 16 ✅，服务器已验证 EXP-20260602-005）**：
+**ML ???Prompt 16 ???????? EXP-20260602-005?**?
 
 ```bash
 git pull origin main
@@ -308,16 +309,16 @@ python scripts/run_ml_backtest.py \
   --experiment-name server_ml_backtest_001
 ```
 
-产物示例（2026-06-02）：sharpe **2.78**，max_drawdown **-0.246**，2011 bars；报告 `outputs/reports/ml_backtest_latest/summary.md`。
+?????2026-06-02??sharpe **2.78**?max_drawdown **-0.246**?2011 bars??? `outputs/reports/ml_backtest_latest/summary.md`?
 
-**Walk-forward（Prompt 17 ✅，EXP-20260602-008）**：
+**Walk-forward?Prompt 17 ??EXP-20260602-008?**?
 
-已验证（2026-06-02）：19 窗口，约 17s，OOS sharpe **0.586**，total_return **0.443**，auc_mean **0.472**。
+????2026-06-02??19 ???? 17s?OOS sharpe **0.586**?total_return **0.443**?auc_mean **0.472**?
 
 ```bash
 git pull origin main
 python -m pip install -e .
-python -m pytest -v   # 预期 126 passed（Plus M3 后）
+python -m pytest -v   # ?? 126 passed?Plus M3 ??
 
 python scripts/run_walk_forward.py \
   --config configs/walk_forward.yaml \
@@ -326,50 +327,50 @@ python scripts/run_walk_forward.py \
   --experiment-name server_walk_forward_001
 ```
 
-产物：`metrics.json`（含 train/val/test/oos）、`windows.csv`、`oos_equity_curve.csv`、`oos_trades.csv`、`summary.md`。
+???`metrics.json`?? train/val/test/oos??`windows.csv`?`oos_equity_curve.csv`?`oos_trades.csv`?`summary.md`?
 
-## 六点五、Plus M2 数据 API smoke（EXP-DATA-001）✅
+## ????Plus M2 ?? API smoke?EXP-DATA-001??
 
-> **切勿**把真实 key 写入 `.env.example` 或 commit 到 GitHub。只在服务器 **`/mnt/localDisk3/weizian/Quant-MAS/.env`** 配置（该文件已在 `.gitignore`）。
+> **??**??? key ?? `.env.example` ? commit ? GitHub?????? **`/mnt/localDisk3/weizian/Quant-MAS/.env`** ???????? `.gitignore`??
 
-**已通过**（2026-06-02，EXP-20260602-012）：FRED DGS10 262 行、Stooq 105 行、Alpha Vantage 100 行。Finnhub 免费 tier 403（预期）。SEC 未测。
+**???**?2026-06-02?EXP-20260602-012??FRED DGS10 262 ??Stooq 105 ??Alpha Vantage 100 ??Finnhub ?? tier 403?????SEC ???
 
-复现命令：
+?????
 
 ```bash
 cd /mnt/localDisk3/weizian/Quant-MAS
 git pull origin main
 conda activate /mnt/localDisk3/weizian/conda_envs/quant-mas
 python -m pip install -e .
-python -m pytest tests/test_data_sources.py -v   # 预期 13 passed
+python -m pytest tests/test_data_sources.py -v   # ?? 13 passed
 
-# 首次：从模板创建 .env，用 nano/vim 填入 key（不要 paste 到 .env.example）
+# ???????? .env?? nano/vim ?? key??? paste ? .env.example?
 cp .env.example .env
 nano .env
 ```
 
-`.env` 需包含（示例，值用你自己的）：
+`.env` ???????????????
 
 ```env
 STOOQ_API_KEY=...
 ALPHAVANTAGE_API_KEY=...
 FINNHUB_API_KEY=...
 FRED_API_KEY=...
-SEC_EDGAR_USER_AGENT=YourName your@email.com   # SEC 必填；其余 M2 源已填 key 时可先测 FRED/AV/Finnhub
+SEC_EDGAR_USER_AGENT=YourName your@email.com   # SEC ????? M2 ??? key ???? FRED/AV/Finnhub
 ```
 
-`download_data.py` 会通过 `load_repo_dotenv()` 自动加载项目根目录 `.env`。
+`download_data.py` ??? `load_repo_dotenv()` ????????? `.env`?
 
-**建议 smoke 顺序**（有 key 的源）：
+**?? smoke ??**?? key ????
 
 ```bash
-# 1. FRED 宏观（最稳）
+# 1. FRED ??????
 python scripts/download_data.py --source fred --series-id DGS10 \
   --start 2024-01-01 --end 2024-12-31 \
   --storage-config configs/storage.server.yaml
 ls -la /mnt/localDisk3/weizian/datasets/raw/macro/
 
-# 2. Alpha Vantage OHLCV（免费 tier 仅 ~100 近期交易日，勿用 2024 区间）
+# 2. Alpha Vantage OHLCV??? tier ? ~100 ???????? 2024 ???
 python scripts/download_data.py --source alpha_vantage \
   --symbols AAPL --start 2026-01-01 --end 2026-06-01 \
   --storage-config configs/storage.server.yaml
@@ -379,13 +380,13 @@ python scripts/download_data.py --source finnhub \
   --symbols AAPL --start 2024-01-01 --end 2024-06-01 \
   --storage-config configs/storage.server.yaml
 
-# 4. Stooq（已有 key，对照）
+# 4. Stooq??? key????
 python scripts/download_data.py --source stooq \
   --symbols AAPL --start 2024-01-01 --end 2024-06-01 \
   --storage-config configs/storage.server.yaml
 ```
 
-SEC（需先改 `.env` 里 `SEC_EDGAR_USER_AGENT` 为真实姓名+邮箱）：
+SEC???? `.env` ? `SEC_EDGAR_USER_AGENT` ?????+????
 
 ```bash
 python scripts/download_data.py --source sec_edgar --cik 0000320193 \
@@ -393,23 +394,23 @@ python scripts/download_data.py --source sec_edgar --cik 0000320193 \
 ls -la /mnt/localDisk3/weizian/datasets/raw/sec/
 ```
 
-通过后：记录见 `docs/experiment_log.md` **EXP-20260602-012** / **EXP-DATA-001**。
+??????? `docs/experiment_log.md` **EXP-20260602-012** / **EXP-DATA-001**?
 
-## 六点六、Plus M3 Memory/RAG（EXP-20260602-013）
+## ????Plus M3 Memory/RAG?EXP-20260602-013?
 
-M3 pull 后全量验收：
+M3 pull ??????
 
 ```bash
 cd /mnt/localDisk3/weizian/Quant-MAS
 git pull origin main
 conda activate /mnt/localDisk3/weizian/conda_envs/quant-mas
 python -m pip install -e .
-python -m pytest -v   # 预期 126 passed
+python -m pytest -v   # ?? 126 passed
 
 python scripts/index_documents.py --help
 python scripts/query_memory.py --help
 
-# 可选 smoke（不联网，hash embedding）
+# ?? smoke?????hash embedding?
 python scripts/index_documents.py --dirs docs --vector-store in_memory
 python scripts/query_memory.py --rag-query "walk-forward OOS sharpe"
 
@@ -419,13 +420,13 @@ python scripts/query_memory.py \
   --best-metric oos.sharpe
 ```
 
-记录：**EXP-20260602-014**。默认 `--json-path outputs/reports/experiments.json` 非服务器 `reports_dir`。
+???**EXP-20260602-014**??? `--json-path outputs/reports/experiments.json` ???? `reports_dir`?
 
-## 六点七、Plus M4 LangGraph（EXP-20260602-015/016）
+## ????Plus M4 LangGraph?EXP-20260602-015/016?
 
 ```bash
 cd /mnt/localDisk3/weizian/Quant-MAS
-git pull origin main   # 需 >= c0fa5e3（M-016 建边修复）
+git pull origin main   # ? >= c0fa5e3?M-016 ?????
 conda activate /mnt/localDisk3/weizian/conda_envs/quant-mas
 python -m pip install -e .
 python -m pip install -e ".[orchestration]"
@@ -434,17 +435,17 @@ python -m pytest tests/test_langgraph_workflow.py::test_langgraph_build_and_dry_
 python scripts/run_langgraph_workflow.py --help
 python scripts/run_langgraph_workflow.py --dry-run --backend sequential
 python scripts/run_langgraph_workflow.py --dry-run --backend langgraph
-# 全量（可选）：核心 137+1 skip；含 orchestration 138 passed
+# ????????? 137+1 skip?? orchestration 138 passed
 # python -m pytest -v
 ```
 
-记录：**EXP-20260602-016**（2026-06-03，a6000-9961 @ `c0fa5e3`）。首次 M4 pull 若 langgraph backend 报 `zip() argument 2 is shorter`，见 [`mistakes.md`](../mistakes.md) **M-016**。
+???**EXP-20260602-016**?2026-06-03?a6000-9961 @ `c0fa5e3`???? M4 pull ? langgraph backend ? `zip() argument 2 is shorter`?? [`mistakes.md`](../mistakes.md) **M-016**?
 
-## 六点八、Plus M5 上下文/LLM（EXP-20260602-017/018 / EXP-LLM-001）
+## ????Plus M5 ???/LLM?EXP-20260602-017/018 / EXP-LLM-001?
 
 ```bash
 cd /mnt/localDisk3/weizian/Quant-MAS
-git pull origin main   # 须含 43c812a（M-017 pytest 隔离）
+git pull origin main   # ?? 43c812a?M-017 pytest ???
 conda activate /mnt/localDisk3/weizian/conda_envs/quant-mas
 python -m pip install -e .
 python -m pip install -e ".[llm]"
@@ -452,20 +453,20 @@ python -m pip install -e ".[llm]"
 python -m pytest tests/test_context_engineering.py -v   # 12 passed, 1 warning
 python scripts/run_research_agent.py --help
 python scripts/run_research_agent.py --task "Summarize OOS baseline vs latest ML run"
-python -m pytest -v   # 150 passed（EXP-018：7.24s，含 .env LLM_API_KEY）
+python -m pytest -v   # 150 passed?EXP-018?7.24s?? .env LLM_API_KEY?
 
-# 真实 LLM smoke（DeepSeek，key 在 repo 根 .env，不入库）：
+# ?? LLM smoke?DeepSeek?key ? repo ? .env??????
 python scripts/run_research_agent.py \
   --storage-config configs/storage.server.yaml \
   --json-path /mnt/localDisk3/weizian/reports/experiments.json \
   --task "Explain walk-forward OOS sharpe baseline and compare to latest ML run" \
   --use-llm
-# → EXP-LLM-001：llm_provider=openai_compatible，baseline oos.sharpe ≈ 0.586
+# ? EXP-LLM-001?llm_provider=openai_compatible?baseline oos.sharpe ? 0.586
 ```
 
-记录：**EXP-20260602-018**（2026-06-03，a6000-9961 @ `43c812a`）；**EXP-LLM-001**（DeepSeek smoke）。`.env` 导致 mock 测试失败见 [`mistakes.md`](../mistakes.md) **M-017**。
+???**EXP-20260602-018**?2026-06-03?a6000-9961 @ `43c812a`??**EXP-LLM-001**?DeepSeek smoke??`.env` ?? mock ????? [`mistakes.md`](../mistakes.md) **M-017**?
 
-## 六点九、Plus M6 文本信号 + Walk-forward（EXP-TEXT-001 / EXP-TEXT-WF-001）✅
+## ????Plus M6 ???? + Walk-forward?EXP-TEXT-001 / EXP-TEXT-WF-001??
 
 ```bash
 cd /mnt/localDisk3/weizian/Quant-MAS
@@ -474,11 +475,11 @@ conda activate /mnt/localDisk3/weizian/conda_envs/quant-mas
 python -m pip install -e ".[ml,text]"
 python -m pytest -v   # 161 passed
 
-# 配置：复制 example → 编辑路径
+# ????? example ? ????
 # cp configs/text_model.server.yaml.example configs/text_model.server.yaml
 # cp configs/features.text.server.yaml.example configs/features.text.yaml
 
-# FinBERT（Hub 不可达时用 ModelScope 本地路径，见 mistakes.md M-018）
+# FinBERT?Hub ????? ModelScope ?????? mistakes.md M-018?
 python scripts/train_text_model.py --mode finbert_baseline \
   --config configs/text_model.server.yaml \
   --text-path data/text/smoke_from_features.jsonl \
@@ -491,7 +492,7 @@ python scripts/build_features.py \
   --storage-config configs/storage.server.yaml \
   --input /mnt/localDisk3/weizian/datasets/raw/market_data.parquet \
   --output /mnt/localDisk3/weizian/datasets/features/features_with_text.parquet
-# fillna(0) on finbert_sentiment if sparse — see text_model_plan.md
+# fillna(0) on finbert_sentiment if sparse ? see text_model_plan.md
 
 python scripts/run_walk_forward.py \
   --config configs/walk_forward.yaml \
@@ -506,49 +507,49 @@ python scripts/compare_experiments.py \
   --output-dir /mnt/localDisk3/weizian/reports/research
 ```
 
-**EXP-TEXT-WF-001 结果**：oos.sharpe **0.563** vs baseline **0.586**（Δ -0.023）；200/6033 text 覆盖 + fillna(0)，exploratory。
+**EXP-TEXT-WF-001 ??**?oos.sharpe **0.563** vs baseline **0.586**?? -0.023??200/6033 text ?? + fillna(0)?exploratory?
 
-**EXP-TEXT-WF-002 结果**：oos.sharpe **0.579** vs baseline **0.586**（Δ **-0.007**）；100% 覆盖 + `feature_aligned_smoke` 占位文本；19 窗；comparison **7 rows**。
+**EXP-TEXT-WF-002 ??**?oos.sharpe **0.579** vs baseline **0.586**?? **-0.007**??100% ?? + `feature_aligned_smoke` ?????19 ??comparison **7 rows**?
 
-**注意**：勿覆盖 `market_data.parquet` 为小样本（见 **M-019**）；应用 `merge_parquet.py` 恢复 6033 行。
+**??**???? `market_data.parquet` ?????? **M-019**???? `merge_parquet.py` ?? 6033 ??
 
-记录：**EXP-20260602-020**（pytest 161）；**EXP-TEXT-001**；**EXP-TEXT-WF-001**。
+???**EXP-20260602-020**?pytest 161??**EXP-TEXT-001**?**EXP-TEXT-WF-001**?
 
-详见 [`docs/text_model_plan.md`](text_model_plan.md)。
+?? [`docs/text_model_plan.md`](text_model_plan.md)?
 
-### EXP-TEXT-WF-002：高覆盖文本信号 + 覆盖率审计 + Walk-forward ✅
+### EXP-TEXT-WF-002???????? + ????? + Walk-forward ?
 
-**注意**：`signals_finbert_wf002.parquet` 须先用步骤 1 生成；**不要**使用文档占位路径 `/path/to/...`。  
-可先对 EXP-TEXT-001 产物做 baseline 审计（步骤 0），再与高覆盖 wf002 对比。
+**??**?`signals_finbert_wf002.parquet` ????? 1 ???**??**???????? `/path/to/...`?  
+??? EXP-TEXT-001 ??? baseline ????? 0??????? wf002 ???
 
 ```bash
 cd /mnt/localDisk3/weizian/Quant-MAS
 git pull origin main
 conda activate /mnt/localDisk3/weizian/conda_envs/quant-mas
 python -m pip install -e ".[ml,text]"
-python -m pytest -v   # 预期 314 passed
+python -m pytest -v   # ?? 314 passed
 
-# 0) 可选：审计 EXP-TEXT-001 已有信号（baseline 覆盖率 ~200/6033）
+# 0) ????? EXP-TEXT-001 ?????baseline ??? ~200/6033?
 python scripts/audit_text_signals.py \
   --features-path /mnt/localDisk3/weizian/datasets/features/features.parquet \
   --signals-path /mnt/localDisk3/weizian/datasets/text/signals_finbert.parquet \
   --output-dir /mnt/localDisk3/weizian/reports/text_signal_audit_wf001
 
-# 1) 生成或准备更高覆盖率的文本信号（wf002 尚不存在则必须先跑本步）
-# CLI 参数：--text-path（输入 JSONL）、--signals-output（输出 parquet）、--output-dir（模型元数据）
-# 错误示例（勿用）：--records-path / --output-path
+# 1) ????????????????wf002 ????????????
+# CLI ???--text-path??? JSONL??--signals-output??? parquet??--output-dir???????
+# ?????????--records-path / --output-path
 #
-# 1a) 先确认输入文件存在（不存在则见下方 1b）
+# 1a) ????????????????? 1b?
 ls -la /mnt/localDisk3/weizian/datasets/text/news_wf002.jsonl
-ls -la data/text/smoke_from_features.jsonl   # EXP-TEXT-001 用的 200 条 smoke
+ls -la data/text/smoke_from_features.jsonl   # EXP-TEXT-001 ?? 200 ? smoke
 #
-# 1b) 若 news_wf002.jsonl 尚未准备：从 features 对齐生成全量占位 JSONL（6033 行 × 3 symbol）
+# 1b) ? news_wf002.jsonl ?????? features ???????? JSONL?6033 ? � 3 symbol?
 python scripts/build_text_records_from_features.py \
   --features-path /mnt/localDisk3/weizian/datasets/features/features.parquet \
   --output-path /mnt/localDisk3/weizian/datasets/text/news_wf002.jsonl \
   2>&1 | tee /mnt/localDisk3/weizian/logs/exp_text_wf002_build_records.log
 #
-# 输出建议命名为 signals_finbert_wf002.parquet，避免覆盖 EXP-TEXT-001 产物
+# ??????? signals_finbert_wf002.parquet????? EXP-TEXT-001 ??
 python scripts/train_text_model.py --mode finbert_baseline \
   --config configs/text_model.server.yaml \
   --text-path /mnt/localDisk3/weizian/datasets/text/news_wf002.jsonl \
@@ -556,22 +557,22 @@ python scripts/train_text_model.py --mode finbert_baseline \
   --signals-output /mnt/localDisk3/weizian/datasets/text/signals_finbert_wf002.parquet \
   2>&1 | tee /mnt/localDisk3/weizian/logs/exp_text_wf002_finbert.log
 
-# 2) 先审计覆盖率，不直接跑 OOS
+# 2) ??????????? OOS
 python scripts/audit_text_signals.py \
   --features-path /mnt/localDisk3/weizian/datasets/features/features.parquet \
   --signals-path /mnt/localDisk3/weizian/datasets/text/signals_finbert_wf002.parquet \
   --output-dir /mnt/localDisk3/weizian/reports/text_signal_audit_wf002 \
   2>&1 | tee /mnt/localDisk3/weizian/logs/exp_text_wf002_audit.log
 
-# 3) 用高覆盖 signals 构建 features_with_text_wf002.parquet
-# 将 configs/features.text.yaml 中 text_signals_path 指向 signals_finbert_wf002.parquet
+# 3) ???? signals ?? features_with_text_wf002.parquet
+# ? configs/features.text.yaml ? text_signals_path ?? signals_finbert_wf002.parquet
 python scripts/build_features.py \
   --config configs/features.text.yaml \
   --storage-config configs/storage.server.yaml \
   --input /mnt/localDisk3/weizian/datasets/raw/market_data.parquet \
   --output /mnt/localDisk3/weizian/datasets/features/features_with_text_wf002.parquet
 
-# 4) 用同一 walk-forward 协议对比 EXP-20260602-008 baseline 0.586
+# 4) ??? walk-forward ???? EXP-20260602-008 baseline 0.586
 python scripts/run_walk_forward.py \
   --config configs/walk_forward.yaml \
   --storage-config configs/storage.server.yaml \
@@ -585,18 +586,18 @@ python scripts/compare_experiments.py \
   --output-dir /mnt/localDisk3/weizian/reports/research
 ```
 
-记录要求：
+?????
 
-- `text_signal_audit_wf002/metrics.json`：必须记录 `coverage_ratio`、`matched_rows`、`matched_symbol_count`
-- `walk_forward_text_002/metrics.json`：只报告 `oos.*`，并与 **0.586** 对比
-- 若 coverage 仍接近 WF-001 的 `200/6033`，结论仍应写成 exploratory
-- `simulation.*`、LLM 解释、单段回测不得替代 OOS
+- `text_signal_audit_wf002/metrics.json`????? `coverage_ratio`?`matched_rows`?`matched_symbol_count`
+- `walk_forward_text_002/metrics.json`???? `oos.*`??? **0.586** ??
+- ? coverage ??? WF-001 ? `200/6033`??????? exploratory
+- `simulation.*`?LLM ??????????? OOS
 
-### EXP-TEXT-WF-003：真实金融新闻 JSONL + 时间对齐 ✅
+### EXP-TEXT-WF-003??????? JSONL + ???? ?
 
-**结果（2026-06-04）**：fetch **9434** → align **5088** → FinBERT **146** signals → coverage **2.42%** → **oos.sharpe 0.565**（Δ vs baseline **-0.021**）。详见 [real_news_text_experiment.md](real_news_text_experiment.md)。
+**???2026-06-04?**?fetch **9434** ? align **5088** ? FinBERT **146** signals ? coverage **2.42%** ? **oos.sharpe 0.565**?? vs baseline **-0.021**???? [real_news_text_experiment.md](real_news_text_experiment.md)?
 
-**前置**：`real_news_wf003.jsonl` 须为**真实新闻**（含 `published_at` 时间戳）；**不能**用 `docs/examples/real_news_wf003.sample.jsonl`（仅 schema 样例，不可作 OOS）。推荐用 Finnhub（服务器 `.env` 已配 `FINNHUB_API_KEY`）。
+**??**?`real_news_wf003.jsonl` ??**????**?? `published_at` ?????**??**? `docs/examples/real_news_wf003.sample.jsonl`?? schema ?????? OOS????? Finnhub???? `.env` ?? `FINNHUB_API_KEY`??
 
 JSONL schema example: [`docs/examples/real_news_wf003.sample.jsonl`](examples/real_news_wf003.sample.jsonl).
 
@@ -605,12 +606,12 @@ cd /mnt/localDisk3/weizian/Quant-MAS
 git pull origin main
 conda activate /mnt/localDisk3/weizian/conda_envs/quant-mas
 python -m pip install -e ".[ml,text]"
-python -m pytest tests/test_text_signals.py -v   # 预期 31 passed
-python -m pytest -v   # 预期 330 passed（本地）
+python -m pytest tests/test_text_signals.py -v   # ?? 31 passed
+python -m pytest -v   # ?? 330 passed????
 
-# 0) 从 Finnhub 拉取真实新闻
-# 免费版 company-news 通常只有最近 1 年；--start 2018-01-01 会 raw=0
-# 已验证（2026-06-04）：--start 2025-06-04 --end 2026-06-04 -> 9434 条
+# 0) ? Finnhub ??????
+# ??? company-news ?????? 1 ??--start 2018-01-01 ? raw=0
+# ????2026-06-04??--start 2025-06-04 --end 2026-06-04 -> 9434 ?
 python scripts/fetch_real_news.py \
   --source finnhub \
   --symbols AAPL MSFT SPY \
@@ -620,30 +621,30 @@ python scripts/fetch_real_news.py \
   --delay 1.0 \
   --output-path /mnt/localDisk3/weizian/datasets/text/real_news_wf003.jsonl \
   2>&1 | tee /mnt/localDisk3/weizian/logs/exp_text_wf003_fetch_news.log
-# 等价写法：--recent-days 365（在跑数日当天自动推算起止日期）
+# ?????--recent-days 365????????????????
 
-# 1) 将真实新闻按发布时间对齐到可交易 bar
+# 1) ???????????????? bar
 python scripts/align_real_news.py \
   --news-path /mnt/localDisk3/weizian/datasets/text/real_news_wf003.jsonl \
   --features-path /mnt/localDisk3/weizian/datasets/features/features.parquet \
   --output-dir /mnt/localDisk3/weizian/reports/real_news_alignment_wf003 \
   --market-close 16:00
 
-# 2) 对齐后的 JSONL 进入 FinBERT 信号生成
+# 2) ???? JSONL ?? FinBERT ????
 python scripts/train_text_model.py --mode finbert_baseline \
   --config configs/text_model.server.yaml \
   --text-path /mnt/localDisk3/weizian/reports/real_news_alignment_wf003/aligned_news.jsonl \
   --output-dir /mnt/localDisk3/weizian/models/text/exp_text_wf003 \
   --signals-output /mnt/localDisk3/weizian/datasets/text/signals_finbert_wf003.parquet
 
-# 3) 覆盖率审计
+# 3) ?????
 python scripts/audit_text_signals.py \
   --features-path /mnt/localDisk3/weizian/datasets/features/features.parquet \
   --signals-path /mnt/localDisk3/weizian/datasets/text/signals_finbert_wf003.parquet \
   --output-dir /mnt/localDisk3/weizian/reports/text_signal_audit_wf003
 
-# 4) 构建 text-enhanced features（稀疏覆盖须 fillna(0)，与 WF-001 一致）
-# configs/features.text.yaml 增加：text_signal_fillna: 0
+# 4) ?? text-enhanced features?????? fillna(0)?? WF-001 ???
+# configs/features.text.yaml ???text_signal_fillna: 0
 python scripts/build_features.py \
   --config configs/features.text.yaml \
   --storage-config configs/storage.server.yaml \
@@ -663,41 +664,41 @@ python scripts/compare_experiments.py \
   --output-dir /mnt/localDisk3/weizian/reports/research
 ```
 
-记录要求：同时报告 fetch record_count、alignment dropped rows、coverage ratio、OOS sharpe，并与 **0.586** baseline、WF-002 **0.579**、WF-001 **0.563** 对比。
+????????? fetch record_count?alignment dropped rows?coverage ratio?OOS sharpe??? **0.586** baseline?WF-002 **0.579**?WF-001 **0.563** ???
 
-## 六点十、Plus M7 RL 模拟（EXP-20260602-021 / EXP-20260602-022）✅
+## ????Plus M7 RL ???EXP-20260602-021 / EXP-20260602-022??
 
 ```bash
 cd /mnt/localDisk3/weizian/Quant-MAS
 git pull origin main
 conda activate /mnt/localDisk3/weizian/conda_envs/quant-mas
 python -m pip install -e .
-python -m pytest -v   # 预期 180 passed
+python -m pytest -v   # ?? 180 passed
 
 python scripts/run_rl_baseline.py --help
 python scripts/run_rl_baseline.py --config configs/rl.yaml --policy random --dry-run \
   --output-dir /mnt/localDisk3/weizian/reports/rl_baseline_001
 
-# 可选 policies: buy_hold | ml_copy（ml_copy 需 --signals-path）
+# ?? policies: buy_hold | ml_copy?ml_copy ? --signals-path?
 python scripts/run_rl_baseline.py --config configs/rl.yaml --policy buy_hold --dry-run
 ```
 
-**说明**：
+**??**?
 
-- **simulation only** — 不接 broker；metrics 为 `simulation.*`，**不得**与 walk-forward `oos.sharpe` **0.586** 混比
-- 可选：`pip install -e ".[rl]"` 安装 gymnasium wrapper（核心 pytest 不依赖）
-- 记录：**EXP-20260602-021**（本地）；**EXP-20260602-022**（服务器 **180 passed**，10.15s）
+- **simulation only** ? ?? broker?metrics ? `simulation.*`?**??**? walk-forward `oos.sharpe` **0.586** ??
+- ???`pip install -e ".[rl]"` ?? gymnasium wrapper??? pytest ????
+- ???**EXP-20260602-021**?????**EXP-20260602-022**???? **180 passed**?10.15s?
 
-详见 [`docs/rl_plan.md`](rl_plan.md)。
+?? [`docs/rl_plan.md`](rl_plan.md)?
 
-## 六点十一、Plus M8 MCP/A2A（EXP-20260602-023 / EXP-20260602-024）✅
+## ?????Plus M8 MCP/A2A?EXP-20260602-023 / EXP-20260602-024??
 
 ```bash
 cd /mnt/localDisk3/weizian/Quant-MAS
 git pull origin main
 conda activate /mnt/localDisk3/weizian/conda_envs/quant-mas
 python -m pip install -e .
-python -m pytest -v   # 预期 195 passed
+python -m pytest -v   # ?? 195 passed
 
 python scripts/export_agent_cards.py --help
 python scripts/export_agent_cards.py --config configs/protocols.yaml \
@@ -705,99 +706,99 @@ python scripts/export_agent_cards.py --config configs/protocols.yaml \
   --include-mcp-specs
 ```
 
-**说明**：
+**??**?
 
-- **内部 adapter only** — 不接外部 MCP server；不启动 network listener
-- policy 默认 deny shell/broker/order/secrets
-- 记录：**EXP-20260602-023**（本地 195 passed）；**EXP-20260602-024**（服务器 **195 passed**，12.41s）
+- **?? adapter only** ? ???? MCP server???? network listener
+- policy ?? deny shell/broker/order/secrets
+- ???**EXP-20260602-023**??? 195 passed??**EXP-20260602-024**???? **195 passed**?12.41s?
 
-详见 [`docs/protocols.md`](protocols.md)。
+?? [`docs/protocols.md`](protocols.md)?
 
-## 六点十二、v3 M9 企业 DB（EXP-025 / EXP-026）
+## ?????v3 M9 ?? DB?EXP-025 / EXP-026?
 
-### 6.12.1 前置条件
+### 6.12.1 ????
 
-| 项 | 要求 |
+| ? | ?? |
 |----|------|
-| Docker | weizian 在 **docker 组**（`groups` 含 `docker`；若刚加组须 **重新 SSH 登录**） |
-| infra | `/mnt/localDisk3/weizian/infra/quant-mas-db/`（compose + `setup.sh` + `.env`） |
-| 凭据 | `POSTGRES_DSN` 在 `Quant-MAS/.env`（与 infra `.env` 一致，**勿 commit**） |
-| 代码 | `origin/main` ≥ M10（**212 pytest**，含 `seed_postgres_from_json.py`） |
-| Python | conda `quant-mas`；`psycopg[binary]>=3.1` |
+| Docker | weizian ? **docker ?**?`groups` ? `docker`?????? **?? SSH ??**? |
+| infra | `/mnt/localDisk3/weizian/infra/quant-mas-db/`?compose + `setup.sh` + `.env`? |
+| ?? | `POSTGRES_DSN` ? `Quant-MAS/.env`?? infra `.env` ???**? commit**? |
+| ?? | `origin/main` ? M10?**212 pytest**?? `seed_postgres_from_json.py`? |
+| Python | conda `quant-mas`?`psycopg[binary]>=3.1` |
 
-### 6.12.2 启动 Postgres + pgvector
+### 6.12.2 ?? Postgres + pgvector
 
 ```bash
-# 0) 确认 docker 组（必须重新登录后才生效）
+# 0) ?? docker ?????????????
 groups | tr ' ' '\n' | grep -x docker && echo "docker OK"
 
-# 1) 一键启动（推荐）
+# 1) ????????
 bash /mnt/localDisk3/weizian/infra/quant-mas-db/setup.sh
 
-# 或手动：
+# ????
 # cd /mnt/localDisk3/weizian/infra/quant-mas-db
 # docker compose up -d postgres
 # docker exec quant-mas-postgres psql -U quant_mas -d quant_mas \
 #   -c "CREATE EXTENSION IF NOT EXISTS vector;"
 
-# 2) 验收容器与端口
+# 2) ???????
 docker ps --filter name=quant-mas-postgres
 ss -ltn | grep 5432 || true
 docker exec quant-mas-postgres psql -U quant_mas -d quant_mas -c "SELECT extname FROM pg_extension WHERE extname='vector';"
 ```
 
-可选 Neo4j：`cd /mnt/localDisk3/weizian/infra/quant-mas-db && docker compose --profile neo4j up -d neo4j`
+?? Neo4j?`cd /mnt/localDisk3/weizian/infra/quant-mas-db && docker compose --profile neo4j up -d neo4j`
 
-### 6.12.3 拉代码 + pytest（与 DB 无关）
+### 6.12.3 ??? + pytest?? DB ???
 
 ```bash
 cd /mnt/localDisk3/weizian/Quant-MAS
 git fetch origin main
-git merge --ff-only origin/main   # 目标：d10a641+（212 pytest + seed 脚本）
+git merge --ff-only origin/main   # ???d10a641+?212 pytest + seed ???
 
 conda activate /mnt/localDisk3/weizian/conda_envs/quant-mas
 python -m pip install -e .
 python -m pip install "psycopg[binary]>=3.1" neo4j
-python -m pytest -v   # 预期 212 passed
+python -m pytest -v   # ?? 212 passed
 ```
 
-### 6.12.4 EXP-026 真实 DB smoke
+### 6.12.4 EXP-026 ?? DB smoke
 
 ```bash
 cd /mnt/localDisk3/weizian/Quant-MAS
 conda activate /mnt/localDisk3/weizian/conda_envs/quant-mas
-set -a && source .env && set +a   # 加载 POSTGRES_DSN
+set -a && source .env && set +a   # ?? POSTGRES_DSN
 
-# A) 从服务器 experiments.json 导入 Postgres（空库首次；重复跑加 --skip-existing）
+# A) ???? experiments.json ?? Postgres?????????? --skip-existing?
 python scripts/seed_postgres_from_json.py \
   --json-path /mnt/localDisk3/weizian/reports/experiments.json
 
-# B) 查 best OOS（论文主指标 walk-forward OOS，非单段 ML）
+# B) ? best OOS?????? walk-forward OOS???? ML?
 python scripts/query_memory.py --backend postgres --best-metric oos.sharpe
-# 预期：含 oos.sharpe ≈ 0.586 的 baseline 实验名
+# ???? oos.sharpe ? 0.586 ? baseline ???
 
-# C) pgvector 索引 docs
+# C) pgvector ?? docs
 python scripts/index_documents.py --vector-store pgvector --dirs docs --embedding-dimensions 64
-# 预期：[index] documents=… chunks=…（通常 100+ chunks）
+# ???[index] documents=? chunks=???? 100+ chunks?
 
-# D) SQL 抽查（可选）
+# D) SQL ??????
 docker exec quant-mas-postgres psql -U quant_mas -d quant_mas \
   -c "SELECT COUNT(*) FROM experiments;"
 docker exec quant-mas-postgres psql -U quant_mas -d quant_mas \
   -c "SELECT COUNT(*) FROM rag_vectors;"
 ```
 
-**说明**：
+**??**?
 
-- pytest 默认 mock，**不依赖**真实 Postgres / vLLM
-- `--best-metric oos.sharpe` 需要 Postgres 里已有实验记录 → 先跑 **seed**（默认 JSON 路径是仓库内空路径，须指向服务器 `reports/experiments.json`）
-- 记录：**EXP-025** 本地 207；**EXP-027/028** 212；**EXP-LLM-002** ✅；**EXP-026** ✅（2026-06-03：6 exp, 443 chunks, OOS 0.586 @ `02bdb8a`）
+- pytest ?? mock?**???**?? Postgres / vLLM
+- `--best-metric oos.sharpe` ?? Postgres ??????? ? ?? **seed**??? JSON ???????????????? `reports/experiments.json`?
+- ???**EXP-025** ?? 207?**EXP-027/028** 212?**EXP-LLM-002** ??**EXP-026** ??2026-06-03?6 exp, 443 chunks, OOS 0.586 @ `02bdb8a`?
 
-详见 [`docs/database_setup.md`](database_setup.md) §M9 · [`docs/context_engineering.md`](context_engineering.md) M10。
+?? [`docs/database_setup.md`](database_setup.md) �M9 � [`docs/context_engineering.md`](context_engineering.md) M10?
 
-## 六点十三、v3 M10 LLM（EXP-027 / EXP-028 / EXP-LLM-002）✅
+## ?????v3 M10 LLM?EXP-027 / EXP-028 / EXP-LLM-002??
 
-### 6.13.1 pytest（mock，不启 vLLM）
+### 6.13.1 pytest?mock??? vLLM?
 
 ```bash
 cd /mnt/localDisk3/weizian/Quant-MAS
@@ -806,19 +807,19 @@ python -m pytest tests/test_context_engineering.py -v   # 17 passed
 python -m pytest -v                                     # 212 passed
 ```
 
-记录：**EXP-20260602-027**（本地 212）；**EXP-20260602-028**（服务器 212，11.39s）。
+???**EXP-20260602-027**??? 212??**EXP-20260602-028**???? 212?11.39s??
 
-### 6.13.2 vLLM 环境（独立 conda，勿装进 quant-mas）
+### 6.13.2 vLLM ????? conda???? quant-mas?
 
 ```bash
-# 一次性：独立环境
+# ????????
 conda create -p /mnt/localDisk3/weizian/conda_envs/vllm python=3.11 -y
 conda activate /mnt/localDisk3/weizian/conda_envs/vllm
 pip install vllm
-which vllm   # 必须在 .../conda_envs/vllm/bin/vllm，不是 ~/.local/bin/vllm
+which vllm   # ??? .../conda_envs/vllm/bin/vllm??? ~/.local/bin/vllm
 ```
 
-**模型**（服务器无法直连 huggingface.co 时用镜像下载到本地）：
+**??**???????? huggingface.co ???????????
 
 ```bash
 export HF_ENDPOINT=https://hf-mirror.com
@@ -827,17 +828,17 @@ huggingface-cli download Qwen/Qwen2.5-7B-Instruct \
   --local-dir-use-symlinks False
 ```
 
-**踩坑**：
+**??**?
 
-| 问题 | 处理 |
+| ?? | ?? |
 |------|------|
-| `Network is unreachable`（HF） | 镜像下载 + 本地路径 serve |
-| FlashInfer / CUDA 12 编译失败 | `export VLLM_USE_FLASHINFER_SAMPLER=0` |
-| `vllm: command not found` | 先 `conda activate .../vllm` |
-| GPU OOM（3GB free） | 旧 vLLM 仍占 GPU 0：`pkill -f "vllm serve"` 或 `kill <EngineCore PID>` |
-| 误用 `VLLM_USE_FLASHINFER` | v0.22 无效；用 **`VLLM_USE_FLASHINFER_SAMPLER=0`** |
+| `Network is unreachable`?HF? | ???? + ???? serve |
+| FlashInfer / CUDA 12 ???? | `export VLLM_USE_FLASHINFER_SAMPLER=0` |
+| `vllm: command not found` | ? `conda activate .../vllm` |
+| GPU OOM?3GB free? | ? vLLM ?? GPU 0?`pkill -f "vllm serve"` ? `kill <EngineCore PID>` |
+| ?? `VLLM_USE_FLASHINFER` | v0.22 ???? **`VLLM_USE_FLASHINFER_SAMPLER=0`** |
 
-### 6.13.3 启动 vLLM（终端 1，建议 tmux）
+### 6.13.3 ?? vLLM??? 1??? tmux?
 
 ```bash
 tmux new -s vllm
@@ -850,10 +851,10 @@ unset VLLM_BASE_URL VLLM_MODEL VLLM_USE_FLASHINFER
 CUDA_VISIBLE_DEVICES=0 vllm serve /mnt/localDisk3/weizian/models/Qwen2.5-7B-Instruct \
   --host 127.0.0.1 --port 8000 --dtype auto --max-model-len 8192 \
   --served-model-name Qwen/Qwen2.5-7B-Instruct --enforce-eager
-# 等到 Application startup complete；Ctrl+B D detach
+# ?? Application startup complete?Ctrl+B D detach
 ```
 
-### 6.13.4 ResearchAgent smoke（终端 2，EXP-LLM-002）
+### 6.13.4 ResearchAgent smoke??? 2?EXP-LLM-002?
 
 ```bash
 conda activate /mnt/localDisk3/weizian/conda_envs/quant-mas
@@ -868,29 +869,29 @@ mkdir -p /mnt/localDisk3/weizian/reports/llm
 
 python scripts/run_research_agent.py \
   --provider local_vllm --use-llm \
-  --task "Interpret ONLY the walk-forward OOS baseline EXP-20260602-008 (oos.sharpe ≈ 0.586). Do NOT treat workflow_ml_backtest, single-segment ML sharpe, or pytest milestones as paper metrics. List three research risks." \
+  --task "Interpret ONLY the walk-forward OOS baseline EXP-20260602-008 (oos.sharpe ? 0.586). Do NOT treat workflow_ml_backtest, single-segment ML sharpe, or pytest milestones as paper metrics. List three research risks." \
   --experiment-name walk-forward \
   --rag-query "OOS baseline EXP-20260602-008 sharpe 0.586" \
   --output-json /mnt/localDisk3/weizian/reports/llm/EXP-LLM-002-constrained.json
 ```
 
-验收：`llm_provider=local_vllm`；RAG 命中 `experiment_log.md`；**不**将单段 ML sharpe 当论文指标。
+???`llm_provider=local_vllm`?RAG ?? `experiment_log.md`?**?**??? ML sharpe ??????
 
-记录：**EXP-LLM-002** ✅（2026-06-03，Qwen2.5-7B-Instruct @ GPU 0，vLLM 0.22.0）。
+???**EXP-LLM-002** ??2026-06-03?Qwen2.5-7B-Instruct @ GPU 0?vLLM 0.22.0??
 
-## 六点十四、v3 M11 竞争学习（EXP-029 / EXP-POP-002）✅
+## ?????v3 M11 ?????EXP-029 / EXP-POP-002??
 
-### 6.14.1 拉代码 + pytest
+### 6.14.1 ??? + pytest
 
 ```bash
 cd /mnt/localDisk3/weizian/Quant-MAS
 git fetch origin main
-git merge --ff-only origin/main   # 目标：含 M11，225 pytest
+git merge --ff-only origin/main   # ???? M11?225 pytest
 
 conda activate /mnt/localDisk3/weizian/conda_envs/quant-mas
 python -m pip install -e .
 python -m pytest tests/test_population_training.py -v   # 13 passed
-python -m pytest -v                                     # 预期 225 passed
+python -m pytest -v                                     # ?? 225 passed
 ```
 
 ### 6.14.2 competitive mock dry-run
@@ -904,27 +905,27 @@ python scripts/run_competitive_experiment.py \
   --dry-run
 ```
 
-**说明**：
+**??**?
 
-- `--dry-run` 仅 stdout，不写 ExperimentMemory / artifacts
-- 指标为 `population.*` / `simulation.*`；**不得**与 OOS **0.586** 混比
-- 记录：**EXP-20260602-029** 本地 225；**EXP-POP-002** ✅ 服务器 **225 passed**（17.32s）+ dry-run（2026-06-03 @ `64a5b2a`）
+- `--dry-run` ? stdout??? ExperimentMemory / artifacts
+- ??? `population.*` / `simulation.*`?**??**? OOS **0.586** ??
+- ???**EXP-20260602-029** ?? 225?**EXP-POP-002** ? ??? **225 passed**?17.32s?+ dry-run?2026-06-03 @ `64a5b2a`?
 
-详见 [`docs/competitive_learning.md`](competitive_learning.md)。
+?? [`docs/competitive_learning.md`](competitive_learning.md)?
 
-## 六点十五、v3 M11.5 种群训练闭环（EXP-030 / EXP-POP-003）✅
+## ?????v3 M11.5 ???????EXP-030 / EXP-POP-003??
 
-### 6.15.1 拉代码 + pytest
+### 6.15.1 ??? + pytest
 
 ```bash
 cd /mnt/localDisk3/weizian/Quant-MAS
 git fetch origin main
-git merge --ff-only origin/main   # 目标：含 M11.5，237 pytest
+git merge --ff-only origin/main   # ???? M11.5?237 pytest
 
 conda activate /mnt/localDisk3/weizian/conda_envs/quant-mas
 python -m pip install -e .
 python -m pytest tests/test_population_training_loop.py -v   # 12 passed
-python -m pytest -v                                             # 预期 237 passed
+python -m pytest -v                                             # ?? 237 passed
 ```
 
 ### 6.15.2 population training dry-run
@@ -937,25 +938,25 @@ python scripts/run_population_training.py \
   --dry-run
 ```
 
-非 dry-run 会写 `outputs/population_training/` 与 ExperimentMemory（仍仅 `population.*` / `simulation.*`）。
+? dry-run ?? `outputs/population_training/` ? ExperimentMemory??? `population.*` / `simulation.*`??
 
-- 记录：**EXP-20260602-030** 本地 237；**EXP-POP-003** ✅ 服务器 **237 passed**（41.83s）+ training dry-run（2026-06-03 @ `aa841d4`）
+- ???**EXP-20260602-030** ?? 237?**EXP-POP-003** ? ??? **237 passed**?41.83s?+ training dry-run?2026-06-03 @ `aa841d4`?
 
-详见 [`docs/population_training.md`](population_training.md)。
+?? [`docs/population_training.md`](population_training.md)?
 
-## 六点十六、v3 M11.6 候选验证桥（EXP-031 / EXP-POP-004）✅
+## ?????v3 M11.6 ??????EXP-031 / EXP-POP-004??
 
-### 6.16.1 拉代码 + pytest
+### 6.16.1 ??? + pytest
 
 ```bash
 cd /mnt/localDisk3/weizian/Quant-MAS
 git fetch origin main
-git merge --ff-only origin/main   # 目标：含 M11.6，248 pytest
+git merge --ff-only origin/main   # ???? M11.6?248 pytest
 
 conda activate /mnt/localDisk3/weizian/conda_envs/quant-mas
 python -m pip install -e .
 python -m pytest tests/test_strategy_candidate_bridge.py -v   # 11 passed
-python -m pytest -v                                             # 预期 248 passed
+python -m pytest -v                                             # ?? 248 passed
 ```
 
 ### 6.16.2 export candidates + backtest smoke dry-run
@@ -970,33 +971,33 @@ python scripts/export_population_candidates.py \
   --dry-run
 ```
 
-**说明**：
+**??**?
 
-- `--dry-run` 仅 stdout，不写 ExperimentMemory / artifacts
-- 指标为 `population.*` / `simulation.*` / `backtest.*`；**不得**写或混比 `oos.*`（论文主指标 **0.586**）
-- `--run-walk-forward` 第一版为 stub，不产出 OOS 数字
-- 记录：**EXP-20260602-031** 本地 248；**EXP-POP-004** ✅ 服务器 **248 passed**（55.15s，bridge 2.48s）+ export dry-run（2026-06-03 @ `7ab510f`）
+- `--dry-run` ? stdout??? ExperimentMemory / artifacts
+- ??? `population.*` / `simulation.*` / `backtest.*`?**??**???? `oos.*`?????? **0.586**?
+- `--run-walk-forward` ???? stub???? OOS ??
+- ???**EXP-20260602-031** ?? 248?**EXP-POP-004** ? ??? **248 passed**?55.15s?bridge 2.48s?+ export dry-run?2026-06-03 @ `7ab510f`?
 
-详见 [`docs/strategy_candidate_bridge.md`](strategy_candidate_bridge.md)。
+?? [`docs/strategy_candidate_bridge.md`](strategy_candidate_bridge.md)?
 
-## 六点十七、v3 M11.7 候选 Walk-forward OOS（EXP-032 / EXP-POP-005）✅
+## ?????v3 M11.7 ?? Walk-forward OOS?EXP-032 / EXP-POP-005??
 
-### 6.17.1 拉代码 + pytest
+### 6.17.1 ??? + pytest
 
 ```bash
 cd /mnt/localDisk3/weizian/Quant-MAS
 git fetch origin main
-git merge --ff-only origin/main   # 目标：含 M11.7，259 pytest
+git merge --ff-only origin/main   # ???? M11.7?259 pytest
 
 conda activate /mnt/localDisk3/weizian/conda_envs/quant-mas
 python -m pip install -e .
 python -m pytest tests/test_candidate_oos_validation.py -v   # 11 passed
-python -m pytest -v                                             # 预期 259 passed
+python -m pytest -v                                             # ?? 259 passed
 ```
 
-### 6.17.2 真实 features 上跑 candidate OOS
+### 6.17.2 ?? features ?? candidate OOS
 
-先导出候选（M11.6）——**必须 `--no-dry-run`** 才会写出 `outputs/candidates/candidates.json`：
+??????M11.6???**?? `--no-dry-run`** ???? `outputs/candidates/candidates.json`?
 
 ```bash
 python scripts/export_population_candidates.py \
@@ -1006,20 +1007,20 @@ python scripts/export_population_candidates.py \
   --no-dry-run
 ```
 
-确认文件存在：
+???????
 
 ```bash
 ls -la outputs/candidates/candidates.json
 ```
 
-**服务器 features 路径**（非 repo 内 `data/features/`，与 walk-forward EXP-008 一致）：
+**??? features ??**?? repo ? `data/features/`?? walk-forward EXP-008 ????
 
 ```bash
 FEATURES=/mnt/localDisk3/weizian/datasets/features/features.parquet
-ls -la "$FEATURES"   # 预期存在，约 6033 rows
+ls -la "$FEATURES"   # ?????? 6033 rows
 ```
 
-再跑 walk-forward OOS（M11.7）：
+?? walk-forward OOS?M11.7??
 
 ```bash
 python scripts/validate_candidate_oos.py --help
@@ -1032,7 +1033,7 @@ python scripts/validate_candidate_oos.py \
   --storage-config configs/storage.yaml \
   --dry-run
 
-# 非 dry-run 写 artifacts + ExperimentMemory
+# ? dry-run ? artifacts + ExperimentMemory
 python scripts/validate_candidate_oos.py \
   --candidate-json outputs/candidates/candidates.json \
   --candidate-id cand_mean_rev_1 \
@@ -1041,24 +1042,24 @@ python scripts/validate_candidate_oos.py \
   --no-dry-run
 ```
 
-**说明**：
+**??**?
 
-- **M11.7 是唯一**允许从候选链路写入 `oos.*` 的模块
-- 对比 baseline：**EXP-20260602-008**，`oos.sharpe = 0.586`
-- 记录：**EXP-20260602-032** 本地 mock；**EXP-POP-005** ✅ 服务器 `cand_mean_rev_1` **oos.sharpe 1.036**（77 窗，2019-07→2025-12）vs ML baseline **0.586**（2026-06-04 @ `ffef849`）
+- **M11.7 ???**????????? `oos.*` ???
+- ?? baseline?**EXP-20260602-008**?`oos.sharpe = 0.586`
+- ???**EXP-20260602-032** ?? mock?**EXP-POP-005** ? ??? `cand_mean_rev_1` **oos.sharpe 1.036**?77 ??2019-07?2025-12?vs ML baseline **0.586**?2026-06-04 @ `ffef849`?
 
-详见 [`docs/strategy_candidate_oos.md`](strategy_candidate_oos.md)。
+?? [`docs/strategy_candidate_oos.md`](strategy_candidate_oos.md)?
 
-## 六点十八、v3 M11.8 批量候选 OOS（EXP-033 / EXP-POP-006）✅
+## ?????v3 M11.8 ???? OOS?EXP-033 / EXP-POP-006??
 
 ```bash
 cd /mnt/localDisk3/weizian/Quant-MAS
 conda activate /mnt/localDisk3/weizian/conda_envs/quant-mas
-git pull origin main   # 目标：含 M11.8，266 pytest
+git pull origin main   # ???? M11.8?266 pytest
 
-python -m pytest -v    # 预期 266 passed
+python -m pytest -v    # ?? 266 passed
 
-# 若无 candidates.json，先导出
+# ?? candidates.json????
 python scripts/export_population_candidates.py \
   --population-config configs/population_training.yaml \
   --top-k 5 \
@@ -1073,23 +1074,23 @@ python scripts/batch_validate_candidates.py \
   --no-dry-run
 ```
 
-**说明**：
+**??**?
 
-- 复用 M11.7 `run_candidate_walk_forward`；输出 `candidate_oos_comparison.csv` / `.md`
-- 对比 baseline：**EXP-20260602-008**，`oos.sharpe = 0.586`
-- 记录：**EXP-20260602-033** 本地；**EXP-POP-006** ✅ 服务器 4 候选均超 baseline，best **1.039**（2026-06-04 @ `9477c3d`）
-- 用于 **ablation / 机制分析**，不替代 ML 主 baseline
+- ?? M11.7 `run_candidate_walk_forward`??? `candidate_oos_comparison.csv` / `.md`
+- ?? baseline?**EXP-20260602-008**?`oos.sharpe = 0.586`
+- ???**EXP-20260602-033** ???**EXP-POP-006** ? ??? 4 ???? baseline?best **1.039**?2026-06-04 @ `9477c3d`?
+- ?? **ablation / ????**???? ML ? baseline
 
-详见 [`docs/candidate_oos_batch.md`](candidate_oos_batch.md)。
+?? [`docs/candidate_oos_batch.md`](candidate_oos_batch.md)?
 
-## 六点十九、v3 M12.1 RL Training Loop（EXP-034 / EXP-POP-007）✅
+## ?????v3 M12.1 RL Training Loop?EXP-034 / EXP-POP-007??
 
 ```bash
 cd /mnt/localDisk3/weizian/Quant-MAS
 conda activate /mnt/localDisk3/weizian/conda_envs/quant-mas
-git pull origin main   # 目标：含 M12.1，282 pytest 本地
+git pull origin main   # ???? M12.1?282 pytest ??
 
-python -m pytest -v    # 预期 282 passed
+python -m pytest -v    # ?? 282 passed
 
 python scripts/run_rl_experiment.py --help
 
@@ -1106,39 +1107,39 @@ python scripts/run_rl_experiment.py \
   --no-dry-run
 ```
 
-**说明**：
+**??**?
 
-- **simulation only**；metrics 为 `training.*` / `simulation.*`，**禁止**写成 OOS
-- 对照 baseline 仅在文档/summary 引用 **EXP-20260602-008** `oos.sharpe = 0.586`
-- 记录：**EXP-20260602-034** 本地 ✅；**EXP-POP-007** / **EXP-RL-003** ✅ 服务器 GRPO smoke（2026-06-04 @ `e291cf9`；**simulation only**）
-- OOS 评估须事后：M11.6 export → M11.7/M11.8 validate
+- **simulation only**?metrics ? `training.*` / `simulation.*`?**??**?? OOS
+- ?? baseline ????/summary ?? **EXP-20260602-008** `oos.sharpe = 0.586`
+- ???**EXP-20260602-034** ?? ??**EXP-POP-007** / **EXP-RL-003** ? ??? GRPO smoke?2026-06-04 @ `e291cf9`?**simulation only**?
+- OOS ??????M11.6 export ? M11.7/M11.8 validate
 
-详见 [`docs/rl_experiment.md`](rl_experiment.md)。
+?? [`docs/rl_experiment.md`](rl_experiment.md)?
 
-## 六点二十、v3 M12.2 RL Policy Export（EXP-035 / EXP-POP-008）✅
+## ?????v3 M12.2 RL Policy Export?EXP-035 / EXP-POP-008??
 
 ```bash
 cd /mnt/localDisk3/weizian/Quant-MAS
 conda activate /mnt/localDisk3/weizian/conda_envs/quant-mas
-git pull origin main   # 含 M12.2+，296 pytest
+git pull origin main   # ? M12.2+?296 pytest
 
-python -m pytest -v    # 预期 296 passed
+python -m pytest -v    # ?? 296 passed
 
 python scripts/export_rl_policy_candidate.py \
   --config configs/rl_policy_export.yaml \
   --no-dry-run
 ```
 
-**说明**：
+**??**?
 
-- M12.2 **只 export** `StrategyCandidate`（`source=rl_training`）；**不写 oos.***
-- 记录：**EXP-20260602-035** 本地 ✅；**EXP-POP-008** 服务器 ✅（`e7fea132af8a451ba9c999762d220ee6`；`rl_grpo_policy_001_1`）
+- M12.2 **? export** `StrategyCandidate`?`source=rl_training`??**?? oos.***
+- ???**EXP-20260602-035** ?? ??**EXP-POP-008** ??? ??`e7fea132af8a451ba9c999762d220ee6`?`rl_grpo_policy_001_1`?
 
-详见 [`docs/rl_policy_export.md`](rl_policy_export.md)。
+?? [`docs/rl_policy_export.md`](rl_policy_export.md)?
 
-## 六点二十一、v3 M12.3 RL 候选 Walk-forward OOS（EXP-POP-009）✅
+## ??????v3 M12.3 RL ?? Walk-forward OOS?EXP-POP-009??
 
-前置：**EXP-POP-008** 已生成 `outputs/rl_candidates/candidates.json`。
+???**EXP-POP-008** ??? `outputs/rl_candidates/candidates.json`?
 
 ```bash
 python scripts/validate_candidate_oos.py \
@@ -1148,28 +1149,28 @@ python scripts/validate_candidate_oos.py \
   --no-dry-run
 ```
 
-**已验证结果**（2026-06-04 @ `6e8c507`）：
+**?????**?2026-06-04 @ `6e8c507`??
 
-| 字段 | 值 | 说明 |
+| ?? | ? | ?? |
 |------|-----|------|
-| `candidate_id` | `rl_grpo_policy_001_1` | EXP-POP-008 导出 |
-| `window_count` | **77** | 与 population OOS 同配置 |
-| `oos.sharpe` | **0.0** | argmax logit → `target_weight=0.0`（全现金） |
-| `vs_baseline_sharpe` | **-0.586** | 相对 EXP-008 **0.586** |
-| `simulation.sharpe_mean` | **6.31** | M12.1 仿真，**不可混报为 OOS** |
+| `candidate_id` | `rl_grpo_policy_001_1` | EXP-POP-008 ?? |
+| `window_count` | **77** | ? population OOS ??? |
+| `oos.sharpe` | **0.0** | argmax logit ? `target_weight=0.0`????? |
+| `vs_baseline_sharpe` | **-0.586** | ?? EXP-008 **0.586** |
+| `simulation.sharpe_mean` | **6.31** | M12.1 ???**????? OOS** |
 
-- 记录：**EXP-POP-009** ✅；**296 passed** in **45.05s**
-- 产物：`outputs/candidate_oos/`（metrics.json、windows.csv、oos_equity_curve.csv）
+- ???**EXP-POP-009** ??**296 passed** in **45.05s**
+- ???`outputs/candidate_oos/`?metrics.json?windows.csv?oos_equity_curve.csv?
 
-## 六点二十二、v3 M12.4 Observation-Aware RL Policy（EXP-036 / EXP-POP-010）✅
+## ??????v3 M12.4 Observation-Aware RL Policy?EXP-036 / EXP-POP-010??
 
-前置：`git pull` 含 M12.4（预期 **308 pytest**）。
+???`git pull` ? M12.4??? **308 pytest**??
 
 ```bash
 cd /mnt/localDisk3/weizian/Quant-MAS
 conda activate /mnt/localDisk3/weizian/conda_envs/quant-mas
 
-python -m pytest -v    # 预期 308 passed
+python -m pytest -v    # ?? 308 passed
 
 python scripts/run_rl_experiment.py \
   --config configs/rl_training.yaml \
@@ -1189,30 +1190,30 @@ python scripts/validate_candidate_oos.py \
   --no-dry-run
 ```
 
-**说明**：
+**??**?
 
-- M12.4 训练只写 `training.*` / `simulation.*`；OOS 仅 M11.7 写 `oos.*`
-- 与 EXP-POP-009（logits 全现金 `oos.sharpe=0.0`）对比：feature_linear 应产生**非恒定** `target_weight`
-- 记录：**EXP-20260602-036** 本地 ✅；**EXP-POP-010** 服务器 ✅（`rl_feature_linear_policy_001_1` **oos.sharpe 0.387** vs baseline **0.586**）
+- M12.4 ???? `training.*` / `simulation.*`?OOS ? M11.7 ? `oos.*`
+- ? EXP-POP-009?logits ??? `oos.sharpe=0.0`????feature_linear ???**???** `target_weight`
+- ???**EXP-20260602-036** ?? ??**EXP-POP-010** ??? ??`rl_feature_linear_policy_001_1` **oos.sharpe 0.387** vs baseline **0.586**?
 
-详见 [`docs/rl_observation_policy.md`](rl_observation_policy.md)。
+?? [`docs/rl_observation_policy.md`](rl_observation_policy.md)?
 
-## 七、删除旧部署（如曾在 ~/quant-mas 建过）
+## ??????????? ~/quant-mas ???
 
 ```bash
 rm -rf ~/quant-mas
-# conda 环境可选删除：conda env remove -n quant-mas -y
+# conda ???????conda env remove -n quant-mas -y
 ```
 
-## 八、本地 ↔ 服务器工作流
+## ???? ? ??????
 
-| 操作 | 本地 Windows | 服务器 |
+| ?? | ?? Windows | ??? |
 |------|-------------|--------|
-| 写代码 | Codex | — |
-| 测试 | `python -m pytest -v` | `conda activate quant-mas && python -m pytest -v` |
-| 推送/拉取 | `git push` | `git pull` |
+| ??? | Codex | ? |
+| ?? | `python -m pytest -v` | `conda activate quant-mas && python -m pytest -v` |
+| ??/?? | `git push` | `git pull` |
 
-本地推送：
+?????
 
 ```powershell
 cd "D:\scientific reasearch and work\SRTP\Quant MAS"
@@ -1221,27 +1222,35 @@ git commit -m "your message"
 git push origin main
 ```
 
-## M13.0 MCP Scheduler Minimal����ʵ�֣�
+## M13.0 MCP Scheduler Minimal ?
 
-M13.0 �ķ����� smoke Ŀ������֤��������ƣ�������ʵ GPU �����񣬲���������������ʵ LLM��
-
-���ػ�������ϲ� M13.0 ������У�
+M13.0 ???? smoke ??????????????? GPU ????????????? LLM?
 
 ```bash
-python scripts/run_mcp_pipeline.py --help
+cd /mnt/localDisk3/weizian/Quant-MAS
+git pull origin main   # 605fa66+
+conda activate /mnt/localDisk3/weizian/conda_envs/quant-mas
+python -m pytest -v                              # ?? 342 passed
+python -m pytest tests/test_mcp_scheduler.py -v  # ?? 11 passed
+
 python scripts/run_mcp_pipeline.py --list-recipes
 python scripts/run_mcp_pipeline.py --recipe mock_research --dry-run
+python scripts/run_mcp_pipeline.py --recipe text_smoke --dry-run
 ```
 
-Ԥ�ڲ��
+**????2026-06-04?EXP-M13-001?**??? **342 passed**?53.99s??`mock_research` / `text_smoke` dry-run ??? `audit.jsonl`?
+
+?????
 
 ```text
 outputs/pipelines/<run_id>/audit.jsonl
 ```
 
-�߽磺
+???
 
-- �� dry-run ���� mock ʵ��ڵ㡣
-- `ToolPolicy` ��������ܾ� shell / broker / order / secrets��
-- �������ⲿ MCP server listener��
-- ��д���µ� OOS �о����ۡ�
+- ? dry-run ?? mock ?????
+- `ToolPolicy` ?????? shell / broker / order / secrets?
+- ????? MCP server listener?
+- ????? OOS ?????
+
+????**M13.1** Pipeline Recipe Scheduler?? [mcp_protocol.md](mcp_protocol.md)?

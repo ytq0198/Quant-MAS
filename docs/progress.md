@@ -1,199 +1,199 @@
-# Quant MAS 开发进度
+# Quant MAS ????
 
-更新时间：2026-06-04（**EXP-TEXT-WF-003 ✅** · 文本三线消融闭环 · M12.4 双端）
+?????2026-06-04?**EXP-TEXT-WF-003 ?** � ???????? � M12.4 ???
 
-**Plus v2**：M1–M8 ✅ · **v3 M9–M12.4** ✅ 双端 · RL observation-aware policy 全链路
+**Plus v2**?M1?M8 ? � **v3 M9?M12.4** ? ?? � RL observation-aware policy ???
 
-**pytest 基线**：**326 passed** 本地 + 服务器 · **论文主指标**：**0.586**（EXP-008）· **RL feature_linear OOS**：**0.387**（EXP-POP-010 ablation）· **RL logits OOS**：**0.0**（EXP-POP-009）
+**pytest ??**?**342 passed** ?? + ??? � **?????**?**0.586**?EXP-008?� **RL feature_linear OOS**?**0.387**?EXP-POP-010 ablation?� **RL logits OOS**?**0.0**?EXP-POP-009?
 
-## Plus v2 八条主线（M1–M8）
+## Plus v2 ?????M1?M8?
 
-| 编号 | 名称 | 状态 | 关键交付 / 实验 | 文档 |
+| ?? | ?? | ?? | ???? / ?? | ?? |
 |------|------|------|-----------------|------|
-| **M1** | 研究基线与实验规范 | ✅ | BaselineRegistry、`compare_experiments.py`；OOS **0.586** | [research_protocol.md](research_protocol.md) |
-| **M2** | 数据源扩展 | ✅ | Alpha Vantage / Finnhub / FRED / SEC fetchers | [data_sources.md](data_sources.md) |
-| **M3** | Memory / RAG v2 | ✅ | SQLite、HybridRetriever、index/query CLI | [database_setup.md](database_setup.md) |
-| **M3.5** | 企业 RAG 扩展 | ✅ 并入 M9 | Postgres/pgvector/Neo4j（本地 EXP-025） | [database_setup.md](database_setup.md) |
-| **M4** | LangGraph 工作流 | ✅ | ResearchWorkflow、sequential + langgraph | [langgraph_workflow.md](langgraph_workflow.md) |
-| **M5** | 上下文 / LLM | ✅ | ContextBuilder、ResearchAgent；EXP-LLM-001 | [context_engineering.md](context_engineering.md) |
-| **M5.5** | 本地 vLLM | 📋 按需 | OpenAI 兼容端点（a6000） | 项目plus设计 §M5.5 |
-| **M6** | 文本信号 | ✅ | FinBERT smoke **0.563** · 占位 **0.579** · 真实 **0.565** vs **0.586** | [text_model_plan.md](text_model_plan.md) |
-| **M7** | RL / GRPO 实验 | ✅ | TradingEnv、GRPO ranking；180 passed 本地+服务器 | [rl_plan.md](rl_plan.md) |
-| **M8** | MCP / A2A 协议 | ✅ | MCP adapter、AgentCard；195 passed 本地+服务器 | [protocols.md](protocols.md) |
+| **M1** | ????????? | ? | BaselineRegistry?`compare_experiments.py`?OOS **0.586** | [research_protocol.md](research_protocol.md) |
+| **M2** | ????? | ? | Alpha Vantage / Finnhub / FRED / SEC fetchers | [data_sources.md](data_sources.md) |
+| **M3** | Memory / RAG v2 | ? | SQLite?HybridRetriever?index/query CLI | [database_setup.md](database_setup.md) |
+| **M3.5** | ?? RAG ?? | ? ?? M9 | Postgres/pgvector/Neo4j??? EXP-025? | [database_setup.md](database_setup.md) |
+| **M4** | LangGraph ??? | ? | ResearchWorkflow?sequential + langgraph | [langgraph_workflow.md](langgraph_workflow.md) |
+| **M5** | ??? / LLM | ? | ContextBuilder?ResearchAgent?EXP-LLM-001 | [context_engineering.md](context_engineering.md) |
+| **M5.5** | ?? vLLM | ?? ?? | OpenAI ?????a6000? | ??plus?? �M5.5 |
+| **M6** | ???? | ? | FinBERT smoke **0.563** � ?? **0.579** � ?? **0.565** vs **0.586** | [text_model_plan.md](text_model_plan.md) |
+| **M7** | RL / GRPO ?? | ? | TradingEnv?GRPO ranking?180 passed ??+??? | [rl_plan.md](rl_plan.md) |
+| **M8** | MCP / A2A ?? | ? | MCP adapter?AgentCard?195 passed ??+??? | [protocols.md](protocols.md) |
 
-第五～六阶段见 [项目plus设计.md](../项目plus设计.md)（M7 RL 模拟 / M8 协议扩展，非实盘）。
+??????? [??plus??.md](../??plus??.md)?M7 RL ?? / M8 ??????????
 
-## Plus v3 主线（M9–M13）
+## Plus v3 ???M9?M13?
 
-> 设计：[项目v3设计.md](../项目v3设计.md)
+> ???[??v3??.md](../??v3??.md)
 
-| 编号 | 名称 | 状态 | 关键交付 / 实验 | 文档 |
+| ?? | ?? | ?? | ???? / ?? | ?? |
 |------|------|------|-----------------|------|
-| **M9** | 企业数据与数据库 | ✅ | Postgres 骨架；212 passed 本地+服务器 | [database_setup.md](database_setup.md) |
-| **M10** | LLM 生产化 | ✅ | local_vllm；212 passed 本地+服务器 | [codex_prompt_M10.md](codex_prompt_M10.md) |
-| **M11** | 竞争学习 / 策略种群 | ✅ | competitive CLI；225 双端（EXP-POP-002） | [competitive_learning.md](competitive_learning.md) |
-| **M11.5** | 种群训练闭环 | ✅ | 237 双端（EXP-030/POP-003） | [population_training.md](population_training.md) |
-| **M11.6** | 候选验证桥 | ✅ | 248 双端（EXP-031/POP-004） | [strategy_candidate_bridge.md](strategy_candidate_bridge.md) |
-| **M11.7** | 候选 Walk-forward OOS | ✅ | 259 双端 + EXP-POP-005 真实 OOS | [strategy_candidate_oos.md](strategy_candidate_oos.md) |
-| **M11.8** | 批量候选 OOS 比较 | ✅ | 266 双端 + EXP-POP-006（4/4 > 0.586） | [candidate_oos_batch.md](candidate_oos_batch.md) |
-| **M12.1** | RL 训练实验 | ✅ 双端 | GRPOPolicyAgent、RLTrainingLoop；282 双端 + EXP-POP-007 | [rl_experiment.md](rl_experiment.md) |
-| **M12.2** | RL 候选导出桥 | ✅ 双端 | policy_state → StrategyCandidate；EXP-POP-008 | [rl_policy_export.md](rl_policy_export.md) |
-| **M12.3** | RL 候选 OOS 适配 | ✅ 双端 | `grpo_policy` → walk-forward OOS；EXP-POP-009 | [rl_policy_export.md](rl_policy_export.md) §M12.3 |
-| **M12.4** | Observation-aware RL | ✅ 双端 | EXP-036 / **EXP-POP-010**；OOS **0.387** | [rl_observation_policy.md](rl_observation_policy.md) |
-| **M13** | 企业化编排 | 📋 | DAG scheduler | [protocols.md](protocols.md) |
+| **M9** | ???????? | ? | Postgres ???212 passed ??+??? | [database_setup.md](database_setup.md) |
+| **M10** | LLM ??? | ? | local_vllm?212 passed ??+??? | [codex_prompt_M10.md](codex_prompt_M10.md) |
+| **M11** | ???? / ???? | ? | competitive CLI?225 ???EXP-POP-002? | [competitive_learning.md](competitive_learning.md) |
+| **M11.5** | ?????? | ? | 237 ???EXP-030/POP-003? | [population_training.md](population_training.md) |
+| **M11.6** | ????? | ? | 248 ???EXP-031/POP-004? | [strategy_candidate_bridge.md](strategy_candidate_bridge.md) |
+| **M11.7** | ?? Walk-forward OOS | ? | 259 ?? + EXP-POP-005 ?? OOS | [strategy_candidate_oos.md](strategy_candidate_oos.md) |
+| **M11.8** | ???? OOS ?? | ? | 266 ?? + EXP-POP-006?4/4 > 0.586? | [candidate_oos_batch.md](candidate_oos_batch.md) |
+| **M12.1** | RL ???? | ? ?? | GRPOPolicyAgent?RLTrainingLoop?282 ?? + EXP-POP-007 | [rl_experiment.md](rl_experiment.md) |
+| **M12.2** | RL ????? | ? ?? | policy_state ? StrategyCandidate?EXP-POP-008 | [rl_policy_export.md](rl_policy_export.md) |
+| **M12.3** | RL ?? OOS ?? | ? ?? | `grpo_policy` ? walk-forward OOS?EXP-POP-009 | [rl_policy_export.md](rl_policy_export.md) �M12.3 |
+| **M12.4** | Observation-aware RL | ? ?? | EXP-036 / **EXP-POP-010**?OOS **0.387** | [rl_observation_policy.md](rl_observation_policy.md) |
+| **M13** | ????? | ?? | DAG scheduler | [protocols.md](protocols.md) |
 
-## 阶段总览（v1 Prompt + Plus v2）
+## ?????v1 Prompt + Plus v2?
 
-| 阶段 | 名称 | 状态 | 关键交付 |
+| ?? | ?? | ?? | ???? |
 |------|------|------|----------|
-| 第零阶段 | 项目骨架 | ✅ | Prompt 1 |
-| 第一阶段 | 量化核心 MVP | ✅ | Prompt 2–7、11–12、14 |
-| 第二阶段 | 机器学习实验 | ✅ | Prompt 15–17、15b |
-| 第二阶段扩展 | 基础风控 | ✅ | Prompt 18 |
-| 第三阶段 | Agent 增强 | ✅ | Prompt 8–10、19 |
-| 第四阶段 | Memory + RAG | ✅ | Prompt 20 |
-| **Plus M1** | 研究基线 | ✅ | EXP-20260602-009/010，**102 passed** |
-| **Plus M2** | 数据扩展 | ✅ | EXP-20260602-011/012，EXP-DATA-001 |
-| **Plus M3** | Memory/RAG v2 | ✅ 本地 | EXP-20260602-013，**126 passed** |
-| **Plus M4** | LangGraph 编排 | ✅ | EXP-20260602-015/016 |
-| **Plus M5** | 上下文/LLM | ✅ | EXP-20260602-017/018，EXP-LLM-001，**150 passed** |
-| **Plus M7** | RL 模拟 | ✅ | EXP-021/022，**180 passed** |
-| 第五～六阶段 | 编排 / 协议 | ✅ | Plus **M8** MCP/A2A（EXP-023/024） |
+| ???? | ???? | ? | Prompt 1 |
+| ???? | ???? MVP | ? | Prompt 2?7?11?12?14 |
+| ???? | ?????? | ? | Prompt 15?17?15b |
+| ?????? | ???? | ? | Prompt 18 |
+| ???? | Agent ?? | ? | Prompt 8?10?19 |
+| ???? | Memory + RAG | ? | Prompt 20 |
+| **Plus M1** | ???? | ? | EXP-20260602-009/010?**102 passed** |
+| **Plus M2** | ???? | ? | EXP-20260602-011/012?EXP-DATA-001 |
+| **Plus M3** | Memory/RAG v2 | ? ?? | EXP-20260602-013?**126 passed** |
+| **Plus M4** | LangGraph ?? | ? | EXP-20260602-015/016 |
+| **Plus M5** | ???/LLM | ? | EXP-20260602-017/018?EXP-LLM-001?**150 passed** |
+| **Plus M7** | RL ?? | ? | EXP-021/022?**180 passed** |
+| ?????? | ?? / ?? | ? | Plus **M8** MCP/A2A?EXP-023/024? |
 
-## Quant MAS v2：M1 研究基线
+## Quant MAS v2?M1 ????
 
-> 设计细节见 [项目plus设计.md §M1](../项目plus设计.md#m1研究基线与实验规范)；实验规范见 [docs/research_protocol.md](research_protocol.md)。
+> ????? [??plus??.md �M1](../??plus??.md#m1?????????)?????? [docs/research_protocol.md](research_protocol.md)?
 
-### 目标
+### ??
 
-建立统一实验基线管理，**后续所有新实验必须与 EXP-20260602-008 Walk-forward OOS baseline 对比**后再写结论。
+???????????**?????????? EXP-20260602-008 Walk-forward OOS baseline ??**??????
 
-### 已交付（代码）
+### ???????
 
-| 组件 | 路径 | 说明 |
+| ?? | ?? | ?? |
 |------|------|------|
-| BaselineRegistry | `src/quant_mas/research/baseline.py` | `BaselineRun`、`add_baseline`、`compare_runs`、`get_best("oos.sharpe")` |
-| MetricsTable | `src/quant_mas/research/metrics_table.py` | `collect_experiment_metrics`、`build_comparison_table` |
-| CLI | `scripts/compare_experiments.py` | 从 ExperimentMemory 输出 `comparison.csv` / `comparison.md` |
-| 实验规范 | `docs/research_protocol.md` | 必填字段、OOS 主指标、比较族 |
-| 测试 | `tests/test_research_baseline.py` | 4 项（嵌套 metric、空 memory） |
+| BaselineRegistry | `src/quant_mas/research/baseline.py` | `BaselineRun`?`add_baseline`?`compare_runs`?`get_best("oos.sharpe")` |
+| MetricsTable | `src/quant_mas/research/metrics_table.py` | `collect_experiment_metrics`?`build_comparison_table` |
+| CLI | `scripts/compare_experiments.py` | ? ExperimentMemory ?? `comparison.csv` / `comparison.md` |
+| ???? | `docs/research_protocol.md` | ?????OOS ??????? |
+| ?? | `tests/test_research_baseline.py` | 4 ???? metric?? memory? |
 
-### 状态
+### ??
 
-| 项目 | 状态 | 备注 |
+| ?? | ?? | ?? |
 |------|------|------|
-| M1 模块代码 | ✅ | baseline / metrics_table / compare_experiments / research_protocol |
-| `python scripts/compare_experiments.py --help` | ✅ | EXP-20260602-009 |
-| `tests/test_research_baseline.py` | ✅ **4 passed** | 嵌套 metric、best baseline、CLI 输出 |
-| 全量 pytest（本地） | ✅ **102 passed** | EXP-20260602-009 |
-| 全量 pytest（服务器） | ✅ **102 passed**（1.64s） | EXP-20260602-010 |
-| 服务器 `compare_experiments` | ✅ **5 rows** | `oos.sharpe` **0.586**（与 EXP-20260602-008 一致） |
+| M1 ???? | ? | baseline / metrics_table / compare_experiments / research_protocol |
+| `python scripts/compare_experiments.py --help` | ? | EXP-20260602-009 |
+| `tests/test_research_baseline.py` | ? **4 passed** | ?? metric?best baseline?CLI ?? |
+| ?? pytest???? | ? **102 passed** | EXP-20260602-009 |
+| ?? pytest????? | ? **102 passed**?1.64s? | EXP-20260602-010 |
+| ??? `compare_experiments` | ? **5 rows** | `oos.sharpe` **0.586**?? EXP-20260602-008 ??? |
 
-### 下一步
+### ???
 
-M1/M2 已完成；**M3 本地 ✅**（见下两节）；下一步 **M4**。
+M1/M2 ????**M3 ?? ?**?????????? **M4**?
 
-### OOS 主 baseline（不可遗忘）
+### OOS ? baseline??????
 
-| 实验 | 主指标 | 用途 |
+| ?? | ??? | ?? |
 |------|--------|------|
-| **EXP-20260602-008** | **OOS sharpe 0.586** | 论文 / 报告 **唯一主指标** |
-| EXP-20260602-005 | sharpe 2.78（单段 ML） | ⚠️ in-sample，**禁止**与 OOS 混比 |
-| EXP-20260601-004 | ma_cross sharpe ≈ 1.00 | 传统策略参考 |
-| EXP-20260601-006 | test AUC 0.466 | ML 训练参考 |
+| **EXP-20260602-008** | **OOS sharpe 0.586** | ?? / ?? **?????** |
+| EXP-20260602-005 | sharpe 2.78??? ML? | ?? in-sample?**??**? OOS ?? |
+| EXP-20260601-004 | ma_cross sharpe ? 1.00 | ?????? |
+| EXP-20260601-006 | test AUC 0.466 | ML ???? |
 
-## Quant MAS v2：M2 数据扩展
+## Quant MAS v2?M2 ????
 
-> 设计见 [项目plus设计.md §M2](../项目plus设计.md#m2数据源扩展)；用法见 [docs/data_sources.md](data_sources.md)。
+> ??? [??plus??.md �M2](../??plus??.md#m2?????)???? [docs/data_sources.md](data_sources.md)?
 
-| 组件 | 路径 |
+| ?? | ?? |
 |------|------|
-| Fetcher 子包 | `src/quant_mas/data/fetchers/` |
+| Fetcher ?? | `src/quant_mas/data/fetchers/` |
 | Registry | `DataSourceRegistry` |
-| 新源 | Alpha Vantage、Finnhub、FRED、SEC EDGAR |
-| 配置 | `configs/data_sources.yaml` |
-| 测试 | `tests/test_data_sources.py`（**13 passed**） |
+| ?? | Alpha Vantage?Finnhub?FRED?SEC EDGAR |
+| ?? | `configs/data_sources.yaml` |
+| ?? | `tests/test_data_sources.py`?**13 passed**? |
 
-| 项目 | 状态 |
+| ?? | ?? |
 |------|------|
-| 全量 pytest（本地） | ✅ **115 passed**（EXP-20260602-011） |
-| test_data_sources（服务器） | ✅ **13 passed**（EXP-20260602-012） |
-| API smoke（EXP-DATA-001） | ✅ FRED + Stooq + Alpha Vantage；Finnhub 免费 blocked |
+| ?? pytest???? | ? **115 passed**?EXP-20260602-011? |
+| test_data_sources????? | ? **13 passed**?EXP-20260602-012? |
+| API smoke?EXP-DATA-001? | ? FRED + Stooq + Alpha Vantage?Finnhub ?? blocked |
 
-`download_data.py` 新增：`--source alpha_vantage|finnhub|fred|sec_edgar`、`--series-id`、`--cik`。
+`download_data.py` ???`--source alpha_vantage|finnhub|fred|sec_edgar`?`--series-id`?`--cik`?
 
-## Quant MAS v2：M3 Memory/RAG v2
+## Quant MAS v2?M3 Memory/RAG v2
 
-> 设计见 [项目plus设计.md §M3](../项目plus设计.md#m3数据库与-memory--rag-升级)；部署见 [database_setup.md](database_setup.md)。
+> ??? [??plus??.md �M3](../??plus??.md#m3????-memory--rag-??)???? [database_setup.md](database_setup.md)?
 
-| 组件 | 路径 |
+| ?? | ?? |
 |------|------|
-| MemoryStore | `memory/store_base.py`、`json_store.py`、`sqlite_store.py`、`factory.py` |
-| RAG | `rag/embedding_client.py`、`in_memory_vector_store.py`、`hybrid_retriever.py` |
-| 配置 | `configs/memory.yaml` |
-| CLI | `index_documents.py`、`query_memory.py` |
-| 测试 | `tests/test_memory_store_v2.py`（**11 passed**） |
+| MemoryStore | `memory/store_base.py`?`json_store.py`?`sqlite_store.py`?`factory.py` |
+| RAG | `rag/embedding_client.py`?`in_memory_vector_store.py`?`hybrid_retriever.py` |
+| ?? | `configs/memory.yaml` |
+| CLI | `index_documents.py`?`query_memory.py` |
+| ?? | `tests/test_memory_store_v2.py`?**11 passed**? |
 
-| 项目 | 状态 |
+| ?? | ?? |
 |------|------|
-| 全量 pytest（本地） | ✅ **126 passed**（EXP-20260602-013） |
-| test_memory_rag（Prompt 20） | ✅ **11 passed**（未破坏） |
-| 全量 pytest（服务器） | ✅ **126 passed**（EXP-20260602-014） |
-| index/query CLI `--help` | ✅ |
+| ?? pytest???? | ? **126 passed**?EXP-20260602-013? |
+| test_memory_rag?Prompt 20? | ? **11 passed**????? |
+| ?? pytest????? | ? **126 passed**?EXP-20260602-014? |
+| index/query CLI `--help` | ? |
 
-## Prompt 任务状态
+## Prompt ????
 
-- [x] Prompt 1–10：骨架 → Agent Core
-- [x] Prompt 11–12：端到端 pipeline + 测试
-- [x] Prompt 13：文档收口（2026-06-01，EXP-20260601-015）
-- [x] Prompt 14：服务器部署脚本
-- [x] Prompt 15–17、15b：ML 训练 / 回测 / walk-forward
-- [x] Prompt 18：基础风控
-- [x] Prompt 19：Supervisor 7 类路由
-- [x] Prompt 20：Memory + RAG
-- [x] **Plus M1**：研究基线与实验规范（EXP-20260602-009/010）
-- [x] **Plus M2**：多数据源扩展（EXP-20260602-011/012，EXP-DATA-001）
-- [x] **Plus M3**：Memory/RAG v2（EXP-20260602-013/014）
-- [x] **Plus M4**：LangGraph ResearchWorkflow（EXP-20260602-015/016；**137+1 skip**，含 orchestration **138 passed**）
+- [x] Prompt 1?10??? ? Agent Core
+- [x] Prompt 11?12???? pipeline + ??
+- [x] Prompt 13??????2026-06-01?EXP-20260601-015?
+- [x] Prompt 14????????
+- [x] Prompt 15?17?15b?ML ?? / ?? / walk-forward
+- [x] Prompt 18?????
+- [x] Prompt 19?Supervisor 7 ???
+- [x] Prompt 20?Memory + RAG
+- [x] **Plus M1**???????????EXP-20260602-009/010?
+- [x] **Plus M2**????????EXP-20260602-011/012?EXP-DATA-001?
+- [x] **Plus M3**?Memory/RAG v2?EXP-20260602-013/014?
+- [x] **Plus M4**?LangGraph ResearchWorkflow?EXP-20260602-015/016?**137+1 skip**?? orchestration **138 passed**?
 
-## Quant MAS v2：M4 LangGraph
+## Quant MAS v2?M4 LangGraph
 
 > [langgraph_workflow.md](langgraph_workflow.md)
 
-| 项目 | 状态 |
+| ?? | ?? |
 |------|------|
-| sequential dry-run 6 节点 | ✅ |
-| langgraph dry-run 6 节点 | ✅ 服务器 EXP-016 |
-| test_langgraph_workflow | ✅ 11+1 skip（核心）/ **12 passed**（含 orchestration） |
-| 全量 pytest（本地） | ✅ **137+1 skip** / **138 passed**（含 orchestration） |
-| 全量 pytest（服务器） | ✅ langgraph invoke + dry-run（EXP-016 @ `c0fa5e3`） |
+| sequential dry-run 6 ?? | ? |
+| langgraph dry-run 6 ?? | ? ??? EXP-016 |
+| test_langgraph_workflow | ? 11+1 skip????/ **12 passed**?? orchestration? |
+| ?? pytest???? | ? **137+1 skip** / **138 passed**?? orchestration? |
+| ?? pytest????? | ? langgraph invoke + dry-run?EXP-016 @ `c0fa5e3`? |
 
-- [x] **Plus M5**：Context + ResearchAgent + 可选 LLM（EXP-20260602-017，**150+1 warning**）
+- [x] **Plus M5**?Context + ResearchAgent + ?? LLM?EXP-20260602-017?**150+1 warning**?
 
-## Quant MAS v2：M5 上下文/LLM
+## Quant MAS v2?M5 ???/LLM
 
 > [context_engineering.md](context_engineering.md)
 
-| 项目 | 状态 |
+| ?? | ?? |
 |------|------|
-| ContextBuilder + compression | ✅ |
-| ResearchAgent / ReportResult | ✅ |
-| resolve_llm_client（默认 Mock） | ✅ |
-| test_context_engineering | ✅ 12 passed, 1 warning |
-| 全量 pytest（本地） | ✅ **150 passed, 1 warning** |
-| 全量 pytest（服务器） | ✅ **150 passed**（7.24s，EXP-018 @ `43c812a`） |
-| DeepSeek ResearchAgent smoke | ✅ EXP-LLM-001（openai_compatible） |
+| ContextBuilder + compression | ? |
+| ResearchAgent / ReportResult | ? |
+| resolve_llm_client??? Mock? | ? |
+| test_context_engineering | ? 12 passed, 1 warning |
+| ?? pytest???? | ? **150 passed, 1 warning** |
+| ?? pytest????? | ? **150 passed**?7.24s?EXP-018 @ `43c812a`? |
+| DeepSeek ResearchAgent smoke | ? EXP-LLM-001?openai_compatible? |
 
-## 当前 pytest 状态
+## ?? pytest ??
 
-| 环境 | Python | 结果 | 日期 | 实验 |
+| ?? | Python | ?? | ?? | ?? |
 |------|--------|------|------|------|
-| 本地 Windows | 3.11+ | **331 passed** | 2026-06-04 | EXP-TEXT-WF-003 docs |
-| 服务器 a6000-9961 | 3.11.15 | **331 passed** | 2026-06-04 | EXP-TEXT-WF-003 OOS **0.565** @ `561e104` |
+| ?? Windows | 3.11+ | **331 passed** | 2026-06-04 | EXP-TEXT-WF-003 docs |
+| ??? a6000-9961 | 3.11.15 | **331 passed** | 2026-06-04 | EXP-TEXT-WF-003 OOS **0.565** @ `561e104` |
 
-命令：`python -m pytest -v`（勿裸敲 `pytest` / `pip`）。
+???`python -m pytest -v`???? `pytest` / `pip`??
 
-## 当前可用 CLI
+## ???? CLI
 
 ```powershell
 python scripts/download_data.py --help
@@ -217,169 +217,169 @@ python scripts/batch_validate_candidates.py --help
 python scripts/export_agent_cards.py --help
 ```
 
-## 当前已实现能力
+## ???????
 
 ### Quant Engine
 
-- 数据：Parquet、Stooq/yfinance/auto、**Alpha Vantage / Finnhub / FRED / SEC**（Plus M2）、OHLCV 校验
-- 特征：技术指标、future label、按 symbol 分组
-- 策略 / 回测：MA Cross、MLSignalStrategy、walk-forward OOS
-- 模型：LightGBM（CPU + GPU/CUDA）
-- 风控：RiskLimits、持仓裁剪/拒绝、回撤守卫
+- ???Parquet?Stooq/yfinance/auto?**Alpha Vantage / Finnhub / FRED / SEC**?Plus M2??OHLCV ??
+- ????????future label?? symbol ??
+- ?? / ???MA Cross?MLSignalStrategy?walk-forward OOS
+- ???LightGBM?CPU + GPU/CUDA?
+- ???RiskLimits?????/???????
 
 ### Agent Layer
 
-- 7 个 Quant Tools + Supervisor 规则路由（中英文关键词）
-- 路由：ml_backtest / risk_check / pipeline / backtest / train_model / report / data_summary
+- 7 ? Quant Tools + Supervisor ????????????
+- ???ml_backtest / risk_check / pipeline / backtest / train_model / report / data_summary
 
 ### Memory / RAG
 
-- ExperimentMemory：get / search / sort_by_metric / find_best（含嵌套 metric）
-- TradeMemory：JSONL 空壳
-- SimpleRetriever：关键词检索 docs（无向量库、无 LLM）
+- ExperimentMemory?get / search / sort_by_metric / find_best???? metric?
+- TradeMemory?JSONL ??
+- SimpleRetriever?????? docs??????? LLM?
 
-### Research Layer（Plus M1）
+### Research Layer?Plus M1?
 
-- BaselineRegistry / BaselineRun：命名 baseline 与实验 run 的统一比较
-- MetricsTable：`collect_experiment_metrics` → `build_comparison_table`
-- `compare_experiments.py`：从 ExperimentMemory 导出 CSV / Markdown 比较表
-- **规则**：新实验结论须与 **EXP-20260602-008 OOS sharpe 0.586** 对比（见 `research_protocol.md`）
+- BaselineRegistry / BaselineRun??? baseline ??? run ?????
+- MetricsTable?`collect_experiment_metrics` ? `build_comparison_table`
+- `compare_experiments.py`?? ExperimentMemory ?? CSV / Markdown ???
+- **??**???????? **EXP-20260602-008 OOS sharpe 0.586** ???? `research_protocol.md`?
 
-## 服务器真实实验（研究用）
+## ????????????
 
-| 实验 | 关键结果 | 备注 |
+| ?? | ???? | ?? |
 |------|----------|------|
-| EXP-20260601-004 | Stooq 6033 rows；ma_cross sharpe ≈ 1.00 | 真实 pipeline |
-| EXP-20260601-006 | CPU LightGBM test AUC 0.466 | 过拟合基线 |
-| EXP-20260602-004 | GPU LightGBM device=cuda | 见 M-010 |
-| EXP-20260602-005 | ML 单段回测 sharpe **2.78** | **非 OOS，勿混用** |
-| EXP-20260602-008 | Walk-forward **OOS sharpe 0.586** | **报告主指标** |
-| EXP-TEXT-001 | FinBERT smoke（ModelScope） | 200 signals；6033 行 features 中 134 非零 |
-| EXP-TEXT-WF-001 | Walk-forward + text | OOS sharpe **0.563** vs baseline **0.586**（exploratory；3.32% 覆盖） |
-| EXP-TEXT-WF-002 | Walk-forward + 100% text | OOS sharpe **0.579** vs baseline **0.586**（Δ **-0.007**；占位文本） |
-| EXP-TEXT-WF-003 | Walk-forward + 真实新闻 | OOS sharpe **0.565** vs baseline **0.586**（Δ **-0.021**；Finnhub 2.42% 覆盖） |
-| EXP-POP-005 | 单候选 OOS（M11.7） | `cand_mean_rev_1` **oos.sharpe 1.036** vs **0.586**（77 窗） |
-| EXP-POP-007 | RL training smoke（M12.1） | **simulation.sharpe_mean 6.31**（**≠ OOS 0.586**） |
-| EXP-POP-006 | 批量候选 OOS（M11.8） | 4/4 超 baseline；best **1.039** |
+| EXP-20260601-004 | Stooq 6033 rows?ma_cross sharpe ? 1.00 | ?? pipeline |
+| EXP-20260601-006 | CPU LightGBM test AUC 0.466 | ????? |
+| EXP-20260602-004 | GPU LightGBM device=cuda | ? M-010 |
+| EXP-20260602-005 | ML ???? sharpe **2.78** | **? OOS????** |
+| EXP-20260602-008 | Walk-forward **OOS sharpe 0.586** | **?????** |
+| EXP-TEXT-001 | FinBERT smoke?ModelScope? | 200 signals?6033 ? features ? 134 ?? |
+| EXP-TEXT-WF-001 | Walk-forward + text | OOS sharpe **0.563** vs baseline **0.586**?exploratory?3.32% ??? |
+| EXP-TEXT-WF-002 | Walk-forward + 100% text | OOS sharpe **0.579** vs baseline **0.586**?? **-0.007**?????? |
+| EXP-TEXT-WF-003 | Walk-forward + ???? | OOS sharpe **0.565** vs baseline **0.586**?? **-0.021**?Finnhub 2.42% ??? |
+| EXP-POP-005 | ??? OOS?M11.7? | `cand_mean_rev_1` **oos.sharpe 1.036** vs **0.586**?77 ?? |
+| EXP-POP-007 | RL training smoke?M12.1? | **simulation.sharpe_mean 6.31**?**? OOS 0.586**? |
+| EXP-POP-006 | ???? OOS?M11.8? | 4/4 ? baseline?best **1.039** |
 
-## 研究解读
+## ????
 
-1. 单段 ML 回测 sharpe 2.78 ≫ walk-forward OOS sharpe 0.586 → **论文/报告以 OOS 为准**。
-2. OOS auc_mean 0.472 与 val/test AUC ≈ 0.46–0.48 一致；模型调参留作后续研究。
-3. Agent 可编排 ML 回测、风控、pipeline；Memory/RAG 可检索历史实验与文档。
-4. **Plus M1**：任何新实验写入 ExperimentMemory 后，须用 `compare_experiments.py` 生成比较表，并与 **EXP-20260602-008** 对照后再下结论。
-5. **Plus M6 text**：EXP-TEXT-WF-001（3.32%）**0.563**；EXP-TEXT-WF-002（100% 占位）**0.579**；EXP-TEXT-WF-003（Finnhub 真实 2.42%）**0.565**。三线均略低于主基线 **0.586**；真实新闻在稀疏覆盖下 ≈ WF-001，未复现 WF-002 占位回升。
+1. ?? ML ?? sharpe 2.78 ? walk-forward OOS sharpe 0.586 ? **??/??? OOS ??**?
+2. OOS auc_mean 0.472 ? val/test AUC ? 0.46?0.48 ??????????????
+3. Agent ??? ML ??????pipeline?Memory/RAG ???????????
+4. **Plus M1**???????? ExperimentMemory ???? `compare_experiments.py` ???????? **EXP-20260602-008** ????????
+5. **Plus M6 text**?EXP-TEXT-WF-001?3.32%?**0.563**?EXP-TEXT-WF-002?100% ???**0.579**?EXP-TEXT-WF-003?Finnhub ?? 2.42%?**0.565**?????????? **0.586**??????????? ? WF-001???? WF-002 ?????
 
-## Quant MAS v2：M6 文本信号
+## Quant MAS v2?M6 ????
 
-> [text_model_plan.md](text_model_plan.md) · [codex_prompt_M6.md](codex_prompt_M6.md)
+> [text_model_plan.md](text_model_plan.md) � [codex_prompt_M6.md](codex_prompt_M6.md)
 
-| 项目 | 状态 |
+| ?? | ?? |
 |------|------|
-| text/ schema + mock classifier | ✅ |
-| text_signals merge + leakage 检查 | ✅ |
-| train_text_model.py（mock dry-run） | ✅ |
-| test_text_signals | ✅ **11 passed** |
-| 全量 pytest（本地） | ✅ **161 passed** |
-| 全量 pytest（服务器） | ✅ **161 passed**（9.20s，EXP-020 @ `b9de2f2`） |
-| EXP-TEXT-001 FinBERT smoke | ✅ ModelScope 本地 FinBERT，200 signals |
-| EXP-TEXT-WF-001 walk-forward | ✅ oos.sharpe **0.563** vs baseline **0.586**（exploratory） |
+| text/ schema + mock classifier | ? |
+| text_signals merge + leakage ?? | ? |
+| train_text_model.py?mock dry-run? | ? |
+| test_text_signals | ? **11 passed** |
+| ?? pytest???? | ? **161 passed** |
+| ?? pytest????? | ? **161 passed**?9.20s?EXP-020 @ `b9de2f2`? |
+| EXP-TEXT-001 FinBERT smoke | ? ModelScope ?? FinBERT?200 signals |
+| EXP-TEXT-WF-001 walk-forward | ? oos.sharpe **0.563** vs baseline **0.586**?exploratory? |
 
-## Quant MAS v2：M7 RL 模拟
+## Quant MAS v2?M7 RL ??
 
-> [rl_plan.md](rl_plan.md) · [codex_prompt_M7.md](codex_prompt_M7.md)
+> [rl_plan.md](rl_plan.md) � [codex_prompt_M7.md](codex_prompt_M7.md)
 
-| 项目 | 状态 |
+| ?? | ?? |
 |------|------|
-| TradingEnv + next-bar open 执行 | ✅ |
-| Random / BuyHold / MLCopy policies | ✅ |
-| GRPO-style group-relative ranking | ✅ |
-| run_rl_baseline.py --dry-run | ✅ |
-| run_competitive_experiment.py --dry-run | ✅ EXP-POP-001/002 |
-| run_population_training.py --dry-run | ✅ EXP-030/POP-003 双端 |
-| test_trading_env | ✅ **13 passed** |
-| test_grpo_experiment | ✅ **6 passed** |
-| 全量 pytest（本地） | ✅ **180 passed** |
-| 全量 pytest（服务器） | ✅ **180 passed**（10.15s，EXP-022 @ `d8ece63`） |
+| TradingEnv + next-bar open ?? | ? |
+| Random / BuyHold / MLCopy policies | ? |
+| GRPO-style group-relative ranking | ? |
+| run_rl_baseline.py --dry-run | ? |
+| run_competitive_experiment.py --dry-run | ? EXP-POP-001/002 |
+| run_population_training.py --dry-run | ? EXP-030/POP-003 ?? |
+| test_trading_env | ? **13 passed** |
+| test_grpo_experiment | ? **6 passed** |
+| ?? pytest???? | ? **180 passed** |
+| ?? pytest????? | ? **180 passed**?10.15s?EXP-022 @ `d8ece63`? |
 
-## Quant MAS v2：M8 MCP / A2A
+## Quant MAS v2?M8 MCP / A2A
 
-> [protocols.md](protocols.md) · [codex_prompt_M8.md](codex_prompt_M8.md)
+> [protocols.md](protocols.md) � [codex_prompt_M8.md](codex_prompt_M8.md)
 
-| 项目 | 状态 |
+| ?? | ?? |
 |------|------|
-| MCPToolSpec / policy / adapter | ✅ |
-| deny shell/broker/order/secrets | ✅ |
-| AgentCard（Supervisor/Research/Report） | ✅ |
-| export_agent_cards.py | ✅ |
-| test_protocols | ✅ **15 passed** |
-| 全量 pytest（本地） | ✅ **195 passed** |
-| 全量 pytest（服务器） | ✅ **212 passed**（11.39s，EXP-028 @ `3fd32e0`） |
-| 服务器 Postgres 真实连接 | ✅ EXP-026（6 exp, 443 chunks, OOS 0.586） |
+| MCPToolSpec / policy / adapter | ? |
+| deny shell/broker/order/secrets | ? |
+| AgentCard?Supervisor/Research/Report? | ? |
+| export_agent_cards.py | ? |
+| test_protocols | ? **15 passed** |
+| ?? pytest???? | ? **195 passed** |
+| ?? pytest????? | ? **212 passed**?11.39s?EXP-028 @ `3fd32e0`? |
+| ??? Postgres ???? | ? EXP-026?6 exp, 443 chunks, OOS 0.586? |
 
-## Quant MAS v3：M9 企业 DB
+## Quant MAS v3?M9 ?? DB
 
-> [database_setup.md](database_setup.md) · [项目v3设计.md](../项目v3设计.md) §M9
+> [database_setup.md](database_setup.md) � [??v3??.md](../??v3??.md) �M9
 
-| 项目 | 状态 |
+| ?? | ?? |
 |------|------|
-| PostgresMemoryStore + oos.sharpe 嵌套查询 | ✅ |
-| PgVectorStore upsert/search/delete | ✅ |
-| Neo4jGraphStore 骨架 | ✅ |
-| factory json \| sqlite \| postgres | ✅ |
-| query_memory / index_documents CLI | ✅ |
-| test_memory_enterprise | ✅ **12 passed** |
-| 全量 pytest（本地+服务器） | ✅ **212 passed**（EXP-028，11.39s） |
-| 服务器 Postgres 真实连接 | ✅ EXP-026 |
+| PostgresMemoryStore + oos.sharpe ???? | ? |
+| PgVectorStore upsert/search/delete | ? |
+| Neo4jGraphStore ?? | ? |
+| factory json \| sqlite \| postgres | ? |
+| query_memory / index_documents CLI | ? |
+| test_memory_enterprise | ? **12 passed** |
+| ?? pytest???+???? | ? **212 passed**?EXP-028?11.39s? |
+| ??? Postgres ???? | ? EXP-026 |
 
-## Quant MAS v3：M10 LLM
+## Quant MAS v3?M10 LLM
 
-> [context_engineering.md](context_engineering.md) · [codex_prompt_M10.md](codex_prompt_M10.md)
+> [context_engineering.md](context_engineering.md) � [codex_prompt_M10.md](codex_prompt_M10.md)
 
-| 项目 | 状态 |
+| ?? | ?? |
 |------|------|
-| local_vllm provider | ✅ |
-| ResearchAgent LLM 失败回退 Mock | ✅ |
-| --provider CLI | ✅ |
-| test_context_engineering | ✅ **17 passed** |
-| 全量 pytest（本地） | ✅ **212 passed** |
-| 全量 pytest（服务器） | ✅ **212 passed**（11.39s，EXP-028） |
-| 服务器 / vLLM smoke | ✅ EXP-LLM-002（Qwen2.5-7B @ a6000） |
+| local_vllm provider | ? |
+| ResearchAgent LLM ???? Mock | ? |
+| --provider CLI | ? |
+| test_context_engineering | ? **17 passed** |
+| ?? pytest???? | ? **212 passed** |
+| ?? pytest????? | ? **212 passed**?11.39s?EXP-028? |
+| ??? / vLLM smoke | ? EXP-LLM-002?Qwen2.5-7B @ a6000? |
 
-## Plus v2 收官（V2 结尾）
+## Plus v2 ???V2 ???
 
-> 系统结构定稿见根目录 [`项目进度.md`](../项目进度.md) §Plus v2 收官；架构详图 [`architecture.md`](architecture.md)。
+> ?????????? [`????.md`](../????.md) �Plus v2 ??????? [`architecture.md`](architecture.md)?
 
-**设计原则**：Quant Engine 做计算；Agent Layer 做编排、解释与报告；LLM 不直接实盘下单。
+**????**?Quant Engine ????Agent Layer ??????????LLM ????????
 
-**十层架构（定稿）**：Quant Engine → Tool Layer（7 tools）→ Agent Layer → Text（M6）→ RL Simulation（M7）→ Protocol（M8）→ Context（M5）→ Orchestration（M4）→ Memory/RAG（M3）→ Research（M1）。
+**????????**?Quant Engine ? Tool Layer?7 tools?? Agent Layer ? Text?M6?? RL Simulation?M7?? Protocol?M8?? Context?M5?? Orchestration?M4?? Memory/RAG?M3?? Research?M1??
 
-**主数据流**：`download_data → features → train → walk_forward（OOS 0.586）→ ExperimentMemory → compare_experiments`。
+**????**?`download_data ? features ? train ? walk_forward?OOS 0.586?? ExperimentMemory ? compare_experiments`?
 
-**Agent 路径**：`SupervisorAgent → ToolRegistry → Quant Engine → metrics`。
+**Agent ??**?`SupervisorAgent ? ToolRegistry ? Quant Engine ? metrics`?
 
-**v2 关键指标**：pytest **195** · OOS sharpe **0.586** · text OOS **0.563**（exploratory）· RL `simulation.*` 不与 OOS 混比。
+**v2 ????**?pytest **195** � OOS sharpe **0.586** � text OOS **0.563**?exploratory?� RL `simulation.*` ?? OOS ???
 
-**v2 不做**：实盘 broker、外部 MCP server、ShellTool。
+**v2 ??**??? broker??? MCP server?ShellTool?
 
-## 后续工作（v2 之后）
+## ?????v2 ???
 
-- ~~**M10 本地/服务器 pytest**~~ ✅ EXP-027/028（212）
-- **M9 服务器 DB smoke**：✅ EXP-026（2026-06-03）
-- ~~**EXP-LLM-002**~~ ✅（2026-06-03，local_vllm + ResearchAgent）
-- ~~**M11.8 服务器批量 OOS**~~ ✅ EXP-POP-006（266 pytest；best **1.039**）
-- ~~**M12.1 本地 RL training loop**~~ ✅ EXP-034（**282 pytest**）
-- ~~**M12.1 服务器 RL smoke**~~ ✅ EXP-POP-007 / EXP-RL-003
-- ~~**M12.2 本地 export bridge**~~ ✅ EXP-035（**294→296 pytest**）
-- ~~**M12.2 服务器 export**~~ ✅ EXP-POP-008
-- ~~**M12.3 RL 候选 OOS**~~ ✅ EXP-POP-009（**296 pytest**；`oos.sharpe=0.0` 全现金 ablation）
-- ~~**M12.4 Observation-aware RL policy**~~ ✅ 双端 EXP-036 / **EXP-POP-010**（OOS **0.387**）
-- ~~**EXP-TEXT-WF-002** coverage audit tool~~ ✅ EXP-TEXT-WF-002-PREP（**314 pytest**）
-- ~~**EXP-TEXT-WF-002** 服务器 walk-forward OOS~~ ✅ oos.sharpe **0.579** vs **0.586**
-- ~~**EXP-TEXT-WF-003** 服务器 walk-forward OOS~~ ✅ oos.sharpe **0.565** vs **0.586**
-- M13 编排
+- ~~**M10 ??/??? pytest**~~ ? EXP-027/028?212?
+- **M9 ??? DB smoke**?? EXP-026?2026-06-03?
+- ~~**EXP-LLM-002**~~ ??2026-06-03?local_vllm + ResearchAgent?
+- ~~**M11.8 ????? OOS**~~ ? EXP-POP-006?266 pytest?best **1.039**?
+- ~~**M12.1 ?? RL training loop**~~ ? EXP-034?**282 pytest**?
+- ~~**M12.1 ??? RL smoke**~~ ? EXP-POP-007 / EXP-RL-003
+- ~~**M12.2 ?? export bridge**~~ ? EXP-035?**294?296 pytest**?
+- ~~**M12.2 ??? export**~~ ? EXP-POP-008
+- ~~**M12.3 RL ?? OOS**~~ ? EXP-POP-009?**296 pytest**?`oos.sharpe=0.0` ??? ablation?
+- ~~**M12.4 Observation-aware RL policy**~~ ? ?? EXP-036 / **EXP-POP-010**?OOS **0.387**?
+- ~~**EXP-TEXT-WF-002** coverage audit tool~~ ? EXP-TEXT-WF-002-PREP?**314 pytest**?
+- ~~**EXP-TEXT-WF-002** ??? walk-forward OOS~~ ? oos.sharpe **0.579** vs **0.586**
+- ~~**EXP-TEXT-WF-003** ??? walk-forward OOS~~ ? oos.sharpe **0.565** vs **0.586**
+- M13 ??
 
-## Quant MAS v3：M12.4 Observation-aware RL
+## Quant MAS v3?M12.4 Observation-aware RL
 
 M12.4 adds a feature-linear policy path for RL candidates. It reads deterministic market observations (`position_weight`, `last_return`, `rolling_vol_5`, `volume`, `close`) and exports `agent_type="feature_linear_policy"` candidates for the existing M11.7/M11.8 OOS validation hooks.
 
@@ -387,11 +387,11 @@ Validation status:
 
 | Item | Status |
 |------|--------|
-| Feature policy tests | ✅ **14 passed** |
-| RL training/export regression | ✅ **28 passed** |
-| Candidate OOS regression | ✅ **20 passed** |
-| Full pytest | ✅ **308 passed** |
-| Server OOS smoke | ✅ **EXP-POP-010**（`oos.sharpe=0.387`） |
+| Feature policy tests | ? **14 passed** |
+| RL training/export regression | ? **28 passed** |
+| Candidate OOS regression | ? **20 passed** |
+| Full pytest | ? **308 passed** |
+| Server OOS smoke | ? **EXP-POP-010**?`oos.sharpe=0.387`? |
 
 Boundary: M12.4 training still writes only `training.*` / `simulation.*`; `oos.*` remains owned by M11.7/M11.8.
 
@@ -411,30 +411,20 @@ M13 is split into four incremental stages so implementation can stay small and t
 
 | Stage | Status | Purpose | Document |
 |------|--------|---------|----------|
-| **M13.0 MCP Scheduler Minimal** | Next | Internal dry-run scheduler, Agent messages, audit JSONL, ToolPolicy safety checks | [mcp_protocol.md](mcp_protocol.md) |
-| **M13.1 Pipeline Recipe Scheduler** | Later | YAML recipes for ML/Text/Population/RL research pipelines | [mcp_protocol.md](mcp_protocol.md) |
+| **M13.0 MCP Scheduler Minimal** | ? | Internal dry-run scheduler, audit JSONL, ToolPolicy | [mcp_protocol.md](mcp_protocol.md) |
+| **M13.1 Pipeline Recipe Scheduler** | Next | YAML recipes for ML/Text/Population/RL | [mcp_protocol.md](mcp_protocol.md) |
 | **M13.2 LangGraph Extended DAG** | Later | Optional LangGraph backend for population, RL, and batch walk-forward nodes | [mcp_protocol.md](mcp_protocol.md) |
 | **M13.3 Paper Artifact Export** | Later | Paper-grade result tables, ablation tables, and audit package | [mcp_protocol.md](mcp_protocol.md) |
 
-Current next implementation target: **M13.0** only. It must not replace M4 ResearchWorkflow or SupervisorAgent, must default to dry-run, must not start an external MCP listener, and must keep `ToolPolicy` denying shell/broker/order/secrets.
+Current next implementation target: **M13.1** Pipeline Recipe Scheduler.
 
-### M13.0 completion note
+### M13.0 completion note（EXP-M13-001 ✅ 双端）
 
-M13.0 MCP Scheduler Minimal has been implemented locally.
+| 环境 | 结果 |
+|------|------|
+| 本地 | **342 passed** |
+| 服务器 a6000-9961 | **342 passed**（53.99s）；pipeline dry-run ✅ @ 605fa66 |
 
-Delivered:
-
-- `src/quant_mas/orchestration/agent_communication.py`
-- `src/quant_mas/orchestration/audit_log.py`
-- `src/quant_mas/orchestration/mcp_scheduler.py`
-- `scripts/run_mcp_pipeline.py`
-- `tests/test_mcp_scheduler.py`
-
-Verification:
-
-- `python -m pytest tests/test_mcp_scheduler.py -v` �� **11 passed**
-- `python scripts/run_mcp_pipeline.py --help` �� OK
-- `python scripts/run_mcp_pipeline.py --list-recipes` �� `mock_research`, `text_smoke`
-- `python -m pytest -v` �� **342 passed**
+Delivered: agent_communication / audit_log / mcp_scheduler / run_mcp_pipeline / test_mcp_scheduler（11/11）
 
 M13.0 remains dry-run only and does not create new OOS research metrics.
