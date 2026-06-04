@@ -135,8 +135,9 @@ policy:
 
 M12.2 export supports both states:
 
-- `PolicyState` from logits policy
-- Export supports both states; **`agent_type` is auto-detected** from checkpoint (config override ignored when stale).
+- `PolicyState` from logits policy → `agent_type=grpo_policy`
+- `FeaturePolicyState` from feature-linear policy → `agent_type=feature_linear_policy`
+- **`agent_type` is auto-detected** from checkpoint; stale `grpo_policy` in config is ignored
 
 `StrategyCandidate.params` should include:
 
