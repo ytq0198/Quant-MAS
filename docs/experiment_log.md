@@ -1,6 +1,6 @@
 # Quant MAS 实验记录
 
-更新时间：2026-06-04（v3 M12.2 ✅ **294 本地闭环 · 待 EXP-POP-008 服务器 export smoke**）
+更新时间：2026-06-04（v3 M12.2 ✅ **294 本地 + EXP-POP-008 服务器 export**）
 
 本文件用于记录真实实验和重要验证。不要记录未经实际运行的数据结果；尚未真实运行的项目标记为「待验证」。
 
@@ -196,32 +196,22 @@
 
 ## 当前验证记录
 
-### EXP-POP-008：v3 M12.2 服务器 RL policy → StrategyCandidate export ⏳
+### EXP-POP-008：v3 M12.2 服务器 RL policy → StrategyCandidate export ✅
 
-- 日期：待跑
+- 日期：2026-06-04
 - 阶段：**M12.2** — 读取 M12.1 checkpoint，导出 `StrategyCandidate`（**不写 oos.***）
-- 环境：a6000-9961；conda `quant-mas`；前置 **EXP-POP-007** `outputs/rl_training/rl_training_grpo_001/`
-- 命令（模板）：
-
-```bash
-python -m pytest -v                                    # 预期 294 passed
-python scripts/export_rl_policy_candidate.py \
-  --config configs/rl_policy_export.yaml \
-  --no-dry-run
-```
-
-- 预期产物：`outputs/rl_candidates/candidates.json`；ExperimentMemory `family=rl_policy_export`
-- **可选后续 OOS**（独立步骤，非 M12.2）：
-
-```bash
-python scripts/validate_candidate_oos.py \
-  --candidate-json outputs/rl_candidates/candidates.json \
-  --features-path /mnt/localDisk3/weizian/datasets/features/features.parquet \
-  --config configs/candidate_oos.yaml \
-  --no-dry-run
-```
-
-- 科研边界：export 只写 `training.*` / `simulation.*` selection_metrics；OOS 仅 M11.7 可写 `oos.*`
+- 环境：a6000-9961；conda `quant-mas`；Python **3.11.15**；前置 **EXP-POP-007** `outputs/rl_training/rl_training_grpo_001/`
+- 命令与结果：
+  - `python -m pytest -v` → **294 passed** in **44.93s** ✅
+  - `export_rl_policy_candidate.py --config configs/rl_policy_export.yaml --no-dry-run` → ✅（`e7fea132af8a451ba9c999762d220ee6`）
+- 导出候选：
+  - `candidate_id`: **`rl_grpo_policy_001_1`**；`agent_type`: **`grpo_policy`**
+  - `selection_metrics`: 仅 `training.*` / `simulation.*` / `summary.*`（**无 oos.***）✅
+  - `simulation.sharpe_mean`: **6.31**（simulation only，**≠ OOS**）
+- 产物：`outputs/rl_candidates/candidates.json`、`candidates.csv`、`export_summary.md`
+- **OOS 适配（M12.3）**：`validate_candidate_oos.py` 曾报 `Unsupported agent_type`；已在 `CandidateStrategyAdapter` 增加 `grpo_policy` 分支（logits → 常数 `target_weight`）。服务器拉取后重跑 OOS 即可。
+- 科研边界：export 只写 selection_metrics；OOS 仅 M11.7 可写 `oos.*`
+- 下一步：M12.3 `grpo_policy` OOS adapter；可选 RL walk-forward OOS vs **0.586**
 - 问题：—
 - 下一步：export smoke 后可选 RL 候选 OOS vs **0.586**（ablation）
 
@@ -242,7 +232,7 @@ python scripts/validate_candidate_oos.py \
   - 全量 `python -m pytest -v` → **294 passed**（282→294，+12）
 - 边界：不训练、不 OOS、不 LLM、不联网；`source=rl_training`；OOS 须 M11.7/M11.8
 - 问题：无
-- 下一步：服务器 **EXP-POP-008**；可选 RL 候选 walk-forward OOS
+- 下一步：~~服务器 **EXP-POP-008**~~ ✅；M12.3 `grpo_policy` OOS adapter；可选 RL walk-forward OOS
 
 ### EXP-POP-007：v3 M12.1 服务器 RL training smoke ✅
 

@@ -1,7 +1,7 @@
 # M12.2 RL Policy Export Bridge
 
 Updated: 2026-06-04  
-Status: M12.2 implemented locally; server export smoke pending (EXP-POP-008)
+Status: M12.2 + M12.3 OOS adapter implemented; EXP-POP-008 server export ✅
 
 M12.2 converts M12.1 simulation-trained policy artifacts into the existing
 `StrategyCandidate` schema. It is a bridge only. It must not run walk-forward
@@ -152,6 +152,26 @@ M12.2 must allow:
 - `summary.baseline_experiment_id`
 
 These are summary references, not RL OOS results.
+
+## M12.3 OOS Adapter (`grpo_policy`)
+
+After export, M11.7 `CandidateStrategyAdapter` maps `grpo_policy` candidates to walk-forward signals:
+
+- Read `params.action_logits` from the exported candidate
+- Pick argmax logit index (deterministic tie-break: lowest index)
+- Map index → `target_weight` via `params.action_levels` or default `[0.0, 0.25, 0.5, 1.0]`
+
+Current M12.1 `GRPOPolicyAgent.act()` ignores observations, so OOS uses a **constant** target weight per symbol. This matches simulation behavior but is not state-dependent.
+
+```bash
+python scripts/validate_candidate_oos.py \
+  --candidate-json outputs/rl_candidates/candidates.json \
+  --features-path /path/to/features.parquet \
+  --config configs/candidate_oos.yaml \
+  --no-dry-run
+```
+
+Only M11.7/M11.8 write `oos.*` metrics for these candidates.
 
 ## Test Plan
 

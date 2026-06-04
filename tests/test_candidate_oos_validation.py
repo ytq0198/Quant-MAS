@@ -42,6 +42,50 @@ def test_candidate_strategy_adapter_generates_mean_reversion_signals() -> None:
     assert mean_reversion["target_weight"].between(0.0, 1.0).all()
 
 
+def test_candidate_strategy_adapter_generates_grpo_policy_signals() -> None:
+    candidate = make_candidate(
+        candidate_id="rl_grpo_policy_001_1",
+        agent_id="grpo_policy_001",
+        agent_type="grpo_policy",
+        params={
+            "action_logits": [0.1, 0.2, 0.05, -0.3],
+            "action_levels": [0.0, 0.25, 0.5, 1.0],
+            "action_policy": "discrete_logits",
+        },
+    )
+
+    signals = CandidateStrategyAdapter(candidate).generate_signals(make_features(days=8))
+
+    assert set(signals.columns) == {"date", "symbol", "target_weight"}
+    assert signals["target_weight"].between(0.0, 1.0).all()
+    assert signals["target_weight"].nunique() == 1
+    assert signals["target_weight"].iloc[0] == pytest.approx(0.25)
+
+
+def test_run_candidate_walk_forward_grpo_policy_reports_oos_metrics() -> None:
+    candidate = make_candidate(
+        candidate_id="rl_grpo_policy_001_1",
+        agent_id="grpo_policy_001",
+        agent_type="grpo_policy",
+        params={
+            "action_logits": [0.1, 0.2, 0.05, -0.3],
+            "action_levels": [0.0, 0.25, 0.5, 1.0],
+            "action_policy": "discrete_logits",
+        },
+    )
+
+    result = run_candidate_walk_forward(
+        candidate,
+        make_features(days=36),
+        config=candidate_oos_config(),
+    )
+
+    assert result.metrics["summary"]["candidate_id"] == "rl_grpo_policy_001_1"
+    assert result.metrics["summary"]["agent_type"] == "grpo_policy"
+    assert "sharpe" in result.metrics["oos"]
+    assert not result.oos_equity_curve.empty
+
+
 def test_candidate_strategy_adapter_ignores_unused_future_columns() -> None:
     base = CandidateStrategyAdapter(make_candidate()).generate_signals(make_features(days=8))
     frame = make_features(days=8)

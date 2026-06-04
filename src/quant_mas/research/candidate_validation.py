@@ -19,6 +19,8 @@ from quant_mas.backtest import (
 from quant_mas.research.strategy_candidate import StrategyCandidate
 from quant_mas.strategies import Strategy
 
+_DEFAULT_GRPO_ACTION_LEVELS = [0.0, 0.25, 0.5, 1.0]
+
 
 @dataclass(frozen=True)
 class CandidateValidationResult:
@@ -152,6 +154,9 @@ class CandidateStrategyAdapter(Strategy):
                 weights = (0.5 + scale * signal * 10.0).clip(0.0, 1.0)
             elif self.candidate.agent_type == "mean_reversion":
                 weights = (0.5 - scale * signal * 10.0).clip(0.0, 1.0)
+            elif self.candidate.agent_type == "grpo_policy":
+                weight = _grpo_policy_target_weight(self.candidate.params)
+                weights = pd.Series(weight, index=group.index, dtype=float)
             else:
                 raise ValueError("Unsupported StrategyCandidate agent_type for OOS validation")
             rows.append(
@@ -293,6 +298,42 @@ def _candidate_signal(group: pd.DataFrame) -> pd.Series:
     if "last_return" in group.columns:
         return pd.to_numeric(group["last_return"], errors="raise").fillna(0.0)
     return group["close"].astype(float).pct_change().fillna(0.0)
+
+
+def _grpo_action_levels(params: dict[str, Any]) -> list[float]:
+    raw = params.get("action_levels", _DEFAULT_GRPO_ACTION_LEVELS)
+    if not isinstance(raw, (list, tuple)) or not raw:
+        raise ValueError("grpo_policy candidate params.action_levels must be a non-empty list")
+    levels = [float(value) for value in raw]
+    if any(level < 0.0 or level > 1.0 for level in levels):
+        raise ValueError("grpo_policy action_levels must be within [0.0, 1.0]")
+    return levels
+
+
+def _resolve_grpo_action_index(action_logits: list[float]) -> int:
+    if not action_logits:
+        raise ValueError("grpo_policy candidate params.action_logits must be non-empty")
+    maximum = max(action_logits)
+    for index, value in enumerate(action_logits):
+        if value == maximum:
+            return index
+    raise ValueError("grpo_policy candidate params.action_logits must contain a finite maximum")
+
+
+def _grpo_policy_target_weight(params: dict[str, Any]) -> float:
+    """Map exported discrete logits to a constant long-only target weight."""
+    raw_logits = params.get("action_logits")
+    if not isinstance(raw_logits, list) or not raw_logits:
+        raise ValueError("grpo_policy candidate params.action_logits must be a non-empty list")
+    action_logits = [float(value) for value in raw_logits]
+    action_levels = _grpo_action_levels(params)
+    action_index = _resolve_grpo_action_index(action_logits)
+    if action_index >= len(action_levels):
+        raise ValueError(
+            "grpo_policy action index exceeds action_levels length: "
+            f"{action_index} >= {len(action_levels)}"
+        )
+    return float(action_levels[action_index])
 
 
 def _slice_window(data, window) -> dict[str, pd.DataFrame]:
