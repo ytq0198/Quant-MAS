@@ -29,6 +29,12 @@ from quant_mas.rl.population_training import (
     PopulationTrainingConfig,
     PopulationTrainingLoop,
 )
+from quant_mas.rl.policy_export import (
+    export_policy_candidate,
+    load_policy_state,
+    load_training_metrics,
+    write_rl_candidates,
+)
 from quant_mas.rl.ppo_trainer import PPOTrainer, TrainerProtocol
 from quant_mas.rl.reward import compute_episode_metrics, compute_step_reward
 from quant_mas.rl.training_loop import (
@@ -69,7 +75,10 @@ __all__ = [
     "compute_episode_metrics",
     "compute_step_reward",
     "extract_top_candidates",
+    "export_policy_candidate",
     "expected_score",
+    "load_policy_state",
+    "load_training_metrics",
     "rank_candidates_by_group_relative_reward",
     "run_candidate_backtest_smoke",
     "schedule_walk_forward_eval_stub",
@@ -78,4 +87,5 @@ __all__ = [
     "update_pair",
     "walk_forward_stub",
     "write_candidates",
+    "write_rl_candidates",
 ]

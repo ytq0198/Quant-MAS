@@ -79,18 +79,21 @@ Key design:
 Goal: make the training output compatible with the existing research validation
 chain without duplicating OOS code.
 
-First version:
+Design status: locked in [rl_policy_export.md](rl_policy_export.md).
 
-- `export_strategy_candidate_stub()` returns a documented stub.
-- `schedule_walk_forward_eval_stub()` points to `scripts/validate_candidate_oos.py`
-  and `scripts/batch_validate_candidates.py`.
+First implementation:
+
+- `src/quant_mas/rl/policy_export.py` loads `policy_state.json` and `metrics.json`.
+- `scripts/export_rl_policy_candidate.py` writes `candidates.json` / `candidates.csv`.
+- Output uses the existing `StrategyCandidate` schema.
+- Selection metrics keep only `training.*` / `simulation.*` plus safe summary metadata.
 - No automatic walk-forward execution inside M12.
 
-Later version:
+Validation remains external:
 
 ```text
 trained policy
-  -> StrategyCandidate / deterministic adapter
+  -> StrategyCandidate
   -> M11.7 single OOS or M11.8 batch OOS
   -> ablation table
 ```

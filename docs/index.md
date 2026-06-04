@@ -158,8 +158,8 @@ Memory/RAG feeds **ResearchAgent** context — it does not execute trades.
 
 | Metric | Value | Experiment |
 |--------|-------|------------|
-| pytest | **282 passed** | EXP-034 / EXP-POP-007 双端 |
-| RL training (M12.1) | GRPO smoke + checkpoint | simulation only；EXP-POP-007 ✅ |
+| pytest | **294 passed** | EXP-035 本地（M12.2） |
+| RL policy export (M12.2) | policy_state → StrategyCandidate | EXP-035 ✅；OOS 走 M11.7 |
 | Competitive learning (M11) | Elo mock dry-run | EXP-029 / EXP-POP-002 |
 | Population training (M11.5) | 3-gen loop dry-run | EXP-030 / EXP-POP-003 |
 | Candidate bridge (M11.6) | Top-K export + backtest smoke | EXP-POP-004 ✅ |
@@ -243,6 +243,7 @@ Server: [server_commands.md](server_commands.md)
 | [population_training.md](population_training.md) | **v3 M11.5** 多代种群训练闭环 |
 | [strategy_candidate_bridge.md](strategy_candidate_bridge.md) | **v3 M11.6** Top-K → Quant Engine 候选桥 |
 | [candidate_oos_batch.md](candidate_oos_batch.md) | **v3 M11.8** 批量候选 OOS 比较 |
+| [rl_policy_export.md](rl_policy_export.md) | **v3 M12.2** RL policy → StrategyCandidate export |
 | [rl_experiment.md](rl_experiment.md) | **v3 M12.1** RL 训练 loop（simulation only） |
 | [codex_prompt_M12.md](codex_prompt_M12.md) | **v3 M12** RL 训练 Codex 任务（M12.1 ✅ 本地） |
 | [strategy_candidate_oos.md](strategy_candidate_oos.md) | **v3 M11.7** 候选 Walk-forward OOS |

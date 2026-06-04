@@ -1,6 +1,6 @@
 # Quant MAS 实验记录
 
-更新时间：2026-06-04（v3 M12.1 ✅ **282 双端 + EXP-POP-007 RL smoke**）
+更新时间：2026-06-04（v3 M12.2 ✅ **294 本地闭环 · 待 EXP-POP-008 服务器 export smoke**）
 
 本文件用于记录真实实验和重要验证。不要记录未经实际运行的数据结果；尚未真实运行的项目标记为「待验证」。
 
@@ -196,6 +196,54 @@
 
 ## 当前验证记录
 
+### EXP-POP-008：v3 M12.2 服务器 RL policy → StrategyCandidate export ⏳
+
+- 日期：待跑
+- 阶段：**M12.2** — 读取 M12.1 checkpoint，导出 `StrategyCandidate`（**不写 oos.***）
+- 环境：a6000-9961；conda `quant-mas`；前置 **EXP-POP-007** `outputs/rl_training/rl_training_grpo_001/`
+- 命令（模板）：
+
+```bash
+python -m pytest -v                                    # 预期 294 passed
+python scripts/export_rl_policy_candidate.py \
+  --config configs/rl_policy_export.yaml \
+  --no-dry-run
+```
+
+- 预期产物：`outputs/rl_candidates/candidates.json`；ExperimentMemory `family=rl_policy_export`
+- **可选后续 OOS**（独立步骤，非 M12.2）：
+
+```bash
+python scripts/validate_candidate_oos.py \
+  --candidate-json outputs/rl_candidates/candidates.json \
+  --features-path /mnt/localDisk3/weizian/datasets/features/features.parquet \
+  --config configs/candidate_oos.yaml \
+  --no-dry-run
+```
+
+- 科研边界：export 只写 `training.*` / `simulation.*` selection_metrics；OOS 仅 M11.7 可写 `oos.*`
+- 问题：—
+- 下一步：export smoke 后可选 RL 候选 OOS vs **0.586**（ablation）
+
+### EXP-20260602-035：v3 M12.2 RL policy export bridge 本地验证 ✅
+
+- 日期：2026-06-04
+- 阶段：**M12.2** — `policy_state.json` + `metrics.json` → `StrategyCandidate`
+- 环境：本地
+- 交付：
+  - `rl/policy_export.py` — `export_policy_candidate`、`write_rl_candidates`、拒绝 `oos.*`
+  - `scripts/export_rl_policy_candidate.py`、`configs/rl_policy_export.yaml`
+  - `docs/rl_policy_export.md`、`tests/test_rl_policy_export.py` — **12** 项
+- 命令与结果：
+  - `python -m pytest tests/test_rl_policy_export.py -v` → **12 passed**
+  - `python -m pytest tests/test_rl_policy_export.py tests/test_rl_training.py tests/test_strategy_candidate_bridge.py -v` → **39 passed**
+  - `python -m pytest tests/test_candidate_oos_validation.py tests/test_candidate_oos_batch.py -v` → **18 passed**
+  - `export_rl_policy_candidate.py --help` → ✅
+  - 全量 `python -m pytest -v` → **294 passed**（282→294，+12）
+- 边界：不训练、不 OOS、不 LLM、不联网；`source=rl_training`；OOS 须 M11.7/M11.8
+- 问题：无
+- 下一步：服务器 **EXP-POP-008**；可选 RL 候选 walk-forward OOS
+
 ### EXP-POP-007：v3 M12.1 服务器 RL training smoke ✅
 
 - 日期：2026-06-04
@@ -212,7 +260,7 @@
 - **科研边界**：**simulation only**；`simulation.sharpe_mean` **不可**与 walk-forward **0.586** 混报为 OOS
 - 产物：`outputs/rl_training/rl_training_grpo_001/`（policy_state.json、metrics.json、summary.md）
 - 问题：无
-- 下一步：M12.2 policy export bridge；EXP-TEXT-WF-002；可选 `--algorithm ppo` stub
+- 下一步：~~M12.2 export bridge~~ → **EXP-POP-008**；EXP-TEXT-WF-002
 
 ### EXP-RL-003：v3 M12.1 RL experiment CLI 服务器 smoke ✅
 
@@ -1235,6 +1283,7 @@
 | EXP-20260602-009 | 2026-06-02 | Plus M1 研究基线本地 | **102 passed**（+4 测试） |
 | EXP-20260602-010 | 2026-06-02 | Plus M1 服务器 pytest + 比较表 | **102 passed**；OOS sharpe 0.586 |
 | EXP-20260602-011 | 2026-06-02 | Plus M2 数据扩展本地 | **115 passed**（+13） |
+| EXP-20260602-035 | 2026-06-04 | v3 M12.2 本地 RL policy export | **294 passed**（+12）；export **12/12** |
 | EXP-POP-007 | 2026-06-04 | v3 M12.1 服务器 RL smoke | **282 passed**；GRPO train **simulation.sharpe_mean 6.31**（≠ OOS）@ `e291cf9` |
 | EXP-RL-003 | 2026-06-04 | v3 M12.1 RL CLI 服务器 | 同 EXP-POP-007；checkpoint + Memory ✅ |
 | EXP-20260602-034 | 2026-06-04 | v3 M12.1 本地 RL training loop | **282 passed**（+16）；RL **16/16**；simulation only |

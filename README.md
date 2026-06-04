@@ -6,7 +6,7 @@
 [![GitHub](https://img.shields.io/badge/GitHub-ytq0198%2FQuant--MAS-181717?logo=github)](https://github.com/ytq0198/Quant-MAS)
 [![Release](https://img.shields.io/badge/release-v0.1.0-blue)](https://github.com/ytq0198/Quant-MAS/releases/tag/v0.1.0)
 [![Python](https://img.shields.io/badge/python-3.11+-3776AB?logo=python&logoColor=white)](https://www.python.org/)
-[![Tests](https://img.shields.io/badge/tests-282%20passed-brightgreen)](docs/progress.md)
+[![Tests](https://img.shields.io/badge/tests-294%20passed-brightgreen)](docs/progress.md)
 [![Status](https://img.shields.io/badge/status-research%20platform-orange)](docs/progress.md)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![MAS Agent](https://img.shields.io/badge/MAS-Agent%20System-purple)](docs/architecture.md)
@@ -49,7 +49,7 @@
 
 **Plus v2 status / 当前进度**：**M1–M8 ✅** · **v3 M9–M12.1 ✅** 双端（**282 pytest**）
 
-**v3 next / 下一步**：M12.2 export bridge · EXP-TEXT-WF-002
+**v3 next / 下一步**：EXP-POP-008 服务器 export · 可选 RL 候选 OOS · EXP-TEXT-WF-002
 
 ---
 
@@ -403,7 +403,8 @@ Quant-MAS/
 - [x] **M11.7** Candidate walk-forward OOS — real features **EXP-POP-005** ✅（`oos.sharpe` 1.036 vs 0.586）
 - [x] **M11.8** Batch candidate OOS comparison — **EXP-POP-006** ✅（best 1.039，4/4 > 0.586）
 - [x] **M12.1** RL training loop — **EXP-034 / EXP-POP-007** ✅（282 pytest 双端；simulation only）
-- [ ] **M12.2** policy export bridge
+- [x] **M12.2** RL policy export bridge — local **EXP-035** ✅（294 pytest）
+- [ ] **M12.2** server export — **EXP-POP-008**
 - [ ] **M13** Enterprise orchestration — multi-experiment DAG scheduler, audit log
 - [ ] FinBERT server smoke + text-enhanced walk-forward ablation (EXP-TEXT-WF-002)
 - [ ] Optional paper-trading sandbox (simulation only)

@@ -92,6 +92,18 @@ M12.1 本地交付：
 | 配置 | `configs/rl_training.yaml` |
 | 测试 | `tests/test_rl_training.py` |
 
+M12.2 设计已锁定：
+
+```text
+policy_state.json + metrics.json
+    -> StrategyCandidate(source="rl_training")
+    -> candidates.json / candidates.csv
+    -> M11.7 / M11.8 OOS validation
+```
+
+M12.2 仍然不写 `oos.*`，只负责把训练产物桥接到统一候选 schema。
+详见 [rl_policy_export.md](rl_policy_export.md)。
+
 设计文档：[rl_experiment.md](rl_experiment.md)  
 实现提示词：[codex_prompt_M12.md](codex_prompt_M12.md)
 

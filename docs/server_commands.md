@@ -11,7 +11,6 @@ GitHub 仓库：[https://github.com/ytq0198/Quant-MAS](https://github.com/ytq019
 | 日期 | 项目 | 结果 | 备注 |
 |------|------|------|------|
 | 2026-06-04 | v3 M12.1 服务器 RL training smoke | GRPO **simulation.sharpe_mean 6.31** ✅ | EXP-POP-007 @ `e291cf9` |
-| 2026-06-04 | v3 M12.1 服务器 pytest | **282 passed**（46.70s）✅ | EXP-POP-007 |
 | 2026-06-04 | v3 M11.8 服务器 pytest | **266 passed**（45.63s）✅ | EXP-POP-006 |
 | 2026-06-04 | v3 M11.7 服务器 candidate OOS | `cand_mean_rev_1` **oos.sharpe 1.036** vs **0.586** ✅ | EXP-POP-005 @ `ffef849` |
 | 2026-06-03 | v3 M11.7 服务器 pytest | **259 passed**（48.32s）✅ | EXP-POP-005 @ `f804a95` |
@@ -964,6 +963,37 @@ python scripts/run_rl_experiment.py \
 - OOS 评估须事后：M11.6 export → M11.7/M11.8 validate
 
 详见 [`docs/rl_experiment.md`](rl_experiment.md)。
+
+## 六点二十、v3 M12.2 RL Policy Export（EXP-035 / EXP-POP-008）⏳
+
+```bash
+cd /mnt/localDisk3/weizian/Quant-MAS
+conda activate /mnt/localDisk3/weizian/conda_envs/quant-mas
+git pull origin main   # 目标：含 M12.2，294 pytest 本地
+
+python -m pytest -v    # 预期 294 passed
+
+python scripts/export_rl_policy_candidate.py \
+  --config configs/rl_policy_export.yaml \
+  --no-dry-run
+```
+
+**可选后续 OOS**（独立，M11.7 才写 `oos.*`）：
+
+```bash
+python scripts/validate_candidate_oos.py \
+  --candidate-json outputs/rl_candidates/candidates.json \
+  --features-path /mnt/localDisk3/weizian/datasets/features/features.parquet \
+  --config configs/candidate_oos.yaml \
+  --no-dry-run
+```
+
+**说明**：
+
+- M12.2 **只 export** `StrategyCandidate`（`source=rl_training`）；**不写 oos.***
+- 记录：**EXP-20260602-035** 本地 ✅；**EXP-POP-008** 服务器 export 待跑
+
+详见 [`docs/rl_policy_export.md`](rl_policy_export.md)。
 
 ## 七、删除旧部署（如曾在 ~/quant-mas 建过）
 

@@ -1,0 +1,10 @@
+rl_policy_export:
+  policy_state: outputs/rl_training/rl_training_grpo_001/policy_state.json
+  metrics: outputs/rl_training/rl_training_grpo_001/metrics.json
+  output_dir: outputs/rl_candidates
+  agent_type: grpo_policy
+
+experiment:
+  name: rl_policy_export_001
+  family: rl_policy_export
+  memory_path: null
