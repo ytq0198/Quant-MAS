@@ -1,6 +1,6 @@
 # Quant MAS 实验记录
 
-更新时间：2026-06-04（v3 M11.8 ✅ **266 本地闭环 · 待 EXP-POP-006 服务器批量 OOS**）
+更新时间：2026-06-04（v3 M11.8 ✅ **266 双端 + EXP-POP-006 批量 OOS**）
 
 本文件用于记录真实实验和重要验证。不要记录未经实际运行的数据结果；尚未真实运行的项目标记为「待验证」。
 
@@ -178,30 +178,31 @@
 
 ## 当前验证记录
 
-### EXP-POP-006：v3 M11.8 服务器批量候选 OOS ⏳
+### EXP-POP-006：v3 M11.8 服务器批量候选 OOS ✅
 
-- 日期：待跑
-- 阶段：**M11.8** — Top-K 候选批量 walk-forward OOS + 比较表
-- 环境：a6000-9961；conda `quant-mas`；features parquet 同 EXP-POP-005
-- 命令（模板）：
+- 日期：2026-06-04
+- 阶段：**M11.8** 服务器 @ **`9477c3d`**
+- 环境：a6000-9961；conda `quant-mas`；Python **3.11.15**
+- 数据：`/mnt/localDisk3/weizian/datasets/features/features.parquet`；Top-4 mean_reversion 候选（export `--top-k 5` 实际产出 4 条）
+- 命令与结果：
+  - `python -m pytest -v` → **266 passed** in **45.63s** ✅
+  - `export_population_candidates.py ... --top-k 5 --no-dry-run` → ✅（`f9030c6adbf94db5a5a4cb4a189eb9cb`）
+  - `batch_validate_candidates.py ... --top-k 5 --no-dry-run` → ✅
+- **批量 OOS 比较表**（77 windows；baseline **0.586**）：
 
-```bash
-python scripts/batch_validate_candidates.py \
-  --candidate-json outputs/candidates/candidates.json \
-  --features-path /mnt/localDisk3/weizian/datasets/features/features.parquet \
-  --config configs/candidate_oos.yaml \
-  --top-k 5 \
-  --no-dry-run
-```
+| OOS Rank | Candidate | scale | oos.sharpe | vs baseline | exceeds |
+|----------|-----------|-------|------------|-------------|---------|
+| 1 | `cand_mean_rev_1_g1_1_g2_2` | 1.03 | **1.039** | +0.453 | ✅ |
+| 2 | `cand_mean_rev_1_g2_1` | 1.015 | **1.037** | +0.451 | ✅ |
+| 3 | `cand_mean_rev_1_g1_1` | 1.01 | **1.037** | +0.451 | ✅ |
+| 4 | `cand_mean_rev_1` | 1.0 | **1.036** | +0.450 | ✅ |
 
-- 预期产物：
-  - `outputs/candidate_oos_batch/candidate_oos_comparison.csv` / `.md`
-  - 每候选单独 OOS 报告（同 M11.7 结构）
-  - ExperimentMemory `family=strategy_candidate_oos_batch`
-- 对照：**EXP-20260602-008** `oos.sharpe = 0.586`；单候选参照 **EXP-POP-005**（`cand_mean_rev_1` **1.036**）
-- 科研边界：批量候选 OOS 用于 **ablation / 机制分析**，不替代 ML 主 baseline
-- 问题：—
-- 下一步：跑通后回填 comparison 表；可选 `--candidate-ids` 子集 ablation
+- 汇总：`best_oos_sharpe` **1.039**；`exceeds_baseline_count` **4/4**；Population 输入 rank 与 OOS rank **不一致**（scale 微调在 OOS 上略优）
+- 与 EXP-POP-005：`cand_mean_rev_1` **1.036** vs 本次 **1.036**（一致，四舍五入）
+- **科研边界**：规则型 Population 候选 OOS，用于 **ablation / 竞争学习机制**；论文主指标仍为 **EXP-20260602-008** `oos.sharpe = 0.586`
+- 产物：`outputs/candidate_oos_batch/candidate_oos_comparison.csv` / `.md`；ExperimentMemory `family=strategy_candidate_oos_batch`
+- 问题：无
+- 下一步：**M12** RL 训练；EXP-TEXT-WF-002；论文 ablation 表可引用上表
 
 ### EXP-20260602-033：v3 M11.8 批量候选 OOS 本地验证 ✅
 
@@ -220,7 +221,7 @@ python scripts/batch_validate_candidates.py \
   - 全量 `python -m pytest -v` → **266 passed**（259→266，+7）
 - 边界：无 LLM / 网络 / 模型训练 / broker；仅 batch M11.7 OOS；Memory `family=strategy_candidate_oos_batch`
 - 问题：无
-- 下一步：服务器 **EXP-POP-006** 批量 OOS vs **0.586**
+- 下一步：~~服务器 EXP-POP-006~~ ✅；**M12** RL 训练；EXP-TEXT-WF-002
 
 ### EXP-POP-005：v3 M11.7 服务器 candidate Walk-forward OOS ✅
 
