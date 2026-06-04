@@ -230,6 +230,29 @@
 
 **CLI 注意**：`train_text_model.py` 使用 `--text-path`、`--signals-output`、`--output-dir`（**不是** `--records-path` / `--output-path`）。步骤 1 前须确认 `news_wf002.jsonl` 已存在；可用 `scripts/build_text_records_from_features.py` 从 `features.parquet` 生成全量对齐占位 JSONL。
 
+### EXP-TEXT-WF-002：高覆盖信号 + 覆盖率审计（服务器，进行中）
+
+- 日期：2026-06-04
+- 阶段：EXP-TEXT-WF-002 步骤 1–2 完成；**OOS 待跑**
+- 环境：a6000-9961；git **`d25ad0f`**
+- 文本来源：`feature_aligned_smoke` 占位 JSONL（6033 行 × 3 symbol，非真实新闻）
+- 命令与结果：
+  - `build_text_records_from_features.py` → `news_wf002.jsonl`（**6033** records，**3** symbols）
+  - `train_text_model.py --mode finbert_baseline` → `signals_finbert_wf002.parquet`（**6033** rows）
+  - `audit_text_signals.py` → **coverage_ratio = 1.0**（6033/6033；AAPL/MSFT/SPY；2018-01-02 ~ 2025-12-31）
+  - 产物：`/mnt/localDisk3/weizian/reports/text_signal_audit_wf002/`
+- 对比 wf001 审计：
+
+| 指标 | wf001（EXP-TEXT-001） | wf002（当前） |
+|------|----------------------|---------------|
+| coverage_ratio | 3.32% | **100%** |
+| signal_rows | 200 | 6033 |
+| symbols | 仅 AAPL | AAPL / MSFT / SPY |
+| 日期范围 | 至 2018-10-16 | 至 2025-12-31 |
+
+- 科研边界：覆盖率审计 **≠ OOS**；结论须等 `run_walk_forward.py` 并与 **0.586** 对比
+- 下一步：`build_features.py` → `features_with_text_wf002.parquet` → `server_walk_forward_text_002`
+
 ### EXP-20260602-036：v3 M12.4 Observation-aware RL Policy 本地验证 ✅
 
 - 日期：2026-06-04

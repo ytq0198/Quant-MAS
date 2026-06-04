@@ -16,6 +16,6 @@ return_periods:
 label:
   horizon: 5
 
-text_signals_path: /mnt/localDisk3/weizian/datasets/text/signals_finbert.parquet
+text_signals_path: /mnt/localDisk3/weizian/datasets/text/signals_finbert_wf002.parquet
 text_signal_columns:
   - finbert_sentiment
