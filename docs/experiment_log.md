@@ -1,6 +1,6 @@
 # Quant MAS 实验记录
 
-更新时间：2026-06-04（v3 M12.1 ✅ **282 本地闭环 · 待 EXP-RL-003/POP-007 服务器 smoke**）
+更新时间：2026-06-04（v3 M12.1 ✅ **282 双端 + EXP-POP-007 RL smoke**）
 
 本文件用于记录真实实验和重要验证。不要记录未经实际运行的数据结果；尚未真实运行的项目标记为「待验证」。
 
@@ -196,33 +196,30 @@
 
 ## 当前验证记录
 
-### EXP-POP-007：v3 M12.1 服务器 RL training smoke ⏳
+### EXP-POP-007：v3 M12.1 服务器 RL training smoke ✅
 
-- 日期：待跑
-- 阶段：**M12.1** — simulation-only GRPO training loop + checkpoint
-- 环境：a6000-9961；conda `quant-mas`
-- 命令（模板）：
+- 日期：2026-06-04
+- 阶段：**M12.1** 服务器 @ **`e291cf9`**
+- 环境：a6000-9961；conda `quant-mas`；Python **3.11.15**
+- 命令与结果：
+  - `python -m pytest -v` → **282 passed** in **46.70s** ✅
+  - `run_rl_experiment.py --algorithm grpo --max-steps 50 --no-dry-run` → ✅（`6cf7ce901a52472b98015bce32230f25`）
+- **Simulation / training 结果**（**≠ OOS**）：
+  - `training.policy_step_count`: **1**；`policy_delta_norm`: **0.000695**
+  - `simulation.sharpe_mean`: **6.31**；`total_return_mean`: **0.0125**；`max_drawdown_mean`: **-0.00257**
+  - `ranking.top_candidate`: `grpo_policy_001_g2_r1`；`top_relative_reward`: **0.082**
+  - `summary.baseline_oos_sharpe`: **0.586**（仅文档引用，**未写入 oos.***）
+- **科研边界**：**simulation only**；`simulation.sharpe_mean` **不可**与 walk-forward **0.586** 混报为 OOS
+- 产物：`outputs/rl_training/rl_training_grpo_001/`（policy_state.json、metrics.json、summary.md）
+- 问题：无
+- 下一步：M12.2 policy export bridge；EXP-TEXT-WF-002；可选 `--algorithm ppo` stub
 
-```bash
-python -m pytest -v                                    # 预期 282 passed
-python scripts/run_rl_experiment.py \
-  --config configs/rl_training.yaml \
-  --algorithm grpo \
-  --max-steps 50 \
-  --no-dry-run
-```
+### EXP-RL-003：v3 M12.1 RL experiment CLI 服务器 smoke ✅
 
-- 预期产物：`outputs/rl_training/` — `policy_state.json`、`metrics.json`、`summary.md`；ExperimentMemory `family=rl_training`
-- **科研边界**：仅 **simulation.*** / **training.***；**禁止**写成 OOS 或替代 **0.586**
-- OOS 若需评估：训练策略 → M11.6 export → M11.7/M11.8 validate（事后 hook，非 M12 自动）
-- 问题：—
-- 下一步：回填 metrics；可选 `--algorithm ppo` stub smoke
-
-### EXP-RL-003：v3 M12.1 RL experiment CLI smoke ⏳
-
-- 日期：待跑（可与 EXP-POP-007 合并记录）
-- 命令：`run_rl_experiment.py --dry-run` + `--no-dry-run --max-steps 10`
-- 对照 baseline：**EXP-20260602-008** `oos.sharpe = 0.586`（文档引用，训练不写 oos.*）
+- 日期：2026-06-04
+- 阶段：与 **EXP-POP-007** 同批 @ **`e291cf9`**
+- 结果：`run_rl_experiment.py --no-dry-run` 写 checkpoint + ExperimentMemory；family **`rl_training`**
+- 对照：**EXP-20260602-008** `oos.sharpe = 0.586`（summary 引用 only）
 
 ### EXP-20260602-034：v3 M12.1 最小 RL Training Loop 本地验证 ✅
 
@@ -242,7 +239,7 @@ python scripts/run_rl_experiment.py \
   - 全量 `python -m pytest -v` → **282 passed**（266→282，+16）
 - 边界：只写 `training.*` / `simulation.*`；**不写** `oos.*`；无 broker / LLM / 网络 / GPU pytest
 - 问题：无
-- 下一步：服务器 **EXP-POP-007** / **EXP-RL-003** smoke
+- 下一步：~~服务器 EXP-POP-007~~ ✅；M12.2 export bridge；EXP-TEXT-WF-002
 
 ### EXP-POP-006：v3 M11.8 服务器批量候选 OOS ✅
 
@@ -1238,6 +1235,8 @@ python scripts/run_rl_experiment.py \
 | EXP-20260602-009 | 2026-06-02 | Plus M1 研究基线本地 | **102 passed**（+4 测试） |
 | EXP-20260602-010 | 2026-06-02 | Plus M1 服务器 pytest + 比较表 | **102 passed**；OOS sharpe 0.586 |
 | EXP-20260602-011 | 2026-06-02 | Plus M2 数据扩展本地 | **115 passed**（+13） |
+| EXP-POP-007 | 2026-06-04 | v3 M12.1 服务器 RL smoke | **282 passed**；GRPO train **simulation.sharpe_mean 6.31**（≠ OOS）@ `e291cf9` |
+| EXP-RL-003 | 2026-06-04 | v3 M12.1 RL CLI 服务器 | 同 EXP-POP-007；checkpoint + Memory ✅ |
 | EXP-20260602-034 | 2026-06-04 | v3 M12.1 本地 RL training loop | **282 passed**（+16）；RL **16/16**；simulation only |
 | EXP-POP-006 | 2026-06-04 | v3 M11.8 服务器批量 candidate OOS | **266 passed**；4/4 > **0.586**；best **1.039** @ `9477c3d` |
 | EXP-20260602-033 | 2026-06-04 | v3 M11.8 批量候选 OOS 本地 | **266 passed**（+7）；batch **7/7** |

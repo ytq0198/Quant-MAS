@@ -1,6 +1,6 @@
 # Plus v3 M12：强化学习训练实验 — Codex 提示词
 
-**状态：✅ M12.1 本地闭环（282 pytest）；服务器 smoke 待 EXP-POP-007**
+**状态：✅ M12.1 双端闭环（282 pytest；EXP-POP-007 simulation smoke）**
 
 更新时间：2026-06-04
 

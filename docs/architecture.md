@@ -196,6 +196,6 @@ collect_experiment_metrics → BaselineRegistry / comparison table
 | **M11.6** 候选验证桥 | StrategyCandidate → backtest smoke | ✅ EXP-031/POP-004（248 双端） |
 | **M11.7** 候选 OOS | Walk-forward OOS hook | ✅ EXP-032/POP-005（`oos.sharpe` 1.036） |
 | **M11.8** 批量候选 OOS | Top-K comparison table | ✅ EXP-033/POP-006（best **1.039**） |
-| **M12.1** RL 训练 loop | GRPO training + checkpoint | ✅ EXP-034 本地（282）；服务器 smoke 待跑 |
+| **M12.1** RL 训练 loop | GRPO training + checkpoint | ✅ EXP-034/POP-007（simulation only） |
 
 详见 [项目plus设计.md](../项目plus设计.md)、[competitive_learning.md](competitive_learning.md)。**Plus v2 系统结构定稿**见 [`项目进度.md`](../项目进度.md) §Plus v2 收官。

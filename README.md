@@ -47,9 +47,9 @@
 > Quant Engine computes. Agent Layer explains, orchestrates, and reports.  
 > Quant Engine 做计算；Agent Layer 做编排、解释与报告。
 
-**Plus v2 status / 当前进度**：**M1–M8 ✅** · **v3 M9–M11.8 ✅** 双端 · **M12.1 ✅** 本地（**282 pytest**）
+**Plus v2 status / 当前进度**：**M1–M8 ✅** · **v3 M9–M12.1 ✅** 双端（**282 pytest**）
 
-**v3 next / 下一步**：M12.1 服务器 RL smoke · EXP-TEXT-WF-002
+**v3 next / 下一步**：M12.2 export bridge · EXP-TEXT-WF-002
 
 ---
 
@@ -122,7 +122,7 @@ python -m pip install -e ".[llm]"                 # HTTP LLM client
 python -m pip install -e ".[text]"                # FinBERT / LoRA (server manual)
 ```
 
-**Verified baseline / 已验证基线**：**282 passed** 本地（EXP-034 / M12.1）；**266 passed** 双端（M11.8）
+**Verified baseline / 已验证基线**：**282 passed** 双端（EXP-034 / EXP-POP-007 @ `e291cf9`）
 
 ---
 
@@ -299,8 +299,8 @@ print(result.content)
 
 | Item | Value | Notes |
 |------|-------|-------|
-| **pytest** | **282 passed** | EXP-034 本地（M12.1） |
-| **RL training (M12.1)** | GRPO/PPO short loop | simulation only；**≠ OOS**（EXP-034 ✅） |
+| **pytest** | **282 passed** | EXP-034 / EXP-POP-007 双端（46.70s 服务器） |
+| **RL training (M12.1)** | GRPO loop + checkpoint | **simulation.sharpe_mean 6.31**（**≠ OOS 0.586**）EXP-POP-007 ✅ |
 | **batch candidate OOS (M11.8)** | 4 mean-reversion candidates | best **oos.sharpe 1.039** vs ML **0.586**（EXP-POP-006 ✅） |
 | **candidate OOS (M11.7)** | `cand_mean_rev_1` walk-forward OOS | **oos.sharpe 1.036** vs ML baseline **0.586**（EXP-POP-005 ✅） |
 | **population training** | 3-gen loop dry-run | EXP-POP-003 ✅ |
@@ -402,8 +402,8 @@ Quant-MAS/
 - [x] **M11.6** Strategy candidate bridge — Top-K export + backtest smoke **EXP-031/POP-004** ✅
 - [x] **M11.7** Candidate walk-forward OOS — real features **EXP-POP-005** ✅（`oos.sharpe` 1.036 vs 0.586）
 - [x] **M11.8** Batch candidate OOS comparison — **EXP-POP-006** ✅（best 1.039，4/4 > 0.586）
-- [x] **M12.1** RL training loop — local **EXP-034** ✅（282 pytest；simulation only）
-- [ ] **M12.1** server RL smoke — **EXP-POP-007** / **EXP-RL-003**
+- [x] **M12.1** RL training loop — **EXP-034 / EXP-POP-007** ✅（282 pytest 双端；simulation only）
+- [ ] **M12.2** policy export bridge
 - [ ] **M13** Enterprise orchestration — multi-experiment DAG scheduler, audit log
 - [ ] FinBERT server smoke + text-enhanced walk-forward ablation (EXP-TEXT-WF-002)
 - [ ] Optional paper-trading sandbox (simulation only)

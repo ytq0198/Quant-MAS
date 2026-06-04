@@ -1,8 +1,8 @@
 # Quant MAS 开发进度
 
-更新时间：2026-06-04（**v3 M12.1 ✅** 本地实现 · **282** pytest · 服务器 smoke 待跑）
+更新时间：2026-06-04（**v3 M12.1 ✅** 双端 **282** · EXP-POP-007 RL smoke）
 
-**Plus v2**：M1–M8 ✅ · **v3 M9–M11.8** ✅ 双端闭环 · **M12.1** ✅ 本地 RL training loop
+**Plus v2**：M1–M8 ✅ · **v3 M9–M12.1** ✅ 双端闭环
 
 **pytest 基线**：**282 passed** 本地 · **论文主指标**：Walk-forward ML OOS sharpe **0.586**（EXP-008）· **候选 OOS（单）**：`cand_mean_rev_1` **1.036**（EXP-POP-005）· **批量 best**：**1.039**（EXP-POP-006，`cand_mean_rev_1_g1_1_g2_2`，规则型 mean-reversion，**非** ML 主 baseline 替代）
 
@@ -36,7 +36,7 @@
 | **M11.6** | 候选验证桥 | ✅ | 248 双端（EXP-031/POP-004） | [strategy_candidate_bridge.md](strategy_candidate_bridge.md) |
 | **M11.7** | 候选 Walk-forward OOS | ✅ | 259 双端 + EXP-POP-005 真实 OOS | [strategy_candidate_oos.md](strategy_candidate_oos.md) |
 | **M11.8** | 批量候选 OOS 比较 | ✅ | 266 双端 + EXP-POP-006（4/4 > 0.586） | [candidate_oos_batch.md](candidate_oos_batch.md) |
-| **M12.1** | RL 训练实验 | ✅ 本地 | GRPOPolicyAgent、RLTrainingLoop、PPO/MARL stub；282 passed | [rl_experiment.md](rl_experiment.md) · [rl_plan.md](rl_plan.md) |
+| **M12.1** | RL 训练实验 | ✅ 双端 | GRPOPolicyAgent、RLTrainingLoop；282 双端 + EXP-POP-007 | [rl_experiment.md](rl_experiment.md) |
 | **M13** | 企业化编排 | 📋 | DAG scheduler | [protocols.md](protocols.md) |
 
 ## 阶段总览（v1 Prompt + Plus v2）
@@ -185,8 +185,8 @@ M1/M2 已完成；**M3 本地 ✅**（见下两节）；下一步 **M4**。
 
 | 环境 | Python | 结果 | 日期 | 实验 |
 |------|--------|------|------|------|
-| 本地 Windows | 3.11+ | **266 passed** | 2026-06-04 | EXP-20260602-033 |
-| 服务器 a6000-9961 | 3.11.15 | **266 passed** | 2026-06-04 | EXP-POP-006 @ `9477c3d` |
+| 本地 Windows | 3.11+ | **282 passed** | 2026-06-04 | EXP-20260602-034 |
+| 服务器 a6000-9961 | 3.11.15 | **282 passed** | 2026-06-04 | EXP-POP-007 @ `e291cf9` |
 
 命令：`python -m pytest -v`（勿裸敲 `pytest` / `pip`）。
 
@@ -254,7 +254,8 @@ python scripts/export_agent_cards.py --help
 | EXP-TEXT-001 | FinBERT smoke（ModelScope） | 200 signals；6033 行 features 中 134 非零 |
 | EXP-TEXT-WF-001 | Walk-forward + text | OOS sharpe **0.563** vs baseline **0.586**（exploratory） |
 | EXP-POP-005 | 单候选 OOS（M11.7） | `cand_mean_rev_1` **oos.sharpe 1.036** vs **0.586**（77 窗） |
-| EXP-POP-006 | 批量候选 OOS（M11.8） | 4/4 超 baseline；best **1.039**（`cand_mean_rev_1_g1_1_g2_2`） |
+| EXP-POP-007 | RL training smoke（M12.1） | **simulation.sharpe_mean 6.31**（**≠ OOS 0.586**） |
+| EXP-POP-006 | 批量候选 OOS（M11.8） | 4/4 超 baseline；best **1.039** |
 
 ## 研究解读
 
@@ -363,5 +364,6 @@ python scripts/export_agent_cards.py --help
 - ~~**EXP-LLM-002**~~ ✅（2026-06-03，local_vllm + ResearchAgent）
 - ~~**M11.8 服务器批量 OOS**~~ ✅ EXP-POP-006（266 pytest；best **1.039**）
 - ~~**M12.1 本地 RL training loop**~~ ✅ EXP-034（**282 pytest**）
-- **M12.1 服务器 RL smoke** — EXP-POP-007 / EXP-RL-003
+- ~~**M12.1 服务器 RL smoke**~~ ✅ EXP-POP-007 / EXP-RL-003
+- **M12.2** policy export bridge
 - **EXP-TEXT-WF-002**

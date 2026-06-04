@@ -1,7 +1,7 @@
 # M12 RL Training Experiment Design
 
 Updated: 2026-06-04  
-Status: M12.1 implemented locally; server smoke pending
+Status: M12.1 dual-end validated; EXP-POP-007 server smoke ✅
 
 M12 extends the existing M7 simulation environment from **ranking only** to a
 minimal, auditable **training loop**. It is intentionally mock-first and

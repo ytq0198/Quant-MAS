@@ -158,8 +158,8 @@ Memory/RAG feeds **ResearchAgent** context — it does not execute trades.
 
 | Metric | Value | Experiment |
 |--------|-------|------------|
-| pytest | **282 passed** | EXP-034 本地（M12.1） |
-| RL training (M12.1) | GRPO loop + checkpoint | simulation only；EXP-034 ✅ |
+| pytest | **282 passed** | EXP-034 / EXP-POP-007 双端 |
+| RL training (M12.1) | GRPO smoke + checkpoint | simulation only；EXP-POP-007 ✅ |
 | Competitive learning (M11) | Elo mock dry-run | EXP-029 / EXP-POP-002 |
 | Population training (M11.5) | 3-gen loop dry-run | EXP-030 / EXP-POP-003 |
 | Candidate bridge (M11.6) | Top-K export + backtest smoke | EXP-POP-004 ✅ |

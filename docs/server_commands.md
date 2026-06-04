@@ -10,7 +10,8 @@ GitHub 仓库：[https://github.com/ytq0198/Quant-MAS](https://github.com/ytq019
 
 | 日期 | 项目 | 结果 | 备注 |
 |------|------|------|------|
-| 2026-06-04 | v3 M11.8 服务器批量 candidate OOS | 4/4 > **0.586**；best **1.039** ✅ | EXP-POP-006 @ `9477c3d` |
+| 2026-06-04 | v3 M12.1 服务器 RL training smoke | GRPO **simulation.sharpe_mean 6.31** ✅ | EXP-POP-007 @ `e291cf9` |
+| 2026-06-04 | v3 M12.1 服务器 pytest | **282 passed**（46.70s）✅ | EXP-POP-007 |
 | 2026-06-04 | v3 M11.8 服务器 pytest | **266 passed**（45.63s）✅ | EXP-POP-006 |
 | 2026-06-04 | v3 M11.7 服务器 candidate OOS | `cand_mean_rev_1` **oos.sharpe 1.036** vs **0.586** ✅ | EXP-POP-005 @ `ffef849` |
 | 2026-06-03 | v3 M11.7 服务器 pytest | **259 passed**（48.32s）✅ | EXP-POP-005 @ `f804a95` |
@@ -931,7 +932,7 @@ python scripts/batch_validate_candidates.py \
 
 详见 [`docs/candidate_oos_batch.md`](candidate_oos_batch.md)。
 
-## 六点十九、v3 M12.1 RL Training Loop（EXP-034 / EXP-POP-007）⏳
+## 六点十九、v3 M12.1 RL Training Loop（EXP-034 / EXP-POP-007）✅
 
 ```bash
 cd /mnt/localDisk3/weizian/Quant-MAS
@@ -959,7 +960,7 @@ python scripts/run_rl_experiment.py \
 
 - **simulation only**；metrics 为 `training.*` / `simulation.*`，**禁止**写成 OOS
 - 对照 baseline 仅在文档/summary 引用 **EXP-20260602-008** `oos.sharpe = 0.586`
-- 记录：**EXP-20260602-034** 本地 ✅；**EXP-POP-007** / **EXP-RL-003** 服务器 smoke 待跑
+- 记录：**EXP-20260602-034** 本地 ✅；**EXP-POP-007** / **EXP-RL-003** ✅ 服务器 GRPO smoke（2026-06-04 @ `e291cf9`；**simulation only**）
 - OOS 评估须事后：M11.6 export → M11.7/M11.8 validate
 
 详见 [`docs/rl_experiment.md`](rl_experiment.md)。
