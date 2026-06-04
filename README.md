@@ -6,7 +6,7 @@
 [![GitHub](https://img.shields.io/badge/GitHub-ytq0198%2FQuant--MAS-181717?logo=github)](https://github.com/ytq0198/Quant-MAS)
 [![Release](https://img.shields.io/badge/release-v0.1.0-blue)](https://github.com/ytq0198/Quant-MAS/releases/tag/v0.1.0)
 [![Python](https://img.shields.io/badge/python-3.11+-3776AB?logo=python&logoColor=white)](https://www.python.org/)
-[![Tests](https://img.shields.io/badge/tests-314%20passed-brightgreen)](docs/progress.md)
+[![Tests](https://img.shields.io/badge/tests-361%20passed-brightgreen)](docs/progress.md)
 [![Status](https://img.shields.io/badge/status-research%20platform-orange)](docs/progress.md)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![MAS Agent](https://img.shields.io/badge/MAS-Agent%20System-purple)](docs/architecture.md)
@@ -47,9 +47,9 @@
 > Quant Engine computes. Agent Layer explains, orchestrates, and reports.  
 > Quant Engine 做计算；Agent Layer 做编排、解释与报告。
 
-**Plus v2 status / 当前进度**：**M1–M8 ✅** · **v3 M9–M12.4 ✅** 双端（**310 pytest**）
+**Plus v2 status / 当前进度**：**M1–M8 ✅** · **v3 M9–M13 ✅** 双端（**361 pytest**）
 
-**v3 next / 下一步**：EXP-TEXT-WF-002 服务器 walk-forward（先 audit 覆盖率）· M13 编排
+**v3 next / 下一步**：论文撰写（`outputs/paper/`）· 可选 EXP-TEXT-002 LoRA · 可选 RL/Population 研究线
 
 ---
 
@@ -300,8 +300,9 @@ print(result.content)
 | Item | Value | Notes |
 |------|-------|-------|
 | **RL feature_linear OOS (M12.4)** | `rl_feature_linear_policy_001_1` | **oos.sharpe 0.387** vs ML **0.586**（EXP-POP-010 ✅） |
-| **pytest** | **326 passed** | EXP-TEXT-WF-003-PREP 本地 + 服务器双端 @ `635a54a` |
-| **Text coverage audit** | `audit_text_signals.py` | EXP-TEXT-WF-002-PREP ✅（**非 OOS**） |
+| **pytest** | **361 passed** | M13 收口 · 双端 @ `6913dbf` |
+| **OOS + real Finnhub text (wf003)** | **sharpe 0.565** | EXP-TEXT-WF-003 · 2.42% coverage vs **0.586** |
+| **M13 paper export** | 6 artifacts in `outputs/paper/` | EXP-M13-004 ✅ · 主表仅 `oos.*` |
 | **RL candidate OOS (M12.3)** | `rl_grpo_policy_001_1` walk-forward | **oos.sharpe 0.0**（全现金 ablation；**≠ simulation 6.31**）EXP-POP-009 ✅ |
 | **RL training (M12.1)** | GRPO loop + checkpoint | **simulation.sharpe_mean 6.31**（**≠ OOS 0.586**）EXP-POP-007 ✅ |
 | **batch candidate OOS (M11.8)** | 4 mean-reversion candidates | best **oos.sharpe 1.039** vs ML **0.586**（EXP-POP-006 ✅） |
@@ -310,7 +311,8 @@ print(result.content)
 | **local vLLM smoke** | ResearchAgent `local_vllm` | EXP-LLM-002（Qwen2.5-7B @ a6000） |
 | **Postgres/pgvector smoke** | `query_memory` + `index_documents` | EXP-026（6 experiments, **443 chunks**） |
 | **OOS baseline** | **sharpe 0.586** | EXP-20260602-008, 19 walk-forward windows |
-| **OOS + FinBERT text** | **sharpe 0.563** | EXP-TEXT-WF-001 · exploratory (200/6033 text coverage) |
+| **OOS + FinBERT text (wf001)** | **sharpe 0.563** | EXP-TEXT-WF-001 · 3.32% coverage |
+| **OOS + FinBERT text (wf002)** | **sharpe 0.579** | EXP-TEXT-WF-002 · 100% placeholder |
 | Single-segment ML backtest | sharpe 2.78 | ⚠️ in-sample — **not** paper metric |
 | GPU LightGBM | verified on server | CUDA path documented in `docs/server_commands.md` |
 
@@ -322,11 +324,11 @@ print(result.content)
 
 **English**
 
-> Built **Quant MAS**, a Python 3.11 multi-agent quantitative research platform with deterministic quant pipelines, walk-forward OOS evaluation (baseline sharpe 0.586), Memory/RAG, optional LangGraph, enterprise DB backends (Postgres/pgvector), **local vLLM ResearchAgent** (EXP-LLM-002), **competitive learning chain** (M11–M11.8: population → StrategyCandidate → walk-forward OOS → batch comparison), **RL train→export→OOS ablation** (M12.1–M12.4, including observation-aware `FeatureLinearPolicyAgent`), text signals, MCP-style protocol adapter, and mock-safe LLM defaults. Maintained **308 passing pytest** cases with strict safeguards preventing LLM agents from direct live trading.
+> Built **Quant MAS**, a Python 3.11 multi-agent quantitative research platform with deterministic quant pipelines, walk-forward OOS evaluation (baseline sharpe 0.586), Memory/RAG, optional LangGraph, enterprise DB backends (Postgres/pgvector), **local vLLM ResearchAgent** (EXP-LLM-002), **competitive learning chain** (M11–M11.8), **RL train→export→OOS ablation** (M12.1–M12.4), text signals (EXP-TEXT-WF-003), **M13 enterprise orchestration** (YAML recipes, LangGraph backend, paper artifact export), MCP-style protocol adapter, and mock-safe LLM defaults. Maintained **361 passing pytest** cases with strict safeguards preventing LLM agents from direct live trading.
 
 **中文**
 
-> 基于 Python 3.11 构建 **Quant MAS** 多智能体量化研究平台，完成 Walk-forward OOS、风控、Agent 编排、Memory/RAG、**v3 企业 DB**、**本地 vLLM（M10）**、**竞争学习链路（M11→M11.8：种群→候选→OOS→批量比较）**、文本信号、RL 模拟与 **MCP/A2A 协议层（M8）**；维护 **266 项 pytest** 通过，明确 LLM Agent 不直接参与实盘下单。
+> 基于 Python 3.11 构建 **Quant MAS** 多智能体量化研究平台，完成 Walk-forward OOS、风控、Agent 编排、Memory/RAG、**v3 企业 DB（M9）**、**本地 vLLM（M10）**、**竞争学习链路（M11→M11.8）**、**RL 全链路（M12）**、**M13 编排与论文导出**、文本信号三线消融；维护 **361 项 pytest** 通过，明确 LLM Agent 不直接参与实盘下单。
 
 ---
 
@@ -350,11 +352,11 @@ Quant-MAS/
 │   ├── text/                 # text signals (M6)
 │   ├── rl/                   # TradingEnv (M7), population training, candidate bridge (M11–M11.6)
 │   ├── protocols/            # MCP/A2A adapter (M8)
-│   ├── orchestration/        # LangGraph workflow (M4)
-│   └── research/             # baseline registry (M1), StrategyCandidate (M11.6), candidate OOS (M11.7–M11.8)
-├── scripts/                  # CLI entrypoints
-├── configs/                  # YAML configs (+ llm.server.yaml.example)
-├── tests/                    # 308 pytest cases
+│   ├── orchestration/        # ResearchWorkflow (M4), MCP scheduler & recipes (M13)
+│   └── research/             # baseline (M1), candidates, paper_artifacts (M13.3)
+├── scripts/                  # CLI entrypoints (+ export_paper_artifacts.py)
+├── configs/                  # YAML configs (+ pipelines/*.yaml.example)
+├── tests/                    # 361 pytest cases
 ├── docs/                     # architecture, progress, experiment log, server_commands
 ├── architecture.png          # architecture diagram
 ├── CONTRIBUTING.md
@@ -369,7 +371,8 @@ Quant-MAS/
 | Doc | Description |
 |-----|-------------|
 | [docs/index.md](docs/index.md) | Documentation hub (bilingual) |
-| [docs/progress.md](docs/progress.md) | Plus v2 M1–M8 + v3 M9/M10 progress |
+| [docs/progress.md](docs/progress.md) | Plus v2 + v3 M9–M13 progress（361 pytest） |
+| [docs/mcp_protocol.md](docs/mcp_protocol.md) | M13 orchestration protocol |
 | [项目进度.md](项目进度.md) | 中文进度总览（Plus v2 收官 + v3） |
 | [项目v3设计.md](项目v3设计.md) | v3 roadmap M9–M13 |
 | [docs/experiment_log.md](docs/experiment_log.md) | Verified experiments (EXP-LLM-002, OOS 0.586, …) |
@@ -411,8 +414,9 @@ Quant-MAS/
 - [x] **M12.2** RL policy export bridge — **EXP-035 / EXP-POP-008** ✅（294→296 pytest）
 - [x] **M12.3** RL candidate OOS adapter — **EXP-POP-009** ✅（`grpo_policy` walk-forward；oos.sharpe **0.0** ablation）
 - [x] **M12.4** Observation-aware RL policy — **EXP-036 / EXP-POP-010** ✅（OOS **0.387** ablation）
-- [ ] **M13** Enterprise orchestration — multi-experiment DAG scheduler, audit log
-- [ ] FinBERT + text-enhanced walk-forward **EXP-TEXT-WF-002**（prep ✅ coverage audit；服务器 OOS 待跑）
+- [x] **M13** Enterprise orchestration — scheduler, YAML recipes, LangGraph backend, paper export **EXP-M13-001→004 ✅**
+- [x] FinBERT text walk-forward trilogy **EXP-TEXT-WF-001/002/003**（wf003 real Finnhub: **0.565** vs **0.586**）
+- [ ] Optional **EXP-TEXT-002** LoRA fine-tune
 - [ ] Optional paper-trading sandbox (simulation only)
 
 See [项目v3设计.md](项目v3设计.md) for full v3 scope.

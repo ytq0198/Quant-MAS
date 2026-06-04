@@ -1,7 +1,7 @@
 # Quant MAS Documentation / 项目文档
 
 **Research-first multi-agent quantitative platform · 多智能体量化研究平台**  
-**Release**: [v0.1.0](https://github.com/ytq0198/Quant-MAS/releases/tag/v0.1.0) · **Tests**: 259 passed（双端）· **GitHub**: [ytq0198/Quant-MAS](https://github.com/ytq0198/Quant-MAS)
+**Release**: [v0.1.0](https://github.com/ytq0198/Quant-MAS/releases/tag/v0.1.0) · **Tests**: 361 passed（双端）· **GitHub**: [ytq0198/Quant-MAS](https://github.com/ytq0198/Quant-MAS)
 
 > Documentation hub for students, researchers, and contributors.  
 > 面向学生、科研者与贡献者的文档入口，与 [README](../README.md) 结构对应。
@@ -37,7 +37,7 @@ Quant MAS combines a **deterministic Quant Engine** with a **lightweight Agent L
 
 LLM agents **must not** place live orders. Signals require backtesting, risk checks, audit, and human confirmation.
 
-**Plus v2**：M1–M8 ✅ 收官 · **v3 M9** ✅ 本地（207 pytest）· 见 [`项目v3设计.md`](../项目v3设计.md)
+**Plus v2**：M1–M8 ✅ 收官 · **v3 M9–M13** ✅（361 pytest · M13 编排收口）· 见 [`项目v3设计.md`](../项目v3设计.md)
 
 ---
 
@@ -76,7 +76,8 @@ Deep dive: [architecture.md](architecture.md) · [项目plus设计.md](../项目
 | Agent Layer | SupervisorAgent, ReportAgent, ResearchAgent | 监督 / 报告 / 研究智能体 | ✅ |
 | Memory | JSON & SQLite experiment stores | 实验记忆 | ✅ |
 | RAG | Keyword + hash vector + hybrid retrieval | 混合检索 | ✅ |
-| Orchestration | Sequential + optional LangGraph DAG | 工作流编排 | ✅ |
+| Orchestration | M4 ResearchWorkflow + M13 scheduler/recipes | 工作流与批处理编排 | ✅ |
+| Paper export | `export_paper_artifacts` (M13.3) | 论文级结果表与审计包 | ✅ |
 | Context / LLM | ContextBuilder, mock-safe LLM client | 上下文与可选 LLM | ✅ |
 | Text Signals | Mock / FinBERT / LoRA skeleton | 文本特征骨架 | ✅ M6 |
 | Research | Baseline registry, compare CLI | 实验基线与对比 | ✅ M1 |
@@ -100,7 +101,9 @@ Lightweight agents — no heavy framework lock-in.
 
 1. **Supervisor + Tools** — `run_agent.py --task "..."`
 2. **ResearchWorkflow DAG** — 6 nodes: download → features → train → ml_backtest → risk → report ([langgraph_workflow.md](langgraph_workflow.md))
-3. **ResearchAgent** — `run_research_agent.py` + ContextBuilder ([context_engineering.md](context_engineering.md))
+3. **M13 Pipeline** — `run_mcp_pipeline.py --recipe configs/pipelines/*.yaml.example --dry-run` ([mcp_protocol.md](mcp_protocol.md))
+4. **Paper export** — `export_paper_artifacts.py` → `outputs/paper/` (M13.3)
+5. **ResearchAgent** — `run_research_agent.py` + ContextBuilder ([context_engineering.md](context_engineering.md))
 
 **Safety / 安全规则**
 
@@ -158,8 +161,10 @@ Memory/RAG feeds **ResearchAgent** context — it does not execute trades.
 
 | Metric | Value | Experiment |
 |--------|-------|------------|
-| pytest | **308 passed** | EXP-036 本地（M12.4）；服务器 **296** @ M12.3 |
-| RL observation policy (M12.4) | `rl_feature_linear_policy_001_1` OOS **0.387** | EXP-POP-010 ✅（vs baseline **0.586**） |
+| pytest | **361 passed** | M13 收口 · 双端 @ `6913dbf` |
+| M13 paper export | 6 artifacts | EXP-M13-004 ✅ |
+| OOS + real Finnhub (wf003) | **0.565** vs **0.586** | EXP-TEXT-WF-003 |
+| RL feature_linear OOS (M12.4) | **0.387** | EXP-POP-010 |
 | RL candidate OOS (M12.3) | `rl_grpo_policy_001_1` **oos.sharpe 0.0** | EXP-POP-009 ablation（全现金；≠ simulation 6.31） |
 | RL policy export (M12.2) | policy_state → StrategyCandidate | EXP-POP-008 ✅ |
 | Competitive learning (M11) | Elo mock dry-run | EXP-029 / EXP-POP-002 |
@@ -169,8 +174,8 @@ Memory/RAG feeds **ResearchAgent** context — it does not execute trades.
 | Batch candidate OOS (M11.8) | best **1.039**；4/4 > **0.586** | EXP-POP-006（ablation） |
 | local vLLM smoke | ResearchAgent `local_vllm` | EXP-LLM-002 |
 | **OOS sharpe (baseline)** | **0.586** | EXP-20260602-008 |
-| **OOS + FinBERT text (wf001)** | **0.563** | EXP-TEXT-WF-001 · exploratory (3.32% coverage) |
-| **OOS + FinBERT text (wf002)** | **0.579** | EXP-TEXT-WF-002 · 100% coverage, placeholder text |
+| **OOS + FinBERT text (wf002)** | **0.579** | EXP-TEXT-WF-002 · placeholder 100% |
+| **OOS + FinBERT text (wf001)** | **0.563** | EXP-TEXT-WF-001 · 3.32% coverage |
 | Single-segment ML sharpe | 2.78 | ⚠️ in-sample only |
 | DeepSeek ResearchAgent smoke | verified | EXP-LLM-001 |
 | local vLLM ResearchAgent smoke (a6000) | verified | EXP-LLM-002 |
@@ -188,7 +193,7 @@ Memory/RAG feeds **ResearchAgent** context — it does not execute trades.
 
 1. [README](../README.md) — overview & Quick Start  
 2. [architecture.md](architecture.md) — layers & CLI map  
-3. `python -m pytest -v` — 195 tests  
+3. `python -m pytest -v` — 361 tests  
 4. `run_pipeline.py --skip-download` — local demo  
 5. Features → backtest → walk-forward  
 6. ExperimentMemory & RAG  
@@ -229,7 +234,12 @@ python scripts/compare_experiments.py --output-dir outputs/research
 
 python scripts/train_text_model.py --mode mock --config configs/text_model.yaml --dry-run
 python scripts/run_rl_baseline.py --config configs/rl.yaml --policy random --dry-run
-python scripts/export_agent_cards.py --config configs/protocols.yaml --output-dir outputs/protocols
+python scripts/export_paper_artifacts.py \
+  --memory-path outputs/reports/experiments.json \
+  --audit-dir outputs/pipelines \
+  --output-dir outputs/paper
+
+python scripts/run_mcp_pipeline.py --recipe configs/pipelines/text_enhanced.yaml.example --dry-run
 ```
 
 Server: [server_commands.md](server_commands.md)
@@ -240,9 +250,9 @@ Server: [server_commands.md](server_commands.md)
 
 | Document | 说明 |
 |----------|------|
-| [progress.md](progress.md) | M1–M8 进度、pytest 基线 |
-| [项目v3设计.md](../项目v3设计.md) | **v3 升级规划**（M9–M13） |
-| [codex_prompt_M10.md](codex_prompt_M10.md) | **v3 M10** LLM / local_vllm Codex 任务 |
+| [progress.md](progress.md) | M1–M13 进度、361 pytest 基线 |
+| [mcp_protocol.md](mcp_protocol.md) | **v3 M13** 编排协议（✅ 收口） |
+| [项目v3设计.md](../项目v3设计.md) | **v3 设计**（M9–M13 ✅） |
 | [population_training.md](population_training.md) | **v3 M11.5** 多代种群训练闭环 |
 | [strategy_candidate_bridge.md](strategy_candidate_bridge.md) | **v3 M11.6** Top-K → Quant Engine 候选桥 |
 | [candidate_oos_batch.md](candidate_oos_batch.md) | **v3 M11.8** 批量候选 OOS 比较 |

@@ -263,7 +263,7 @@
   - LangGraph 已安装；不可用时自动回落 deterministic scheduler dry-run
   - 仅 dry-run；audit JSONL 仍由 M13 scheduler 写入
   - 不替换 M4 `ResearchWorkflow` / `SupervisorAgent`；不新增 OOS 指标
-- 下一步：~~M13.3~~ ✅ → 服务器 EXP-M13-004 真实导出 smoke
+- 下一步：~~M13.3~~ ✅ · **M13 整体收口**
 
 ### EXP-M13-002：M13.1 Pipeline Recipe Scheduler（双端）✅
 

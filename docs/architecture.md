@@ -1,6 +1,6 @@
 # Quant MAS 架构
 
-更新时间：2026-06-01（**Plus v2 收官** — M7 RL + M8 Protocol Layer）
+更新时间：2026-06-04（**v3 M13 收口** — 361 pytest · 编排 + 论文导出）
 
 Quant MAS 采用「确定性量化引擎 + **Text Signal Layer（M6）** + **RL Simulation Layer（M7）** + 轻量 Agent 编排 + Context Layer（M5） + Memory/RAG v2 + Research 基线层」架构。Agent 不替代回测、训练、风控和执行，也不允许直接实盘下单。
 
@@ -66,10 +66,16 @@ Quant MAS
 │   configs/context.yaml, configs/llm.yaml
 │   run_research_agent.py（**不替换** Supervisor）
 │
-├── Orchestration Layer（Plus M4）
-│   ResearchWorkflow — sequential / 可选 LangGraph
-│   QuantWorkflowState, 6 节点 DAG（dry-run 默认）
-│   run_langgraph_workflow.py（**不替换** Supervisor）
+├── Orchestration Layer（Plus M4 + v3 M13）
+│   ResearchWorkflow — sequential / 可选 LangGraph（M4）
+│   MCPScheduler — dry-run recipe 调度、audit JSONL（M13）
+│   pipeline_recipe + langgraph_recipe_workflow（M13.1–M13.2）
+│   run_mcp_pipeline.py / run_langgraph_workflow.py
+│
+├── Research Layer（Plus M1 + v3 M13.3）
+│   baseline.py, metrics_table.py, compare_experiments CLI
+│   paper_artifacts.py — 论文级 CSV/Markdown/audit 导出
+│   export_paper_artifacts.py
 │
 ├── Memory Layer（Plus M3）
 │   MemoryStore 抽象 → JsonMemoryStore | SqliteMemoryStore
@@ -81,11 +87,8 @@ Quant MAS
 │   HashEmbeddingClient, InMemoryVectorStore, HybridRetriever
 │   index_documents.py / query_memory.py
 │
-└── Research Layer（Plus M1）
-    baseline.py          BaselineRun, BaselineRegistry
-    metrics_table.py     collect_experiment_metrics, build_comparison_table
-    compare_experiments.py   CLI → comparison.csv / comparison.md
-    research_protocol.md     实验规范与 OOS 主指标定义
+└── configs/
+    pipelines/*.yaml.example（M13.1 recipe 模板）
 ```
 
 ## CLI 入口
@@ -173,7 +176,7 @@ collect_experiment_metrics → BaselineRegistry / comparison table
 
 ## 测试与部署
 
-- **pytest**：**308 passed** 本地（EXP-036）；**296 passed** 服务器（M12.3 @ `6e8c507`）
+- **pytest**：**361 passed** 双端（M13 收口 @ `6913dbf`）
 - **服务器**：`/mnt/localDisk3/weizian/Quant-MAS`，conda `quant-mas`，Python 3.11.15
 - **GitHub**：https://github.com/ytq0198/Quant-MAS
 
@@ -197,26 +200,22 @@ collect_experiment_metrics → BaselineRegistry / comparison table
 | **M11.7** 候选 OOS | Walk-forward OOS hook | ✅ EXP-032/POP-005（`oos.sharpe` 1.036） |
 | **M11.8** 批量候选 OOS | Top-K comparison table | ✅ EXP-033/POP-006（best **1.039**） |
 | **M12.1** RL 训练 loop | GRPO training + checkpoint | ✅ EXP-034/POP-007（simulation only） |
-| **M12.2** RL export bridge | policy_state → StrategyCandidate | ✅ EXP-035 本地（294） |
+| **M12.2** RL export bridge | policy_state → StrategyCandidate | ✅ EXP-POP-008 |
+| **M12.3** RL 候选 OOS | grpo_policy walk-forward | ✅ EXP-POP-009 |
+| **M12.4** Observation RL | FeatureLinearPolicyAgent | ✅ EXP-POP-010（oos 0.387） |
+| **M13** 企业编排 | Scheduler + recipe + paper export | ✅ EXP-M13-001→004（361） |
 
-详见 [项目plus设计.md](../项目plus设计.md)、[competitive_learning.md](competitive_learning.md)。**Plus v2 系统结构定稿**见 [`项目进度.md`](../项目进度.md) §Plus v2 收官。
+详见 [项目plus设计.md](../项目plus设计.md)、[mcp_protocol.md](mcp_protocol.md)、[progress.md](progress.md)。
 
-## M13 Orchestration Roadmap
+## M13 Orchestration（✅ 收口 · EXP-M13-001→004）
 
-M13 extends the existing orchestration and protocol layers with an internal research scheduler. It does not replace M4 `ResearchWorkflow`, `SupervisorAgent`, or the Quant Engine.
+M13 extends orchestration with an **internal research scheduler** (not an external MCP server). It does not replace M4 `ResearchWorkflow`, `SupervisorAgent`, or the Quant Engine.
 
-The first implementation target is **M13.0 MCP Scheduler Minimal**:
+| 子阶段 | 交付 | pytest |
+|--------|------|--------|
+| M13.0 | `mcp_scheduler.py`, audit JSONL, ToolPolicy | 342 双端 |
+| M13.1 | YAML recipes（ML/Text/Population/RL） | 349 双端 |
+| M13.2 | `--backend langgraph` + scheduler fallback | 354 双端 |
+| M13.3 | `paper_artifacts.py`, `export_paper_artifacts.py` | 361 双端 |
 
-- `agent_communication.py`: internal `AgentMessage` / `PlanMessage` / `NodeResultMessage` / `AuditMessage` and in-memory bus.
-- `mcp_scheduler.py`: dry-run scheduler for mock research nodes.
-- `audit_log.py`: append-only JSONL audit trail.
-- `run_mcp_pipeline.py`: CLI entry point, dry-run by default.
-- `tests/test_mcp_scheduler.py`: mock-only tests.
-
-Later stages:
-
-- **M13.1**: YAML recipe scheduler for ML/Text/Population/RL pipelines.
-- **M13.2**: optional LangGraph extended DAG.
-- **M13.3**: paper-grade experiment tables and audit package.
-
-Safety boundary: M13 does not start an external MCP server, does not call real LLM APIs by default, does not touch broker/order tools, and keeps `ToolPolicy` denying shell/broker/order/secrets.
+详见 [mcp_protocol.md](mcp_protocol.md)。Safety: dry-run only by default; ToolPolicy denies shell/broker/order/secrets; no new OOS metrics.

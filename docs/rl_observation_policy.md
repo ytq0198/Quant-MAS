@@ -1,7 +1,8 @@
 # M12.4 Observation-Aware RL Policy
 
 Updated: 2026-06-04  
-Status: M12.4 ✅ dual-end; EXP-POP-010 OOS sharpe **0.387** (ablation vs baseline **0.586**)
+Status: M12.4 ✅ dual-end; EXP-POP-010 OOS sharpe **0.387** (ablation vs baseline **0.586**)  
+Project pytest baseline (post-M13): **361 passed** — see [progress.md](progress.md)
 
 ## Implementation Status
 

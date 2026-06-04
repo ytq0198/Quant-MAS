@@ -158,7 +158,7 @@ M13 是批处理研究调度，不是对话路由器，也不是外部 MCP 服�
 
 ## 当前下一步
 
-**M13 整体收口 ✅**（EXP-M13-001 → EXP-M13-004，361 pytest 双端 @ `931356f`）。M13.0–M13.3 编排四阶段全部完成；论文主 baseline 仍为 EXP-20260602-008（`oos.sharpe = 0.586`）。
+**M13 已收口**（EXP-M13-001→004 · 361 pytest 双端 @ `6913dbf`）。后续：论文撰写（`outputs/paper/`）· 可选 EXP-TEXT-002 LoRA · 可选 RL/Population 研究线。
 
 ## M13.0 Implementation Note
 

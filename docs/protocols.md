@@ -18,6 +18,8 @@ M8 **不是**生产 MCP Server，也**不是** broker / shell / 网络监听服�
 
 **论文主指标**不变：walk-forward **oos.sharpe 0.586**（EXP-20260602-008）。
 
+> **v3 M13** 在 M8 `ToolPolicy` 之上新增批处理调度与 audit JSONL，语义见 [mcp_protocol.md](mcp_protocol.md)（与本文 M8 工具网关互补，不替代）。
+
 ## 已交付（第一版）
 
 | 组件 | 路径 |

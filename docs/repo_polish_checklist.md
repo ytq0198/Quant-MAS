@@ -1,6 +1,6 @@
 # Quant MAS 仓库整理清单（Repo Polish Checklist）
 
-更新时间：2026-06-03  
+更新时间：2026-06-04（**361 pytest** · M13 收口）  
 仓库：<https://github.com/ytq0198/Quant-MAS>  
 联系：3240101782@zju.edu.cn
 
@@ -13,14 +13,14 @@
 | 检查项 | 状态 | 说明 |
 |--------|------|------|
 | 双语标题与一句话定位 | ✅ 已完成 | 英 + 中首段 |
-| 徽章（Python / Tests / Status / License / GitHub） | ✅ 已完成 | Tests=266 passed（EXP-033/POP-006 双端） |
+| 徽章（Python / Tests / Status / License / GitHub） | ✅ 已完成 | Tests=**361 passed**（M13 收口双端 @ `6913dbf`） |
 | 安全声明（非实盘、LLM 不下单） | ✅ 已完成 | blockquote 双语 |
 | Quick Start | ✅ 已完成 | clone → pip → pytest |
 | CLI Examples | ✅ 已完成 | pipeline / train / ml backtest / ResearchAgent / text mock |
 | Features 表 | ✅ 已完成 | 双语列 |
 | Architecture | ⚠️ 部分 | 已引用 `assets/architecture.png` + mermaid 回退；**PNG 文件待提交** |
 | Resume Usage | ✅ 已完成 | 英 + 中各一段 |
-| Roadmap | ✅ 已完成 | 已完成项到 M6；后续为模拟层 / 报告 / 部署 |
+| Roadmap | ✅ 已完成 | M1–M13 ✅；下一步论文撰写 / 可选 EXP-TEXT-002 |
 | Documentation 链接 | ✅ 已完成 | index / architecture / progress / experiment_log 等 |
 | Contributing + 社交引导 | ✅ 已完成 | Star/Fork/Issue/PR + 邮箱 |
 | License | ✅ 已完成 | `LICENSE`（MIT） |
