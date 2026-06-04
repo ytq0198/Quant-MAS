@@ -1,6 +1,10 @@
 candidate_oos:
   baseline_oos_sharpe: 0.586
   baseline_experiment_id: EXP-20260602-008
+  batch:
+    top_k: null
+    output_dir: outputs/candidate_oos_batch
+    experiment_name: candidate_oos_batch_001
 
 walk_forward:
   train_window: 252

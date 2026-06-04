@@ -32,6 +32,16 @@ class CandidateValidationResult:
     artifacts: dict[str, str] = field(default_factory=dict)
 
 
+@dataclass(frozen=True)
+class CandidateBatchValidationResult:
+    """Batch walk-forward validation output for multiple candidates."""
+
+    results: list[CandidateValidationResult]
+    comparison: pd.DataFrame
+    metrics: dict[str, Any]
+    artifacts: dict[str, str] = field(default_factory=dict)
+
+
 def run_candidate_walk_forward(
     candidate: StrategyCandidate,
     feature_table: pd.DataFrame,
@@ -98,6 +108,33 @@ def run_candidate_walk_forward(
     )
 
 
+def run_candidate_batch_walk_forward(
+    candidates: list[StrategyCandidate],
+    feature_table: pd.DataFrame,
+    *,
+    config: dict[str, Any],
+    top_k: int | None = None,
+) -> CandidateBatchValidationResult:
+    """Run candidate OOS validation for a ranked candidate list."""
+    selected = list(candidates)
+    if top_k is not None:
+        selected = selected[: int(top_k)]
+    if not selected:
+        raise ValueError("No StrategyCandidate records provided for batch OOS validation")
+
+    results = [
+        run_candidate_walk_forward(candidate, feature_table, config=config)
+        for candidate in selected
+    ]
+    comparison = build_candidate_oos_comparison(results)
+    metrics = _aggregate_batch_metrics(comparison, config=config)
+    return CandidateBatchValidationResult(
+        results=results,
+        comparison=comparison,
+        metrics=metrics,
+    )
+
+
 class CandidateStrategyAdapter(Strategy):
     """Convert a StrategyCandidate into deterministic target-weight signals."""
 
@@ -156,6 +193,70 @@ def save_candidate_validation_report(
         "oos_trades": str(trades_path),
         "summary": str(summary_path),
     }
+
+
+def save_candidate_batch_validation_report(
+    result: CandidateBatchValidationResult,
+    output_dir: str | Path,
+) -> dict[str, str]:
+    """Persist batch comparison plus per-candidate OOS artifacts."""
+    target = Path(output_dir).expanduser()
+    target.mkdir(parents=True, exist_ok=True)
+    metrics_path = target / "metrics.json"
+    comparison_csv = target / "candidate_oos_comparison.csv"
+    comparison_md = target / "candidate_oos_comparison.md"
+    metrics_path.write_text(
+        json.dumps(result.metrics, indent=2, ensure_ascii=False) + "\n",
+        encoding="utf-8",
+    )
+    result.comparison.to_csv(comparison_csv, index=False)
+    comparison_md.write_text(_comparison_markdown(result), encoding="utf-8")
+
+    artifacts: dict[str, str] = {
+        "metrics": str(metrics_path),
+        "comparison_csv": str(comparison_csv),
+        "comparison_md": str(comparison_md),
+    }
+    for candidate_result in result.results:
+        candidate_dir = target / "candidates" / candidate_result.candidate.candidate_id
+        candidate_artifacts = save_candidate_validation_report(candidate_result, candidate_dir)
+        for key, value in candidate_artifacts.items():
+            artifacts[f"{candidate_result.candidate.candidate_id}.{key}"] = value
+    return artifacts
+
+
+def build_candidate_oos_comparison(
+    results: list[CandidateValidationResult],
+) -> pd.DataFrame:
+    """Build a sorted comparison table from candidate OOS results."""
+    rows: list[dict[str, Any]] = []
+    for rank, result in enumerate(results, start=1):
+        candidate = result.candidate
+        summary = result.metrics.get("summary", {})
+        oos = result.metrics.get("oos", {})
+        baseline = float(summary.get("baseline_oos_sharpe", 0.586))
+        sharpe = float(oos.get("sharpe", 0.0))
+        rows.append(
+            {
+                "input_rank": rank,
+                "candidate_id": candidate.candidate_id,
+                "agent_id": candidate.agent_id,
+                "agent_type": candidate.agent_type,
+                "oos.sharpe": sharpe,
+                "oos.total_return": oos.get("total_return"),
+                "oos.max_drawdown": oos.get("max_drawdown"),
+                "oos.final_equity": oos.get("final_equity"),
+                "summary.window_count": summary.get("window_count"),
+                "summary.baseline_oos_sharpe": baseline,
+                "summary.vs_baseline_sharpe": summary.get("vs_baseline_sharpe"),
+                "exceeds_baseline": sharpe > baseline,
+            }
+        )
+    return (
+        pd.DataFrame(rows)
+        .sort_values(["oos.sharpe", "candidate_id"], ascending=[False, True], ignore_index=True)
+        .assign(oos_rank=lambda frame: range(1, len(frame) + 1))
+    )
 
 
 def _prepare_frame(frame: pd.DataFrame) -> pd.DataFrame:
@@ -301,3 +402,65 @@ def _summary_markdown(result: CandidateValidationResult) -> str:
             "",
         ]
     )
+
+
+def _aggregate_batch_metrics(
+    comparison: pd.DataFrame,
+    *,
+    config: dict[str, Any],
+) -> dict[str, Any]:
+    baseline = float(config.get("candidate_oos", {}).get("baseline_oos_sharpe", 0.586))
+    best = comparison.iloc[0].to_dict()
+    return {
+        "summary": {
+            "candidate_count": int(len(comparison)),
+            "best_candidate_id": best["candidate_id"],
+            "best_agent_type": best["agent_type"],
+            "best_oos_sharpe": float(best["oos.sharpe"]),
+            "baseline_oos_sharpe": baseline,
+            "best_vs_baseline_sharpe": float(best["oos.sharpe"] - baseline),
+            "exceeds_baseline_count": int(comparison["exceeds_baseline"].sum()),
+            "baseline_experiment_id": config.get("candidate_oos", {}).get(
+                "baseline_experiment_id",
+                "EXP-20260602-008",
+            ),
+        },
+        "comparison": comparison.to_dict(orient="records"),
+        "walk_forward": dict(config.get("walk_forward", {})),
+    }
+
+
+def _comparison_markdown(result: CandidateBatchValidationResult) -> str:
+    summary = result.metrics["summary"]
+    lines = [
+        "# StrategyCandidate Batch OOS Comparison",
+        "",
+        f"- candidate_count: {summary['candidate_count']}",
+        f"- best_candidate_id: {summary['best_candidate_id']}",
+        f"- best_oos_sharpe: {summary['best_oos_sharpe']:.6f}",
+        f"- baseline_oos_sharpe: {summary['baseline_oos_sharpe']:.6f}",
+        f"- best_vs_baseline_sharpe: {summary['best_vs_baseline_sharpe']:.6f}",
+        "",
+        "| Rank | Candidate | Agent Type | OOS Sharpe | vs Baseline | Exceeds Baseline |",
+        "|------|-----------|------------|------------|-------------|------------------|",
+    ]
+    for row in result.comparison.to_dict(orient="records"):
+        lines.append(
+            "| {rank} | {candidate} | {agent_type} | {sharpe:.6f} | {delta:.6f} | {exceeds} |".format(
+                rank=row["oos_rank"],
+                candidate=row["candidate_id"],
+                agent_type=row["agent_type"],
+                sharpe=float(row["oos.sharpe"]),
+                delta=float(row["summary.vs_baseline_sharpe"]),
+                exceeds=bool(row["exceeds_baseline"]),
+            )
+        )
+    lines.extend(
+        [
+            "",
+            "Only this batch OOS validation hook may compare population candidates using `oos.*` metrics.",
+            "These results remain research artifacts and are not trading recommendations.",
+            "",
+        ]
+    )
+    return "\n".join(lines)

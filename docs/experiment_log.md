@@ -1,6 +1,6 @@
 # Quant MAS 实验记录
 
-更新时间：2026-06-04（v3 M11.7 ✅ **259 双端 + EXP-POP-005 真实 OOS**）
+更新时间：2026-06-04（v3 M11.8 ✅ **266 本地闭环 · 待 EXP-POP-006 服务器批量 OOS**）
 
 本文件用于记录真实实验和重要验证。不要记录未经实际运行的数据结果；尚未真实运行的项目标记为「待验证」。
 
@@ -178,6 +178,50 @@
 
 ## 当前验证记录
 
+### EXP-POP-006：v3 M11.8 服务器批量候选 OOS ⏳
+
+- 日期：待跑
+- 阶段：**M11.8** — Top-K 候选批量 walk-forward OOS + 比较表
+- 环境：a6000-9961；conda `quant-mas`；features parquet 同 EXP-POP-005
+- 命令（模板）：
+
+```bash
+python scripts/batch_validate_candidates.py \
+  --candidate-json outputs/candidates/candidates.json \
+  --features-path /mnt/localDisk3/weizian/datasets/features/features.parquet \
+  --config configs/candidate_oos.yaml \
+  --top-k 5 \
+  --no-dry-run
+```
+
+- 预期产物：
+  - `outputs/candidate_oos_batch/candidate_oos_comparison.csv` / `.md`
+  - 每候选单独 OOS 报告（同 M11.7 结构）
+  - ExperimentMemory `family=strategy_candidate_oos_batch`
+- 对照：**EXP-20260602-008** `oos.sharpe = 0.586`；单候选参照 **EXP-POP-005**（`cand_mean_rev_1` **1.036**）
+- 科研边界：批量候选 OOS 用于 **ablation / 机制分析**，不替代 ML 主 baseline
+- 问题：—
+- 下一步：跑通后回填 comparison 表；可选 `--candidate-ids` 子集 ablation
+
+### EXP-20260602-033：v3 M11.8 批量候选 OOS 本地验证 ✅
+
+- 日期：2026-06-04
+- 阶段：**M11.8** — 批量复用 M11.7 `run_candidate_walk_forward`，Top-K / 显式 ID 子集
+- 环境：本地
+- 交付：
+  - `research/candidate_validation.py` — `run_candidate_batch_walk_forward`、`save_candidate_batch_validation_report`
+  - `scripts/batch_validate_candidates.py`、`configs/candidate_oos.yaml`（复用）
+  - `docs/candidate_oos_batch.md`、`tests/test_candidate_oos_batch.py` — **7** 项
+  - `项目v3设计.md` — v3-3e 行更新
+- 命令与结果：
+  - `python scripts/batch_validate_candidates.py --help` → ✅
+  - `python -m pytest tests/test_candidate_oos_batch.py -v` → **7 passed**
+  - `python -m pytest tests/test_strategy_candidate_bridge.py tests/test_candidate_oos_validation.py tests/test_candidate_oos_batch.py -v` → **29 passed**
+  - 全量 `python -m pytest -v` → **266 passed**（259→266，+7）
+- 边界：无 LLM / 网络 / 模型训练 / broker；仅 batch M11.7 OOS；Memory `family=strategy_candidate_oos_batch`
+- 问题：无
+- 下一步：服务器 **EXP-POP-006** 批量 OOS vs **0.586**
+
 ### EXP-POP-005：v3 M11.7 服务器 candidate Walk-forward OOS ✅
 
 - 日期：2026-06-04
@@ -199,7 +243,7 @@
   - 论文主指标仍为 **EXP-20260602-008** `oos.sharpe = 0.586`；候选 OOS 用于竞争学习链路闭环对照
   - M11.6 `backtest.sharpe` ≈ 12.99 仍为 synthetic smoke，**≠** 本 OOS
 - 问题：无（`future_*` label 列已通过 `ffef849` 在信号前 drop）
-- 下一步：M12 RL 训练；EXP-TEXT-WF-002；可选 `cand_mean_rev_1_g1_1` 对照
+- 下一步：~~M11.8 批量 OOS~~ → **EXP-POP-006**；M12 RL 训练；EXP-TEXT-WF-002
 
 ### EXP-20260602-032：v3 M11.7 StrategyCandidate Walk-forward OOS 本地验证 ✅
 
