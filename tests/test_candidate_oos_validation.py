@@ -42,12 +42,26 @@ def test_candidate_strategy_adapter_generates_mean_reversion_signals() -> None:
     assert mean_reversion["target_weight"].between(0.0, 1.0).all()
 
 
-def test_candidate_strategy_adapter_rejects_future_columns() -> None:
+def test_candidate_strategy_adapter_ignores_unused_future_columns() -> None:
+    base = CandidateStrategyAdapter(make_candidate()).generate_signals(make_features(days=8))
     frame = make_features(days=8)
     frame["future_direction_5"] = [0, 1] * 4
+    frame["future_return_5"] = 0.01
 
-    with pytest.raises(ValueError, match="future"):
-        CandidateStrategyAdapter(make_candidate()).generate_signals(frame)
+    with_future = CandidateStrategyAdapter(make_candidate()).generate_signals(frame)
+
+    assert base["target_weight"].equals(with_future["target_weight"])
+
+
+def test_run_candidate_walk_forward_ignores_unused_future_columns() -> None:
+    frame = make_features(days=36)
+    frame["future_return_5"] = 0.01
+    frame["future_direction_5"] = 1
+
+    result = run_candidate_walk_forward(make_candidate(), frame, config=candidate_oos_config())
+
+    assert result.metrics["summary"]["window_count"] == 2
+    assert "sharpe" in result.metrics["oos"]
 
 
 def test_run_candidate_walk_forward_reports_oos_metrics() -> None:
@@ -77,14 +91,6 @@ def test_candidate_walk_forward_windows_are_chronological() -> None:
         assert pd.Timestamp(row["train_end_date"]) < pd.Timestamp(row["validation_start_date"])
         assert pd.Timestamp(row["validation_end_date"]) < pd.Timestamp(row["test_start_date"])
         assert pd.Timestamp(row["test_end_date"]) < pd.Timestamp(row["oos_start_date"])
-
-
-def test_run_candidate_walk_forward_rejects_future_signal_columns() -> None:
-    frame = make_features(days=36)
-    frame["future_return_5"] = 0.01
-
-    with pytest.raises(ValueError, match="future"):
-        run_candidate_walk_forward(make_candidate(), frame, config=candidate_oos_config())
 
 
 def test_save_candidate_validation_report_writes_artifacts(tmp_path: Path) -> None:

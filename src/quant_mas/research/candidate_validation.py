@@ -39,8 +39,7 @@ def run_candidate_walk_forward(
     config: dict[str, Any],
 ) -> CandidateValidationResult:
     """Run deterministic walk-forward OOS backtests for a StrategyCandidate."""
-    _reject_future_signal_columns(feature_table)
-    data = _prepare_frame(feature_table)
+    data = _prepare_frame(_signal_safe_frame(feature_table))
     walk_config = config.get("walk_forward", {})
     windows = build_walk_forward_windows(
         data["date"],
@@ -106,8 +105,7 @@ class CandidateStrategyAdapter(Strategy):
         self.candidate = candidate
 
     def generate_signals(self, data: pd.DataFrame) -> pd.DataFrame:
-        _reject_future_signal_columns(data)
-        frame = _prepare_frame(data)
+        frame = _prepare_frame(_signal_safe_frame(data))
         rows = []
         for symbol, group in frame.groupby("symbol", sort=True):
             group = group.sort_values("date").reset_index(drop=True)
@@ -171,14 +169,21 @@ def _prepare_frame(frame: pd.DataFrame) -> pd.DataFrame:
     return data.sort_values(["date", "symbol"]).reset_index(drop=True)
 
 
-def _reject_future_signal_columns(frame: pd.DataFrame) -> None:
+def _signal_safe_frame(frame: pd.DataFrame) -> pd.DataFrame:
+    """Drop label/future columns before candidate signal generation.
+
+    Real feature tables (e.g. server ``features.parquet``) may include
+    ``future_*`` labels for ML training. Candidate OOS must not read them,
+    but their presence in the parquet file is allowed.
+    """
     forbidden = [
         column
         for column in frame.columns
         if str(column).startswith("future_") or str(column).lower() in {"label", "target"}
     ]
-    if forbidden:
-        raise ValueError(f"Candidate signals must not use future/label columns: {forbidden}")
+    if not forbidden:
+        return frame
+    return frame.drop(columns=forbidden)
 
 
 def _candidate_signal(group: pd.DataFrame) -> pd.Series:

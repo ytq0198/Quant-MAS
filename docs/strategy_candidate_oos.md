@@ -22,6 +22,7 @@ StrategyCandidate
 - No LLM calls.
 - No model training.
 - Candidate signals must not use `future_*`, label, or target columns.
+- Label columns may exist in the input parquet (server `features.parquet`); they are dropped before signal generation.
 - `backtest.*` smoke metrics from M11.6 are not OOS.
 - `oos.*` is allowed only after this walk-forward hook runs.
 
