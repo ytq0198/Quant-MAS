@@ -46,6 +46,7 @@ def fetch_finnhub_company_news_records(
     records: list[RealNewsRecord] = []
     seen: set[tuple[str, int | str, ...]] = set()
     request_index = 0
+    consecutive_empty = 0
     for index, symbol in enumerate(normalized):
         if index > 0 and delay_seconds > 0:
             time.sleep(delay_seconds)
@@ -83,8 +84,19 @@ def fetch_finnhub_company_news_records(
                 _log_progress(
                     f"request {request_index}/{total_requests}: "
                     f"{symbol} {chunk_start}..{chunk_end} -> "
-                    f"+{chunk_added} (total {len(records)})"
+                    f"raw={len(payload)} +{chunk_added} (total {len(records)})"
                 )
+            if len(payload) == 0:
+                consecutive_empty += 1
+                if progress and consecutive_empty == 12:
+                    _log_progress(
+                        "warning: 12 consecutive empty API responses. "
+                        "Finnhub free tier company-news is typically limited to "
+                        "the most recent 1 year. Stop (Ctrl+C) and rerun with a "
+                        "recent --start date, e.g. last 365 days."
+                    )
+            else:
+                consecutive_empty = 0
 
     records.sort(key=lambda record: (record.symbol, record.published_at))
     if progress:

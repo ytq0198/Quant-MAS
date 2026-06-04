@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+from datetime import date, timedelta
 from pathlib import Path
 
 from quant_mas.text.finnhub_news import (
@@ -33,6 +34,12 @@ def main() -> int:
     )
     parser.add_argument("--start", default="2018-01-01", help="Start date YYYY-MM-DD.")
     parser.add_argument("--end", default="2025-12-31", help="End date YYYY-MM-DD.")
+    parser.add_argument(
+        "--recent-days",
+        type=int,
+        default=None,
+        help="If set, override --start to today minus N days (Finnhub free tier: use ~365).",
+    )
     parser.add_argument("--output-path", required=True, help="Output JSONL path.")
     parser.add_argument("--api-key", help="Finnhub API key override.")
     parser.add_argument(
@@ -53,14 +60,21 @@ def main() -> int:
         help="Suppress per-request progress logs on stderr.",
     )
     args = parser.parse_args()
+    start = args.start
+    end = args.end
+    if args.recent_days is not None:
+        if args.recent_days < 1:
+            raise ValueError("--recent-days must be >= 1")
+        end = date.today().isoformat()
+        start = (date.today() - timedelta(days=args.recent_days)).isoformat()
 
     try:
         if args.source != "finnhub":
             raise ValueError(f"Unsupported source: {args.source}")
         records = fetch_finnhub_company_news_records(
             args.symbols,
-            start=args.start,
-            end=args.end,
+            start=start,
+            end=end,
             api_key=args.api_key,
             chunk_months=args.chunk_months,
             delay_seconds=args.delay,
@@ -74,8 +88,8 @@ def main() -> int:
     summary = {
         "source": args.source,
         "symbols": [symbol.upper() for symbol in args.symbols],
-        "start": args.start,
-        "end": args.end,
+        "start": start,
+        "end": end,
         "record_count": len(records),
         "output_path": str(output_path),
         "symbol_counts": _count_by_symbol(records),

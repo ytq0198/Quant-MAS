@@ -606,12 +606,12 @@ python -m pip install -e ".[ml,text]"
 python -m pytest tests/test_text_signals.py -v   # 预期 31 passed
 python -m pytest -v   # 预期 330 passed（本地）
 
-# 0) 从 Finnhub 拉取真实新闻（2018–2025；按月分块；约 3×96 次请求，注意限速）
+# 0) 从 Finnhub 拉取真实新闻
+# 免费版 company-news 通常只有最近 1 年；2018 年会 raw=0，勿浪费 288 次请求
 python scripts/fetch_real_news.py \
   --source finnhub \
   --symbols AAPL MSFT SPY \
-  --start 2018-01-01 \
-  --end 2025-12-31 \
+  --recent-days 365 \
   --chunk-months 1 \
   --delay 1.0 \
   --output-path /mnt/localDisk3/weizian/datasets/text/real_news_wf003.jsonl \
