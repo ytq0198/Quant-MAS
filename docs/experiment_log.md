@@ -1,6 +1,6 @@
 # Quant MAS 实验记录
 
-更新时间：2026-06-04（v3 M12.4 ✅ **308 本地 · EXP-036** · 服务器 feature_linear OOS 待 EXP-POP-010）
+更新时间：2026-06-04（v3 M12.4 **310 pytest 双端** · EXP-POP-010 训练+export ✅ · OOS 修复待 pull）
 
 本文件用于记录真实实验和重要验证。不要记录未经实际运行的数据结果；尚未真实运行的项目标记为「待验证」。
 
@@ -217,37 +217,24 @@
 - 问题：无
 - 下一步：服务器 **EXP-POP-010**（feature_linear 训练 → export → walk-forward OOS）
 
-### EXP-POP-010：v3 M12.4 服务器 feature_linear RL → OOS ⏳
+### EXP-POP-010：v3 M12.4 服务器 feature_linear RL → OOS ⏳（export 标签 bug 已修）
 
-- 日期：待跑
-- 阶段：**M12.4** 服务器 — observation-aware policy 真实 features walk-forward OOS
-- 环境：a6000-9961；conda `quant-mas`；前置 `git pull`（含 M12.4，预期 **308 pytest**）
-- 命令（模板）：
-
-```bash
-python -m pytest -v
-
-python scripts/run_rl_experiment.py \
-  --config configs/rl_training.yaml \
-  --policy-type feature_linear \
-  --algorithm grpo \
-  --max-steps 50 \
-  --no-dry-run
-
-python scripts/export_rl_policy_candidate.py \
-  --config configs/rl_policy_export.yaml \
-  --no-dry-run
-
-python scripts/validate_candidate_oos.py \
-  --candidate-json outputs/rl_candidates/candidates.json \
-  --features-path /mnt/localDisk3/weizian/datasets/features/features.parquet \
-  --config configs/candidate_oos.yaml \
-  --no-dry-run
-```
-
-- 成功标准（机制）：导出候选 **非**常数全现金；OOS adapter 产生状态相关 `target_weight`（Sharpe 高低为次要）
-- 科研边界：`simulation.*` **≠** `oos.*`；主 baseline 仍为 **0.586**
-- 问题：—
+- 日期：2026-06-04
+- 阶段：**M12.4** 服务器 @ **`b923d1b`**（OOS 修复 commit 待 pull）
+- 环境：a6000-9961；conda `quant-mas`；Python **3.11.15**
+- 命令与结果：
+  - `python -m pytest -v` → **308 passed** in **47.36s** ✅
+  - `run_rl_experiment.py --policy-type feature_linear --max-steps 50 --no-dry-run` → ✅（`41fb2b777b8945b4ac8352c28487ddd0`）
+  - `export_rl_policy_candidate.py --no-dry-run` → ✅（`68e757fcae674052ab8b82b61d15ab7d`）
+  - `validate_candidate_oos.py --no-dry-run` → ❌ `grpo_policy candidate params.action_logits must be a non-empty list`
+- **Simulation / training**（**≠ OOS**）：
+  - `simulation.sharpe_mean`: **12.13**；`total_return_mean`: **0.0269**
+  - `training.policy_delta_norm`: **0.00859**；`policy_step_count`: **1**
+- **根因**：`configs/rl_policy_export.yaml` 硬编码 `agent_type: grpo_policy`，覆盖了 `FeaturePolicyState` 自动检测；导出候选带 `policy_type=feature_linear` 但 `agent_type=grpo_policy`，M11.7 误走 logits 分支
+- **修复**（待 pull）：checkpoint 类型优先于 config；移除 yaml 硬编码；OOS adapter 按 `params.policy_type` 容错
+- **重跑 OOS**（无需重新训练）：`git pull` 后直接 `validate_candidate_oos.py ...`（或 re-export 得 `agent_type=feature_linear_policy`）
+- 科研边界：`simulation.sharpe_mean=12.13` **不可**混报为 OOS；主 baseline **0.586**
+- 问题：export 标签（已修）；真实 `oos.*` 待重跑
 
 ### EXP-POP-009：v3 M12.3 服务器 RL 候选 walk-forward OOS ✅
 
@@ -1350,8 +1337,8 @@ python scripts/validate_candidate_oos.py \
 | EXP-20260602-010 | 2026-06-02 | Plus M1 服务器 pytest + 比较表 | **102 passed**；OOS sharpe 0.586 |
 | EXP-20260602-011 | 2026-06-02 | Plus M2 数据扩展本地 | **115 passed**（+13） |
 | EXP-20260602-035 | 2026-06-04 | v3 M12.2 本地 RL policy export | **294 passed**（+12）；export **12/12** |
-| EXP-20260602-036 | 2026-06-04 | v3 M12.4 本地 observation-aware RL | **308 passed**（+12）；feature-linear **12/12** |
-| EXP-POP-010 | — | v3 M12.4 服务器 feature_linear OOS | 待验证 |
+| EXP-POP-010 | 2026-06-04 | v3 M12.4 服务器 feature_linear | **308 passed**；train+export ✅；OOS 阻塞（export agent_type bug，已修待 pull） |
+| EXP-20260602-036 | 2026-06-04 | v3 M12.4 本地 observation-aware RL | **308→310 passed**（+12）；feature-linear **14/14** |
 | EXP-POP-009 | 2026-06-04 | v3 M12.3 服务器 RL 候选 OOS | **296 passed**；`rl_grpo_policy_001_1` **oos.sharpe 0.0**（全现金 ablation）@ `6e8c507` |
 | EXP-POP-008 | 2026-06-04 | v3 M12.2 服务器 RL export | **294 passed**；export **`rl_grpo_policy_001_1`** @ `6e8c507` 前序 |
 | EXP-POP-007 | 2026-06-04 | v3 M12.1 服务器 RL smoke | **282 passed**；GRPO train **simulation.sharpe_mean 6.31**（≠ OOS）@ `e291cf9` |

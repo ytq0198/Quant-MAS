@@ -2,7 +2,8 @@ rl_policy_export:
   policy_state: outputs/rl_training/rl_training_grpo_001/policy_state.json
   metrics: outputs/rl_training/rl_training_grpo_001/metrics.json
   output_dir: outputs/rl_candidates
-  agent_type: grpo_policy
+  # agent_type auto-detected from policy_state.json (do not hardcode grpo_policy):
+  # grpo_policy (logits) | feature_linear_policy (FeaturePolicyState)
 
 experiment:
   name: rl_policy_export_001

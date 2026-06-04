@@ -55,7 +55,11 @@ def export_policy_candidate(
     selected_candidate_id = candidate_id or f"rl_{_slug(agent_id)}_{state.step_count}"
     selection_metrics = _selection_metrics(metrics)
     assert_no_oos_metrics(selection_metrics)
-    selected_agent_type = agent_type or _agent_type_for_state(state)
+    detected_agent_type = _agent_type_for_state(state)
+    if agent_type is not None and agent_type != detected_agent_type:
+        selected_agent_type = detected_agent_type
+    else:
+        selected_agent_type = agent_type or detected_agent_type
     return StrategyCandidate(
         candidate_id=selected_candidate_id,
         source="rl_training",

@@ -150,14 +150,15 @@ class CandidateStrategyAdapter(Strategy):
             group = group.sort_values("date").reset_index(drop=True)
             signal = _candidate_signal(group)
             scale = float(self.candidate.params.get("scale", 1.0))
+            adapter_type = _resolve_rl_policy_adapter_type(self.candidate)
             if self.candidate.agent_type == "momentum":
                 weights = (0.5 + scale * signal * 10.0).clip(0.0, 1.0)
             elif self.candidate.agent_type == "mean_reversion":
                 weights = (0.5 - scale * signal * 10.0).clip(0.0, 1.0)
-            elif self.candidate.agent_type == "grpo_policy":
+            elif adapter_type == "grpo_policy":
                 weight = _grpo_policy_target_weight(self.candidate.params)
                 weights = pd.Series(weight, index=group.index, dtype=float)
-            elif self.candidate.agent_type == "feature_linear_policy":
+            elif adapter_type == "feature_linear_policy":
                 weights = _feature_linear_policy_weights(group, self.candidate.params)
             else:
                 raise ValueError("Unsupported StrategyCandidate agent_type for OOS validation")
@@ -300,6 +301,30 @@ def _candidate_signal(group: pd.DataFrame) -> pd.Series:
     if "last_return" in group.columns:
         return pd.to_numeric(group["last_return"], errors="raise").fillna(0.0)
     return group["close"].astype(float).pct_change().fillna(0.0)
+
+
+def _resolve_rl_policy_adapter_type(candidate: StrategyCandidate) -> str:
+    """Map StrategyCandidate to the RL OOS adapter branch."""
+    if candidate.agent_type in {"momentum", "mean_reversion", "grpo_policy", "feature_linear_policy"}:
+        if candidate.agent_type in {"grpo_policy", "feature_linear_policy"}:
+            params = candidate.params
+            policy_type = str(params.get("policy_type", "")).lower()
+            if policy_type in {"feature_linear", "feature_linear_policy"}:
+                return "feature_linear_policy"
+            if isinstance(params.get("action_weights"), list) and isinstance(params.get("feature_names"), list):
+                return "feature_linear_policy"
+            if policy_type in {"logits", "discrete_logits"} or isinstance(params.get("action_logits"), list):
+                return "grpo_policy"
+        return candidate.agent_type
+    params = candidate.params
+    policy_type = str(params.get("policy_type", "")).lower()
+    if policy_type in {"feature_linear", "feature_linear_policy"}:
+        return "feature_linear_policy"
+    if isinstance(params.get("action_weights"), list) and isinstance(params.get("feature_names"), list):
+        return "feature_linear_policy"
+    if isinstance(params.get("action_logits"), list):
+        return "grpo_policy"
+    return candidate.agent_type
 
 
 def _grpo_action_levels(params: dict[str, Any]) -> list[float]:

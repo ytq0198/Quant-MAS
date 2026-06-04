@@ -113,6 +113,32 @@ def test_export_supports_feature_policy_state(tmp_path: Path) -> None:
     assert candidate.params["policy_type"] == "feature_linear"
 
 
+def test_export_feature_policy_ignores_stale_grpo_agent_type(tmp_path: Path) -> None:
+    candidate = export_policy_candidate(
+        policy_state_path=write_feature_policy_state(tmp_path),
+        metrics_path=write_metrics(tmp_path),
+        agent_type="grpo_policy",
+    )
+
+    assert candidate.agent_type == "feature_linear_policy"
+
+
+def test_feature_linear_adapter_works_when_agent_type_mislabeled() -> None:
+    candidate = make_feature_candidate()
+    mislabeled = StrategyCandidate(
+        candidate_id=candidate.candidate_id,
+        source=candidate.source,
+        agent_id=candidate.agent_id,
+        agent_type="grpo_policy",
+        params=candidate.params,
+        selection_metrics=candidate.selection_metrics,
+    )
+
+    signals = CandidateStrategyAdapter(mislabeled).generate_signals(make_features())
+
+    assert signals["target_weight"].nunique() > 1
+
+
 def test_exported_feature_candidate_contains_weights(tmp_path: Path) -> None:
     candidate = export_policy_candidate(
         policy_state_path=write_feature_policy_state(tmp_path),
