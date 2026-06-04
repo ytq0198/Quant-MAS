@@ -416,7 +416,7 @@ M13 is split into four incremental stages so implementation can stay small and t
 | **M13.2 LangGraph Extended DAG** | done | Optional LangGraph backend for population, RL, and batch walk-forward nodes | [mcp_protocol.md](mcp_protocol.md) |
 | **M13.3 Paper Artifact Export** | done | Paper-grade result tables, ablation tables, and audit package | [mcp_protocol.md](mcp_protocol.md) |
 
-Current next target: **M13 closeout** — server EXP-M13-004 real export smoke (EXP-M13-003 dual-end done @ 7f48486 ? @ `2610612`).
+**M13 closed** (EXP-M13-004 dual-end @ 931356f). Next: paper writing / optional research (EXP-TEXT-002 LoRA, etc.) (EXP-M13-003 dual-end done @ 7f48486 ? @ `2610612`).
 
 ### M13.0 completion note（EXP-M13-001 ✅ 双端）
 
@@ -450,29 +450,13 @@ Delivered: langgraph_recipe_workflow + --backend CLI + test_langgraph_recipe_wor
 
 M13.2 remains dry-run only. It maps YAML recipes to an optional LangGraph DAG when LangGraph is installed, and falls back to the deterministic scheduler backend when unavailable.
 
-### M13.3 completion note
+### M13.3 completion note（EXP-M13-004 ✅ 双端 · M13 收口）
 
-M13.3 Paper Artifact Export has been implemented locally.
+| 环境 | 结果 |
+|------|------|
+| 本地 | **361 passed**；7 paper tests ✅ |
+| 服务器 a6000-9961 | **361 passed**（61.08s）；真实 memory 导出 6 产物 ✅ @ 931356f |
 
-Delivered:
-
-- `src/quant_mas/research/paper_artifacts.py`
-- `scripts/export_paper_artifacts.py`
-- `tests/test_paper_artifacts.py`
-
-Exports:
-
-- `paper_main_results.csv`
-- `paper_text_ablation.csv`
-- `paper_population_ablation.csv`
-- `paper_rl_ablation.csv`
-- `paper_experiment_index.md`
-- `audit_summary.json`
-
-Verification:
-
-- `python -m pytest tests/test_paper_artifacts.py -v` �� **7 passed**
-
-- python -m pytest -v -> **361 passed**
+Delivered: paper_artifacts + export CLI + test_paper_artifacts（7/7）
 
 M13.3 does not infer missing experiment results. Main-result tables use OOS metrics only; simulation/training/population metrics remain ablation context.

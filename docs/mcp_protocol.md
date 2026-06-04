@@ -158,7 +158,7 @@ M13 是批处理研究调度，不是对话路由器，也不是外部 MCP 服�
 
 ## 当前下一步
 
-**M13.3 本地已完成**（EXP-M13-004，361 pytest）。M13 编排四阶段（0→3）代码交付完毕；下一步：服务器真实 `experiments.json` + `outputs/pipelines` 导出 smoke，然后 **M13 整体收口**。
+**M13 整体收口 ✅**（EXP-M13-001 → EXP-M13-004，361 pytest 双端 @ `931356f`）。M13.0–M13.3 编排四阶段全部完成；论文主 baseline 仍为 EXP-20260602-008（`oos.sharpe = 0.586`）。
 
 ## M13.0 Implementation Note
 
@@ -274,6 +274,8 @@ Boundaries:
 - Text ablation rows keep coverage, aligned count, and dropped count columns.
 - RL ablation rows keep OOS and simulation metrics in separate columns.
 - Missing values are left blank; the exporter does not infer or invent results.
+
+M13.3 implemented @ `931356f`. **Server verified 2026-06-04**（61.08s，361 passed；真实 `experiments.json` 导出 6 产物 ✅）。
 
 Verification:
 
