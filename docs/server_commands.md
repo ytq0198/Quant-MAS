@@ -533,6 +533,28 @@ python scripts/audit_text_signals.py \
   --output-dir /mnt/localDisk3/weizian/reports/text_signal_audit_wf001
 
 # 1) 生成或准备更高覆盖率的文本信号（wf002 尚不存在则必须先跑本步）
+# CLI 参数：--text-path（输入 JSONL）、--signals-output（输出 parquet）、--output-dir（模型元数据）
+# 错误示例（勿用）：--records-path / --output-path
+#
+# 1a) 先确认输入文件存在（不存在则见下方 1b）
+ls -la /mnt/localDisk3/weizian/datasets/text/news_wf002.jsonl
+ls -la data/text/smoke_from_features.jsonl   # EXP-TEXT-001 用的 200 条 smoke
+#
+# 1b) 若 news_wf002.jsonl 尚未准备：从 features 对齐生成全量占位 JSONL（6033 行 × 3 symbol）
+# python - <<'PY'
+# import json
+# import pandas as pd
+# df = pd.read_parquet("/mnt/localDisk3/weizian/datasets/features/features.parquet")
+# out = "/mnt/localDisk3/weizian/datasets/text/news_wf002.jsonl"
+# with open(out, "w", encoding="utf-8") as f:
+#     for row in df.itertuples(index=False):
+#         d = str(getattr(row, "date", row[0]))[:10]
+#         sym = str(getattr(row, "symbol", row[1]))
+#         f.write(json.dumps({"date": d, "symbol": sym, "source": "feature_aligned_smoke",
+#                             "text": f"{sym} market headline for {d}", "metadata": {}}, ensure_ascii=False) + "\n")
+# print("wrote", out, "rows", len(df))
+# PY
+#
 # 输出建议命名为 signals_finbert_wf002.parquet，避免覆盖 EXP-TEXT-001 产物
 python scripts/train_text_model.py --mode finbert_baseline \
   --config configs/text_model.server.yaml \

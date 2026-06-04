@@ -215,6 +215,21 @@
   - 结果必须与 EXP-20260602-008 `oos.sharpe=0.586` 对比
 - 下一步：服务器生成高覆盖 `signals_finbert_wf002.parquet` → audit → build features → walk-forward
 
+**服务器 baseline 审计（EXP-TEXT-WF-001 信号，2026-06-04）**：
+
+| 指标 | 值 |
+|------|-----|
+| feature_rows | 6033 |
+| signal_rows | 200 |
+| coverage_ratio | **3.32%**（200/6033） |
+| symbols | 特征 AAPL/MSFT/SPY；信号仅 **AAPL** |
+| signal 日期 | 2018-01-02 ~ **2018-10-16**（特征至 2025-12-31） |
+| 产物 | `/mnt/localDisk3/weizian/reports/text_signal_audit_wf001/` |
+
+与 EXP-TEXT-WF-001（oos.sharpe **0.563**）一致：低覆盖 smoke 级信号，不能代表高覆盖结论。
+
+**CLI 注意**：`train_text_model.py` 使用 `--text-path`、`--signals-output`、`--output-dir`（**不是** `--records-path` / `--output-path`）。步骤 1 前须确认 `news_wf002.jsonl` 已存在。
+
 ### EXP-20260602-036：v3 M12.4 Observation-aware RL Policy 本地验证 ✅
 
 - 日期：2026-06-04
