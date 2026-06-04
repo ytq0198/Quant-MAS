@@ -19,3 +19,5 @@ label:
 text_signals_path: /mnt/localDisk3/weizian/datasets/text/signals_finbert_wf002.parquet
 text_signal_columns:
   - finbert_sentiment
+# Sparse text coverage: fill missing sentiment with 0 (same as EXP-TEXT-WF-001).
+text_signal_fillna: 0

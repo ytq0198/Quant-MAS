@@ -637,8 +637,8 @@ python scripts/audit_text_signals.py \
   --signals-path /mnt/localDisk3/weizian/datasets/text/signals_finbert_wf003.parquet \
   --output-dir /mnt/localDisk3/weizian/reports/text_signal_audit_wf003
 
-# 4) 构建 text-enhanced features 并跑 walk-forward
-# 注意：configs/features.text.yaml 的 text_signals_path 应指向 signals_finbert_wf003.parquet
+# 4) 构建 text-enhanced features（稀疏覆盖须 fillna(0)，与 WF-001 一致）
+# configs/features.text.yaml 增加：text_signal_fillna: 0
 python scripts/build_features.py \
   --config configs/features.text.yaml \
   --storage-config configs/storage.server.yaml \

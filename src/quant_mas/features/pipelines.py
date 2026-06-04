@@ -89,4 +89,20 @@ def build_feature_table_from_config(
             signals,
             signal_columns=config.get("text_signal_columns"),
         )
+        fillna_value = config.get("text_signal_fillna")
+        if fillna_value is not None:
+            columns = config.get("text_signal_columns")
+            if columns is None:
+                signal_frame = signals.copy()
+                if {"signal_name", "value"}.issubset(signal_frame.columns):
+                    columns = sorted(signal_frame["signal_name"].dropna().unique())
+                else:
+                    columns = [
+                        column
+                        for column in signal_frame.columns
+                        if column not in {"date", "symbol"}
+                    ]
+            for column in columns:
+                if column in features.columns:
+                    features[column] = features[column].fillna(fillna_value)
     return features

@@ -98,3 +98,33 @@ def test_build_feature_table_sorts_within_symbol_before_rolling() -> None:
     assert features["date"].tolist() == sorted(features["date"].tolist())
     assert features.loc[1, "ma_2"] == pytest.approx(15.0)
     assert features.loc[0, "future_return_1"] == pytest.approx(20 / 10 - 1.0)
+
+
+def test_build_feature_table_from_config_fills_sparse_text_signals(tmp_path) -> None:
+    from quant_mas.features.pipelines import build_feature_table_from_config
+
+    raw = make_ohlcv("AAA", [10, 11, 12, 13, 14, 15, 16, 17, 18, 19])
+    signals = pd.DataFrame(
+        {
+            "date": [raw.loc[0, "date"]],
+            "symbol": ["AAA"],
+            "finbert_sentiment": [0.25],
+        }
+    )
+    signals_path = tmp_path / "signals.parquet"
+    signals.to_parquet(signals_path, index=False)
+
+    features = build_feature_table_from_config(
+        raw,
+        {
+            "label": {"horizon": 2},
+            "text_signals_path": str(signals_path),
+            "text_signal_columns": ["finbert_sentiment"],
+            "text_signal_fillna": 0,
+        },
+    )
+
+    assert len(features) == len(raw)
+    assert features["finbert_sentiment"].isna().sum() == 0
+    assert features.loc[0, "finbert_sentiment"] == pytest.approx(0.25)
+    assert features.loc[1, "finbert_sentiment"] == pytest.approx(0.0)
