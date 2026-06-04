@@ -224,6 +224,8 @@ python scripts/validate_candidate_oos.py \
   --dry-run
 ```
 
+Server (a6000): use `/mnt/localDisk3/weizian/datasets/features/features.parquet` instead of `data/features/features.parquet`.
+
 ### Compare experiments / 实验对比
 
 ```bash

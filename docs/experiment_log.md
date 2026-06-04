@@ -178,29 +178,32 @@
 
 ## 当前验证记录
 
-### EXP-POP-005：v3 M11.7 服务器 pytest + candidate OOS 前置检查（部分）📋
+### EXP-POP-005：v3 M11.7 服务器 candidate export + OOS 验证（进行中）📋
 
-- 日期：2026-06-03
-- 阶段：**M11.7** 服务器 pull @ **`f804a95`**
+- 日期：2026-06-04（续 2026-06-03 pytest）
+- 阶段：**M11.7** 服务器 @ **`f804a95`** / docs **`08a9baf`**
 - 环境：a6000-9961；conda `quant-mas`；Python **3.11.15**
 - 命令与结果：
-  - `python -m pytest -v` → **259 passed** in **48.32s** ✅
-  - `python scripts/validate_candidate_oos.py --candidate-json outputs/candidates/candidates.json ... --dry-run` → ❌ `[Errno 2] No such file or directory: outputs/candidates/candidates.json`
-- 原因：M11.6 `export_population_candidates.py` 默认 **`--dry-run`** 不写磁盘；需先 **`--no-dry-run`** 导出 `candidates.json`
-- 修复步骤：
+  - `python -m pytest -v` → **259 passed** in **48.32s** ✅（2026-06-03）
+  - `export_population_candidates.py ... --no-dry-run` → ✅
+    - `outputs/candidates/candidates.json`（1686 B）
+    - Top-2：`cand_mean_rev_1`、`cand_mean_rev_1_g1_1`
+    - `experiment_id`: `c1e96fbebbb9413bb52bad6239f0bfc2`
+    - `backtest.sharpe` ≈ **12.99**（smoke，**≠** OOS）
+  - `validate_candidate_oos.py ... --features-path data/features/features.parquet --dry-run` → ❌ `Parquet file does not exist`
+- 原因：服务器真实 features 在 **`/mnt/localDisk3/weizian/datasets/features/features.parquet`**（EXP-008 walk-forward 同路径），非 repo 相对路径 `data/features/features.parquet`
+- 修复命令：
   ```bash
-  python scripts/export_population_candidates.py \
-    --population-config configs/population_training.yaml \
-    --top-k 2 --run-backtest-smoke --no-dry-run
-
   python scripts/validate_candidate_oos.py \
     --candidate-json outputs/candidates/candidates.json \
-    --features-path data/features/features.parquet \
+    --candidate-id cand_mean_rev_1 \
+    --features-path /mnt/localDisk3/weizian/datasets/features/features.parquet \
     --config configs/candidate_oos.yaml \
+    --storage-config configs/storage.yaml \
     --dry-run
   ```
-- 问题：无代码缺陷；工作流文档已强调 `--no-dry-run`
-- 下一步：完成 export + 真实 features OOS；对比 **oos.sharpe** vs **0.586**
+- 问题：无代码缺陷；路径与 walk-forward 文档应对齐
+- 下一步：dry-run 通过后 `--no-dry-run`；记录 `oos.sharpe` vs baseline **0.586**
 
 ### EXP-20260602-032：v3 M11.7 StrategyCandidate Walk-forward OOS 本地验证 ✅
 

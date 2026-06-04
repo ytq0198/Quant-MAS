@@ -858,6 +858,13 @@ python scripts/export_population_candidates.py \
 ls -la outputs/candidates/candidates.json
 ```
 
+**服务器 features 路径**（非 repo 内 `data/features/`，与 walk-forward EXP-008 一致）：
+
+```bash
+FEATURES=/mnt/localDisk3/weizian/datasets/features/features.parquet
+ls -la "$FEATURES"   # 预期存在，约 6033 rows
+```
+
 再跑 walk-forward OOS（M11.7）：
 
 ```bash
@@ -866,7 +873,7 @@ python scripts/validate_candidate_oos.py --help
 python scripts/validate_candidate_oos.py \
   --candidate-json outputs/candidates/candidates.json \
   --candidate-id cand_mean_rev_1 \
-  --features-path data/features/features.parquet \
+  --features-path /mnt/localDisk3/weizian/datasets/features/features.parquet \
   --config configs/candidate_oos.yaml \
   --storage-config configs/storage.yaml \
   --dry-run
@@ -874,7 +881,8 @@ python scripts/validate_candidate_oos.py \
 # 非 dry-run 写 artifacts + ExperimentMemory
 python scripts/validate_candidate_oos.py \
   --candidate-json outputs/candidates/candidates.json \
-  --features-path data/features/features.parquet \
+  --candidate-id cand_mean_rev_1 \
+  --features-path /mnt/localDisk3/weizian/datasets/features/features.parquet \
   --config configs/candidate_oos.yaml \
   --no-dry-run
 ```

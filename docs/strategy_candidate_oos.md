@@ -58,9 +58,16 @@ their difference. It is still research output, not investment advice.
 
 ## Server Workflow
 
+**Local / pytest** use `data/features/features.parquet` (synthetic).  
+**Server (a6000)** use the same path as walk-forward EXP-008:
+
+```text
+/mnt/localDisk3/weizian/datasets/features/features.parquet
+```
+
 1. Export population candidates with M11.6 (**`--no-dry-run`** writes `candidates.json`; `--dry-run` does not).
 2. Point `--candidate-json` to `outputs/candidates/candidates.json`.
-3. Point `--features-path` to the real server feature parquet.
+3. Point `--features-path` to the real server feature parquet (see above).
 4. Run `validate_candidate_oos.py --no-dry-run`.
 5. Compare resulting `oos.sharpe` against `EXP-20260602-008`.
 
@@ -72,10 +79,11 @@ python scripts/export_population_candidates.py \
   --run-backtest-smoke \
   --no-dry-run
 
-# Step 2 — OOS validation
+# Step 2 — OOS validation (server path)
 python scripts/validate_candidate_oos.py \
   --candidate-json outputs/candidates/candidates.json \
-  --features-path data/features/features.parquet \
+  --candidate-id cand_mean_rev_1 \
+  --features-path /mnt/localDisk3/weizian/datasets/features/features.parquet \
   --config configs/candidate_oos.yaml \
   --dry-run
 ```
@@ -88,7 +96,7 @@ has completed and the artifacts are stored in ExperimentMemory.
 | Experiment | Environment | Result |
 | --- | --- | --- |
 | **EXP-20260602-032** | Local mock | **259 passed**; OOS tests **11/11** |
-| **EXP-POP-005** | Server @ `f804a95` | ✅ **259 passed** (48.32s); real OOS pending (`candidates.json` needs M11.6 `--no-dry-run`) |
+| **EXP-POP-005** | Server @ `f804a95` | ✅ **259 passed** (48.32s); export ✅; OOS 待 server features 路径 |
 
 Local acceptance:
 
