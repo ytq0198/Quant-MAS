@@ -86,18 +86,26 @@ For internship preparation, Quant MAS can help demonstrate three kinds of abilit
 
 | Layer | English | 中文 |
 |---|---|---|
-| Data Layer | Loads, validates, stores, and prepares market, macro, text, and research data for experiments. | 负责加载、校验、存储和准备行情、宏观、文本与研究数据。 |
-| Quant Engine Layer | Runs deterministic feature engineering, model training, backtesting, walk-forward OOS evaluation, and risk computation. | 负责确定性的特征工程、模型训练、回测、Walk-forward 样本外评估和风险计算。 |
-| Research / Experiment Layer | Tracks baselines, candidates, comparisons, paper artifacts, and reproducible experiment records. | 负责基线、候选策略、实验对比、论文产物和可复现实验记录。 |
-| Memory / RAG Layer | Stores experiment memory and retrieves relevant documents, prior results, and context for agents. | 存储实验记忆，并为智能体检索相关文档、历史结果和上下文。 |
-| Tool Layer | Exposes controlled quant tools so agents can request computation without bypassing the engine. | 暴露受控量化工具，使智能体能请求计算，但不能绕过量化引擎。 |
-| Agent Layer | Uses ResearchAgent, SupervisorAgent, ReportAgent, and related agents for planning, routing, explanation, and reporting. | 使用 ResearchAgent、SupervisorAgent、ReportAgent 等智能体完成规划、路由、解释和报告。 |
-| Orchestration / Protocol Layer | Coordinates workflows with LangGraph-style flows, MCP-style scheduling, A2A-style descriptions, policies, and audit logs. | 通过 LangGraph 风格流程、MCP 风格调度、A2A 风格描述、策略约束和审计日志协调工作流。 |
-| Outputs / Human Review | Produces reports, paper artifacts, experiment summaries, and human-reviewable decisions. | 产出报告、论文材料、实验摘要和可人工审查的决策记录。 |
+| 1. Data Layer | Provides OHLCV data, multi-source fetchers such as Stooq, YFinance, Finnhub, and Alpha Vantage, macro/filing sources such as FRED and SEC EDGAR, text news, and Parquet/JSONL storage. | 提供 OHLCV 价格与成交量数据，Stooq、YFinance、Finnhub、Alpha Vantage 等多源抓取器，FRED 与 SEC EDGAR 等宏观/财报来源，文本新闻，以及 Parquet/JSONL 存储。 |
+| 2. Quant Engine Layer | Performs deterministic computation through data validation, feature engineering, models, strategies, backtest engine, walk-forward OOS evaluation, and risk layer. | 通过数据校验、特征工程、模型、策略、回测引擎、Walk-forward 样本外评估和风险层执行确定性计算。 |
+| 3. Research / Experiment Layer | Stores experiment memory, registers baselines, compares experiments, exports paper artifacts, and keeps metric families separated. | 存储实验记忆、注册基线、对比实验、导出论文产物，并保持不同指标族分离。 |
+| 4. Memory / RAG Layer | Loads documents, retrieves context with simple and hybrid retrievers, creates hash embeddings, and supports in-memory vector store, optional pgvector, and optional Neo4j. | 加载文档，使用简单检索器和混合检索器获取上下文，生成哈希嵌入，并支持内存向量库、可选 pgvector 和可选 Neo4j。 |
+| 5. Tool Layer | Exposes controlled tools such as DataSummaryTool, BacktestTool, TrainModelTool, ReportTool, RiskTool, MLBacktestTool, and PipelineTool. | 暴露受控工具，包括 DataSummaryTool、BacktestTool、TrainModelTool、ReportTool、RiskTool、MLBacktestTool 和 PipelineTool。 |
+| 6. Agent Layer | Uses SupervisorAgent, ResearchAgent, ReportAgent, MockLLMClient, optional DeepSeek/local vLLM, and ToolRegistry for planning, explanation, routing, and report generation. | 使用 SupervisorAgent、ResearchAgent、ReportAgent、MockLLMClient、可选 DeepSeek/local vLLM 和 ToolRegistry 完成规划、解释、路由和报告生成。 |
+| 7. Orchestration / Protocol Layer | Coordinates M4 research workflow, M13 MCP scheduler, YAML pipeline recipes, optional LangGraph backend, Audit JSONL, agent communication, and ToolPolicy. | 协调 M4 研究工作流、M13 MCP 调度器、YAML 流水线配方、可选 LangGraph 后端、Audit JSONL、智能体通信和 ToolPolicy。 |
+| 8. Outputs / Human Review | Produces backtest reports, walk-forward reports, paper tables, audit logs, experiment index, human confirmation records, and a clear no direct live trading boundary. | 产出回测报告、滚动样本外报告、论文表格、审计日志、实验索引、人工确认记录，并明确不进行任何直接实盘交易。 |
 
-The architecture is intentionally conservative: agents help organize research, while the Quant Engine performs the numerical work.
+The safety boundary is part of the architecture, not an afterthought. LLM agents cannot directly place live orders; only audited OOS metrics can support paper conclusions; all trading candidates require backtesting, risk checks, audit logs, and human confirmation.
 
-该架构有意保持保守：智能体帮助组织研究，数值计算由 Quant Engine 完成。
+安全边界是架构的一部分，而不是事后补充。LLM 智能体不能直接下实盘订单；只有经过审计的样本外指标可以支撑论文结论；所有交易候选都需要经过回测、风控检查、审计日志和人工确认。
+
+Metrics are intentionally separated: `oos.*` is paper-grade, while `simulation.*`, `training.*`, `population.*`, and `audit.*` describe different experiment contexts and must not be mixed.
+
+指标被有意分离：`oos.*` 属于论文级样本外指标，而 `simulation.*`、`training.*`、`population.*` 和 `audit.*` 描述不同实验上下文，不能混用。
+
+By default, the system does not expose an external MCP listener. ToolPolicy also denies shell, broker, order, secrets, and other unsafe execution paths.
+
+默认情况下，系统不开放外部 MCP 监听器。ToolPolicy 也会拒绝 shell、broker、order、secrets 等不安全执行路径。
 
 ---
 
