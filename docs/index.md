@@ -43,7 +43,7 @@ LLM agents **must not** place live orders. Signals require backtesting, risk che
 
 ## 架构 / Architecture
 
-![Quant MAS architecture](../architecture.png)
+![Quant MAS architecture](../architecture.png?v=20260605)
 
 <details>
 <summary>Mermaid / 流程图（点击展开）</summary>

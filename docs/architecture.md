@@ -21,7 +21,7 @@ Quant MAS 采用「确定性量化引擎 + **Text Signal Layer（M6）** + **RL 
 
 ## 架构图（Architecture Diagram）
 
-![Quant MAS 架构图](../architecture.png)
+![Quant MAS 架构图](../architecture.png?v=20260605)
 
 > **说明**：架构图见仓库根目录 [`architecture.png`](../architecture.png)。下方为文本树补充说明。
 

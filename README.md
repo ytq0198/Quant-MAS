@@ -82,7 +82,7 @@ For internship preparation, Quant MAS can help demonstrate three kinds of abilit
 
 ## Architecture / 系统架构
 
-![Quant MAS Architecture](architecture.png)
+![Quant MAS Architecture](architecture.png?v=20260605)
 
 | Layer | English | 中文 |
 |---|---|---|
