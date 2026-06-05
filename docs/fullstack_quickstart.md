@@ -1,8 +1,8 @@
 # Quant MAS v4 Full-stack Quick Start / 全栈快速开始
 
-This document describes the Phase 1-3 full-stack skeleton: a FastAPI backend, status endpoint, mock-safe Agent/Tool/Memory APIs, Backtest/OOS/Risk summary APIs, and a React + Vite dashboard.
+This document describes the Phase 1-4 full-stack skeleton: a FastAPI backend, status endpoint, mock-safe Agent/Tool/Memory APIs, Backtest/OOS/Risk summary APIs, optional database/deployment status APIs, and a React + Vite dashboard.
 
-本文档说明 Phase 1-3 全栈骨架：FastAPI 后端、状态接口、mock-safe Agent/Tool/Memory API、Backtest/OOS/Risk 摘要 API 和 React + Vite 仪表盘。
+本文档说明 Phase 1-4 全栈骨架：FastAPI 后端、状态接口、mock-safe Agent/Tool/Memory API、Backtest/OOS/Risk 摘要 API、可选数据库/部署状态 API 和 React + Vite 仪表盘。
 
 ---
 
@@ -93,10 +93,23 @@ Backtest summaries are displayed for workflow understanding only. Paper-grade co
 
 ---
 
-## 6. Next Phases / 下一阶段
+## 6. Phase 4 Scope / Phase 4 范围
 
-- Phase 4: Database / RAG / server deployment.
-- Phase 4：数据库 / RAG / 服务器部署。
+| Endpoint / Artifact | English | 中文 |
+|---|---|---|
+| `GET /api/database/status` | Lists local files, SQLite, Postgres, pgvector, and Neo4j as optional backends. | 将本地文件、SQLite、Postgres、pgvector 和 Neo4j 列为可选后端。 |
+| `GET /api/deployment/status` | Lists frontend/backend stacks and Docker artifacts. | 列出前后端技术栈和 Docker 产物。 |
+| `docker-compose.yml` | Provides backend, frontend, Postgres/pgvector, and Neo4j service skeletons. | 提供 backend、frontend、Postgres/pgvector 和 Neo4j 服务骨架。 |
+| `Dockerfile.backend` | Builds the FastAPI backend image. | 构建 FastAPI 后端镜像。 |
+| `Dockerfile.frontend` | Builds the React frontend and serves it with Nginx. | 构建 React 前端并用 Nginx 托管。 |
+
+Postgres, pgvector, and Neo4j are optional. Local files remain the default backend for tests and lightweight development.
+
+Postgres、pgvector 和 Neo4j 都是可选项。本地文件仍是测试和轻量开发的默认后端。
+
+---
+
+## 7. Next Phases / 下一阶段
 
 - Later: dedicated charts, audit log pages, human review queues, and real ExperimentMemory integration.
 - 后续：专门图表、审计日志页面、人工审查队列和真实 ExperimentMemory 集成。

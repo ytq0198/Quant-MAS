@@ -1,8 +1,8 @@
 # Quant MAS v4 UI Design / UI 设计
 
-This document records the Phase 1-3 UI direction for the Quant MAS v4 full-stack interface.
+This document records the Phase 1-4 UI direction for the Quant MAS v4 full-stack interface.
 
-本文档记录 Quant MAS v4 全栈界面的 Phase 1-3 UI 方向。
+本文档记录 Quant MAS v4 全栈界面的 Phase 1-4 UI 方向。
 
 ---
 
@@ -14,7 +14,7 @@ The first UI should behave like a research operations dashboard, not a marketing
 
 ---
 
-## Phase 1-3 Screen / Phase 1-3 页面
+## Phase 1-4 Screen / Phase 1-4 页面
 
 | Area | English | 中文 |
 |---|---|---|
@@ -28,6 +28,8 @@ The first UI should behave like a research operations dashboard, not a marketing
 | Backtest Summary | Shows a non-OOS research-only backtest preview with a small equity shape. | 展示非 OOS、仅用于研究理解的回测预览和小型权益形态。 |
 | Walk-forward OOS | Shows the audited OOS baseline, Sharpe `0.586`, and 19 windows. | 展示经过审计的 OOS 基线、Sharpe `0.586` 和 19 个窗口。 |
 | Risk Review | Shows required gates before any candidate can move forward. | 展示候选策略进入下一步前必须经过的关卡。 |
+| Database Backends | Shows local files, SQLite, Postgres, pgvector, and Neo4j readiness metadata. | 展示本地文件、SQLite、Postgres、pgvector 和 Neo4j 准备状态元数据。 |
+| Deployment Skeleton | Shows FastAPI, React/Vite, Docker Compose, backend Dockerfile, and frontend Dockerfile artifacts. | 展示 FastAPI、React/Vite、Docker Compose、后端 Dockerfile 和前端 Dockerfile 产物。 |
 
 ---
 
@@ -41,6 +43,6 @@ Use a quiet, utilitarian research-tool style: dense but readable panels, restrai
 
 ## Interaction Direction / 交互方向
 
-Phase 1 only needs the Dashboard to fetch `/api/status`. Phase 2 adds read-only Agent, Tool, and Memory/RAG panels plus a mock-safe agent run API. Phase 3 adds Backtest, Walk-forward OOS, and Risk Review summary panels. Later phases should add dedicated pages for charts, audit logs, and human review queues.
+Phase 1 only needs the Dashboard to fetch `/api/status`. Phase 2 adds read-only Agent, Tool, and Memory/RAG panels plus a mock-safe agent run API. Phase 3 adds Backtest, Walk-forward OOS, and Risk Review summary panels. Phase 4 adds database and deployment status panels. Later phases should add dedicated pages for charts, audit logs, and human review queues.
 
-Phase 1 只需要 Dashboard 请求 `/api/status`。Phase 2 增加只读 Agent、Tool、Memory/RAG 面板，以及 mock-safe 智能体运行 API。Phase 3 增加 Backtest、Walk-forward OOS 和 Risk Review 摘要面板。后续阶段再增加专门图表、审计日志和人工审查队列。
+Phase 1 只需要 Dashboard 请求 `/api/status`。Phase 2 增加只读 Agent、Tool、Memory/RAG 面板，以及 mock-safe 智能体运行 API。Phase 3 增加 Backtest、Walk-forward OOS 和 Risk Review 摘要面板。Phase 4 增加数据库和部署状态面板。后续阶段再增加专门图表、审计日志和人工审查队列。

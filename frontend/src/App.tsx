@@ -22,6 +22,14 @@ import {
   type OosSummary,
   type RiskSummary
 } from "./api/phase3";
+import {
+  fallbackDatabase,
+  fallbackDeployment,
+  fetchDatabaseStatus,
+  fetchDeploymentStatus,
+  type DatabaseStatus,
+  type DeploymentStatus
+} from "./api/phase4";
 import { fetchStatus, fallbackStatus, type StatusPayload } from "./api/status";
 
 export function App() {
@@ -32,6 +40,8 @@ export function App() {
   const [backtest, setBacktest] = useState<BacktestSummary>(fallbackBacktest);
   const [oos, setOos] = useState<OosSummary>(fallbackOos);
   const [risk, setRisk] = useState<RiskSummary>(fallbackRisk);
+  const [database, setDatabase] = useState<DatabaseStatus>(fallbackDatabase);
+  const [deployment, setDeployment] = useState<DeploymentStatus>(fallbackDeployment);
   const [source, setSource] = useState<"api" | "fallback">("fallback");
 
   useEffect(() => {
@@ -42,9 +52,21 @@ export function App() {
       fetchMemory("OOS baseline"),
       fetchBacktestSummary(),
       fetchOosSummary(),
-      fetchRiskSummary()
+      fetchRiskSummary(),
+      fetchDatabaseStatus(),
+      fetchDeploymentStatus()
     ])
-      .then(([statusPayload, agentPayload, toolPayload, memoryPayload, backtestPayload, oosPayload, riskPayload]) => {
+      .then(([
+        statusPayload,
+        agentPayload,
+        toolPayload,
+        memoryPayload,
+        backtestPayload,
+        oosPayload,
+        riskPayload,
+        databasePayload,
+        deploymentPayload
+      ]) => {
         setStatus(statusPayload);
         setAgents(agentPayload);
         setTools(toolPayload);
@@ -52,6 +74,8 @@ export function App() {
         setBacktest(backtestPayload);
         setOos(oosPayload);
         setRisk(riskPayload);
+        setDatabase(databasePayload);
+        setDeployment(deploymentPayload);
         setSource("api");
       })
       .catch(() => {
@@ -62,6 +86,8 @@ export function App() {
         setBacktest(fallbackBacktest);
         setOos(fallbackOos);
         setRisk(fallbackRisk);
+        setDatabase(fallbackDatabase);
+        setDeployment(fallbackDeployment);
         setSource("fallback");
       });
   }, []);
@@ -210,6 +236,34 @@ export function App() {
             ))}
           </ul>
           <p className="muted">{risk.decision}</p>
+        </article>
+      </section>
+
+      <section className="grid">
+        <article className="panel">
+          <h2>Database Backends</h2>
+          <p className="muted">Mode: {database.mode} · Default: {database.default_backend}</p>
+          <div className="module-grid">
+            {database.backends.map((backend) => (
+              <span className="module-pill" key={backend.name}>
+                {backend.name}: {backend.status}
+              </span>
+            ))}
+          </div>
+        </article>
+
+        <article className="panel">
+          <h2>Deployment Skeleton</h2>
+          <p className="muted">
+            {deployment.frontend.stack} · {deployment.backend.stack}
+          </p>
+          <div className="module-grid">
+            {deployment.artifacts.map((artifact) => (
+              <span className="module-pill" key={artifact}>
+                {artifact}
+              </span>
+            ))}
+          </div>
         </article>
       </section>
     </main>

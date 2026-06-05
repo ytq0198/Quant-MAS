@@ -1,147 +1,69 @@
-# Memory / RAG Database Setup
+# Quant MAS v4 Database Setup / 数据库设置
 
-This document describes Quant MAS memory and RAG storage backends.
+This document describes the optional database layer for Quant MAS v4 Phase 4.
 
-Quant MAS defaults remain local and lightweight:
-
-- experiment memory: JSON
-- optional local database: SQLite
-- vector store for tests: InMemoryVectorStore
-- embedding client for tests: HashEmbeddingClient
-
-Enterprise backends added in M9 are optional and are not required for pytest.
+本文档说明 Quant MAS v4 Phase 4 的可选数据库层。
 
 ---
 
-## Default Local Setup
+## Design Principle / 设计原则
 
-```yaml
-# configs/memory.yaml
-memory_backend: json
-json_path: outputs/reports/experiments.json
-sqlite_path: null
-vector_store: in_memory
-embedding_provider: hash
-```
+The default development path uses local files, Parquet, JSONL, and fixtures. Postgres, pgvector, and Neo4j are optional deployment backends, not required for unit tests.
 
-Useful commands:
-
-```bash
-python scripts/index_documents.py --help
-python scripts/query_memory.py --help
-python scripts/query_memory.py --backend json --best-metric oos.sharpe
-python scripts/query_memory.py --rag-query "walk-forward sharpe"
-```
+默认开发路径使用本地文件、Parquet、JSONL 和夹具数据。Postgres、pgvector 和 Neo4j 是可选部署后端，不是单元测试的强制依赖。
 
 ---
 
-## SQLite
+## Backend Options / 后端选项
 
-SQLite is useful for local structured experiment queries without running external services.
-
-```yaml
-memory_backend: sqlite
-sqlite_path: outputs/reports/experiments.db
-```
-
-```bash
-python scripts/query_memory.py --backend sqlite --query walk-forward
-```
+| Backend | English | 中文 | Required for tests |
+|---|---|---|---|
+| Local files | Stores local data, reports, audit logs, and fixtures. | 存储本地数据、报告、审计日志和夹具。 | Yes |
+| SQLite | Lightweight local ExperimentMemory and development metadata. | 轻量本地 ExperimentMemory 和开发元数据。 | No |
+| Postgres | Server-side experiment records, task state, and metadata tables. | 服务器端实验记录、任务状态和元数据表。 | No |
+| pgvector | Vector search for RAG over documents, reports, and experiment memory. | 面向文档、报告和实验记忆的 RAG 向量检索。 | No |
+| Neo4j | Optional graph relationships across agents, tools, experiments, and documents. | 可选的 Agent、Tool、Experiment、Document 关系图谱。 | No |
 
 ---
 
-## M9 Enterprise Backends
+## Docker Compose / Docker Compose
 
-M9 adds optional enterprise storage backends:
+Phase 4 includes a conservative `docker-compose.yml` with backend, frontend, Postgres/pgvector, and Neo4j services.
 
-- `PostgresMemoryStore`: experiment metadata storage with JSONB metrics, artifacts, params, and notes.
-- `PgVectorStore`: pgvector-backed vector store for document embeddings.
-- `Neo4jGraphStore`: strategy-feature-experiment graph relationship skeleton.
-
-These backends are optional. Tests use mock connections and do not require real Postgres, pgvector, or Neo4j services.
-
-**Local validation**: EXP-20260602-025 — `test_memory_enterprise.py` **12 passed**; full suite **207 passed** (2026-06-01). **Server smoke**: EXP-20260602-026 ✅ — 6 experiments, **443 pgvector chunks**, `oos.sharpe` **0.586** (2026-06-03).
-
-Copy the example config:
+Phase 4 提供保守的 `docker-compose.yml`，包含 backend、frontend、Postgres/pgvector 和 Neo4j 服务。
 
 ```bash
-cp configs/memory.enterprise.yaml.example configs/memory.enterprise.yaml
+docker compose up --build
 ```
 
-Do not commit real credentials.
+Default development URLs:
 
-```env
-POSTGRES_DSN=postgresql://user:password@localhost:5432/quant_mas
-NEO4J_URI=bolt://localhost:7687
-NEO4J_USER=neo4j
-NEO4J_PASSWORD=change-me
-```
+默认开发地址：
 
-Seed Postgres from existing JSON (server smoke, EXP-026):
-
-```bash
-python scripts/seed_postgres_from_json.py \
-  --json-path /mnt/localDisk3/weizian/reports/experiments.json
-```
-
-Query experiment memory from Postgres:
-
-```bash
-python scripts/query_memory.py --backend postgres --best-metric oos.sharpe
-```
-
-Index local docs into pgvector:
-
-```bash
-python scripts/index_documents.py --vector-store pgvector --dirs docs --embedding-dimensions 64
+```text
+Frontend: http://127.0.0.1:5173
+Backend:  http://127.0.0.1:8000
+Postgres: localhost:5432
+Neo4j:    http://127.0.0.1:7474
 ```
 
 ---
 
-## Neo4j Graph Store
-
-`Neo4jGraphStore` is intended for strategy-feature-experiment relationships:
-
-- `Experiment`
-- `Strategy`
-- `Feature`
-- `(:Experiment)-[:USES_STRATEGY]->(:Strategy)`
-- `(:Experiment)-[:USES_FEATURE]->(:Feature)`
-
-The first version is a small CRUD wrapper and is tested with a mock driver.
-
----
-
-## Optional FAISS
-
-FAISS remains optional and is not required for default tests.
+## API Status / API 状态
 
 ```bash
-python scripts/index_documents.py --vector-store faiss --dirs docs
+curl http://127.0.0.1:8000/api/database/status
+curl http://127.0.0.1:8000/api/deployment/status
 ```
 
-If FAISS is not installed, the module raises a clear `ImportError`.
+These endpoints report configuration readiness. They do not prove that every optional database is connected.
+
+这些接口报告配置准备状态，不代表每个可选数据库都已经真实连接。
 
 ---
 
-## Optional OpenAI-Compatible Embeddings
+## Safety / 安全边界
 
-Real embedding APIs should only be used in manually configured environments. Pytest uses `HashEmbeddingClient`.
+The database and deployment layer must not expose broker, order, shell, secrets, or direct live-trading paths.
 
-```env
-EMBEDDING_PROVIDER=openai_compatible
-EMBEDDING_BASE_URL=https://api.example.com/v1
-EMBEDDING_API_KEY=
-EMBEDDING_MODEL=text-embedding-3-small
-```
-
----
-
-## Validation
-
-```bash
-python -m pytest tests/test_memory_enterprise.py -v
-python -m pytest -v
-```
-
-Current M9 tests do not connect to external services and do not read secrets.
+数据库和部署层不应暴露 broker、order、shell、secrets 或直接实盘交易路径。
