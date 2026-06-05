@@ -97,6 +97,4 @@ export function fetchRecentLogs(): Promise<RecentLogsPayload> {
   return readJson<RecentLogsPayload>("/api/logs/recent");
 }
 
-export function fetchEffectiveConfig(): Promise<EffectiveConfigPayload> {
-  return readJson<EffectiveConfigPayload>("/api/config/effective");
-}
+export { fetchEffectiveConfig } from "./config";

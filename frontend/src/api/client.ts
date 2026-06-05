@@ -29,3 +29,19 @@ export async function readJson<T>(url: string): Promise<T> {
   }
   return response.json() as Promise<T>;
 }
+
+export async function postJson<T>(url: string, body: unknown): Promise<T> {
+  const apiKey = getStoredApiKey();
+  const response = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...(apiKey ? { "X-Quant-MAS-Key": apiKey } : {})
+    },
+    body: JSON.stringify(body)
+  });
+  if (!response.ok) {
+    throw new Error(`${url} failed: ${response.status}`);
+  }
+  return response.json() as Promise<T>;
+}

@@ -10,10 +10,16 @@ def get_metrics_summary() -> dict[str, Any]:
     """
     return {
         "source": "fallback_metrics",
+        "research_only": True,
+        "live_trading_enabled": False,
         "counters": {
             "api_groups": 15,
             "protected_routes": 2,
             "fallback_safe_services": 10,
+        },
+        "gauges": {
+            "oos_sharpe_baseline": 0.586,
+            "oos_window_count": 19,
         },
         "notes": [
             "Prometheus/Grafana are not required for Phase 9.",

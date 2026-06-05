@@ -39,8 +39,12 @@ def get_effective_config() -> dict[str, Any]:
     ]
     values = {key: _redact(key, os.getenv(key, "")) for key in keys}
     return {
+        "source": "server_config",
         "auth_mode": os.getenv("QUANT_MAS_AUTH_MODE", "open"),
+        "storage_mode": os.getenv("QUANT_MAS_STORAGE_MODE", "local_files"),
+        "vector_store": os.getenv("VECTOR_STORE", "in_memory"),
         "live_trading_enabled": False,
+        "env": values,
         "values": values,
     }
 

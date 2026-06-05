@@ -1,4 +1,4 @@
-import { readJson } from "./client";
+import { postJson, readJson } from "./client";
 
 export interface AgentInfo {
   name: string;
@@ -95,4 +95,16 @@ export function fetchTools(): Promise<ToolInfo[]> {
 
 export function fetchMemory(query: string): Promise<MemorySearchPayload> {
   return readJson<MemorySearchPayload>(`/api/memory/search?q=${encodeURIComponent(query)}`);
+}
+
+export interface AgentRunResult {
+  agent: string;
+  task: string;
+  status: string;
+  summary: string;
+  live_trading_enabled: boolean;
+}
+
+export function runAgent(agent: string, task: string): Promise<AgentRunResult> {
+  return postJson<AgentRunResult>("/api/agents/run", { agent, task });
 }

@@ -28,9 +28,14 @@ def get_deep_health() -> dict[str, Any]:
     return {
         **get_health(),
         "components": [
-            {"name": "backend", "status": "ok"},
-            {"name": "artifact_root", "status": "exists" if Path(artifact_root).exists() else "missing", "path": str(artifact_root)},
-            {"name": "database_optional", "status": "optional"},
-            {"name": "rag_optional", "status": "optional"},
+            {"name": "backend", "status": "ok", "detail": "FastAPI research API is running."},
+            {
+                "name": "artifact_root",
+                "status": "exists" if Path(artifact_root).exists() else "missing",
+                "detail": f"Artifact root: {artifact_root}",
+                "path": str(artifact_root),
+            },
+            {"name": "database_optional", "status": "optional", "detail": "Postgres is optional."},
+            {"name": "rag_optional", "status": "optional", "detail": "RAG vector store is optional."},
         ],
     }

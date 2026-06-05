@@ -1,70 +1,156 @@
 # Quant MAS v5 UI Design / UI 设计
 
-This document records the Phase 1-10 UI direction for the Quant MAS v5 full-stack interface.
+This document records the v5 enterprise UI refactor: a multi-page research workbench instead of a single long dashboard.
 
-本文档记录 Quant MAS v5 全栈界面的 Phase 1-10 UI 方向。
+本文档记录 v5 企业级 UI 重构：多页面研究工作台，而非单页长列表仪表盘。
 
 ---
 
 ## Design Goal / 设计目标
 
-The first UI should behave like a research operations dashboard, not a marketing page. It should make system status, research baselines, safety boundaries, and planned modules easy to scan.
+The UI should behave like a **professional quantitative research workbench**, not a marketing page or live-trading console. Users navigate by module via a fixed sidebar; the Overview page shows only the most important summary information.
 
-第一版 UI 应该像研究运营仪表盘，而不是营销页。它需要让系统状态、研究基线、安全边界和规划模块易于快速浏览。
+UI 应像**专业量化研究工作台**，而非营销页或实盘控制台。用户通过左侧固定 Sidebar 按模块导航；Overview 首页只展示最关键摘要。
 
 ---
 
-## Phase 1-10 Screen / Phase 1-10 页面
+## Layout / 布局结构
 
 | Area | English | 中文 |
 |---|---|---|
-| Header | Shows Quant MAS v5 enterprise preview and API connection state. | 展示 Quant MAS v5 企业级预览和 API 连接状态。 |
-| Research Baseline | Shows `361 passed`, `EXP-20260602-008`, and OOS Sharpe `0.586`. | 展示 `361 passed`、`EXP-20260602-008` 和 OOS Sharpe `0.586`。 |
-| Safety Boundary | Shows no direct live trading, OOS-only paper conclusions, and metric separation. | 展示不直接实盘交易、论文结论只使用 OOS 指标，以及指标分离。 |
-| Planned Modules | Lists Dashboard, Agent Console, Tool Console, Memory/RAG Search, Backtest View, Walk-forward View, Audit Review, and Paper Export. | 列出 Dashboard、Agent Console、Tool Console、Memory/RAG Search、Backtest View、Walk-forward View、Audit Review 和 Paper Export。 |
-| Agents | Shows mock-safe SupervisorAgent, ResearchAgent, and ReportAgent metadata. | 展示 mock-safe 的 SupervisorAgent、ResearchAgent 和 ReportAgent 元数据。 |
-| Controlled Tools | Shows approved tool names and allowed operations. | 展示已批准工具名称和允许操作。 |
-| Memory/RAG Search | Shows local fixture search results for OOS baseline and safety context. | 展示 OOS 基线和安全上下文的本地夹具检索结果。 |
-| Backtest Summary | Shows a non-OOS research-only backtest preview with a small equity shape. | 展示非 OOS、仅用于研究理解的回测预览和小型权益形态。 |
-| Walk-forward OOS | Shows the audited OOS baseline, Sharpe `0.586`, and 19 windows. | 展示经过审计的 OOS 基线、Sharpe `0.586` 和 19 个窗口。 |
-| Risk Review | Shows required gates before any candidate can move forward. | 展示候选策略进入下一步前必须经过的关卡。 |
-| Database Backends | Shows local files, SQLite, Postgres, pgvector, and Neo4j readiness metadata. | 展示本地文件、SQLite、Postgres、pgvector 和 Neo4j 准备状态元数据。 |
-| Deployment Skeleton | Shows FastAPI, React/Vite, Docker Compose, backend Dockerfile, and frontend Dockerfile artifacts. | 展示 FastAPI、React/Vite、Docker Compose、后端 Dockerfile 和前端 Dockerfile 产物。 |
-| Experiment Registry | Shows artifact-backed experiment records or fallback baseline. | 展示产物驱动的实验记录或回退基线。 |
-| Paper Artifacts | Shows paper export files from configured server artifact directory. | 展示来自服务器配置产物目录的论文导出文件。 |
-| Audit Logs | Shows JSONL audit event count and source mode. | 展示 JSONL 审计事件数量和来源模式。 |
-| Human Review Queue | Shows pending review items and required gates. | 展示待审查项和必要关卡。 |
-| Job Status | Shows lightweight job progress and events. | 展示轻量任务进度和事件。 |
-| Database Tables | Shows optional table readiness for local/Postgres modes. | 展示 local/Postgres 模式的可选表准备状态。 |
-| RAG Documents | Shows fallback or configured RAG documents. | 展示回退或配置的 RAG 文档。 |
-| Graph Relationships | Shows optional Neo4j-style relationship metadata. | 展示可选 Neo4j 风格关系元数据。 |
+| Sidebar | Fixed left navigation: Overview, Experiments, Backtests, OOS, Risk, Agents, Tools, Memory/RAG, Audit, Paper, Database, Observability, Settings | 左侧固定导航 |
+| Header | Project name, page title, backend connection badge, auth mode, safety badge, refresh | 顶栏：项目名、页面标题、连接状态、认证模式、安全标记 |
+| Main Content | One module per page (React state routing, no react-router required) | 每页一个模块 |
+| Context Panel | Safety boundary, current experiment, metric family reminder (desktop) | 右侧上下文面板（桌面端） |
 
 ---
 
-## Visual Direction / 视觉方向
+## Pages / 页面
 
-Use a quiet, utilitarian research-tool style: dense but readable panels, restrained colors, clear typography, and stable responsive grids.
+| Page | Purpose |
+|---|---|
+| Overview | Hero summary, KPI row, workflow stepper, safety card, module shortcuts |
+| Experiments | Experiment registry table + selected experiment summary |
+| Backtests | Research-only backtest summary with non-OOS warning |
+| Walk-forward OOS | Paper-grade OOS metrics (`oos.*`) |
+| Risk Review | Checklist, review queue, human confirmation gates |
+| Agents | Agent cards + mock run console |
+| Tools | Tool catalog + ToolPolicy allowed/denied badges |
+| Memory / RAG | Search input, results, metric family separation reminder |
+| Audit Logs | Event table or empty state |
+| Paper Artifacts | Export jobs / files or empty state |
+| Database | Backend mode, vector store, graph, table chips |
+| Observability | Health, jobs, metrics, logs, effective config |
+| Settings | API key, backend URL, env reminder, research disclaimer |
 
-采用安静、实用的研究工具风格：信息密度适中但易读，颜色克制，排版清晰，响应式网格稳定。
+API Key input lives **only** on Settings — not on Overview.
+
+API Key 输入框**仅**在 Settings 页面，不在首页。
 
 ---
 
-## Interaction Direction / 交互方向
+## Visual System / 视觉系统
 
-Phase 1 only needs the Dashboard to fetch `/api/status`. Phase 2 adds read-only Agent, Tool, and Memory/RAG panels plus a mock-safe agent run API. Phase 3 adds Backtest, Walk-forward OOS, and Risk Review summary panels. Phase 4 adds database and deployment status panels. Phase 5 adds server-ready Experiment, Paper Artifact, and Audit Log panels. Phase 6 adds API Access. Phase 7 adds Human Review Queue and Job Status panels. Phase 8 adds optional Database Tables, RAG Documents, and Graph Relationships panels. Phase 9 adds System Health, Metrics Summary, Server Logs, and Effective Config panels. Phase 10 keeps the dashboard as a demo-ready research operations console, while later product work can split it into dedicated pages.
+- Background: `#F6F8FB`
+- Surface: `#FFFFFF`
+- Primary: `#0F766E` / dark sidebar `#0F172A`
+- Accent: `#2563EB`
+- Border: `#E2E8F0`
+- Font: Inter / system-ui stack
+- Cards: 14px radius, light shadow, 20–24px padding
 
-Phase 1 只需要 Dashboard 请求 `/api/status`。Phase 2 增加只读 Agent、Tool、Memory/RAG 面板，以及 mock-safe 智能体运行 API。Phase 3 增加 Backtest、Walk-forward OOS 和 Risk Review 摘要面板。Phase 4 增加数据库和部署状态面板。Phase 5 增加服务器可用的 Experiment、Paper Artifact 和 Audit Log 面板。Phase 6 增加 API Access。Phase 7 增加 Human Review Queue 和 Job Status 面板。Phase 8 增加可选 Database Tables、RAG Documents 和 Graph Relationships 面板。后续阶段再拆成专门页面。
+### Metric family badges
 
-Phase 9 增加 System Health、Metrics Summary、Server Logs 和 Effective Config 面板。Phase 10 将仪表盘收口为可演示的研究运维控制台，后续产品化再拆成专门页面。
+| Family | Color |
+|---|---|
+| `oos.*` | Blue |
+| `simulation.*` | Purple |
+| `training.*` | Gray |
+| `population.*` | Orange |
+| `audit.*` | Green |
+
+### Safety copy (required)
+
+- Live trading disabled
+- Human review required
+- OOS only for paper conclusions
+- No profit guarantee, auto trading, or financial advice language
 
 ---
 
-## Phase 9-10 Panels / Phase 9-10 面板
+## File Structure / 文件结构
 
-| Area | English | 中文 |
+```
+frontend/src/
+├── App.tsx
+├── main.tsx
+├── styles.css
+├── api/           # client.ts + phase2–phase9
+├── components/    # AppShell, Sidebar, Header, Card, Badge, …
+├── pages/         # Overview, Experiments, Backtests, …
+├── hooks/         # useDashboardData.ts
+└── types/         # navigation.ts
+```
+
+---
+
+## API Integration / API 对接
+
+All existing backend endpoints are preserved. The shared hook `useDashboardData` loads data in parallel; on failure the UI falls back to local fixtures without breaking the page.
+
+保留全部现有后端 API。`useDashboardData` 并行加载；失败时优雅回退到本地 fixture。
+
+Key endpoints: `/api/status`, `/api/agents`, `/api/tools`, `/api/memory/search`, `/api/backtests/{id}`, `/api/oos/{id}`, `/api/risk/{id}`, `/api/database/status`, `/api/deployment/status`, plus Phase 5–9 artifact and observability routes.
+
+---
+
+## Responsive / 响应式
+
+- Desktop: sidebar + main + context panel
+- Tablet: collapsed sidebar, context panel hidden
+- Mobile: stacked layout, compact navigation
+
+---
+
+## Validation / 验收
+
+1. `npm run build` passes
+2. No backend logic changes required
+3. Overview is concise; modules are split into pages
+4. Safety boundary visible; API key only in Settings
+5. Fallback mode clearly indicated
+
+---
+
+## Research Console (v5.1+) / 研究控制台
+
+The UI is now an **actionable research console**, not only a read-only dashboard.
+
+UI 现已升级为**可执行的研究控制台**，不仅是只读仪表盘。
+
+### Submit jobs / 提交任务
+
+| UI Page | Action | Backend |
 |---|---|---|
-| System Health | Shows backend service status, research-only flag, and component readiness. | 展示后端服务状态、research-only 标记和组件准备状态。 |
-| Metrics Summary | Shows readiness counters and baseline gauges without implying future results. | 展示准备度计数和基线数值，不暗示未来结果。 |
-| Server Logs | Shows recent event count and configured log root. | 展示近期事件数量和配置日志目录。 |
-| Effective Config | Shows redacted auth/storage/vector configuration. | 展示脱敏后的认证、存储和向量配置。 |
-| Demo Readiness | Keeps all major v5 capabilities visible on one page for review. | 将 v5 主要能力集中在一页，便于评审展示。 |
+| Experiments / Backtests | Run backtest job | `POST /api/jobs` type `backtest` |
+| Walk-forward OOS | Run OOS job | `POST /api/jobs` type `walk_forward_oos` |
+| Paper Artifacts | Export paper job | `POST /api/artifacts/export` |
+| Risk Review | Approve / Reject | `POST /api/review/{id}/approve` |
+| Observability | Refresh job list | `GET /api/jobs` |
+
+Jobs execute Quant Engine tasks in background threads (`BacktestTool`, walk-forward, paper export).
+
+任务在后台线程中调用 Quant Engine（`BacktestTool`、walk-forward、论文导出）。
+
+### Prerequisites / 前置条件
+
+1. Backend running with `QUANT_MAS_ARTIFACT_ROOT` pointing to repo root
+2. Market data: `data/raw/market_data.parquet` (run `scripts/download_data.py` first)
+3. OOS jobs need `data/features/features.parquet` (run feature pipeline first)
+4. API key with `researcher` role when `QUANT_MAS_AUTH_MODE=api_key`
+
+### After job completes / 任务完成后
+
+- Backtest results → `outputs/reports/backtest_latest/`
+- Experiments registry updates → `outputs/reports/experiments.json`
+- UI auto-refreshes summaries on completion

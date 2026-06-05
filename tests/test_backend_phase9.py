@@ -42,3 +42,5 @@ def test_effective_config_redacts_secrets(monkeypatch):
     assert "secret-value" not in raw
     assert "raw-key" not in raw
     assert payload["auth_mode"] in {"open", "api_key"}
+    assert "env" in payload
+    assert payload["env"] == payload["values"]
