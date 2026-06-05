@@ -921,6 +921,7 @@ input {
   border-radius: 10px;
   background: #f8fafc;
   border: 1px dashed var(--border);
+  overflow: hidden;
 }
 
 .chart-placeholder span {
