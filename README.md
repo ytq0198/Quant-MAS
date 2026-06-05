@@ -187,6 +187,8 @@ This project is still evolving. Feedback, issues, discussions, and PRs are welco
 
 ## Quick Start / 快速开始
 
+### Core package / 核心包
+
 ```bash
 git clone https://github.com/ytq0198/Quant-MAS.git
 cd Quant-MAS
@@ -212,6 +214,35 @@ python -m pip install -e ".[llm]"
 python -m pip install -e ".[text]"
 python -m pip install -e ".[rl]"
 ```
+
+### v4 full-stack skeleton / v4 全栈骨架
+
+Start the FastAPI backend from the repository root:
+
+从仓库根目录启动 FastAPI 后端：
+
+```bash
+python -m pip install -e ".[api]"
+python -m uvicorn backend.app:app --reload
+```
+
+Start the React + Vite frontend in another terminal:
+
+在另一个终端启动 React + Vite 前端：
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+The frontend runs at `http://127.0.0.1:5173` and proxies `/api` to `http://127.0.0.1:8000`.
+
+前端运行在 `http://127.0.0.1:5173`，并将 `/api` 代理到 `http://127.0.0.1:8000`。
+
+See [docs/fullstack_quickstart.md](docs/fullstack_quickstart.md) for the full-stack startup notes.
+
+完整全栈启动说明见 [docs/fullstack_quickstart.md](docs/fullstack_quickstart.md)。
 
 ---
 
