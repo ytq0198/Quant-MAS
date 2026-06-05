@@ -25,6 +25,10 @@ python -m uvicorn backend.app:app --reload
 | `GET /api/risk/{id}` | Returns risk review gates and human confirmation requirements. | 返回风险审查关卡和人工确认要求。 |
 | `GET /api/database/status` | Returns optional database backend readiness metadata. | 返回可选数据库后端准备状态元数据。 |
 | `GET /api/deployment/status` | Returns deployment skeleton metadata and artifacts. | 返回部署骨架元数据和产物列表。 |
+| `GET /api/experiments` | Lists artifact-backed experiment records with fallback baseline. | 列出产物驱动的实验记录，并支持基线回退。 |
+| `GET /api/experiments/{id}` | Returns one artifact-backed experiment record. | 返回单个产物驱动的实验记录。 |
+| `GET /api/artifacts/paper` | Lists paper artifacts from the configured paper directory. | 从配置的论文产物目录列出论文产物。 |
+| `GET /api/audit/logs` | Lists JSONL audit events from the configured audit directory. | 从配置的审计目录列出 JSONL 审计事件。 |
 
 ## Safety / 安全边界
 
@@ -43,3 +47,20 @@ Phase 3 增加 Backtest、OOS 和 Risk 摘要接口。回测摘要被标注为�
 Phase 4 adds optional database and deployment status endpoints. Postgres, pgvector, and Neo4j are documented as optional services, while local files remain the default test-safe backend.
 
 Phase 4 增加可选数据库和部署状态接口。Postgres、pgvector 和 Neo4j 被记录为可选服务，本地文件仍是默认的测试安全后端。
+
+Phase 5 adds server-ready artifact APIs. On the server, set `QUANT_MAS_ARTIFACT_ROOT`, `QUANT_MAS_EXPERIMENT_MEMORY_PATH`, `QUANT_MAS_PAPER_DIR`, or `QUANT_MAS_AUDIT_DIR` to point the backend at real experiment outputs.
+
+Phase 5 增加服务器可用的产物 API。在服务器上可设置 `QUANT_MAS_ARTIFACT_ROOT`、`QUANT_MAS_EXPERIMENT_MEMORY_PATH`、`QUANT_MAS_PAPER_DIR` 或 `QUANT_MAS_AUDIT_DIR`，让后端读取真实实验输出。
+
+## Server Artifact Environment / 服务器产物环境变量
+
+```bash
+set QUANT_MAS_ARTIFACT_ROOT=D:\path\to\Quant-MAS
+set QUANT_MAS_EXPERIMENT_MEMORY_PATH=D:\path\to\outputs\reports\experiments.json
+set QUANT_MAS_PAPER_DIR=D:\path\to\outputs\paper
+set QUANT_MAS_AUDIT_DIR=D:\path\to\outputs\pipelines
+```
+
+On Linux servers, use `export` instead of `set`.
+
+Linux 服务器使用 `export` 替代 `set`。

@@ -1,8 +1,8 @@
 # Quant MAS v4 Full-stack Quick Start / 全栈快速开始
 
-This document describes the Phase 1-4 full-stack skeleton: a FastAPI backend, status endpoint, mock-safe Agent/Tool/Memory APIs, Backtest/OOS/Risk summary APIs, optional database/deployment status APIs, and a React + Vite dashboard.
+This document describes the Phase 1-5 full-stack skeleton: a FastAPI backend, status endpoint, mock-safe Agent/Tool/Memory APIs, Backtest/OOS/Risk summary APIs, optional database/deployment status APIs, server-ready artifact APIs, and a React + Vite dashboard.
 
-本文档说明 Phase 1-4 全栈骨架：FastAPI 后端、状态接口、mock-safe Agent/Tool/Memory API、Backtest/OOS/Risk 摘要 API、可选数据库/部署状态 API 和 React + Vite 仪表盘。
+本文档说明 Phase 1-5 全栈骨架：FastAPI 后端、状态接口、mock-safe Agent/Tool/Memory API、Backtest/OOS/Risk 摘要 API、可选数据库/部署状态 API、服务器可用产物 API 和 React + Vite 仪表盘。
 
 ---
 
@@ -109,7 +109,33 @@ Postgres、pgvector 和 Neo4j 都是可选项。本地文件仍是测试和轻�
 
 ---
 
-## 7. Next Phases / 下一阶段
+## 7. Phase 5 Server Backend Mode / Phase 5 服务器后端模式
+
+| Endpoint | English | 中文 |
+|---|---|---|
+| `GET /api/experiments` | Lists experiments from configured server artifacts, with fallback baseline. | 从配置的服务器产物列出实验，并支持基线回退。 |
+| `GET /api/experiments/{id}` | Returns one experiment record. | 返回单个实验记录。 |
+| `GET /api/artifacts/paper` | Lists paper artifacts from `outputs/paper` or configured path. | 从 `outputs/paper` 或配置路径列出论文产物。 |
+| `GET /api/audit/logs` | Lists JSONL audit events from `outputs/pipelines` or configured path. | 从 `outputs/pipelines` 或配置路径列出 JSONL 审计事件。 |
+
+Server environment variables:
+
+服务器环境变量：
+
+```bash
+export QUANT_MAS_ARTIFACT_ROOT=/path/to/Quant-MAS
+export QUANT_MAS_EXPERIMENT_MEMORY_PATH=/path/to/outputs/reports/experiments.json
+export QUANT_MAS_PAPER_DIR=/path/to/outputs/paper
+export QUANT_MAS_AUDIT_DIR=/path/to/outputs/pipelines
+```
+
+Local development can omit these variables. The API will return fallback-safe baseline or empty artifact lists.
+
+本地开发可以不设置这些变量。API 会返回安全回退基线或空产物列表。
+
+---
+
+## 8. Next Phases / 下一阶段
 
 - Later: dedicated charts, audit log pages, human review queues, and real ExperimentMemory integration.
 - 后续：专门图表、审计日志页面、人工审查队列和真实 ExperimentMemory 集成。

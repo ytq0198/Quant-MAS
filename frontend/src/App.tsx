@@ -30,6 +30,17 @@ import {
   type DatabaseStatus,
   type DeploymentStatus
 } from "./api/phase4";
+import {
+  fallbackAuditLogs,
+  fallbackExperiments,
+  fallbackPaperArtifacts,
+  fetchAuditLogs,
+  fetchExperiments,
+  fetchPaperArtifacts,
+  type AuditLogsPayload,
+  type ExperimentsPayload,
+  type PaperArtifactsPayload
+} from "./api/phase5";
 import { fetchStatus, fallbackStatus, type StatusPayload } from "./api/status";
 
 export function App() {
@@ -42,6 +53,9 @@ export function App() {
   const [risk, setRisk] = useState<RiskSummary>(fallbackRisk);
   const [database, setDatabase] = useState<DatabaseStatus>(fallbackDatabase);
   const [deployment, setDeployment] = useState<DeploymentStatus>(fallbackDeployment);
+  const [experiments, setExperiments] = useState<ExperimentsPayload>(fallbackExperiments);
+  const [paperArtifacts, setPaperArtifacts] = useState<PaperArtifactsPayload>(fallbackPaperArtifacts);
+  const [auditLogs, setAuditLogs] = useState<AuditLogsPayload>(fallbackAuditLogs);
   const [source, setSource] = useState<"api" | "fallback">("fallback");
 
   useEffect(() => {
@@ -54,7 +68,10 @@ export function App() {
       fetchOosSummary(),
       fetchRiskSummary(),
       fetchDatabaseStatus(),
-      fetchDeploymentStatus()
+      fetchDeploymentStatus(),
+      fetchExperiments(),
+      fetchPaperArtifacts(),
+      fetchAuditLogs()
     ])
       .then(([
         statusPayload,
@@ -65,7 +82,10 @@ export function App() {
         oosPayload,
         riskPayload,
         databasePayload,
-        deploymentPayload
+        deploymentPayload,
+        experimentsPayload,
+        paperPayload,
+        auditPayload
       ]) => {
         setStatus(statusPayload);
         setAgents(agentPayload);
@@ -76,6 +96,9 @@ export function App() {
         setRisk(riskPayload);
         setDatabase(databasePayload);
         setDeployment(deploymentPayload);
+        setExperiments(experimentsPayload);
+        setPaperArtifacts(paperPayload);
+        setAuditLogs(auditPayload);
         setSource("api");
       })
       .catch(() => {
@@ -88,6 +111,9 @@ export function App() {
         setRisk(fallbackRisk);
         setDatabase(fallbackDatabase);
         setDeployment(fallbackDeployment);
+        setExperiments(fallbackExperiments);
+        setPaperArtifacts(fallbackPaperArtifacts);
+        setAuditLogs(fallbackAuditLogs);
         setSource("fallback");
       });
   }, []);
@@ -264,6 +290,44 @@ export function App() {
               </span>
             ))}
           </div>
+        </article>
+      </section>
+
+      <section className="phase-grid">
+        <article className="panel">
+          <h2>Experiment Registry</h2>
+          <p className="muted">Source: {experiments.source}</p>
+          <div className="stack">
+            {experiments.experiments.slice(0, 3).map((experiment) => (
+              <div className="list-card" key={experiment.experiment_id}>
+                <strong>{experiment.experiment_id}</strong>
+                <p>{experiment.name}</p>
+                <span>OOS: {experiment.metric_family_summary.oos ? "yes" : "no"}</span>
+              </div>
+            ))}
+          </div>
+        </article>
+
+        <article className="panel">
+          <h2>Paper Artifacts</h2>
+          <p className="muted">Source: {paperArtifacts.source} · Count: {paperArtifacts.artifacts.length}</p>
+          <div className="module-grid">
+            {(paperArtifacts.artifacts.length ? paperArtifacts.artifacts : [{ name: "No paper artifacts loaded yet" }]).map(
+              (artifact) => (
+                <span className="module-pill" key={artifact.name}>
+                  {artifact.name}
+                </span>
+              )
+            )}
+          </div>
+        </article>
+
+        <article className="panel">
+          <h2>Audit Logs</h2>
+          <p className="muted">Source: {auditLogs.source} · Events: {auditLogs.events.length}</p>
+          <p className="safety-state">
+            Server mode reads JSONL audit events when `QUANT_MAS_AUDIT_DIR` or artifact root is configured.
+          </p>
         </article>
       </section>
     </main>
