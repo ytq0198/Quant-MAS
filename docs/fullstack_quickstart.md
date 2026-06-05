@@ -1,8 +1,8 @@
 # Quant MAS v4 Full-stack Quick Start / 全栈快速开始
 
-This document describes the Phase 1-2 full-stack skeleton: a FastAPI backend, status endpoint, mock-safe Agent/Tool/Memory APIs, and a React + Vite dashboard.
+This document describes the Phase 1-3 full-stack skeleton: a FastAPI backend, status endpoint, mock-safe Agent/Tool/Memory APIs, Backtest/OOS/Risk summary APIs, and a React + Vite dashboard.
 
-本文档说明 Phase 1-2 全栈骨架：FastAPI 后端、状态接口、mock-safe Agent/Tool/Memory API 和 React + Vite 仪表盘。
+本文档说明 Phase 1-3 全栈骨架：FastAPI 后端、状态接口、mock-safe Agent/Tool/Memory API、Backtest/OOS/Risk 摘要 API 和 React + Vite 仪表盘。
 
 ---
 
@@ -79,10 +79,24 @@ Phase 2 API 有意保持 mock-safe：不调用真实 broker，不发送订单，
 
 ---
 
-## 5. Next Phases / 下一阶段
+## 5. Phase 3 Scope / Phase 3 范围
 
-- Phase 3: Backtest / Walk-forward / Risk visualization.
-- Phase 3：Backtest / Walk-forward / Risk 可视化。
+| Endpoint | English | 中文 |
+|---|---|---|
+| `GET /api/backtests/demo-backtest` | Returns a research-only, non-OOS backtest summary. | 返回仅用于研究展示的非 OOS 回测摘要。 |
+| `GET /api/oos/EXP-20260602-008` | Returns the audited OOS baseline with Sharpe `0.586` and 19 windows. | 返回经过审计的 OOS 基线，Sharpe 为 `0.586`，共 19 个窗口。 |
+| `GET /api/risk/demo-risk` | Returns risk gates and human confirmation requirements. | 返回风险关卡和人工确认要求。 |
+
+Backtest summaries are displayed for workflow understanding only. Paper-grade conclusions must use audited walk-forward OOS metrics.
+
+回测摘要只用于理解流程。论文级结论必须使用经过审计的 Walk-forward 样本外指标。
+
+---
+
+## 6. Next Phases / 下一阶段
 
 - Phase 4: Database / RAG / server deployment.
 - Phase 4：数据库 / RAG / 服务器部署。
+
+- Later: dedicated charts, audit log pages, human review queues, and real ExperimentMemory integration.
+- 后续：专门图表、审计日志页面、人工审查队列和真实 ExperimentMemory 集成。

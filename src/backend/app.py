@@ -3,7 +3,10 @@ from __future__ import annotations
 from fastapi import FastAPI
 
 from backend.api.agents import router as agents_router
+from backend.api.backtests import router as backtests_router
 from backend.api.memory import router as memory_router
+from backend.api.oos import router as oos_router
+from backend.api.risk import router as risk_router
 from backend.api.status import router as status_router
 from backend.api.tools import router as tools_router
 
@@ -25,6 +28,9 @@ def create_app() -> FastAPI:
     api.include_router(agents_router)
     api.include_router(tools_router)
     api.include_router(memory_router)
+    api.include_router(backtests_router)
+    api.include_router(oos_router)
+    api.include_router(risk_router)
     return api
 
 

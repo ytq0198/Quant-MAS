@@ -20,6 +20,9 @@ python -m uvicorn backend.app:app --reload
 | `POST /api/agents/run` | Runs a controlled mock-safe agent task. | 运行受控的 mock-safe 智能体任务。 |
 | `GET /api/tools` | Lists controlled quant tools and allowed operations. | 列出受控量化工具和允许操作。 |
 | `GET /api/memory/search?q=...` | Searches local fixture research memory. | 检索本地夹具研究记忆。 |
+| `GET /api/backtests/{id}` | Returns a research-only backtest summary fixture. | 返回仅用于研究展示的回测摘要夹具。 |
+| `GET /api/oos/{id}` | Returns the audited walk-forward OOS baseline summary. | 返回经过审计的 Walk-forward 样本外基线摘要。 |
+| `GET /api/risk/{id}` | Returns risk review gates and human confirmation requirements. | 返回风险审查关卡和人工确认要求。 |
 
 ## Safety / 安全边界
 
@@ -30,3 +33,7 @@ The backend is an API boundary around Quant MAS core services. It must not expos
 Phase 2 uses local fixtures and controlled metadata. It is intended for UI/API integration before connecting real Agent, Tool, Memory, and RAG backends.
 
 Phase 2 使用本地夹具和受控元数据，目的是先完成 UI/API 联调，再接入真实 Agent、Tool、Memory 和 RAG 后端。
+
+Phase 3 adds Backtest, OOS, and Risk summary endpoints. Backtest summaries are marked as non-OOS, while `EXP-20260602-008` is marked as the audited OOS baseline.
+
+Phase 3 增加 Backtest、OOS 和 Risk 摘要接口。回测摘要被标注为非 OOS，而 `EXP-20260602-008` 被标注为经过审计的 OOS 基线。

@@ -108,6 +108,10 @@ h2 {
   margin: 0;
 }
 
+.metric-list.compact {
+  gap: 8px;
+}
+
 .metric-list div {
   padding: 14px;
   border-radius: 6px;
@@ -206,6 +210,24 @@ dd {
   color: #667085;
   font-size: 0.78rem;
   font-weight: 700;
+}
+
+.spark-bars {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  align-items: end;
+  height: 62px;
+  margin: 12px 0;
+  padding: 8px;
+  border-radius: 6px;
+  background: #f3f6fb;
+}
+
+.spark-bars span {
+  display: block;
+  border-radius: 4px 4px 0 0;
+  background: #1b6b64;
 }
 
 @media (max-width: 760px) {
