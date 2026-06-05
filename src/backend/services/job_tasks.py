@@ -99,6 +99,10 @@ def _run_backtest(params: dict[str, Any], progress: ProgressCallback) -> dict[st
     }
 
 
+def _stringify_paths(paths: dict[str, Path]) -> dict[str, str]:
+    return {key: str(value) for key, value in paths.items()}
+
+
 def _run_backtest_with_overrides(kwargs: dict[str, Any], progress: ProgressCallback) -> Any:
     import yaml
     from quant_mas.backtest import BacktestEngine, CommissionModel, SlippageModel, save_backtest_report
@@ -106,7 +110,6 @@ def _run_backtest_with_overrides(kwargs: dict[str, Any], progress: ProgressCallb
     from quant_mas.memory import ExperimentMemory
     from quant_mas.strategies import MovingAverageCrossStrategy
     from quant_mas.tools.base import ToolResult
-    from quant_mas.tools.quant import _stringify_paths
 
     config_path = Path(kwargs["config_path"])
     storage_config = Path(kwargs["storage_config"])
