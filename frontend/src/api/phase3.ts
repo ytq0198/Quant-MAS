@@ -1,3 +1,5 @@
+import { readJson } from "./client";
+
 export interface BacktestSummary {
   id: string;
   title: string;
@@ -84,14 +86,6 @@ export const fallbackRisk: RiskSummary = {
   required_gates: ["backtest", "risk check", "audit log", "human confirmation"],
   decision: "No candidate can move to live trading from this UI."
 };
-
-async function readJson<T>(url: string): Promise<T> {
-  const response = await fetch(url);
-  if (!response.ok) {
-    throw new Error(`${url} failed: ${response.status}`);
-  }
-  return response.json() as Promise<T>;
-}
 
 export function fetchBacktestSummary(): Promise<BacktestSummary> {
   return readJson<BacktestSummary>("/api/backtests/demo-backtest");

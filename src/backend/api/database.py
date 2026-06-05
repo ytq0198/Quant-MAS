@@ -5,6 +5,7 @@ from typing import Any
 from fastapi import APIRouter
 
 from backend.services.database import get_database_status
+from backend.services.storage_status import get_database_tables_status
 
 router = APIRouter(prefix="/api/database", tags=["database"])
 
@@ -16,3 +17,12 @@ def read_database_status() -> dict[str, Any]:
     返回可选数据库后端状态。
     """
     return get_database_status()
+
+
+@router.get("/tables")
+def read_database_tables() -> dict[str, Any]:
+    """Return optional database table readiness.
+
+    返回可选数据库表准备状态。
+    """
+    return get_database_tables_status()

@@ -54,11 +54,37 @@ Neo4j:    http://127.0.0.1:7474
 ```bash
 curl http://127.0.0.1:8000/api/database/status
 curl http://127.0.0.1:8000/api/deployment/status
+curl http://127.0.0.1:8000/api/database/tables
+curl http://127.0.0.1:8000/api/rag/documents
+curl "http://127.0.0.1:8000/api/rag/query?q=OOS"
+curl http://127.0.0.1:8000/api/graph/relationships
 ```
 
 These endpoints report configuration readiness. They do not prove that every optional database is connected.
 
 这些接口报告配置准备状态，不代表每个可选数据库都已经真实连接。
+
+---
+
+## Phase 8 Optional Integration / Phase 8 可选集成
+
+Phase 8 keeps local files as the default and adds fallback-safe endpoints for RAG and graph readiness.
+
+Phase 8 保持本地文件为默认模式，并增加 RAG 和图谱准备状态的 fallback-safe 接口。
+
+```text
+QUANT_MAS_STORAGE_MODE=local_files|sqlite|postgres
+VECTOR_STORE=in_memory|pgvector
+POSTGRES_DSN=
+PGVECTOR_DSN=
+NEO4J_URI=
+NEO4J_USER=
+NEO4J_PASSWORD=
+```
+
+If Postgres, pgvector, or Neo4j are not configured, APIs should return status warnings or fallback documents instead of failing.
+
+如果没有配置 Postgres、pgvector 或 Neo4j，API 应返回状态提示或回退文档，而不是直接失败。
 
 ---
 

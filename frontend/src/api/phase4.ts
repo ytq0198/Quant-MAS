@@ -1,3 +1,5 @@
+import { readJson } from "./client";
+
 export interface DatabaseBackend {
   name: string;
   purpose: string;
@@ -90,14 +92,6 @@ export const fallbackDeployment: DeploymentStatus = {
     ]
   }
 };
-
-async function readJson<T>(url: string): Promise<T> {
-  const response = await fetch(url);
-  if (!response.ok) {
-    throw new Error(`${url} failed: ${response.status}`);
-  }
-  return response.json() as Promise<T>;
-}
 
 export function fetchDatabaseStatus(): Promise<DatabaseStatus> {
   return readJson<DatabaseStatus>("/api/database/status");

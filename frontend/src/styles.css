@@ -72,6 +72,38 @@ h2 {
   font-size: 0.9rem;
 }
 
+.access-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 16px;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.access-controls {
+  display: grid;
+  grid-template-columns: minmax(180px, 260px) auto auto;
+  gap: 8px;
+}
+
+.access-controls input {
+  min-height: 36px;
+  padding: 8px 10px;
+  border: 1px solid #cfd7e6;
+  border-radius: 6px;
+  color: #172033;
+}
+
+.access-controls button {
+  min-height: 36px;
+  padding: 8px 12px;
+  border: 1px solid #1b6b64;
+  border-radius: 6px;
+  background: #1b6b64;
+  color: #ffffff;
+  font-weight: 700;
+}
+
 .status-dot {
   width: 10px;
   height: 10px;
@@ -237,6 +269,8 @@ dd {
   }
 
   .hero,
+  .access-panel,
+  .access-controls,
   .grid,
   .phase-grid,
   .metric-list {

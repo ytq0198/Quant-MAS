@@ -1,8 +1,8 @@
-# Quant MAS v4 UI Design / UI 设计
+# Quant MAS v5 UI Design / UI 设计
 
-This document records the Phase 1-5 UI direction for the Quant MAS v4/v5 full-stack interface.
+This document records the Phase 1-10 UI direction for the Quant MAS v5 full-stack interface.
 
-本文档记录 Quant MAS v4/v5 全栈界面的 Phase 1-5 UI 方向。
+本文档记录 Quant MAS v5 全栈界面的 Phase 1-10 UI 方向。
 
 ---
 
@@ -14,11 +14,11 @@ The first UI should behave like a research operations dashboard, not a marketing
 
 ---
 
-## Phase 1-5 Screen / Phase 1-5 页面
+## Phase 1-10 Screen / Phase 1-10 页面
 
 | Area | English | 中文 |
 |---|---|---|
-| Header | Shows Quant MAS v4 full-stack preview and API connection state. | 展示 Quant MAS v4 全栈预览和 API 连接状态。 |
+| Header | Shows Quant MAS v5 enterprise preview and API connection state. | 展示 Quant MAS v5 企业级预览和 API 连接状态。 |
 | Research Baseline | Shows `361 passed`, `EXP-20260602-008`, and OOS Sharpe `0.586`. | 展示 `361 passed`、`EXP-20260602-008` 和 OOS Sharpe `0.586`。 |
 | Safety Boundary | Shows no direct live trading, OOS-only paper conclusions, and metric separation. | 展示不直接实盘交易、论文结论只使用 OOS 指标，以及指标分离。 |
 | Planned Modules | Lists Dashboard, Agent Console, Tool Console, Memory/RAG Search, Backtest View, Walk-forward View, Audit Review, and Paper Export. | 列出 Dashboard、Agent Console、Tool Console、Memory/RAG Search、Backtest View、Walk-forward View、Audit Review 和 Paper Export。 |
@@ -33,6 +33,11 @@ The first UI should behave like a research operations dashboard, not a marketing
 | Experiment Registry | Shows artifact-backed experiment records or fallback baseline. | 展示产物驱动的实验记录或回退基线。 |
 | Paper Artifacts | Shows paper export files from configured server artifact directory. | 展示来自服务器配置产物目录的论文导出文件。 |
 | Audit Logs | Shows JSONL audit event count and source mode. | 展示 JSONL 审计事件数量和来源模式。 |
+| Human Review Queue | Shows pending review items and required gates. | 展示待审查项和必要关卡。 |
+| Job Status | Shows lightweight job progress and events. | 展示轻量任务进度和事件。 |
+| Database Tables | Shows optional table readiness for local/Postgres modes. | 展示 local/Postgres 模式的可选表准备状态。 |
+| RAG Documents | Shows fallback or configured RAG documents. | 展示回退或配置的 RAG 文档。 |
+| Graph Relationships | Shows optional Neo4j-style relationship metadata. | 展示可选 Neo4j 风格关系元数据。 |
 
 ---
 
@@ -46,6 +51,20 @@ Use a quiet, utilitarian research-tool style: dense but readable panels, restrai
 
 ## Interaction Direction / 交互方向
 
-Phase 1 only needs the Dashboard to fetch `/api/status`. Phase 2 adds read-only Agent, Tool, and Memory/RAG panels plus a mock-safe agent run API. Phase 3 adds Backtest, Walk-forward OOS, and Risk Review summary panels. Phase 4 adds database and deployment status panels. Phase 5 adds server-ready Experiment, Paper Artifact, and Audit Log panels. Later phases should add dedicated pages for charts, audit logs, and human review queues.
+Phase 1 only needs the Dashboard to fetch `/api/status`. Phase 2 adds read-only Agent, Tool, and Memory/RAG panels plus a mock-safe agent run API. Phase 3 adds Backtest, Walk-forward OOS, and Risk Review summary panels. Phase 4 adds database and deployment status panels. Phase 5 adds server-ready Experiment, Paper Artifact, and Audit Log panels. Phase 6 adds API Access. Phase 7 adds Human Review Queue and Job Status panels. Phase 8 adds optional Database Tables, RAG Documents, and Graph Relationships panels. Phase 9 adds System Health, Metrics Summary, Server Logs, and Effective Config panels. Phase 10 keeps the dashboard as a demo-ready research operations console, while later product work can split it into dedicated pages.
 
-Phase 1 只需要 Dashboard 请求 `/api/status`。Phase 2 增加只读 Agent、Tool、Memory/RAG 面板，以及 mock-safe 智能体运行 API。Phase 3 增加 Backtest、Walk-forward OOS 和 Risk Review 摘要面板。Phase 4 增加数据库和部署状态面板。Phase 5 增加服务器可用的 Experiment、Paper Artifact 和 Audit Log 面板。后续阶段再增加专门图表、审计日志和人工审查队列。
+Phase 1 只需要 Dashboard 请求 `/api/status`。Phase 2 增加只读 Agent、Tool、Memory/RAG 面板，以及 mock-safe 智能体运行 API。Phase 3 增加 Backtest、Walk-forward OOS 和 Risk Review 摘要面板。Phase 4 增加数据库和部署状态面板。Phase 5 增加服务器可用的 Experiment、Paper Artifact 和 Audit Log 面板。Phase 6 增加 API Access。Phase 7 增加 Human Review Queue 和 Job Status 面板。Phase 8 增加可选 Database Tables、RAG Documents 和 Graph Relationships 面板。后续阶段再拆成专门页面。
+
+Phase 9 增加 System Health、Metrics Summary、Server Logs 和 Effective Config 面板。Phase 10 将仪表盘收口为可演示的研究运维控制台，后续产品化再拆成专门页面。
+
+---
+
+## Phase 9-10 Panels / Phase 9-10 面板
+
+| Area | English | 中文 |
+|---|---|---|
+| System Health | Shows backend service status, research-only flag, and component readiness. | 展示后端服务状态、research-only 标记和组件准备状态。 |
+| Metrics Summary | Shows readiness counters and baseline gauges without implying future results. | 展示准备度计数和基线数值，不暗示未来结果。 |
+| Server Logs | Shows recent event count and configured log root. | 展示近期事件数量和配置日志目录。 |
+| Effective Config | Shows redacted auth/storage/vector configuration. | 展示脱敏后的认证、存储和向量配置。 |
+| Demo Readiness | Keeps all major v5 capabilities visible on one page for review. | 将 v5 主要能力集中在一页，便于评审展示。 |

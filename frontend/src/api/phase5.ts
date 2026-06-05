@@ -1,3 +1,5 @@
+import { readJson } from "./client";
+
 export interface ExperimentRecord {
   experiment_id: string;
   name: string;
@@ -66,14 +68,6 @@ export const fallbackAuditLogs: AuditLogsPayload = {
   path: "outputs/pipelines",
   events: []
 };
-
-async function readJson<T>(url: string): Promise<T> {
-  const response = await fetch(url);
-  if (!response.ok) {
-    throw new Error(`${url} failed: ${response.status}`);
-  }
-  return response.json() as Promise<T>;
-}
 
 export function fetchExperiments(): Promise<ExperimentsPayload> {
   return readJson<ExperimentsPayload>("/api/experiments");

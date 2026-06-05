@@ -1,3 +1,5 @@
+import { readJson } from "./client";
+
 export interface StatusPayload {
   project: string;
   version: string;
@@ -16,7 +18,7 @@ export interface StatusPayload {
 
 export const fallbackStatus: StatusPayload = {
   project: "Quant MAS",
-  version: "v4",
+  version: "v5",
   description:
     "Full-stack multi-agent quantitative research platform with deterministic quant pipelines, audited OOS evaluation, and human-reviewed workflows.",
   baselines: {
@@ -41,14 +43,15 @@ export const fallbackStatus: StatusPayload = {
     "Backtest View",
     "Walk-forward OOS View",
     "Audit / Human Review",
-    "Paper Export"
+    "Paper Export",
+    "API Access",
+    "Human Review Queue",
+    "Job Status",
+    "Optional RAG / Database / Graph",
+    "Observability"
   ]
 };
 
-export async function fetchStatus(): Promise<StatusPayload> {
-  const response = await fetch("/api/status");
-  if (!response.ok) {
-    throw new Error(`Status request failed: ${response.status}`);
-  }
-  return response.json() as Promise<StatusPayload>;
+export function fetchStatus(): Promise<StatusPayload> {
+  return readJson<StatusPayload>("/api/status");
 }

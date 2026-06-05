@@ -1,3 +1,5 @@
+import { readJson } from "./client";
+
 export interface AgentInfo {
   name: string;
   role: string;
@@ -82,14 +84,6 @@ export const fallbackMemory: MemorySearchPayload = {
     }
   ]
 };
-
-async function readJson<T>(url: string): Promise<T> {
-  const response = await fetch(url);
-  if (!response.ok) {
-    throw new Error(`${url} failed: ${response.status}`);
-  }
-  return response.json() as Promise<T>;
-}
 
 export function fetchAgents(): Promise<AgentInfo[]> {
   return readJson<AgentInfo[]>("/api/agents");

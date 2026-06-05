@@ -215,7 +215,7 @@ python -m pip install -e ".[text]"
 python -m pip install -e ".[rl]"
 ```
 
-### v4 full-stack skeleton / v4 全栈骨架
+### v5 full-stack enterprise / v5 全栈企业版
 
 Start the FastAPI backend from the repository root:
 
@@ -240,9 +240,9 @@ The frontend runs at `http://127.0.0.1:5173` and proxies `/api` to `http://127.0
 
 前端运行在 `http://127.0.0.1:5173`，并将 `/api` 代理到 `http://127.0.0.1:8000`。
 
-See [docs/fullstack_quickstart.md](docs/fullstack_quickstart.md) for the full-stack startup notes.
+See [docs/fullstack_quickstart.md](docs/fullstack_quickstart.md) and [docs/v5_enterprise_overview.md](docs/v5_enterprise_overview.md).
 
-完整全栈启动说明见 [docs/fullstack_quickstart.md](docs/fullstack_quickstart.md)。
+完整全栈与企业级说明见 [docs/fullstack_quickstart.md](docs/fullstack_quickstart.md) · [docs/v5_enterprise_overview.md](docs/v5_enterprise_overview.md)。
 
 ---
 

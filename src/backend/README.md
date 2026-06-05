@@ -1,8 +1,8 @@
-# Quant MAS v4 Backend
+# Quant MAS v5 Backend
 
-FastAPI backend skeleton for the Quant MAS v4 full-stack phase.
+FastAPI backend skeleton for the Quant MAS v5 full-stack phase.
 
-Quant MAS v4 全栈阶段的 FastAPI 后端骨架。
+Quant MAS v5 全栈阶段的 FastAPI 后端骨架。
 
 ## Run Locally / 本地运行
 
@@ -29,6 +29,18 @@ python -m uvicorn backend.app:app --reload
 | `GET /api/experiments/{id}` | Returns one artifact-backed experiment record. | 返回单个产物驱动的实验记录。 |
 | `GET /api/artifacts/paper` | Lists paper artifacts from the configured paper directory. | 从配置的论文产物目录列出论文产物。 |
 | `GET /api/audit/logs` | Lists JSONL audit events from the configured audit directory. | 从配置的审计目录列出 JSONL 审计事件。 |
+| `GET /api/auth/me` | Returns the current auth mode, role, and key fingerprint. | 返回当前认证模式、角色和 key 指纹。 |
+| `POST /api/auth/validate-key` | Validates the current API key. | 验证当前 API key。 |
+| `GET /api/review/queue` | Lists human review items. | 列出人工审查项。 |
+| `GET /api/review/{id}` | Returns one human review item. | 返回单个人工审查项。 |
+| `POST /api/review/{id}/approve` | Approves a review item; requires reviewer+. | 批准审查项，需要 reviewer+。 |
+| `POST /api/review/{id}/reject` | Rejects a review item; requires reviewer+. | 拒绝审查项，需要 reviewer+。 |
+| `GET /api/jobs` | Lists lightweight job statuses. | 列出轻量任务状态。 |
+| `GET /api/jobs/{id}` | Returns one job and events. | 返回单个任务及事件。 |
+| `GET /api/database/tables` | Lists optional database table readiness. | 列出可选数据库表准备状态。 |
+| `GET /api/rag/documents` | Lists fallback or configured RAG documents. | 列出回退或配置的 RAG 文档。 |
+| `GET /api/rag/query` | Returns fallback or configured RAG query results. | 返回回退或配置的 RAG 查询结果。 |
+| `GET /api/graph/relationships` | Returns optional graph relationship metadata. | 返回可选图谱关系元数据。 |
 
 ## Safety / 安全边界
 
@@ -64,3 +76,82 @@ set QUANT_MAS_AUDIT_DIR=D:\path\to\outputs\pipelines
 On Linux servers, use `export` instead of `set`.
 
 Linux 服务器使用 `export` 替代 `set`。
+
+## Auth / RBAC / Audit / 认证、权限与审计
+
+Local development defaults to open mode. Server deployments should use api_key mode.
+
+本地开发默认使用 open mode。服务器部署建议使用 api_key mode。
+
+```bash
+export QUANT_MAS_AUTH_MODE=api_key
+export QUANT_MAS_API_KEYS="viewer-secret:viewer,research-secret:researcher,reviewer-secret:reviewer,admin-secret:admin"
+export QUANT_MAS_AUDIT_WRITE_PATH=/opt/quant-mas/logs/backend_audit.jsonl
+```
+
+Use the following request header:
+
+使用以下请求头：
+
+```text
+X-Quant-MAS-Key: <api-key>
+```
+
+Protected examples:
+
+受保护示例：
+
+- `POST /api/agents/run` requires `researcher` or higher.
+- `POST /api/agents/run` 需要 `researcher` 或更高角色。
+- `GET /api/audit/logs` requires `reviewer` or higher.
+- `GET /api/audit/logs` 需要 `reviewer` 或更高角色。
+
+Raw API keys must not be written to audit logs.
+
+审计日志不得写入明文 API key。
+
+## Human Review and Jobs / 人工审查与任务
+
+Phase 7 adds fallback-safe review and job APIs. They are intended to model enterprise workflow gates before adding Redis/Celery or database-backed queues.
+
+Phase 7 增加 fallback-safe 的审查和任务 API。它们用于在引入 Redis/Celery 或数据库队列前，先表达企业级工作流关卡。
+
+Review decisions do not enable live trading.
+
+审查决策不会启用实盘交易。
+
+## Optional RAG / Database / Graph / 可选 RAG、数据库与图谱
+
+Phase 8 adds optional status and fallback endpoints for Postgres, pgvector, RAG, and Neo4j. Local file mode remains the default.
+
+Phase 8 增加 Postgres、pgvector、RAG 和 Neo4j 的可选状态与回退接口。本地文件模式仍是默认模式。
+
+```bash
+export QUANT_MAS_STORAGE_MODE=local_files
+export VECTOR_STORE=in_memory
+export POSTGRES_DSN=
+export PGVECTOR_DSN=
+export NEO4J_URI=
+```
+
+These services are optional and not required for pytest.
+
+这些服务都是可选项，不是 pytest 的强制依赖。
+
+## Observability / 可观测性
+
+Phase 9 adds lightweight observability endpoints for server smoke tests. They are intentionally safe for local development and do not expose raw secrets.
+
+Phase 9 增加轻量可观测性接口，用于服务器 smoke 测试。它们对本地开发保持安全，并且不会暴露明文密钥。
+
+```text
+GET /api/health
+GET /api/health/deep
+GET /api/metrics/summary
+GET /api/logs/recent
+GET /api/config/effective
+```
+
+`/api/config/effective` must redact API keys and secret-like values.
+
+`/api/config/effective` 必须脱敏 API Key 和类似密钥的值。
