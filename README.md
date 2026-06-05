@@ -1,108 +1,181 @@
-# Quant MAS — Multi-Agent Quantitative Research Platform / 多智能体量化研究平台
+# Quant MAS - Multi-Agent Quantitative Research Platform / 多智能体量化研究平台
 
-> **Resume-ready** open-source platform for AI Agent & Quant research: deterministic pipelines, walk-forward OOS, Memory/RAG, and safe agent orchestration — **not a live-trading bot**.  
-> 面向 **AI Agent / Quant / ML** 实习与科研申请者的开源项目：可运行、可回测、可训练、可记录 — **非实盘系统**。
+> A research-oriented, resume-ready multi-agent quantitative research platform with deterministic quant pipelines, walk-forward OOS evaluation, Memory/RAG, LLM-assisted research agents, auditable workflows, and competitive strategy learning.
+>
+> 一个面向科研、实习和简历展示的多智能体量化研究平台，集成确定性量化流水线、Walk-forward 样本外评估、Memory/RAG、LLM 辅助研究智能体、可审计工作流和竞争式策略学习。
+
+> **Safety boundary:** This is not a live-trading bot. LLM agents do not place live orders.
+>
+> **安全边界：** 本项目不是实盘交易机器人，LLM 智能体不直接下单。
 
 [![GitHub](https://img.shields.io/badge/GitHub-ytq0198%2FQuant--MAS-181717?logo=github)](https://github.com/ytq0198/Quant-MAS)
-[![Python](https://img.shields.io/badge/python-3.11+-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![Python](https://img.shields.io/badge/Python-3.11%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
 [![Tests](https://img.shields.io/badge/tests-361%20passed-brightgreen)](docs/progress.md)
-[![OOS Baseline](https://img.shields.io/badge/OOS%20Sharpe-0.586-blue)](docs/experiment_log.md)
-[![M13](https://img.shields.io/badge/M13-orchestration%20%E2%9C%85-purple)](docs/mcp_protocol.md)
+[![OOS Sharpe](https://img.shields.io/badge/OOS%20Sharpe-0.586-blue)](docs/experiment_log.md)
+[![Status](https://img.shields.io/badge/status-research%20platform-purple)](docs/research_protocol.md)
+[![Agent](https://img.shields.io/badge/Agent%20%2F%20RAG%20%2F%20LangGraph%20%2F%20MCP-enabled-0F766E)](docs/architecture.md)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
+Quant MAS is designed as a practical learning and interview project for **AI Agent**, **Quant**, and **Financial AI / LLM application** internships. It is meant to be read, run, extended, discussed, and audited.
+
+Quant MAS 适合作为 **AI Agent / Quant / Financial AI** 实习项目练习与简历项目：代码可阅读、可运行、可扩展、可讨论，也强调实验可审计。
+
 ---
+
+<a id="table-of-contents"></a>
 
 ## Table of Contents / 目录
 
-- [Highlights / 项目亮点](#highlights--项目亮点)
-- [Architecture / 系统架构](#architecture--系统架构)
-- [Features / 功能概览](#features--功能概览)
-- [Quick Start / 快速开始](#quick-start--快速开始)
-- [CLI Examples / 命令示例](#cli-examples--命令示例)
-- [Experiment Snapshot / 实验摘要](#experiment-snapshot--实验摘要)
-- [Resume Usage / 简历写法](#resume-usage--简历写法)
-- [Project Structure / 项目结构](#project-structure--项目结构)
-- [Documentation / 文档索引](#documentation--文档索引)
-- [Roadmap / 路线图](#roadmap--路线图)
-- [Contributing · License · Disclaimer / 贡献 · 许可 · 免责声明](#contributing--license--disclaimer--贡献--许可--免责声明)
+- [Project Overview / 项目简介](#project-overview)
+- [Why This Project / 为什么做这个项目](#why-this-project)
+- [Architecture / 系统架构](#architecture)
+- [Key Design Principles / 核心设计原则](#key-design-principles)
+- [Features / 功能概览](#features)
+- [Current Status / 当前进度](#current-status)
+- [Quick Start / 快速开始](#quick-start)
+- [CLI Examples / 命令示例](#cli-examples)
+- [Research Workflow / 研究流程](#research-workflow)
+- [Experiment Snapshot / 实验摘要](#experiment-snapshot)
+- [Resume Usage / 简历写法](#resume-usage)
+- [Project Structure / 项目结构](#project-structure)
+- [Documentation / 文档索引](#documentation)
+- [Roadmap / 路线图](#roadmap)
+- [Contributing / 贡献指南](#contributing)
+- [Contact / 联系方式](#contact)
+- [Disclaimer / 免责声明](#disclaimer)
 
 ---
 
-## Highlights / 项目亮点
+<a id="project-overview"></a>
 
-| Highlight | Detail |
-|-----------|--------|
-| **361 pytest** | Dual-end verified (local + a6000 server @ `6913dbf`) |
-| **OOS Sharpe 0.586** | Paper ML baseline · EXP-20260602-008 · 19 walk-forward windows |
-| **M13 complete** | YAML recipes · LangGraph backend · auditable paper export |
-| **Safety boundary** | LLM agents orchestrate & explain — they **never** place live orders |
+## Project Overview / 项目简介
 
-| 亮点 | 说明 |
-|------|------|
-| **361 pytest** | 本地 + a6000 服务器双端验证（@ `6913dbf`） |
-| **OOS Sharpe 0.586** | 论文 ML 主基线 · EXP-20260602-008 · 19 窗 walk-forward |
-| **M13 收口** | YAML recipe · LangGraph backend · 可审计论文导出 |
-| **安全边界** | LLM 智能体仅编排与解释 — **绝不**直接下单 |
+Quant MAS separates deterministic quantitative computation from agentic research orchestration. The Quant Engine handles data ingestion, feature engineering, model training, backtesting, risk checks, and walk-forward OOS evaluation. The Agent Layer handles research planning, tool routing, memory retrieval, interpretation, and report generation.
 
-> Quant Engine **computes**. Agent Layer **explains, orchestrates, and reports**.  
-> Quant Engine **做计算**；Agent Layer **做编排、解释与报告**。
+Quant MAS 将确定性的量化计算与智能体研究编排分离。Quant Engine 负责数据获取、特征工程、模型训练、回测、风控检查和 Walk-forward 样本外评估；Agent Layer 负责研究规划、工具编排、记忆检索、结果解释和报告生成。
 
-**Status / 当前进度**：M1–M8 ✅ · v3 M9–M13 ✅ · Next / 下一步：paper writing（`outputs/paper/`）· optional LoRA / RL lines
+This separation keeps the system useful for AI Agent practice without giving the LLM direct control over trading actions. Agents can reason about experiments, call approved tools, and summarize evidence, while quantitative results remain reproducible through code and configuration.
+
+这种分层让项目既适合练习 AI Agent 工程，又不会让 LLM 直接控制交易行为。智能体可以围绕实验进行规划、调用授权工具并总结证据，而量化结果仍由代码和配置保证可复现。
 
 ---
+
+<a id="why-this-project"></a>
+
+## Why This Project / 为什么做这个项目
+
+This project is designed for students and developers who want a practical AI Agent + Quant Research project that can be read, run, extended, and discussed in internship interviews.
+
+这个项目适合想找 AI Agent、量化开发、金融 AI 实习的同学，用来练习工程实现、科研实验和简历展示。
+
+It is not a toy demo, not a live-trading bot, and not a claim about automatic profits. It is a reproducible research engineering project that combines deterministic quant modules, LLM-assisted research workflows, Memory/RAG, LangGraph-style orchestration, MCP-style scheduling, and experiment audit logs.
+
+它不是玩具 demo，也不是自动交易机器人，更不是收益承诺；它是一个可复现的研究工程项目，组合了确定性量化模块、LLM 辅助研究流程、Memory/RAG、LangGraph 风格编排、MCP 风格调度和实验审计日志。
+
+For internship preparation, Quant MAS can help demonstrate three kinds of ability: building AI Agent systems, implementing quant research pipelines, and communicating financial AI experiments with appropriate safety boundaries.
+
+对于实习准备，Quant MAS 可以展示三类能力：构建 AI Agent 系统、实现量化研究流水线，以及在清晰安全边界下表达金融 AI 实验。
+
+---
+
+<a id="architecture"></a>
 
 ## Architecture / 系统架构
 
-![Quant MAS Architecture — Multi-Agent Quant Research Platform / 多智能体量化研究平台](architecture.png)
-
-The diagram above shows six layers: **Interfaces & Inputs → Quant Engine → Tool Layer → MAS Agent Layer → Memory & RAG → Orchestration & Protocols**, plus the typical research flow and safety boundary on the right.
-
-上图展示六层架构：**接口与输入 → 量化核心引擎 → 工具层 → 多智能体层 → 记忆与 RAG → 编排与协议**，以及底部典型研究流程与右侧安全原则。
+![Quant MAS Architecture](architecture.png)
 
 | Layer | English | 中文 |
-|-------|---------|------|
-| **1. Interfaces & Inputs** | User & CLI, configs, market/macro data (Stooq, yfinance, Finnhub, FRED, SEC), research docs | 用户与命令行、配置、市场/宏观数据、研究文档 |
-| **2. Quant Engine** | Data · Features · Models · Strategies · Backtest · Risk — deterministic computation only | 数据 · 特征 · 模型 · 策略 · 回测 · 风控 — 仅确定性计算 |
-| **3. Tool Layer** | Seven callable tools exposed to agents (data summary, backtest, train, report, risk, ml_backtest, pipeline) | 七种可调用工具供智能体使用 |
-| **4. MAS Agent Layer** | SupervisorAgent, ResearchAgent, ReportAgent, RiskAgent — research, planning, explanation | 监督、研究、报告、风控智能体 — 研究规划与解释 |
-| **5. Memory & RAG** | ExperimentMemory, hybrid retriever, JSON/SQLite/Postgres, vector store (FAISS / pgvector) | 实验记忆、混合检索、JSON/SQLite/Postgres、向量库 |
-| **6. Orchestration & Protocols** | LangGraph workflow, Context Engineering, LLM client (mock / OpenAI-compatible / local vLLM), MCP-style adapter | LangGraph 工作流、上下文工程、LLM 客户端、MCP 协议适配 |
+|---|---|---|
+| Data Layer | Loads, validates, stores, and prepares market, macro, text, and research data for experiments. | 负责加载、校验、存储和准备行情、宏观、文本与研究数据。 |
+| Quant Engine Layer | Runs deterministic feature engineering, model training, backtesting, walk-forward OOS evaluation, and risk computation. | 负责确定性的特征工程、模型训练、回测、Walk-forward 样本外评估和风险计算。 |
+| Research / Experiment Layer | Tracks baselines, candidates, comparisons, paper artifacts, and reproducible experiment records. | 负责基线、候选策略、实验对比、论文产物和可复现实验记录。 |
+| Memory / RAG Layer | Stores experiment memory and retrieves relevant documents, prior results, and context for agents. | 存储实验记忆，并为智能体检索相关文档、历史结果和上下文。 |
+| Tool Layer | Exposes controlled quant tools so agents can request computation without bypassing the engine. | 暴露受控量化工具，使智能体能请求计算，但不能绕过量化引擎。 |
+| Agent Layer | Uses ResearchAgent, SupervisorAgent, ReportAgent, and related agents for planning, routing, explanation, and reporting. | 使用 ResearchAgent、SupervisorAgent、ReportAgent 等智能体完成规划、路由、解释和报告。 |
+| Orchestration / Protocol Layer | Coordinates workflows with LangGraph-style flows, MCP-style scheduling, A2A-style descriptions, policies, and audit logs. | 通过 LangGraph 风格流程、MCP 风格调度、A2A 风格描述、策略约束和审计日志协调工作流。 |
+| Outputs / Human Review | Produces reports, paper artifacts, experiment summaries, and human-reviewable decisions. | 产出报告、论文材料、实验摘要和可人工审查的决策记录。 |
 
-**Typical research flow / 典型研究流程**  
-Download Data → Build Features → Train Model → Backtest → Risk Check → Generate Report → Store Memory/RAG → Compare Experiments
+The architecture is intentionally conservative: agents help organize research, while the Quant Engine performs the numerical work.
 
-**Safety principle / 安全原则**  
-LLM agents do **NOT** place live trades directly. All signals must pass backtesting, risk checks, audit, and human approval.  
-LLM 智能体**不**直接实盘下单。所有信号须经回测、风控、审计与人工确认。
-
-Details / 详细设计：[docs/architecture.md](docs/architecture.md) · [docs/index.md](docs/index.md)
+该架构有意保持保守：智能体帮助组织研究，数值计算由 Quant Engine 完成。
 
 ---
+
+<a id="key-design-principles"></a>
+
+## Key Design Principles / 核心设计原则
+
+- LLM agents do not trade directly.
+- LLM 智能体不直接交易。
+
+- Quant Engine performs deterministic computation.
+- Quant Engine 执行确定性计算。
+
+- Agents plan, explain, route tools, retrieve memory, and generate reports.
+- 智能体负责规划、解释、工具路由、记忆检索和报告生成。
+
+- All trading candidates must pass backtesting, risk checks, audit logs, and human confirmation.
+- 所有交易候选都必须经过回测、风控检查、审计日志和人工确认。
+
+- Walk-forward OOS is the paper-grade evaluation metric.
+- Walk-forward 样本外评估是论文级评估指标。
+
+- `simulation.*`, `training.*`, `population.*`, and `audit.*` metrics must not be mixed with `oos.*` metrics.
+- `simulation.*`、`training.*`、`population.*` 和 `audit.*` 指标不能与 `oos.*` 指标混用。
+
+---
+
+<a id="features"></a>
 
 ## Features / 功能概览
 
-**Quant Engine / 量化引擎** — Parquet storage, OHLCV validation, features, MA Cross / LightGBM strategies, backtest, risk, walk-forward OOS  
-Parquet 存储、OHLCV 校验、特征工程、均线/LightGBM 策略、回测、风控、walk-forward 样本外验证
-
-**Agent Layer / 智能体层** — `ToolRegistry`, `SupervisorAgent` (rule routing), `ReportAgent`, `ResearchAgent` (mock-safe · optional local vLLM)  
-工具注册、规则路由监督智能体、报告/研究智能体（默认 Mock · 可选本地 vLLM）
-
-**Memory / RAG / 记忆与检索** — JSON · SQLite · Postgres · pgvector hybrid retrieval  
-JSON · SQLite · Postgres · pgvector 混合检索
-
-**Research extensions (v3) / 研究扩展（v3）**
-
-| Track | Highlight | Key EXP | 说明 |
-|-------|-----------|---------|------|
-| Text signals | FinBERT walk-forward trilogy | WF-003 **0.565** vs **0.586** | 文本信号三线消融 |
-| Population | Candidate → OOS bridge | POP-006 best **1.039** | 种群候选 → 样本外验证 |
-| RL | Train → export → OOS ablation | POP-010 **0.387** (vs **0.0**) | RL 训练→导出→OOS 消融 |
-| M13 orchestration | Scheduler + YAML + LangGraph + paper export | EXP-M13-001→004 | 企业级编排与论文导出 |
-
-Paper rule / 论文规则：conclusions use **walk-forward OOS** only — see [docs/research_protocol.md](docs/research_protocol.md)  
-论文级结论**仅**使用 walk-forward 样本外指标 — 见 [docs/research_protocol.md](docs/research_protocol.md)
+| Category | English | 中文 |
+|---|---|---|
+| Data ingestion | Config-driven data fetching, loading, validation, cataloging, and local storage. | 基于配置的数据获取、加载、校验、目录管理和本地存储。 |
+| Feature engineering | Technical indicators, labels, text signal integration, and feature pipelines. | 技术指标、标签、文本信号集成和特征流水线。 |
+| Backtesting | Deterministic strategy backtesting with metrics and report generation. | 确定性策略回测，支持指标计算和报告生成。 |
+| ML training | Model training utilities including LightGBM-oriented workflows. | 模型训练工具，包含面向 LightGBM 的训练流程。 |
+| Walk-forward OOS | Out-of-sample evaluation workflow for paper-grade baseline comparison. | 面向论文级基线对比的 Walk-forward 样本外评估流程。 |
+| Risk control | Exposure, drawdown, limit, and decision-oriented risk modules. | 仓位、回撤、限制和决策相关的风险控制模块。 |
+| Experiment memory | ExperimentMemory records baselines, candidates, metrics, and artifacts. | ExperimentMemory 记录基线、候选、指标和实验产物。 |
+| Memory/RAG | Document loading, chunking, embedding, vector search, hybrid retrieval, and memory stores. | 文档加载、切分、嵌入、向量搜索、混合检索和记忆存储。 |
+| ResearchAgent / SupervisorAgent | Agents plan research tasks, route tools, summarize results, and coordinate workflows. | 智能体负责研究规划、工具路由、结果总结和工作流协调。 |
+| LangGraph workflow | Optional LangGraph-style workflow backend for research orchestration. | 可选的 LangGraph 风格工作流后端，用于研究编排。 |
+| LLM client | Supports mock clients by default, plus DeepSeek or local vLLM through compatible configuration when available. | 默认支持 Mock 客户端，也可在配置可用时接入 DeepSeek 或本地 vLLM。 |
+| Text signal | Supports text records, text model experiments, and text-enhanced feature workflows. | 支持文本记录、文本模型实验和文本增强特征流程。 |
+| Population / competitive strategy learning | Supports candidate populations and competitive strategy learning experiments. | 支持候选策略种群和竞争式策略学习实验。 |
+| RL simulation | Provides reinforcement-learning-oriented trading environment, training loop, and policy export experiments. | 提供面向强化学习的交易环境、训练循环和策略导出实验。 |
+| MCP-style scheduler and audit logs | Provides scheduler, tool policy, recipe execution, and auditable workflow event logs. | 提供调度器、工具策略、配方执行和可审计工作流事件日志。 |
+| Paper artifact export | Exports experiment tables and audit summaries for research writing. | 导出实验表格和审计摘要，服务论文写作。 |
 
 ---
+
+<a id="current-status"></a>
+
+## Current Status / 当前进度
+
+| Stage | Status | Notes |
+|---|---|---|
+| v1 Prompt 1-20 | Complete | Main deterministic quant pipeline completed. |
+| v1 Prompt 1-20 | 已完成 | 主要确定性量化链路已完成。 |
+| Plus v2 M1-M8 | Complete | Research platform extensions completed. |
+| Plus v2 M1-M8 | 已完成 | 研究平台扩展已收官。 |
+| v3 M9-M13 | Complete | Enterprise-style research system extensions completed. |
+| v3 M9-M13 | 已完成 | 企业风格研究系统扩展已完成。 |
+| Test baseline | 361 passed | Current pytest baseline reported by project progress. |
+| 测试基线 | 361 passed | 当前项目进度记录的 pytest 基线。 |
+| Important OOS baseline | EXP-20260602-008 | Walk-forward OOS Sharpe = 0.586. |
+| 重要样本外基线 | EXP-20260602-008 | Walk-forward OOS Sharpe = 0.586。 |
+| M13 orchestration and paper export | Complete | MCP-style scheduler, recipe workflow, LangGraph backend, and paper artifact export completed. |
+| M13 编排与论文导出 | 已完成 | MCP 风格调度、配方工作流、LangGraph 后端和论文产物导出已完成。 |
+
+This project is still evolving. Feedback, issues, discussions, and PRs are welcome.
+
+项目仍在持续演进。欢迎交流、Issue、Discussion、PR，也欢迎 Star / Fork。
+
+---
+
+<a id="quick-start"></a>
 
 ## Quick Start / 快速开始
 
@@ -111,166 +184,312 @@ git clone https://github.com/ytq0198/Quant-MAS.git
 cd Quant-MAS
 
 python -m pip install -e .
-python -m pytest -v                              # expect 361 passed
+python -m pytest -v
 python -c "import quant_mas; print('Quant MAS ready')"
 ```
 
-**Optional extras / 可选依赖**
+The default test path is designed to avoid real network calls and real LLM API calls unless optional integrations are explicitly configured.
+
+默认测试路径不依赖真实网络请求或真实 LLM API 调用；只有在显式配置可选集成时，才会连接外部服务。
+
+Optional dependency groups are available through `pyproject.toml`, such as `data`, `ml`, `orchestration`, `llm`, `text`, and `rl`.
+
+`pyproject.toml` 中提供了可选依赖组，例如 `data`、`ml`、`orchestration`、`llm`、`text` 和 `rl`。
 
 ```bash
-python -m pip install -r requirements-data.txt    # market data fetchers / 行情抓取
-python -m pip install -r requirements-ml.txt      # LightGBM
-python -m pip install -e ".[orchestration]"       # LangGraph (M13.2)
-python -m pip install -e ".[llm]"                 # HTTP LLM client
-python -m pip install -e ".[text]"                # FinBERT (server manual)
+python -m pip install -e ".[data]"
+python -m pip install -e ".[ml]"
+python -m pip install -e ".[orchestration]"
+python -m pip install -e ".[llm]"
+python -m pip install -e ".[text]"
+python -m pip install -e ".[rl]"
 ```
 
-**Verified baseline / 已验证基线**：**361 passed** dual-end（local + server @ `6913dbf`）  
-本地 + 服务器双端 **361 项 pytest** 通过
-
 ---
+
+<a id="cli-examples"></a>
 
 ## CLI Examples / 命令示例
 
-<details>
-<summary><strong>Walk-forward OOS / 样本外 walk-forward</strong> (paper baseline / 论文基线)</summary>
-
 ```bash
-python scripts/run_walk_forward.py \
-  --config configs/walk_forward.yaml \
-  --storage-config configs/storage.yaml \
-  --experiment-name local_walk_forward_demo
+python scripts/run_pipeline.py --config configs/data.yaml
 ```
 
-</details>
+Run the basic data and feature pipeline.
 
-<details>
-<summary><strong>M13 pipeline / M13 编排流水线</strong> (scheduler or LangGraph)</summary>
-
-```bash
-python scripts/run_mcp_pipeline.py --list-recipes
-python scripts/run_mcp_pipeline.py --recipe configs/pipelines/ml_baseline.yaml.example --dry-run
-python scripts/run_mcp_pipeline.py --backend langgraph \
-  --recipe configs/pipelines/text_enhanced.yaml.example --dry-run
-```
-
-</details>
-
-<details>
-<summary><strong>Paper artifact export / 论文级导出</strong> (M13.3)</summary>
+运行基础数据与特征流水线。
 
 ```bash
-python scripts/export_paper_artifacts.py \
-  --memory-path outputs/reports/experiments.json \
-  --audit-dir outputs/pipelines \
-  --output-dir outputs/paper
+python scripts/run_backtest.py --config configs/backtest.yaml
 ```
 
-Produces 6 files / 产出 6 个文件：`paper_main_results.csv`, text/population/RL ablation CSVs, `paper_experiment_index.md`, `audit_summary.json`
+Run a deterministic backtest from configuration.
 
-</details>
-
-<details>
-<summary><strong>ResearchAgent / 研究解释智能体</strong> (mock-safe · server vLLM)</summary>
+根据配置运行确定性回测。
 
 ```bash
-python scripts/run_research_agent.py \
-  --task "Summarize OOS baseline EXP-20260602-008 (oos.sharpe ≈ 0.586)"
+python scripts/train_model.py --config configs/train.yaml
 ```
 
-Server vLLM / 服务器 vLLM：see [docs/server_commands.md](docs/server_commands.md)
+Train an ML model using the configured training workflow.
 
-</details>
+使用配置化训练流程训练机器学习模型。
 
-More examples / 更多示例：end-to-end pipeline, LightGBM, candidate OOS batch — [docs/server_commands.md](docs/server_commands.md)
+```bash
+python scripts/run_walk_forward.py --config configs/walk_forward.yaml
+```
+
+Run walk-forward OOS evaluation for research-grade comparison.
+
+运行 Walk-forward 样本外评估，用于研究级对比。
+
+```bash
+python scripts/run_agent.py --config configs/agent.yaml
+```
+
+Run the basic agent workflow with controlled tool access.
+
+运行基础智能体流程，并通过受控工具访问量化能力。
+
+```bash
+python scripts/run_research_agent.py --task "Summarize the OOS baseline and safety boundary."
+```
+
+Ask the ResearchAgent to summarize experiment context and safety constraints.
+
+让 ResearchAgent 总结实验上下文和安全约束。
+
+```bash
+python scripts/run_competitive_experiment.py --config configs/competitive.yaml
+```
+
+Run a competitive strategy learning experiment.
+
+运行竞争式策略学习实验。
+
+```bash
+python scripts/export_paper_artifacts.py --memory-path outputs/reports/experiments.json --audit-dir outputs/pipelines --output-dir outputs/paper
+```
+
+Export paper-oriented experiment tables and audit summaries.
+
+导出面向论文写作的实验表格和审计摘要。
 
 ---
+
+<a id="research-workflow"></a>
+
+## Research Workflow / 研究流程
+
+```mermaid
+flowchart LR
+    A[Data] --> B[Features]
+    B --> C[Model]
+    C --> D[Strategy Candidate]
+    D --> E[Backtest]
+    E --> F[Risk Check]
+    F --> G[Walk-forward OOS]
+    G --> H[ExperimentMemory]
+    H --> I[Report]
+    I --> J[Human Review]
+```
+
+The research workflow moves from data to features, model, candidate strategy, backtest, risk check, walk-forward OOS, experiment memory, report generation, and human review.
+
+研究流程从数据出发，经过特征、模型、候选策略、回测、风控检查、Walk-forward 样本外评估、实验记忆、报告生成，最后进入人工审查。
+
+```mermaid
+flowchart LR
+    A[Agent Layer] --> B[Tool Layer]
+    B --> C[Quant Engine]
+    C --> D[Reports]
+    C --> E[Memory]
+    D --> F[Human Review]
+    E --> A
+```
+
+Agents do not compute metrics by themselves. They call tools, tools invoke the Quant Engine, and outputs are stored in reports and memory for later review.
+
+智能体不自行计算指标。它们调用工具，工具再调用 Quant Engine；输出结果进入报告和记忆，供后续审查。
+
+---
+
+<a id="experiment-snapshot"></a>
 
 ## Experiment Snapshot / 实验摘要
 
-| Result | Value | Notes |
-|--------|-------|-------|
-| **ML OOS baseline** | sharpe **0.586** | EXP-20260602-008 |
-| **Text (real Finnhub)** | sharpe **0.565** | EXP-TEXT-WF-003 · 2.42% coverage |
-| **Population best** | sharpe **1.039** | EXP-POP-006 · rule candidates |
-| **RL feature-linear** | sharpe **0.387** | EXP-POP-010 · vs all-cash 0.0 |
-| **M13 paper export** | 6 artifacts | EXP-M13-004 · `outputs/paper/` |
-| **pytest** | **361 passed** | M13 closeout · dual-end |
+| Item | English | 中文 |
+|---|---|---|
+| Main OOS baseline | `EXP-20260602-008`, Walk-forward OOS Sharpe = `0.586`. | 主要样本外基线为 `EXP-20260602-008`，Walk-forward OOS Sharpe = `0.586`。 |
+| Test baseline | Current project baseline reports `361 passed`. | 当前项目测试基线记录为 `361 passed`。 |
+| Evaluation rule | Paper-grade evaluation must use walk-forward OOS. | 论文级评估必须使用 Walk-forward 样本外结果。 |
+| Metric separation | Single-run ML backtest, simulation, population, RL, training, and audit metrics are not equivalent to `oos.*`. | 单次 ML 回测、simulation、population、RL、training 和 audit 指标不等价于 `oos.*`。 |
+| Comparison workflow | New experiments should be compared through `BaselineRegistry` and `compare_experiments.py`. | 新实验应通过 `BaselineRegistry` 和 `compare_experiments.py` 进行对比。 |
 
-| 结果 | 数值 | 说明 |
-|------|------|------|
-| **ML OOS 主基线** | sharpe **0.586** | EXP-20260602-008 |
-| **文本（真实 Finnhub）** | sharpe **0.565** | EXP-TEXT-WF-003 · 2.42% 覆盖 |
-| **种群最佳** | sharpe **1.039** | EXP-POP-006 · 规则候选 |
-| **RL feature-linear** | sharpe **0.387** | EXP-POP-010 · 对比全现金 0.0 |
-| **M13 论文导出** | 6 个产物 | EXP-M13-004 · `outputs/paper/` |
-| **pytest** | **361 passed** | M13 收口 · 双端 |
+The OOS Sharpe value above is a research baseline, not a return promise, trading signal, or live-trading claim.
 
-Full log / 完整记录：[docs/experiment_log.md](docs/experiment_log.md)
+上面的 OOS Sharpe 是研究基线，不是收益承诺、交易信号或实盘能力声明。
 
 ---
+
+<a id="resume-usage"></a>
 
 ## Resume Usage / 简历写法
 
-**English**
+**General English version**
 
-> Built **Quant MAS**, a Python 3.11 multi-agent quant research platform with walk-forward OOS (baseline sharpe 0.586), Memory/RAG, Postgres/pgvector, local vLLM ResearchAgent, competitive learning & RL ablation chains, **M13 enterprise orchestration** (YAML recipes, LangGraph, paper export), and **361 passing pytest** — with strict safeguards preventing LLM agents from direct live trading.
+Built a multi-agent quantitative research platform integrating deterministic quant pipelines, walk-forward OOS evaluation, Memory/RAG, LLM-assisted research agents, auditable MCP-style workflows, and competitive strategy population experiments.
 
-**中文**
+**通用中文版本**
 
-> 基于 Python 3.11 构建 **Quant MAS** 多智能体量化研究平台，完成 Walk-forward OOS（主基线 sharpe 0.586）、Memory/RAG、Postgres/pgvector、本地 vLLM ResearchAgent、竞争学习与 RL 消融链路、**M13 企业级编排**（YAML recipe、LangGraph、论文导出），维护 **361 项 pytest** 通过，明确 LLM Agent 不直接参与实盘下单。
+基于 Python 构建多智能体量化研究平台，完成数据获取、特征工程、回测、LightGBM 训练、Walk-forward 样本外评估、Memory/RAG、LLM 辅助研究智能体、可审计工作流和竞争式策略种群实验。
 
-See also / 另见：[项目进度.md](项目进度.md) · [论文初稿.md](论文初稿.md)
+**AI Agent Internship**
+
+Built a research-agent workflow with tool routing, Memory/RAG retrieval, supervisor-style orchestration, mock-safe LLM clients, LangGraph-style workflow support, and audit logs for reproducible research tasks.
+
+面向 AI Agent 实习：实现研究智能体工作流，支持工具路由、Memory/RAG 检索、Supervisor 风格编排、默认安全的 Mock LLM 客户端、LangGraph 风格工作流和可复现实验审计日志。
+
+**Quant Developer Internship**
+
+Implemented deterministic quant research modules covering data validation, feature pipelines, ML training, strategy backtesting, risk checks, walk-forward OOS evaluation, and baseline comparison.
+
+面向 Quant Developer 实习：实现确定性量化研究模块，覆盖数据校验、特征流水线、机器学习训练、策略回测、风控检查、Walk-forward 样本外评估和基线对比。
+
+**Financial AI / LLM Application Internship**
+
+Integrated LLM-assisted research agents with controlled quant tools, experiment memory, document retrieval, report generation, and safety rules that prevent direct live-order placement by agents.
+
+面向 Financial AI / LLM 应用实习：将 LLM 辅助研究智能体与受控量化工具、实验记忆、文档检索、报告生成和安全规则结合，明确禁止智能体直接实盘下单。
 
 ---
+
+<a id="project-structure"></a>
 
 ## Project Structure / 项目结构
 
 ```text
-Quant-MAS/
-├── src/quant_mas/       # core: data, features, models, backtest, agents, memory, rl, orchestration
-├── scripts/             # CLI (+ export_paper_artifacts.py, run_mcp_pipeline.py)
-├── configs/             # YAML (+ pipelines/*.yaml.example)
-├── tests/               # 361 pytest cases
-├── docs/                # architecture, progress, server_commands, mcp_protocol
-├── architecture.png     # bilingual architecture diagram / 双语架构图
-└── 论文初稿.md           # paper draft with embedded export tables / 含导出表的论文初稿
+src/quant_mas/
+|-- data/
+|-- features/
+|-- models/
+|-- strategies/
+|-- backtest/
+|-- risk/
+|-- agents/
+|-- tools/
+|-- memory/
+|-- rag/
+|-- context/
+|-- rl/
+|-- protocols/
+|-- orchestration/
+`-- research/
 ```
 
+The structure separates quant computation, agent workflows, memory/RAG, protocols, orchestration, and research artifacts into readable modules.
+
+该结构将量化计算、智能体工作流、Memory/RAG、协议、编排和研究产物拆分为清晰模块。
+
 ---
+
+<a id="documentation"></a>
 
 ## Documentation / 文档索引
 
-| Doc | English | 中文 |
-|-----|---------|------|
-| [docs/index.md](docs/index.md) | Documentation hub | 文档总入口 |
-| [docs/progress.md](docs/progress.md) | M1–M13 progress (361 pytest) | 进度追踪 |
-| [docs/server_commands.md](docs/server_commands.md) | Server deploy & runbook | 服务器命令手册 |
-| [docs/mcp_protocol.md](docs/mcp_protocol.md) | M13 orchestration protocol | M13 编排协议 |
-| [docs/experiment_log.md](docs/experiment_log.md) | Verified experiments | 实验记录 |
-| [项目进度.md](项目进度.md) | — | 中文进度总览 |
-| [项目v3设计.md](项目v3设计.md) | v3 design M9–M13 | v3 设计文档 |
-| [论文初稿.md](论文初稿.md) | Paper draft | 论文初稿 |
+| Document | English | 中文 |
+|---|---|---|
+| [docs/index.md](docs/index.md) | Documentation hub for the project. | 项目文档总入口。 |
+| [docs/progress.md](docs/progress.md) | Tracks completed milestones and current progress. | 记录已完成里程碑和当前进度。 |
+| [docs/architecture.md](docs/architecture.md) | Explains the system architecture and module boundaries. | 解释系统架构和模块边界。 |
+| [docs/experiment_log.md](docs/experiment_log.md) | Records experiment IDs, baselines, comparisons, and notes. | 记录实验 ID、基线、对比和说明。 |
+| [docs/research_protocol.md](docs/research_protocol.md) | Defines research evaluation rules, especially OOS usage. | 定义研究评估规则，尤其是样本外评估使用方式。 |
+| [docs/mcp_protocol.md](docs/mcp_protocol.md) | Describes MCP-style scheduling, policy, and audit design. | 描述 MCP 风格调度、策略和审计设计。 |
+| [docs/server_commands.md](docs/server_commands.md) | Provides server-side run commands and operational notes. | 提供服务器运行命令和操作说明。 |
+| [项目v3设计.md](项目v3设计.md) | Records the v3 design plan and milestone intent. | 记录 v3 设计方案和里程碑意图。 |
 
 ---
+
+<a id="roadmap"></a>
 
 ## Roadmap / 路线图
 
-**Done / 已完成** — Quant Engine · Walk-forward OOS · Agents · Memory/RAG · M6 text · M7 RL sim · M8 protocol · M9 Postgres/pgvector · M10 vLLM · M11–M11.8 population OOS · M12 RL export/OOS · **M13 orchestration + paper export** · FinBERT WF-001/002/003
+**Completed / 已完成**
 
-量化引擎 · 样本外验证 · 智能体 · 记忆/RAG · 文本信号 · RL 仿真 · 协议层 · 企业 DB · vLLM · 种群 OOS · RL 导出/OOS · **M13 编排与论文导出** · FinBERT 三线消融
+- v1 Quant MVP: deterministic quant pipeline, backtesting, risk checks, and core CLI workflows.
+- v1 Quant MVP：确定性量化流水线、回测、风控检查和核心命令行流程。
 
-**Optional next / 可选后续** — EXP-TEXT-002 LoRA · paper-trading sandbox (simulation only)  
-可选 EXP-TEXT-002 LoRA · 模拟盘沙盒（仅仿真）
+- v2 Research Platform: experiment memory, Memory/RAG, agents, workflow extensions, and protocol-style foundations.
+- v2 Research Platform：实验记忆、Memory/RAG、智能体、工作流扩展和协议风格基础。
+
+- v3 Enterprise-style Research System: orchestration, MCP-style scheduler, LangGraph-style backend, audit logs, and paper artifact export.
+- v3 Enterprise-style Research System：编排、MCP 风格调度、LangGraph 风格后端、审计日志和论文产物导出。
+
+**Next / 下一步**
+
+- Paper writing and clearer research narrative.
+- 论文写作与更清晰的研究叙事。
+
+- More real-data reproduction and benchmark comparison.
+- 更多真实数据复现和基准对比。
+
+- Stronger text signal experiments.
+- 更强的文本信号实验。
+
+- Optional LoRA experiments.
+- 可选 LoRA 实验。
+
+- Optional RL robustness study.
+- 可选 RL 鲁棒性研究。
+
+- More community-friendly examples and onboarding docs.
+- 更多适合社区使用的示例和入门文档。
 
 ---
 
-## Contributing · License · Disclaimer / 贡献 · 许可 · 免责声明
+<a id="contributing"></a>
 
-Contributions welcome — see [CONTRIBUTING.md](CONTRIBUTING.md). [MIT License](LICENSE).  
-欢迎贡献 — 见 [CONTRIBUTING.md](CONTRIBUTING.md)。[MIT 许可](LICENSE)。
+## Contributing / 贡献指南
 
-**Research & education only.** Not financial advice. Backtest results may be wrong or overfit.  
-**仅供科研与教育。** 不构成投资建议。回测结果可能错误、不完整或过拟合。
+Issues, discussions, PRs, suggestions, and criticism are welcome.
 
-**Repo / 仓库**：https://github.com/ytq0198/Quant-MAS · **Email**： [3240101782@zju.edu.cn](mailto:3240101782@zju.edu.cn)
+欢迎 Issue、讨论、PR、建议，也非常欢迎大家指出问题。
+
+- Do not commit API keys.
+- 不要提交 API keys。
+
+- Do not commit large datasets or model weights.
+- 不要提交大型数据集或模型权重。
+
+- Tests should not depend on real network or real LLM API by default.
+- 默认测试不应依赖真实网络或真实 LLM API。
+
+- Please keep experiment claims reproducible and distinguish `oos.*` from simulation, training, population, and audit metrics.
+- 请保持实验结论可复现，并区分 `oos.*` 与 simulation、training、population、audit 等指标。
+
+---
+
+<a id="contact"></a>
+
+## Contact / 联系方式
+
+If you are also learning AI agents, quantitative research, RAG, or financial AI, feel free to open an issue or contact me. Feedback from experienced researchers and engineers is especially welcome.
+
+如果你也在学习 AI Agent、量化研究、RAG 或金融 AI，欢迎提 Issue 或邮件交流。也非常欢迎有经验的前辈和工程师批评指正。
+
+- Email: [3240101782@zju.edu.cn](mailto:3240101782@zju.edu.cn)
+- GitHub: [https://github.com/ytq0198/Quant-MAS](https://github.com/ytq0198/Quant-MAS)
+
+---
+
+<a id="disclaimer"></a>
+
+## Disclaimer / 免责声明
+
+This project is for research and educational purposes only. It is not financial advice. It should not be used for live trading without independent validation, risk control, audit, and human approval.
+
+本项目仅用于研究和教育目的，不构成投资建议。未经独立验证、风控、审计和人工确认，不应直接用于实盘交易。
+
+LLM agents in this project are designed for planning, explanation, retrieval, routing, and reporting. They are not designed to directly place live orders.
+
+本项目中的 LLM 智能体用于规划、解释、检索、路由和报告生成，不用于直接实盘下单。
