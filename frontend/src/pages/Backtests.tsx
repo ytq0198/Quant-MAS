@@ -24,13 +24,18 @@ export function Backtests({ data, onRefresh }: { data: DashboardData; onRefresh:
         <p className="muted">{backtest.disclaimer}</p>
 
         <div className="chart-placeholder" aria-label={t("backtests.equityChart")}>
-          {backtest.chart.map((point) => (
-            <span
-              key={point.label}
-              title={`${point.label}: ${point.equity}`}
-              style={{ height: `${Math.max(24, point.equity * 48)}px` }}
-            />
-          ))}
+          {backtest.chart.map((point) => {
+            const baseEquity = backtest.chart[0]?.equity || 1;
+            const ratio = baseEquity ? point.equity / baseEquity : 1;
+            const barHeight = Math.max(24, Math.min(96, ratio * 48));
+            return (
+              <span
+                key={point.label}
+                title={`${point.label}: ${point.equity.toFixed(4)}`}
+                style={{ height: `${barHeight}px` }}
+              />
+            );
+          })}
         </div>
 
         <dl className="metric-list">

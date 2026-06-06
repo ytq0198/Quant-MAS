@@ -253,9 +253,12 @@ def _equity_chart_from_csv(path: Path, points: int = 12) -> list[dict[str, Any]]
         column = "equity" if "equity" in frame.columns else frame.columns[-1]
         values = frame[column].astype(float).tolist()
         if len(values) <= points:
-            return [{"label": f"p{i}", "equity": value} for i, value in enumerate(values)]
-        step = max(1, len(values) // points)
-        sampled = values[::step][:points]
-        return [{"label": f"p{i}", "equity": value} for i, value in enumerate(sampled)]
+            sampled = values
+        else:
+            step = max(1, len(values) // points)
+            sampled = values[::step][:points]
+        base = sampled[0] if sampled and sampled[0] else 1.0
+        normalized = [value / base for value in sampled]
+        return [{"label": f"p{i}", "equity": value} for i, value in enumerate(normalized)]
     except Exception:
         return [{"label": "start", "equity": 1.0}, {"label": "end", "equity": 1.0}]
