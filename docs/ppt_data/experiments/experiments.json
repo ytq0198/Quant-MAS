@@ -1,0 +1,780 @@
+[
+  {
+    "experiment_id": "79b3314e7f3c4d65add4f35f8adad263",
+    "name": "server_ma_cross_real_001",
+    "status": "completed",
+    "created_at": "2026-06-02T06:49:06.995904+00:00",
+    "metrics": {
+      "total_return": 2.0245322981386806,
+      "annualized_return": 0.14876623573578907,
+      "sharpe": 1.0006571740927834,
+      "max_drawdown": -0.20580750572921402,
+      "final_equity": 302453.22981386806,
+      "bars": 2011
+    },
+    "artifacts": {
+      "metrics": "/mnt/localDisk3/weizian/reports/server_ma_cross_real_001/metrics.json",
+      "equity_curve": "/mnt/localDisk3/weizian/reports/server_ma_cross_real_001/equity_curve.csv",
+      "trades": "/mnt/localDisk3/weizian/reports/server_ma_cross_real_001/trades.csv",
+      "summary": "/mnt/localDisk3/weizian/reports/server_ma_cross_real_001/summary.md"
+    },
+    "params": {
+      "symbols": [
+        "AAPL",
+        "MSFT",
+        "SPY"
+      ],
+      "start": "2018-01-01",
+      "end": "2025-12-31",
+      "raw_path": "/mnt/localDisk3/weizian/datasets/raw/market_data.parquet",
+      "features_path": "/mnt/localDisk3/weizian/datasets/features/features.parquet",
+      "output_dir": "/mnt/localDisk3/weizian/reports/server_ma_cross_real_001",
+      "strategy": "ma_cross",
+      "skip_download": true,
+      "skip_features": false
+    },
+    "notes": ""
+  },
+  {
+    "experiment_id": "c51833d7ac384109acfa04320afe653b",
+    "name": "server_lgbm_001",
+    "status": "completed",
+    "created_at": "2026-06-02T07:15:57.106008+00:00",
+    "metrics": {
+      "train_accuracy": 0.8755395683453238,
+      "train_auc": 0.9654805730864715,
+      "train_samples": 4170,
+      "train_positive_rate": 0.6954436450839329,
+      "train_start_date": "2018-01-31",
+      "train_end_date": "2023-08-09",
+      "val_accuracy": 0.4451901565995526,
+      "val_auc": 0.457909604519774,
+      "val_samples": 894,
+      "val_positive_rate": 0.40268456375838924,
+      "val_start_date": "2023-08-10",
+      "val_end_date": "2024-10-15",
+      "test_accuracy": 0.4552572706935123,
+      "test_auc": 0.46566563419624496,
+      "test_samples": 894,
+      "test_positive_rate": 0.31096196868008946,
+      "test_start_date": "2024-10-16",
+      "test_end_date": "2025-12-23",
+      "label_column": "future_direction_5",
+      "feature_count": 15,
+      "train_ratio": 0.7,
+      "val_ratio": 0.15,
+      "test_ratio": 0.15
+    },
+    "artifacts": {
+      "model": "/mnt/localDisk3/weizian/models/lightgbm_direction_latest/model.pkl",
+      "metrics": "/mnt/localDisk3/weizian/models/lightgbm_direction_latest/metrics.json",
+      "feature_columns": "/mnt/localDisk3/weizian/models/lightgbm_direction_latest/feature_columns.json",
+      "feature_importance": "/mnt/localDisk3/weizian/models/lightgbm_direction_latest/feature_importance.csv",
+      "metadata": "/mnt/localDisk3/weizian/models/lightgbm_direction_latest/metadata.json"
+    },
+    "params": {
+      "model": {
+        "name": "lightgbm_direction",
+        "params": {
+          "n_estimators": 100,
+          "learning_rate": 0.05,
+          "num_leaves": 31,
+          "random_state": 42
+        }
+      },
+      "split": {
+        "train": 0.7,
+        "validation": 0.15,
+        "test": 0.15
+      },
+      "target": "future_direction"
+    },
+    "notes": ""
+  },
+  {
+    "experiment_id": "b3b23c50e67c4ffa9ffba458100085b0",
+    "name": "server_lgbm_gpu_001",
+    "status": "completed",
+    "created_at": "2026-06-02T08:49:33.805413+00:00",
+    "metrics": {
+      "train_accuracy": 0.8688249400479616,
+      "train_auc": 0.960665211019053,
+      "train_samples": 4170,
+      "train_positive_rate": 0.7002398081534772,
+      "train_start_date": "2018-01-31",
+      "train_end_date": "2023-08-09",
+      "val_accuracy": 0.4451901565995526,
+      "val_auc": 0.45726878007951455,
+      "val_samples": 894,
+      "val_positive_rate": 0.40939597315436244,
+      "val_start_date": "2023-08-10",
+      "val_end_date": "2024-10-15",
+      "test_accuracy": 0.4563758389261745,
+      "test_auc": 0.47940556503275217,
+      "test_samples": 894,
+      "test_positive_rate": 0.3053691275167785,
+      "test_start_date": "2024-10-16",
+      "test_end_date": "2025-12-23",
+      "label_column": "future_direction_5",
+      "feature_count": 15,
+      "train_ratio": 0.7,
+      "val_ratio": 0.15,
+      "test_ratio": 0.15,
+      "device_requested": "cuda",
+      "device_resolved": "cuda",
+      "device_fallback": false,
+      "device_reason": null
+    },
+    "artifacts": {
+      "model": "/mnt/localDisk3/weizian/models/lightgbm_direction_latest/model.pkl",
+      "metrics": "/mnt/localDisk3/weizian/models/lightgbm_direction_latest/metrics.json",
+      "feature_columns": "/mnt/localDisk3/weizian/models/lightgbm_direction_latest/feature_columns.json",
+      "feature_importance": "/mnt/localDisk3/weizian/models/lightgbm_direction_latest/feature_importance.csv",
+      "metadata": "/mnt/localDisk3/weizian/models/lightgbm_direction_latest/metadata.json"
+    },
+    "params": {
+      "model": {
+        "name": "lightgbm_direction",
+        "device": "cuda",
+        "params": {
+          "n_estimators": 100,
+          "learning_rate": 0.05,
+          "num_leaves": 31,
+          "random_state": 42
+        }
+      },
+      "split": {
+        "train": 0.7,
+        "validation": 0.15,
+        "test": 0.15
+      },
+      "target": "future_direction"
+    },
+    "notes": ""
+  },
+  {
+    "experiment_id": "206c1a5f41464c4689297f8c9962b581",
+    "name": "server_ml_backtest_001",
+    "status": "completed",
+    "created_at": "2026-06-02T08:51:06.827489+00:00",
+    "metrics": {
+      "total_return": 68.27128572926588,
+      "annualized_return": 0.7007527537410598,
+      "sharpe": 2.780990149964091,
+      "max_drawdown": -0.24642698245192562,
+      "final_equity": 6927128.572926588,
+      "bars": 2011
+    },
+    "artifacts": {
+      "metrics": "outputs/reports/ml_backtest_latest/metrics.json",
+      "equity_curve": "outputs/reports/ml_backtest_latest/equity_curve.csv",
+      "trades": "outputs/reports/ml_backtest_latest/trades.csv",
+      "summary": "outputs/reports/ml_backtest_latest/summary.md"
+    },
+    "params": {
+      "config": {
+        "model": {
+          "path": "models/lightgbm_direction_latest/model.pkl",
+          "feature_columns_path": "models/lightgbm_direction_latest/feature_columns.json"
+        },
+        "data": {
+          "features_path": "data/features/features.parquet"
+        },
+        "strategy": {
+          "name": "ml_signal",
+          "buy_threshold": 0.6,
+          "sell_threshold": 0.4,
+          "max_weight": 1.0
+        },
+        "portfolio": {
+          "initial_cash": 100000
+        },
+        "costs": {
+          "commission_bps": 1.0,
+          "slippage_bps": 1.0
+        },
+        "output": {
+          "dir": "outputs/reports/ml_backtest_latest"
+        },
+        "experiment": {
+          "name": "ml_signal_backtest"
+        }
+      },
+      "features_path": "/mnt/localDisk3/weizian/datasets/features/features.parquet",
+      "model_path": "/mnt/localDisk3/weizian/models/lightgbm_direction_latest/model.pkl",
+      "feature_columns": [
+        "open",
+        "high",
+        "low",
+        "close",
+        "volume",
+        "return_1",
+        "ma_5",
+        "ma_20",
+        "ma_distance_5",
+        "ma_distance_20",
+        "volatility_20",
+        "volume_change_1",
+        "volume_ma_20",
+        "volume_ratio_20",
+        "rsi_14"
+      ]
+    },
+    "notes": ""
+  },
+  {
+    "experiment_id": "4dd4d0f9d5f2413ab0959ba765d23048",
+    "name": "server_walk_forward_001",
+    "status": "completed",
+    "created_at": "2026-06-02T09:33:13.307877+00:00",
+    "metrics": {
+      "summary": {
+        "window_count": 19,
+        "feature_count": 15,
+        "target_column": "future_direction_5",
+        "device_requested": "auto",
+        "device_resolved": "cuda",
+        "device_fallback": false,
+        "device_reason": null
+      },
+      "train": {
+        "accuracy_mean": 0.9728487886382625,
+        "auc_mean": 0.9973051899595645,
+        "positive_rate_mean": 0.611285157337789,
+        "samples": 28728,
+        "start_date": "2018-01-31",
+        "end_date": "2024-08-05"
+      },
+      "val": {
+        "accuracy_mean": 0.49596212754107494,
+        "auc_mean": 0.48930933413865907,
+        "positive_rate_mean": 0.5377332219437482,
+        "samples": 7182,
+        "start_date": "2020-02-03",
+        "end_date": "2025-02-05"
+      },
+      "test": {
+        "accuracy_mean": 0.48454469507101083,
+        "auc_mean": 0.48804081155753404,
+        "positive_rate_mean": 0.533556112503481,
+        "samples": 7182,
+        "start_date": "2020-08-03",
+        "end_date": "2025-08-07"
+      },
+      "oos": {
+        "accuracy_mean": 0.4792536897800055,
+        "auc_mean": 0.4717841632701249,
+        "positive_rate_mean": 0.5174046226677806,
+        "samples": 3591,
+        "start_date": "2021-02-02",
+        "end_date": "2025-11-05",
+        "total_return": 0.44261387200961444,
+        "annualized_return": 0.08020276609554267,
+        "sharpe": 0.5856731858188372,
+        "max_drawdown": -0.2554973080017515,
+        "final_equity": 144261.38720096144,
+        "bars": 1197,
+        "backtest_total_return_mean": 0.020703641474562186,
+        "backtest_sharpe_mean": 0.863525923610441,
+        "backtest_max_drawdown_mean": -0.05701843373187117
+      },
+      "walk_forward": {
+        "train_window": 504,
+        "validation_window": 126,
+        "test_window": 126,
+        "oos_window": 63,
+        "step": 63,
+        "max_windows": null
+      }
+    },
+    "artifacts": {
+      "metrics": "outputs/reports/walk_forward_latest/metrics.json",
+      "windows": "outputs/reports/walk_forward_latest/windows.csv",
+      "oos_equity_curve": "outputs/reports/walk_forward_latest/oos_equity_curve.csv",
+      "oos_trades": "outputs/reports/walk_forward_latest/oos_trades.csv",
+      "summary": "outputs/reports/walk_forward_latest/summary.md"
+    },
+    "params": {
+      "config": {
+        "model": {
+          "name": "lightgbm_direction",
+          "device": "auto",
+          "params": {
+            "n_estimators": 100,
+            "learning_rate": 0.05,
+            "num_leaves": 31,
+            "random_state": 42
+          }
+        },
+        "target": "future_direction",
+        "data": {
+          "features_path": "data/features/features.parquet"
+        },
+        "walk_forward": {
+          "train_window": 504,
+          "validation_window": 126,
+          "test_window": 126,
+          "oos_window": 63,
+          "step": 63,
+          "max_windows": null
+        },
+        "strategy": {
+          "name": "ml_signal",
+          "buy_threshold": 0.6,
+          "sell_threshold": 0.4,
+          "max_weight": 1.0
+        },
+        "portfolio": {
+          "initial_cash": 100000
+        },
+        "costs": {
+          "commission_bps": 1.0,
+          "slippage_bps": 1.0
+        },
+        "output": {
+          "dir": "outputs/reports/walk_forward_latest"
+        },
+        "experiment": {
+          "name": "walk_forward_oos"
+        }
+      },
+      "features_path": "/mnt/localDisk3/weizian/datasets/features/features.parquet",
+      "feature_columns": [
+        "open",
+        "high",
+        "low",
+        "close",
+        "volume",
+        "return_1",
+        "ma_5",
+        "ma_20",
+        "ma_distance_5",
+        "ma_distance_20",
+        "volatility_20",
+        "volume_change_1",
+        "volume_ma_20",
+        "volume_ratio_20",
+        "rsi_14"
+      ],
+      "target_column": "future_direction_5"
+    },
+    "notes": ""
+  },
+  {
+    "experiment_id": "e265ad48738c43ad8d8bd09afeb3fe0e",
+    "name": "server_walk_forward_text_001",
+    "status": "completed",
+    "created_at": "2026-06-03T04:10:06.926584+00:00",
+    "metrics": {
+      "summary": {
+        "window_count": 19,
+        "feature_count": 16,
+        "target_column": "future_direction_5",
+        "device_requested": "auto",
+        "device_resolved": "cuda",
+        "device_fallback": false,
+        "device_reason": null
+      },
+      "train": {
+        "accuracy_mean": 0.9727443609022558,
+        "auc_mean": 0.997312860254971,
+        "positive_rate_mean": 0.6114592035644667,
+        "samples": 28728,
+        "start_date": "2018-01-31",
+        "end_date": "2024-08-05"
+      },
+      "val": {
+        "accuracy_mean": 0.4952659426343637,
+        "auc_mean": 0.48951464056624366,
+        "positive_rate_mean": 0.5367585630743525,
+        "samples": 7182,
+        "start_date": "2020-02-03",
+        "end_date": "2025-02-05"
+      },
+      "test": {
+        "accuracy_mean": 0.48565859092174873,
+        "auc_mean": 0.4888645162790516,
+        "positive_rate_mean": 0.5352269562795878,
+        "samples": 7182,
+        "start_date": "2020-08-03",
+        "end_date": "2025-08-07"
+      },
+      "oos": {
+        "accuracy_mean": 0.47758284600389855,
+        "auc_mean": 0.4730521415369536,
+        "positive_rate_mean": 0.5157337788916737,
+        "samples": 3591,
+        "start_date": "2021-02-02",
+        "end_date": "2025-11-05",
+        "total_return": 0.4204116818392387,
+        "annualized_return": 0.07668139232443671,
+        "sharpe": 0.5631287992995602,
+        "max_drawdown": -0.25897222589016666,
+        "final_equity": 142041.16818392387,
+        "bars": 1197,
+        "backtest_total_return_mean": 0.019851370338453883,
+        "backtest_sharpe_mean": 0.8271667073629666,
+        "backtest_max_drawdown_mean": -0.057093687485861376
+      },
+      "walk_forward": {
+        "train_window": 504,
+        "validation_window": 126,
+        "test_window": 126,
+        "oos_window": 63,
+        "step": 63,
+        "max_windows": null
+      }
+    },
+    "artifacts": {
+      "metrics": "/mnt/localDisk3/weizian/reports/walk_forward_text_001/metrics.json",
+      "windows": "/mnt/localDisk3/weizian/reports/walk_forward_text_001/windows.csv",
+      "oos_equity_curve": "/mnt/localDisk3/weizian/reports/walk_forward_text_001/oos_equity_curve.csv",
+      "oos_trades": "/mnt/localDisk3/weizian/reports/walk_forward_text_001/oos_trades.csv",
+      "summary": "/mnt/localDisk3/weizian/reports/walk_forward_text_001/summary.md"
+    },
+    "params": {
+      "config": {
+        "model": {
+          "name": "lightgbm_direction",
+          "device": "auto",
+          "params": {
+            "n_estimators": 100,
+            "learning_rate": 0.05,
+            "num_leaves": 31,
+            "random_state": 42
+          }
+        },
+        "target": "future_direction",
+        "data": {
+          "features_path": "data/features/features.parquet"
+        },
+        "walk_forward": {
+          "train_window": 504,
+          "validation_window": 126,
+          "test_window": 126,
+          "oos_window": 63,
+          "step": 63,
+          "max_windows": null
+        },
+        "strategy": {
+          "name": "ml_signal",
+          "buy_threshold": 0.6,
+          "sell_threshold": 0.4,
+          "max_weight": 1.0
+        },
+        "portfolio": {
+          "initial_cash": 100000
+        },
+        "costs": {
+          "commission_bps": 1.0,
+          "slippage_bps": 1.0
+        },
+        "output": {
+          "dir": "outputs/reports/walk_forward_latest"
+        },
+        "experiment": {
+          "name": "walk_forward_oos"
+        }
+      },
+      "features_path": "/mnt/localDisk3/weizian/datasets/features/features_with_text.parquet",
+      "feature_columns": [
+        "open",
+        "high",
+        "low",
+        "close",
+        "volume",
+        "return_1",
+        "ma_5",
+        "ma_20",
+        "ma_distance_5",
+        "ma_distance_20",
+        "volatility_20",
+        "volume_change_1",
+        "volume_ma_20",
+        "volume_ratio_20",
+        "rsi_14",
+        "finbert_sentiment"
+      ],
+      "target_column": "future_direction_5"
+    },
+    "notes": ""
+  },
+  {
+    "experiment_id": "14d4afe9734843e0b7da0b1478fb3791",
+    "name": "server_walk_forward_text_002",
+    "status": "completed",
+    "created_at": "2026-06-04T09:10:05.612852+00:00",
+    "metrics": {
+      "summary": {
+        "window_count": 19,
+        "feature_count": 16,
+        "target_column": "future_direction_5",
+        "device_requested": "auto",
+        "device_resolved": "cuda",
+        "device_fallback": false,
+        "device_reason": null
+      },
+      "train": {
+        "accuracy_mean": 0.9728487886382623,
+        "auc_mean": 0.9973245718411867,
+        "positive_rate_mean": 0.6110066833751044,
+        "samples": 28728,
+        "start_date": "2018-01-31",
+        "end_date": "2024-08-05"
+      },
+      "val": {
+        "accuracy_mean": 0.4973544973544973,
+        "auc_mean": 0.4911776088956676,
+        "positive_rate_mean": 0.5368978000556947,
+        "samples": 7182,
+        "start_date": "2020-02-03",
+        "end_date": "2025-02-05"
+      },
+      "test": {
+        "accuracy_mean": 0.4860763018657755,
+        "auc_mean": 0.4889698529813547,
+        "positive_rate_mean": 0.5334168755221387,
+        "samples": 7182,
+        "start_date": "2020-08-03",
+        "end_date": "2025-08-07"
+      },
+      "oos": {
+        "accuracy_mean": 0.4803675856307435,
+        "auc_mean": 0.47607673892611063,
+        "positive_rate_mean": 0.5207463102199944,
+        "samples": 3591,
+        "start_date": "2021-02-02",
+        "end_date": "2025-11-05",
+        "total_return": 0.44281625204881014,
+        "annualized_return": 0.08023466716177485,
+        "sharpe": 0.5786804887548506,
+        "max_drawdown": -0.2646777959406936,
+        "final_equity": 144281.625204881,
+        "bars": 1197,
+        "backtest_total_return_mean": 0.020629258823606878,
+        "backtest_sharpe_mean": 0.9106999113215806,
+        "backtest_max_drawdown_mean": -0.05999863730951326
+      },
+      "walk_forward": {
+        "train_window": 504,
+        "validation_window": 126,
+        "test_window": 126,
+        "oos_window": 63,
+        "step": 63,
+        "max_windows": null
+      }
+    },
+    "artifacts": {
+      "metrics": "/mnt/localDisk3/weizian/reports/walk_forward_text_002/metrics.json",
+      "windows": "/mnt/localDisk3/weizian/reports/walk_forward_text_002/windows.csv",
+      "oos_equity_curve": "/mnt/localDisk3/weizian/reports/walk_forward_text_002/oos_equity_curve.csv",
+      "oos_trades": "/mnt/localDisk3/weizian/reports/walk_forward_text_002/oos_trades.csv",
+      "summary": "/mnt/localDisk3/weizian/reports/walk_forward_text_002/summary.md"
+    },
+    "params": {
+      "config": {
+        "model": {
+          "name": "lightgbm_direction",
+          "device": "auto",
+          "params": {
+            "n_estimators": 100,
+            "learning_rate": 0.05,
+            "num_leaves": 31,
+            "random_state": 42
+          }
+        },
+        "target": "future_direction",
+        "data": {
+          "features_path": "data/features/features.parquet"
+        },
+        "walk_forward": {
+          "train_window": 504,
+          "validation_window": 126,
+          "test_window": 126,
+          "oos_window": 63,
+          "step": 63,
+          "max_windows": null
+        },
+        "strategy": {
+          "name": "ml_signal",
+          "buy_threshold": 0.6,
+          "sell_threshold": 0.4,
+          "max_weight": 1.0
+        },
+        "portfolio": {
+          "initial_cash": 100000
+        },
+        "costs": {
+          "commission_bps": 1.0,
+          "slippage_bps": 1.0
+        },
+        "output": {
+          "dir": "outputs/reports/walk_forward_latest"
+        },
+        "experiment": {
+          "name": "walk_forward_oos"
+        }
+      },
+      "features_path": "/mnt/localDisk3/weizian/datasets/features/features_with_text_wf002.parquet",
+      "feature_columns": [
+        "open",
+        "high",
+        "low",
+        "close",
+        "volume",
+        "return_1",
+        "ma_5",
+        "ma_20",
+        "ma_distance_5",
+        "ma_distance_20",
+        "volatility_20",
+        "volume_change_1",
+        "volume_ma_20",
+        "volume_ratio_20",
+        "rsi_14",
+        "finbert_sentiment"
+      ],
+      "target_column": "future_direction_5"
+    },
+    "notes": ""
+  },
+  {
+    "experiment_id": "130fba2d8db944c9902a9b27177af9df",
+    "name": "server_walk_forward_text_003",
+    "status": "completed",
+    "created_at": "2026-06-04T11:58:05.825553+00:00",
+    "metrics": {
+      "summary": {
+        "window_count": 19,
+        "feature_count": 16,
+        "target_column": "future_direction_5",
+        "device_requested": "auto",
+        "device_resolved": "cuda",
+        "device_fallback": false,
+        "device_reason": null
+      },
+      "train": {
+        "accuracy_mean": 0.9728835978835979,
+        "auc_mean": 0.9973018918873349,
+        "positive_rate_mean": 0.61104149262044,
+        "samples": 28728,
+        "start_date": "2018-01-31",
+        "end_date": "2024-08-05"
+      },
+      "val": {
+        "accuracy_mean": 0.4955444165970481,
+        "auc_mean": 0.48984420538081813,
+        "positive_rate_mean": 0.5381509328877749,
+        "samples": 7182,
+        "start_date": "2020-02-03",
+        "end_date": "2025-02-05"
+      },
+      "test": {
+        "accuracy_mean": 0.4842662211083263,
+        "auc_mean": 0.48818956507497874,
+        "positive_rate_mean": 0.5352269562795878,
+        "samples": 7182,
+        "start_date": "2020-08-03",
+        "end_date": "2025-08-07"
+      },
+      "oos": {
+        "accuracy_mean": 0.48008911166805895,
+        "auc_mean": 0.4752033192472866,
+        "positive_rate_mean": 0.515455304928989,
+        "samples": 3591,
+        "start_date": "2021-02-02",
+        "end_date": "2025-11-05",
+        "total_return": 0.4210711311791575,
+        "annualized_return": 0.07678660818822025,
+        "sharpe": 0.5647016877646798,
+        "max_drawdown": -0.25897222589016655,
+        "final_equity": 142107.11311791575,
+        "bars": 1197,
+        "backtest_total_return_mean": 0.019907375259375127,
+        "backtest_sharpe_mean": 0.8925593232408192,
+        "backtest_max_drawdown_mean": -0.057618438651684784
+      },
+      "walk_forward": {
+        "train_window": 504,
+        "validation_window": 126,
+        "test_window": 126,
+        "oos_window": 63,
+        "step": 63,
+        "max_windows": null
+      }
+    },
+    "artifacts": {
+      "metrics": "/mnt/localDisk3/weizian/reports/walk_forward_text_003/metrics.json",
+      "windows": "/mnt/localDisk3/weizian/reports/walk_forward_text_003/windows.csv",
+      "oos_equity_curve": "/mnt/localDisk3/weizian/reports/walk_forward_text_003/oos_equity_curve.csv",
+      "oos_trades": "/mnt/localDisk3/weizian/reports/walk_forward_text_003/oos_trades.csv",
+      "summary": "/mnt/localDisk3/weizian/reports/walk_forward_text_003/summary.md"
+    },
+    "params": {
+      "config": {
+        "model": {
+          "name": "lightgbm_direction",
+          "device": "auto",
+          "params": {
+            "n_estimators": 100,
+            "learning_rate": 0.05,
+            "num_leaves": 31,
+            "random_state": 42
+          }
+        },
+        "target": "future_direction",
+        "data": {
+          "features_path": "data/features/features.parquet"
+        },
+        "walk_forward": {
+          "train_window": 504,
+          "validation_window": 126,
+          "test_window": 126,
+          "oos_window": 63,
+          "step": 63,
+          "max_windows": null
+        },
+        "strategy": {
+          "name": "ml_signal",
+          "buy_threshold": 0.6,
+          "sell_threshold": 0.4,
+          "max_weight": 1.0
+        },
+        "portfolio": {
+          "initial_cash": 100000
+        },
+        "costs": {
+          "commission_bps": 1.0,
+          "slippage_bps": 1.0
+        },
+        "output": {
+          "dir": "outputs/reports/walk_forward_latest"
+        },
+        "experiment": {
+          "name": "walk_forward_oos"
+        }
+      },
+      "features_path": "/mnt/localDisk3/weizian/datasets/features/features_with_text_wf003.parquet",
+      "feature_columns": [
+        "open",
+        "high",
+        "low",
+        "close",
+        "volume",
+        "return_1",
+        "ma_5",
+        "ma_20",
+        "ma_distance_5",
+        "ma_distance_20",
+        "volatility_20",
+        "volume_change_1",
+        "volume_ma_20",
+        "volume_ratio_20",
+        "rsi_14",
+        "finbert_sentiment"
+      ],
+      "target_column": "future_direction_5"
+    },
+    "notes": ""
+  }
+]

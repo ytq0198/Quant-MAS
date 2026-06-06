@@ -1,0 +1,4 @@
+experiment_id,name,text_source,coverage_ratio,aligned_count,dropped_count,oos.sharpe,oos.total_return,notes
+e265ad48738c43ad8d8bd09afeb3fe0e,server_walk_forward_text_001,,,,,0.5631287992995602,0.4204116818392387,
+14d4afe9734843e0b7da0b1478fb3791,server_walk_forward_text_002,,,,,0.5786804887548506,0.44281625204881014,
+130fba2d8db944c9902a9b27177af9df,server_walk_forward_text_003,,,,,0.5647016877646798,0.4210711311791575,

@@ -1,0 +1,14 @@
+{
+  "input_records": 9434,
+  "aligned_records": 5088,
+  "dropped_records": 4346,
+  "dropped_reasons": {
+    "no_future_bar": 4346
+  },
+  "market_close": "16:00",
+  "feature_symbols": [
+    "AAPL",
+    "MSFT",
+    "SPY"
+  ]
+}

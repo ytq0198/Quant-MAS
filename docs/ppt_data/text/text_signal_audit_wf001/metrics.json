@@ -1,0 +1,36 @@
+{
+  "feature_rows": 6033,
+  "signal_rows": 200,
+  "matched_rows": 200,
+  "missing_rows": 5833,
+  "coverage_ratio": 0.03315100281783524,
+  "feature_symbol_count": 3,
+  "signal_symbol_count": 1,
+  "matched_symbol_count": 1,
+  "feature_symbols": [
+    "AAPL",
+    "MSFT",
+    "SPY"
+  ],
+  "signal_symbols": [
+    "AAPL"
+  ],
+  "matched_symbols": [
+    "AAPL"
+  ],
+  "signal_columns": [
+    "finbert_sentiment"
+  ],
+  "column_coverage": {
+    "finbert_sentiment": {
+      "matched_rows": 200,
+      "coverage_ratio": 0.03315100281783524
+    }
+  },
+  "feature_start_date": "2018-01-02",
+  "feature_end_date": "2025-12-31",
+  "signal_start_date": "2018-01-02",
+  "signal_end_date": "2018-10-16",
+  "features_path": "/mnt/localDisk3/weizian/datasets/features/features.parquet",
+  "signals_path": "/mnt/localDisk3/weizian/datasets/text/signals_finbert.parquet"
+}

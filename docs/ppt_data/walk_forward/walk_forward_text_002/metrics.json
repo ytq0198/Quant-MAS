@@ -1,0 +1,60 @@
+{
+  "summary": {
+    "window_count": 19,
+    "feature_count": 16,
+    "target_column": "future_direction_5",
+    "device_requested": "auto",
+    "device_resolved": "cuda",
+    "device_fallback": false,
+    "device_reason": null
+  },
+  "train": {
+    "accuracy_mean": 0.9728487886382623,
+    "auc_mean": 0.9973245718411867,
+    "positive_rate_mean": 0.6110066833751044,
+    "samples": 28728,
+    "start_date": "2018-01-31",
+    "end_date": "2024-08-05"
+  },
+  "val": {
+    "accuracy_mean": 0.4973544973544973,
+    "auc_mean": 0.4911776088956676,
+    "positive_rate_mean": 0.5368978000556947,
+    "samples": 7182,
+    "start_date": "2020-02-03",
+    "end_date": "2025-02-05"
+  },
+  "test": {
+    "accuracy_mean": 0.4860763018657755,
+    "auc_mean": 0.4889698529813547,
+    "positive_rate_mean": 0.5334168755221387,
+    "samples": 7182,
+    "start_date": "2020-08-03",
+    "end_date": "2025-08-07"
+  },
+  "oos": {
+    "accuracy_mean": 0.4803675856307435,
+    "auc_mean": 0.47607673892611063,
+    "positive_rate_mean": 0.5207463102199944,
+    "samples": 3591,
+    "start_date": "2021-02-02",
+    "end_date": "2025-11-05",
+    "total_return": 0.44281625204881014,
+    "annualized_return": 0.08023466716177485,
+    "sharpe": 0.5786804887548506,
+    "max_drawdown": -0.2646777959406936,
+    "final_equity": 144281.625204881,
+    "bars": 1197,
+    "backtest_total_return_mean": 0.020629258823606878,
+    "backtest_sharpe_mean": 0.9106999113215806,
+    "backtest_max_drawdown_mean": -0.05999863730951326
+  },
+  "walk_forward": {
+    "train_window": 504,
+    "validation_window": 126,
+    "test_window": 126,
+    "oos_window": 63,
+    "step": 63,
+    "max_windows": null
+  }
+}
