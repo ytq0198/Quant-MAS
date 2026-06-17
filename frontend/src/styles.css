@@ -931,6 +931,172 @@ input {
   background: linear-gradient(180deg, var(--primary) 0%, #5eead4 100%);
 }
 
+/* Help page */
+.help-page .page-banner {
+  margin-bottom: 20px;
+}
+
+.help-layout {
+  display: grid;
+  grid-template-columns: minmax(220px, 280px) minmax(0, 1fr);
+  gap: 20px;
+  align-items: start;
+}
+
+.help-toc {
+  position: sticky;
+  top: 16px;
+}
+
+.help-toc__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: calc(100vh - 180px);
+  overflow-y: auto;
+}
+
+.help-toc__link {
+  display: block;
+  width: 100%;
+  padding: 8px 10px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.88rem;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.help-toc__link:hover {
+  background: #f1f5f9;
+  color: var(--text);
+}
+
+.help-toc__link--active {
+  background: #ecfeff;
+  color: var(--primary-dark);
+  font-weight: 600;
+}
+
+.help-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+.help-card .card__body {
+  padding-top: 0;
+}
+
+.help-section__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+
+.help-section h2 {
+  margin: 0;
+  font-size: 1.15rem;
+}
+
+.help-section__intro {
+  margin: 0 0 12px;
+  color: var(--text-muted);
+  line-height: 1.55;
+}
+
+.help-block {
+  margin-top: 14px;
+}
+
+.help-block h3 {
+  margin: 0 0 8px;
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+
+.help-block--notes {
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+}
+
+.help-list {
+  margin: 0;
+  padding-left: 1.25rem;
+  line-height: 1.6;
+}
+
+.help-list--compact {
+  padding-left: 1.1rem;
+}
+
+.help-steps {
+  margin: 0;
+  padding-left: 1.35rem;
+  line-height: 1.65;
+}
+
+.help-steps li + li {
+  margin-top: 6px;
+}
+
+.help-code {
+  margin: 0;
+  padding: 14px 16px;
+  border-radius: 10px;
+  background: #0f172a;
+  color: #e2e8f0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.8rem;
+  line-height: 1.55;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.help-table {
+  margin-top: 12px;
+}
+
+.btn--sm {
+  padding: 6px 12px;
+  font-size: 0.82rem;
+}
+
+@media (max-width: 900px) {
+  .help-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .help-toc {
+    position: static;
+  }
+
+  .help-toc__list {
+    max-height: none;
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .help-toc__link {
+    width: auto;
+  }
+}
+
 /* Console */
 .console-panel {
   margin: 0;

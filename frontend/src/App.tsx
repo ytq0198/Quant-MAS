@@ -16,6 +16,7 @@ import { PaperArtifacts } from "./pages/PaperArtifacts";
 import { Database } from "./pages/Database";
 import { Observability } from "./pages/Observability";
 import { Settings } from "./pages/Settings";
+import { Help } from "./pages/Help";
 import type { PageId } from "./types/navigation";
 
 export function App() {
@@ -57,6 +58,8 @@ export function App() {
         return <Observability data={data} onRefresh={() => void data.refresh()} />;
       case "settings":
         return <Settings data={data} onRefresh={data.refresh} />;
+      case "help":
+        return <Help onNavigate={setPage} />;
       default:
         return <Overview data={data} onNavigate={setPage} />;
     }

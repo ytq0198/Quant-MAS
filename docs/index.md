@@ -37,7 +37,7 @@ Quant MAS combines a **deterministic Quant Engine** with a **lightweight Agent L
 
 LLM agents **must not** place live orders. Signals require backtesting, risk checks, audit, and human confirmation.
 
-**Plus v2**：M1–M8 ✅ 收官 · **v3 M9–M13** ✅（361 pytest · M13 编排收口）· 见 [`项目v3设计.md`](../项目v3设计.md)
+**Plus v2**：M1–M8 ✅ 收官 · **v3 M9–M13** ✅（361 pytest · M13 编排收口）· **v5 Enterprise** ✅（Job API · Help · 汇报材料）· 见 [`项目v3设计.md`](../项目v3设计.md)
 
 ---
 
@@ -77,6 +77,7 @@ Deep dive: [architecture.md](architecture.md) · [项目plus设计.md](../项目
 | Memory | JSON & SQLite experiment stores | 实验记忆 | ✅ |
 | RAG | Keyword + hash vector + hybrid retrieval | 混合检索 | ✅ |
 | Orchestration | M4 ResearchWorkflow + M13 scheduler/recipes | 工作流与批处理编排 | ✅ |
+| v5 Web Console | React dashboard, Job API, Help guide | 企业研究控制台 | ✅ |
 | Paper export | `export_paper_artifacts` (M13.3) | 论文级结果表与审计包 | ✅ |
 | Context / LLM | ContextBuilder, mock-safe LLM client | 上下文与可选 LLM | ✅ |
 | Text Signals | Mock / FinBERT / LoRA skeleton | 文本特征骨架 | ✅ M6 |
@@ -87,23 +88,54 @@ Deep dive: [architecture.md](architecture.md) · [项目plus设计.md](../项目
 
 ## Agent 设计 / Agent Design
 
-Lightweight agents — no heavy framework lock-in.
+Lightweight agents — no heavy framework lock-in. **Agent 不直接访问 Quant Engine**，一律经 **ToolRegistry** 白名单工具。
 
-**Implemented / 已实现**
+### 工具层 ToolRegistry（L5）
+
+| 步骤 | 机制 |
+|------|------|
+| 定义 | 继承 `BaseTool`：`name` · `description` · `run(**kwargs) → ToolResult` |
+| 注册 | `ToolRegistry.register(tool)` — 唯一 name，重名拒绝 |
+| 调用 | `registry.get(name).run(...)` — Supervisor / Workflow / MCP 共用 |
+| 默认集 | `create_default_tool_registry()` → data_summary · train_model · ml_backtest · risk · report |
+
+白名单工具：`data_summary` · `backtest` · `train_model` · `ml_backtest` · `pipeline` · `risk_check` · `report`
+
+### MCP 协议与 ToolPolicy（L7）
+
+```
+MCPToolCall → ToolPolicy.evaluate → execute_mcp_tool_call → ToolRegistry → MCPToolResult
+```
+
+- `tool_to_mcp_spec` / `registry_to_mcp_specs` — 导出工具 schema
+- **ToolPolicy**：deny-by-default；拒绝 shell/broker/order/secrets；仅允许 SAFE_QUANT_TOOLS
+- 详见 [mcp_protocol.md](mcp_protocol.md) · [protocols.md](protocols.md)
+
+### 智能体层（L6）
 
 | Agent | Role | 说明 |
 |-------|------|------|
-| **SupervisorAgent** | Rule-based routing to 7 tools | 中英文关键词路由，不调用真实 LLM |
-| **ReportAgent** | Report narrative via LLM boundary | 默认 Mock；可选 OpenAI-compatible API |
-| **ResearchAgent** | Context + RAG → hypotheses & summary | 不修改 metrics，不下单 |
+| **SupervisorAgent** | 关键词 → 单工具 | 中英文 RouteRule；记录 AgentEvent / ToolCallEvent |
+| **ResearchAgent** | Context + RAG → JSON 研究解读 | 禁止实盘建议；baseline OOS 0.586 |
+| **ReportAgent** | 报告叙事 | 默认 Mock LLM；不修改 metrics |
 
-**Workflow paths / 工作流路径**
+### 编排层（L7）
+
+| 模式 | 用途 |
+|------|------|
+| **Supervisor + Tools** | 单任务单工具 — `run_agent.py --task "..."` |
+| **ResearchWorkflow** | 6 节点固定 DAG — `data_check → feature_build → train_model → ml_backtest → risk_check → report` |
+| **MCPScheduler** | YAML recipe + 拓扑排序 + audit.jsonl — `run_mcp_pipeline.py --dry-run` |
+| **LangGraph** | 可选后端 — `--backend langgraph` |
+
+**Workflow paths / 工作流路径（CLI）**
 
 1. **Supervisor + Tools** — `run_agent.py --task "..."`
-2. **ResearchWorkflow DAG** — 6 nodes: download → features → train → ml_backtest → risk → report ([langgraph_workflow.md](langgraph_workflow.md))
+2. **ResearchWorkflow DAG** — 6 nodes ([langgraph_workflow.md](langgraph_workflow.md))
 3. **M13 Pipeline** — `run_mcp_pipeline.py --recipe configs/pipelines/*.yaml.example --dry-run` ([mcp_protocol.md](mcp_protocol.md))
 4. **Paper export** — `export_paper_artifacts.py` → `outputs/paper/` (M13.3)
 5. **ResearchAgent** — `run_research_agent.py` + ContextBuilder ([context_engineering.md](context_engineering.md))
+6. **v5 Job API** — `POST /api/jobs`（Web 控制台或 curl）· [v5_enterprise_overview.md](v5_enterprise_overview.md)
 
 **Safety / 安全规则**
 
@@ -250,7 +282,11 @@ Server: [server_commands.md](server_commands.md)
 
 | Document | 说明 |
 |----------|------|
-| [progress.md](progress.md) | M1–M13 进度、361 pytest 基线 |
+| [progress.md](progress.md) | M1–M13 进度、v5 控制台、361 pytest 基线 |
+| [v5_enterprise_overview.md](v5_enterprise_overview.md) | **v5** Job API · Help · MAS 分层 |
+| [../项目说明.md](../项目说明.md) | 新手入门 · ToolRegistry 调用链 |
+| [../Quant_MAS_汇报讲解稿.md](../Quant_MAS_汇报讲解稿.md) | SRTP 汇报口播稿（31 页） |
+| [ppt_data/DATA_MANIFEST.md](ppt_data/DATA_MANIFEST.md) | PPT 实验数据清单 |
 | [mcp_protocol.md](mcp_protocol.md) | **v3 M13** 编排协议（✅ 收口） |
 | [项目v3设计.md](../项目v3设计.md) | **v3 设计**（M9–M13 ✅） |
 | [population_training.md](population_training.md) | **v3 M11.5** 多代种群训练闭环 |

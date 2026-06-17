@@ -68,6 +68,13 @@ const SHORTCUT_IDS: Array<{
     descKey: "shortcut.paper.desc",
     badgeKey: "shortcut.paper.badge",
     icon: "▦"
+  },
+  {
+    id: "help",
+    titleKey: "shortcut.help.title",
+    descKey: "shortcut.help.desc",
+    badgeKey: "shortcut.help.badge",
+    icon: "?"
   }
 ];
 

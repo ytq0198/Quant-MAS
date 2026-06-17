@@ -14,6 +14,23 @@ Quant MAS v5 是本项目的研究型全栈版本。它保留原有的确定性�
 | Access control | API key mode supports viewer, researcher, reviewer, and admin roles. | API Key 模式支持 viewer、researcher、reviewer、admin 四类角色。 |
 | Human gate | Review APIs model approval/rejection gates before any candidate moves forward. | 审核 API 用于表达候选结果进入下一步之前的批准/拒绝关卡。 |
 | Observability | Health, deep health, metrics summary, recent logs, and effective config APIs support server smoke testing. | 健康状态、深度健康、指标摘要、近期日志和有效配置 API 支持服务器 smoke 测试。 |
+| Help guide | In-app Help page (`Help.tsx` + `helpGuide.ts`) with bilingual step-by-step workflows and CLI cross-links. | 应用内 Help 页（中英文分步指南，链至各功能页与 CLI）。 |
+| Executable jobs | `POST /api/jobs` for backtest, walk_forward_oos, and paper_export with progress polling. | `POST /api/jobs` 提交回测、Walk-forward OOS、论文导出并轮询进度。 |
+| Presentation pack | `Quant_MAS_ZJU_CS_Premium_PPT.html` (31 slides), script, and `docs/ppt_data` server exports. | Premium PPT（31 页）、讲解稿及 `docs/ppt_data` 实验导出。 |
+
+## MAS Layer Summary / MAS 分层速览
+
+| Layer | Key modules | Role |
+|---|---|---|
+| L5 Tools | `ToolRegistry`, `BaseTool`, 7 quant tools | Agent 访问 Engine 的唯一入口 |
+| L6 Agents | `SupervisorAgent`, `ResearchAgent`, `ReportAgent` | 路由、解读、报告；不下单 |
+| L7 Protocol | `ToolPolicy`, MCP adapter, `MCPScheduler` | 白名单鉴权、recipe 调度、audit.jsonl |
+| L4 RAG | `ContextBuilder`, `HybridRetriever` | 为 ResearchAgent 装配上下文 |
+| L3 Memory | `ExperimentMemory`, `BaselineRegistry` | 实验注册与 baseline 锁定 |
+
+See [docs/index.md](index.md#agent-设计--agent-design) for call flow details.
+
+详见 [docs/index.md](index.md#agent-设计--agent-design) 中的调用链说明。
 
 ## Enterprise Design Boundary / 企业级设计边界
 

@@ -176,6 +176,8 @@ By default, the system does not expose an external MCP listener. ToolPolicy also
 | 重要样本外基线 | EXP-20260602-008 | Walk-forward OOS Sharpe = 0.586。 |
 | M13 orchestration and paper export | Complete | MCP-style scheduler, recipe workflow, LangGraph backend, and paper artifact export completed. |
 | M13 编排与论文导出 | 已完成 | MCP 风格调度、配方工作流、LangGraph 后端和论文产物导出已完成。 |
+| v5 Enterprise console | Complete | React dashboard, Job API, Help guide, i18n; SRTP presentation materials. |
+| v5 企业控制台 | 已完成 | React 仪表盘、Job API、Help 指南、中英文；SRTP 汇报材料已就绪。 |
 
 This project is still evolving. Feedback, issues, discussions, and PRs are welcome.
 
@@ -444,6 +446,9 @@ The structure separates quant computation, agent workflows, memory/RAG, protocol
 | [docs/experiment_log.md](docs/experiment_log.md) | Records experiment IDs, baselines, comparisons, and notes. | 记录实验 ID、基线、对比和说明。 |
 | [docs/research_protocol.md](docs/research_protocol.md) | Defines research evaluation rules, especially OOS usage. | 定义研究评估规则，尤其是样本外评估使用方式。 |
 | [docs/mcp_protocol.md](docs/mcp_protocol.md) | Describes MCP-style scheduling, policy, and audit design. | 描述 MCP 风格调度、策略和审计设计。 |
+| [docs/v5_enterprise_overview.md](docs/v5_enterprise_overview.md) | v5 full-stack console, Job API, and Help guide. | v5 全栈控制台、Job API 与 Help 指南。 |
+| [项目说明.md](项目说明.md) | Onboarding: research vs live trading, first backtest. | 入门：量化研究 vs 实盘、首次回测。 |
+| [Quant_MAS_汇报讲解稿.md](Quant_MAS_汇报讲解稿.md) | SRTP presentation script (31 slides). | SRTP 汇报逐页讲解稿（31 页）。 |
 | [docs/server_commands.md](docs/server_commands.md) | Provides server-side run commands and operational notes. | 提供服务器运行命令和操作说明。 |
 | [项目v3设计.md](项目v3设计.md) | Records the v3 design plan and milestone intent. | 记录 v3 设计方案和里程碑意图。 |
 

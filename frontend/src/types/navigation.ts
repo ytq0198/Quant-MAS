@@ -11,7 +11,8 @@ export type PageId =
   | "paper"
   | "database"
   | "observability"
-  | "settings";
+  | "settings"
+  | "help";
 
 export interface NavItem {
   id: PageId;
@@ -33,6 +34,7 @@ export const NAV_ITEMS: NavItem[] = [
   { id: "paper", label: "Paper Artifacts", icon: "▦", group: "Compliance" },
   { id: "database", label: "Database", icon: "⬡", group: "Platform" },
   { id: "observability", label: "Observability", icon: "◐", group: "Platform" },
+  { id: "help", label: "Help", icon: "?", group: "Platform" },
   { id: "settings", label: "Settings", icon: "⚙", group: "Platform" }
 ];
 
@@ -49,5 +51,6 @@ export const PAGE_TITLES: Record<PageId, string> = {
   paper: "Paper Artifacts",
   database: "Database Backends",
   observability: "Observability",
+  help: "Help & User Guide",
   settings: "Settings"
 };

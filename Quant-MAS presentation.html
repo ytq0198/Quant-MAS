@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quant MAS: A Multi-Agent Quantitative Research Platform - 魏子安</title>
+    <style>
+        /* 经典学术暗黑科技风全局样式 */
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: #0d1117;
+            color: #c9d1d9;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* 幻灯片容器与动效 */
+        .slide {
+            width: 100%;
+            height: 100%;
+            display: none;
+            padding: 60px 80px;
+            box-sizing: border-box;
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: radial-gradient(circle at 80% 20%, #161b22 0%, #0d1117 100%);
+        }
+        .slide.active {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.99); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        /* 排版排版元素增强 */
+        h1 {
+            color: #58a6ff;
+            font-size: 2.8rem;
+            margin-top: 0;
+            margin-bottom: 5px;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+        }
+        .slide-subtitle {
+            color: #8b949e;
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 1px solid #30363d;
+            padding-bottom: 15px;
+        }
+        h2 { color: #58a6ff; font-size: 2.2rem; margin-top: 0; }
+        h3 { color: #ff7b72; font-size: 1.5rem; margin-top: 0; margin-bottom: 10px; font-weight: 600; }
+        p, li { font-size: 1.25rem; line-height: 1.7; color: #c9d1d9; }
+        ul { margin-top: 5px; padding-left: 25px; }
+        li { margin-bottom: 8px; }
+        strong { color: #f0883e; }
+        
+        /* 布局栅格 */
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 10px; }
+        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 25px; margin-top: 10px; }
+        
+        /* 高级质感卡片设计 */
+        .card {
+            background: #161b22;
+            padding: 30px;
+            border-radius: 12px;
+            border: 1px solid #30363d;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+            transition: border-color 0.3s;
+        }
+        .card:hover { border-color: #58a6ff; }
+        .card-highlight { border-left: 5px solid #58a6ff; }
+        .card-alert { border-left: 5px solid #ff7b72; }
+        .card-success { border-left: 5px solid #56d364; }
+
+        /* LaTeX 数学公式专属美化模块 */
+        .formula-box {
+            background: #090d13;
+            padding: 25px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border: 1px solid #21262d;
+            box-shadow: inset 0 4px 12px rgba(0,0,0,0.4);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        /* 统一页脚 */
+        .footer {
+            position: absolute;
+            bottom: 25px;
+            left: 80px;
+            right: 80px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            color: #8b949e;
+            border-top: 1px solid #21262d;
+            padding-top: 15px;
+        }
+        .footer-left strong { color: #58a6ff; }
+        .nav-indicator {
+            background: #21262d;
+            padding: 4px 12px;
+            border-radius: 20px;
+            border: 1px solid #30363d;
+        }
+        
+        /* 架构图层叠堆叠设计 */
+        .arch-layer {
+            display: flex;
+            align-items: center;
+            background: #161b22;
+            border: 1px solid #30363d;
+            margin-bottom: 8px;
+            border-radius: 6px;
+            overflow: hidden;
+            font-size: 1.05rem;
+        }
+        .arch-layer-num {
+            background: #388bfd;
+            color: #fff;
+            padding: 10px 20px;
+            font-weight: bold;
+            min-width: 90px;
+            text-align: center;
+        }
+        .arch-layer-body { padding: 10px 20px; color: #e6edf2; }
+
+        /* 统一表格设计 */
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; background: #161b22; border-radius: 8px; overflow: hidden; border: 1px solid #30363d; }
+        th, td { padding: 14px 20px; text-align: left; }
+        th { background: #21262d; color: #58a6ff; font-weight: 600; border-bottom: 1px solid #30363d; }
+        td { border-bottom: 1px solid #21262d; }
+    </style>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+
+    <div class="slide active" style="justify-content: center; align-items: center; text-align: center;">
+        <div style="max-width: 1100px;">
+            <h1 style="font-size: 3.4rem; color: #ffffff; line-height: 1.2; margin-bottom: 20px;">Quant MAS: A Multi-Agent Quantitative Research Platform</h1>
+            <p style="font-size: 1.6rem; color: #58a6ff; margin-top: 0; margin-bottom: 60px; font-weight: 300;">具有确定性量化引擎、智能体编排与可审计实验工作流的多智能体量化研究平台</p>
+            
+            <div style="display: grid; grid-template-columns: 1fr; gap: 15px; background: #161b22; padding: 40px; border-radius: 16px; border: 1px solid #30363d; max-width: 750px; margin: 0 auto; text-align: left;">
+                <p style="margin: 5px 0;">👤 <strong>演讲汇报人：</strong> 魏子安 (Zian Wei)</p>
+                <p style="margin: 5px 0;">🏫 <strong>研究单位：</strong> 浙江大学 (ZJU)</p>
+                <p style="margin: 5px 0;">🔗 <strong>项目开源地址：</strong> <a href="https://github.com/ytq0198/Quant-MAS" style="color: #58a6ff; text-decoration: none; border-bottom: 1px dashed #58a6ff;">github.com/ytq0198/Quant-MAS</a></p>
+                <p style="margin: 5px 0;">📧 <strong>联系邮箱：</strong> 3240101782@zju.edu.cn</p>
+            </div>
+            <p style="font-size: 1rem; color: #8b949e; margin-top: 50px;">💡 请使用键盘方向键 <span style="color:#58a6ff;font-weight:bold;">←</span> 或 <span style="color:#58a6ff;font-weight:bold;">→</span> 进行前后翻页切换</p>
+        </div>
+    </div>
+
+    <div class="slide">
+        <h1>01. 研究背景与开发动机</h1>
+        <div class="slide-subtitle">Motivation & Background</div>
+        <div class="grid-2">
+            <div class="card card-alert">
+                <h3>传统 AI 量化交易的两大行业痛点</h3>
+                <ul>
+                    <li><strong>策略孤岛化严重：</strong> 传统的因子挖掘、信号生成、仓位管理与代码回测等开发环节高度依赖人工手工流转，彼此脱节，导致模型自动化进化迭代的效率极其低下。</li>
+                    <li><strong>“黑盒盲盒”悖论：</strong> 端到端的深度学习或纯大模型生成策略往往缺乏严密的金融学逻辑支撑。因模型决策链条不可知，在遭遇市场极端行情时，实盘的风控心理防线极易崩溃。</li>
+                </ul>
+            </div>
+            <div class="card card-success">
+                <h3>Quant MAS 的平台解耦架构思想</h3>
+                <ul>
+                    <li><strong>核心分离原则（Core Separation）：</strong> 在底层架构设计上，将<strong>“确定性的量化计算（Deterministic Computation）”</strong>与<strong>“生成式的智能体研究编排（Agentic Orchestration）”</strong>进行彻底解耦、物理分离。</li>
+                    <li><strong>安全第一防线：</strong> 确立全链路刚性边界，绝不赋予大语言模型（LLM）直接触碰或下发实盘订单的权限，让 AI 释放创新力的同时保证资金绝对安全。</li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer"><div class="footer-left">项目汇报：<strong>Quant MAS</strong></div><div class="nav-indicator">2 / 12</div></div>
+    </div>
+
+    <div class="slide">
+        <h1>02. 系统核心设计原则</h1>
+        <div class="slide-subtitle">Key Design Principles (Derived from architecture.png)</div>
+        <div class="grid-2">
+            <div class="card card-highlight">
+                <h3>1. 智能体不触碰底层交易</h3>
+                <p>根据架构图刚性约束，LLM Agent 在系统内简而言之<strong>不直接提交任何实盘订单</strong>。智能体层仅扮演“量化研究员”的职能，负责顶层路径规划、编排工具链、自动解释回测报告以及检索实验记忆群。</p>
+            </div>
+            <div class="card card-highlight">
+                <h3>2. 确定性引擎硬核承载</h3>
+                <p>所有涉及数据流清洗（`validate_ohlcv`）、高频分布式回测、多因子计算与极端风控指标监控，均由底层强类型的确定性计算引擎独立执行，确保精度无损，彻底绝缘大模型产生的“幻觉”。</p>
+            </div>
+        </div>
+        <div class="grid-2" style="margin-top: 20px;">
+            <div class="card card-highlight">
+                <h3>3. 严格的多维指标物理隔离</h3>
+                <p>严禁实验指标交叉混淆！训练集拟合度与样本内模拟指标仅作为策略候选集的演进参考。<strong>系统强制规定：只有流经滚动外推评估（Walk-forward OOS, oos.*）的纯净指标，才能支撑学术论文或实盘决策。</strong></p>
+            </div>
+            <div class="card card-highlight">
+                <h3>4. 链路层全向可审计追踪</h3>
+                <p>设计了完善的日志链（Audit JSONL）。智能体的每一次工具调用（ToolRegistry）、代码变异控制与策略生命周期更迭均留下确定性数字脚印，确保研究产物完全<strong>可复现、可审计、可追溯</strong>。</p>
+            </div>
+        </div>
+        <div class="footer"><div class="footer-left">项目汇报：<strong>Quant MAS</strong></div><div class="nav-indicator">3 / 12</div></div>
+    </div>
+
+    <div class="slide">
+        <h1>03. 平台 8 层系统架构全景总览</h1>
+        <div class="slide-subtitle">System Architecture Layered Breakdown (Mapping architecture.png)</div>
+        <p style="margin-top:-15px; margin-bottom: 15px;">系统采用高内聚、低耦合的纵向 8 层协同演进架构，各层权责划分极为明确：</p>
+        
+        <div style="display: flex; flex-direction: column; gap: 4px;">
+            <div class="arch-layer" style="border-left: 5px solid #ff7b72;"><div class="arch-layer-num" style="background:#ff7b72;">Layer 8</div><div class="arch-layer-body"><strong>输出与人工审核层 (Outputs / Human Review)：</strong> 回测多维报告、滚动外推数据报告、可审计日志。引入 <strong>Human Confirmation</strong> 机制。</div></div>
+            <div class="arch-layer"><div class="arch-layer-num">Layer 7</div><div class="arch-layer-body"><strong>编排与协议层 (Orchestration / Protocol Layer)：</strong> M4 研究工作流（固定的 6 节点 DAG 调度）、M13 MCP 任务调度器。</div></div>
+            <div class="arch-layer"><div class="arch-layer-num">Layer 6</div><div class="arch-layer-body"><strong>智能体群落协同层 (Agent Layer)：</strong> 监督智能体 (Supervisor)、研究智能体 (Research)、研报智能体 (Report) 异步多角色协作。</div></div>
+            <div class="arch-layer"><div class="arch-layer-num">Layer 5</div><div class="arch-layer-body"><strong>原子工具箱层 (Tool Layer)：</strong> 数据摘要、回测引擎、模型训练调度、自动化风控检测、ML回测等全栈原子工具组件。</div></div>
+            <div class="arch-layer"><div class="arch-layer-num">Layer 4</div><div class="arch-layer-body"><strong>高维记忆与 RAG 层 (Memory / RAG Layer)：</strong> 混合检索器 (HybridRetriever)、Hash Embedding、内存向量库 (pgvector)、关系图谱 (Neo4j)。</div></div>
+            <div class="arch-layer"><div class="arch-layer-num">Layer 3</div><div class="arch-layer-body"><strong>研究与实验管线层 (Research / Experiment Layer)：</strong> 实验记忆体 (ExperimentMemory)、基线策略注册表 (BaselineRegistry)。</div></div>
+            <div class="arch-layer" style="border-left: 5px solid #56d364;"><div class="arch-layer-num" style="background:#56d364;">Layer 2</div><div class="arch-layer-body"><strong>量化引擎计算层 (Quant Engine Layer)：</strong> 强数据验证器 (`validate_ohlcv`)、量价/宏观特征工程、传统ML预测模型群、Risk 隔离层。</div></div>
+            <div class="arch-layer"><div class="arch-layer-num" style="background:#21262d;color:#8b949e;">Layer 1</div><div class="arch-layer-body" style="color:#8b949e;"><strong>异构数据源基础层 (Data Layer)：</strong> 多源网络抓取器（Stooq, YFinance, FRED）、结构化流式高效存储（Parquet, JSONL）。</div></div>
+        </div>
+        <div class="footer"><div class="footer-left">项目汇报：<strong>Quant MAS</strong></div><div class="nav-indicator">4 / 12</div></div>
+    </div>
+
+    <div class="slide">
+        <h1>04. 数据层清洗与确定性计算引擎基石</h1>
+        <div class="slide-subtitle">Data Layer Validation & Deterministic Computation Engine</div>
+        <div class="grid-2">
+            <div class="card">
+                <h3>强类型数据流验证管道</h3>
+                <p>数据源进入系统后，必须强制流经底层确定性量化引擎的静态验证算子：</p>
+                <div class="formula-box">
+                    $$\text{Heterogeneous Raw Data} \xrightarrow{\quad\mathbf{validate\_ohlcv}\quad} \mathcal{D}_{\text{clean}} \in \text{Parquet / JSONL}$$
+                </div>
+                <p style="font-size: 1.1rem; color: #8b949e;">该验证模块运行于大模型上游，自动对缺失值、高低价严重倒挂、异常跳空进行清洗，从源头封杀因脏数据引发的 AI 策略误判。</p>
+            </div>
+            <div class="card">
+                <h3>三大核心安全防线细则 (Safety Boundaries)</h3>
+                <ul>
+                    <li><strong style="color:#ff7b72;">安全防线 1：</strong> <code>LLM Agents cannot directly place live orders.</code> 智能体层任何时候绝不被授予交易 API 密钥，仅生成实验策略代码。</li>
+                    <li><strong style="color:#ff7b72;">安全防线 2：</strong> <code>ToolPolicy denies shell / broker / secrets.</code> MCP 调度层对高危 shell 系统指令、越权读取账户命令执行硬性强力拦截。</li>
+                    <li><strong style="color:#ff7b72;">安全防线 3：</strong> <code>Only audited OOS metrics support paper conclusions.</code> 只有通过独立审计节点认证的滚动外推指标才能入库，根绝虚假优化的花哨报告。</li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer"><div class="footer-left">技术亮点：<strong>量化引擎基石</strong></div><div class="nav-indicator">5 / 12</div></div>
+    </div>
+
+    <div class="slide">
+        <h1>05. 机器学习模块：多模态异构特征矩阵融合</h1>
+        <div class="slide-subtitle">Multi-Modal Heterogeneous Feature Engineering & Baseline Models</div>
+        <p style="margin-top:-15px;">为了使策略生成具备宏观与新闻视野，系统在引擎层构建了时序资产价格与非结构化宏观文本舆情的联合融合特征空间：</p>
+        
+        <div class="card">
+            <h3>多模态联合特征空间数学表达</h3>
+            <div class="formula-box">
+                $$\mathbf{X}_t = \begin{bmatrix} \mathbf{F}_{\text{technical}}(t) \\ \mathbf{F}_{\text{macro}}(t) \\ \alpha \cdot \mathbf{E}_{\text{FinBERT}}(\text{Text}_t) \end{bmatrix} \in \mathbb{R}^{(d_1 + d_2 + d_3) \times T}$$
+            </div>
+            <p style="font-size: 1.15rem; color: #e6edf2; margin-top: 15px;">
+                其中，$\mathbf{F}_{\text{technical}}(t) \in \mathbb{R}^{d_1}$ 表示传统的量价时序动量、高阶波动率算子；$\mathbf{F}_{\text{macro}}(t) \in \mathbb{R}^{d_2}$ 代表 FRED 抓取的多维宏观经济周期标尺；$\mathbf{E}_{\text{FinBERT}}(\text{Text}_t) \in \mathbb{R}^{d_3}$ 代表通过金融垂直大模型对新闻/财报语料抽取的非结构化高维情绪特征，$\alpha$ 为动态调节权重。
+            </p>
+        </div>
+        <div class="footer"><div class="footer-left">技术亮点：<strong>机器学习模块</strong></div><div class="nav-indicator">6 / 12</div></div>
+    </div>
+
+    <div class="slide">
+        <h1>06. 深度学习核心：基于 LoRA 的垂直领域适配</h1>
+        <div class="slide-subtitle">Low-Rank Adaptation (LoRA) for Agent-Level Local Models</div>
+        <div class="grid-2">
+            <div class="card">
+                <h3>垂直微调的技术核心</h3>
+                <p>为了让本地开源大模型（如 DeepSeek、本地 vLLM 部署模型）在 `Agent Layer` 能够写出严密的量化代码并深刻理解财报，系统集成了轻量化低秩适配（LoRA）微调技术。</p>
+                <p>这种设计在<strong>冻结核心大模型百亿级参数主干</strong>的前提下，实现了极低算力开销下金融策略生成和长文本推理准确率的内生级蜕变。</p>
+            </div>
+            <div class="card">
+                <h3>低秩权重矩阵分解数学公式</h3>
+                <p>在基础大模型原有权重 $W_0 \in \mathbb{R}^{d \times k}$ 旁路并联低秩训练矩阵：</p>
+                <div class="formula-box">
+                    $$W = W_0 + \Delta W = W_0 + \frac{\alpha}{r} (B \cdot A)$$
+                </div>
+                <p style="font-size: 1.1rem; color: #8b949e; margin-top: 10px;">
+                    其中，矩阵 $B \in \mathbb{R}^{d \times r}$ 且 $A \in \mathbb{R}^{r \times k}$。其中设置极小固定的秩阶数 $r \ll \min(d, k)$，使得反向传播的梯度仅作用于极小的低秩伴随矩阵上，从而极大加速了策略智能体（ResearchAgent）的内生进化速度。
+                </p>
+            </div>
+        </div>
+        <div class="footer"><div class="footer-left">技术亮点：<strong>深度学习核心</strong></div><div class="nav-indicator">7 / 12</div></div>
+    </div>
+
+    <div class="slide">
+        <h1>07. 强化学习决策机制：时序马尔可夫规约</h1>
+        <div class="slide-subtitle">Reinforcement Learning Portfolio Management & MDP Formulation</div>
+        <p style="margin-top:-15px;">为了让系统智能体在多变的金融市场中学会最优化资产调仓与头寸管理，平台引入了动态强化学习机制。其马尔可夫决策过程（MDP）规约如下：</p>
+        
+        <div class="grid-2">
+            <div class="card">
+                <h3>1. 高维复合状态空间 (State Space, $S_t$)</h3>
+                <p>为了给智能体提供全面的市场画像，状态向量构建包含：</p>
+                <div class="formula-box">
+                    $$S_t = \left\{ \mathbf{X}_{t-N:t}, \mathbf{w}_{t-1}, \text{Drawdown}_t, \mathbf{M}_{\text{RAG}}(t) \right\}$$
+                </div>
+                <ul>
+                    <li>$\mathbf{X}_{t-N:t}$：历史 $N$ 期的多模态特征矩阵流。</li>
+                    <li>$\mathbf{w}_{t-1}$：智能体组合在前一交易日的实际持仓权重。</li>
+                    <li>$\text{Drawdown}_t$：当前账户实时面临的净值最大回撤。</li>
+                    <li>$\mathbf{M}_{\text{RAG}}(t)$：RAG 层实时检索到的产业链上游实体风险传导图谱。</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h3>2. 双规约动作空间 (Action Space, $A_t$)</h3>
+                <p>根据不同交易场景的需求，系统支持智能体输出双重空间动作：</p>
+                <ul>
+                    <li><strong>离散择时动作空间：</strong>
+                        $$\mathcal{A}_{\text{discrete}} = \{ \text{Buy (1)}, \text{Sell (-1)}, \text{Hold (0)} \}$$
+                    </li>
+                    <li><strong>连续投资组合调仓空间：</strong> 用于管理大资金跨资产多标的头寸分配：
+                        $$\mathcal{A}_{\text{continuous}} = \left\{ \mathbf{w}_t \in \mathbb{R}^M \ \middle|\ \sum_{i=1}^M w_{i,t} = 1, \ w_{i,t} \ge 0 \right\}$$
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer"><div class="footer-left">技术亮点：<strong>强化学习决策</strong></div><div class="nav-indicator">8 / 12</div></div>
+    </div>
+
+    <div class="slide">
+        <h1>08. 强化学习核心：广义夏普与回撤惩罚奖励</h1>
+        <div class="slide-subtitle">Reward Shaping with Generalized Sharpe & Maximum Drawdown Penalty</div>
+        <p style="margin-top:-15px;">传统的端到端强化学习极易引发严重的过拟合或恶意扛单。Quant MAS 设计了包含风险收益比、回撤硬惩罚以及换手率摩擦控制的综合奖励函数 $R_t$：</p>
+        
+        <div class="card">
+            <div class="formula-box">
+                $$R_t = \frac{\mathbb{E}[r_t] - r_f}{\sigma(r_t)} - \lambda_1 \cdot \max_{\tau \in [0, t]} (D_\tau) - \lambda_2 \cdot \| \mathbf{w}_t - \mathbf{w}_{t-1} \|_2^2$$
+            </div>
+            
+            <div class="grid-3" style="margin-top: 25px;">
+                <div class="card card-success" style="padding:15px 20px;">
+                    <h3 style="color:#56d364;font-size:1.2rem;">🟢 1. 广义夏普算子</h3>
+                    <p style="font-size:1rem;margin:0;color:#8b949e;">引导模型最大化风险调整后净值收益，而不是一味盲目追求极致暴利，保证策略具备抵抗时间平移的稳健性。</p>
+                </div>
+                <div class="card card-alert" style="padding:15px 20px;">
+                    <h3 style="color:#ff7b72;font-size:1.2rem;">🔴 2. 最大回撤严厉惩罚</h3>
+                    <p style="font-size:1rem;margin:0;color:#8b949e;">$\max(D_\tau)$ 项代表历史高点到当前时段的最大净值回撤。一旦模型产生严重的抗单或风控越线，奖励直接面临断崖式暴跌，强制智能体学会及时止损。</p>
+                </div>
+                <div class="card card-highlight" style="padding:15px 20px;">
+                    <h3 style="color:#58a6ff;font-size:1.2rem;">🔵 3. 换手率二次型约束</h3>
+                    <p style="font-size:1rem;margin:0;color:#8b949e;">通过二范数惩罚相邻权重的剧烈漂移 $\Delta \mathbf{w}$。该项有效抑制了因大模型瞬时噪点产生的频繁调仓冲动，将交易摩擦成本压制到极低范围内。</p>
+                </div>
+            </div>
+        </div>
+        <div class="footer"><div class="footer-left">技术亮点：<strong>强化学习核心</strong></div><div class="nav-indicator">9 / 12</div></div>
+    </div>
+
+    <div class="slide">
+        <h1>09. 策略种群进化：代码级交叉与变异机制</h1>
+        <div class="slide-subtitle">Strategy Population Evolution & Code-Level Crossover/Mutation</div>
+        <div class="grid-2">
+            <div class="card">
+                <h3>多模态策略群自动孵化</h3>
+                <p>系统拒绝单一死板的参数搜索，而是由 <code>ResearchAgent</code> 注入多元化的提示词引导，结合实验记忆库（`ExperimentMemory`），在种群候选池（Population Candidates）中进行自动代码级演进：</p>
+                <div class="formula-box">
+                    $$\text{Strategy}_{\text{parent}} \xrightarrow{\quad\mathcal{M}_{\text{LLM}}(\epsilon)\quad} \text{Strategy}_{\text{mutated}}}$$
+                </div>
+                <p style="font-size:1.1rem;color:#8b949e;"><strong>代码变异（Mutation）：</strong> 智能体定位现有逻辑的薄弱因子，自适应修改局部的代码逻辑或重构特征工程算子。</p>
+            </div>
+            <div class="card">
+                <h3>代码杂交（Crossover）机制</h3>
+                <p>当基线策略注册表（`BaselineRegistry`）筛选出两个互补且 Sharpe 优秀的独立策略时：</p>
+                <ul>
+                    <li>系统执行代码合并协议，剥离策略 A 的<strong>均线择时逻辑核心</strong>，与策略 B 的<strong>高阶高频波动率控仓逻辑</strong>。</li>
+                    <li>在智能体沙箱中将二者交叉重组为更高维的新一代群落后代，实现量化智慧的自主演进。</li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer"><div class="footer-left">技术亮点：<strong>策略种群进化</strong></div><div class="nav-indicator">10 / 12</div></div>
+    </div>
+
+    <div class="slide">
+        <h1>10. 种群屏障：高维哈希与汉明淘汰算法</h1>
+        <div class="slide-subtitle">Diversity Protection via High-Dimensional Hash Embedding & Hamming Distance</div>
+        <p style="margin-top:-15px;"><strong>核心痛点：</strong> 多智能体策略演进极易触发代码逻辑的“局部收敛”，导致大模型生成大量名字不同、但因子与代码逻辑高度雷同的同质化策略（近亲繁殖）。</p>
+        
+        <div class="card">
+            <h3>哈希汉明多样性保护算法（Diversity Guard）</h3>
+            <p>系统创新的引入高维文本与特征拓扑哈希嵌入技术，将新生成策略的代码全文本结构抽象映射成定长的二进制高维编码 $\mathcal{H}(\text{Strategy}) \in \{0, 1\}^L$。通过计算其与群落已有策略的汉明距离（Hamming Distance）执行硬风控：</p>
+            
+            <div class="formula-box">
+                $$D_H \left( \mathcal{H}(S_{\text{new}}), \mathcal{H}(S_i) \right) = \sum_{j=1}^L \left( \mathcal{H}_j(S_{\text{new}}) \oplus \mathcal{H}_j(S_i) \right)$$
+            </div>
+            
+            <div class="card-alert" style="background:#090d13; padding:15px 25px; border-radius:8px; margin-top:15px;">
+                <p style="margin:0; font-size:1.2rem; text-align:center; color:#ff7b72; font-weight:600;">
+                    🚨 自适应硬性防线：一旦满足 $\min_{i} (D_H) < \gamma$（即检测到空间结构高度同质化），系统判定该策略冗余，触发刚性机制直接予以强行淘汰，确保策略库的生物多样性！
+                </p>
+            </div>
+        </div>
+        <div class="footer"><div class="footer-left">技术亮点：<strong>种群进化屏障</strong></div><div class="nav-indicator">11 / 12</div></div>
+    </div>
+
+    <div class="slide" style="justify-content: space-between;">
+        <div>
+            <h1>11. 严格指标分流看板与可审计消融测试</h1>
+            <div class="slide-subtitle">Metrics Separation Ledger & Open Source Summary</div>
+            <p style="margin-top:-15px;">全面落实 <code>architecture.png</code> 的规范，为了防范量化研究中普遍存在的数据窥探与伪过拟合，系统对指标命名空间执行严格物理隔离：</p>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>指标命名空间</th>
+                        <th>核心技术对应场景</th>
+                        <th>平台刚性审计与混淆拦截规则</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="color:#58a6ff; font-weight:bold;">oos.* (外推指标)</td>
+                        <td>滚动外推（Walk-forward Out-of-Sample）流评估</td>
+                        <td style="color:#56d364; font-weight:600;">🏆 唯一被审计算子（audit.*）允许作为论文结论与实盘配置的合法核心指标</td>
+                    </tr>
+                    <tr>
+                        <td style="color:#8b949e;">simulation.* (模拟指标)</td>
+                        <td>样本内模拟测试、纸面模拟等级验证（Paper-grade）</td>
+                        <td>❌ 仅供研发阶段参数对齐，绝对禁止与外推指标混用或直接推导结论</td>
+                    </tr>
+                    <tr>
+                        <td style="color:#8b949e;">training.* (训练指标)</td>
+                        <td>模型样本内损失函数拟合、梯度下降统计观测</td>
+                        <td>❌ 仅供算法收敛性技术分析，严禁用于任何预期的实盘收益率评估</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card card-success" style="text-align: center; background: #161b22; padding: 25px; margin-top: 20px;">
+            <h3 style="color:#56d364; margin-bottom:5px; font-size:1.4rem;">🤝 诚邀加入 Quant MAS 量化多智能体开源建设</h3>
+            <p style="font-size: 1.15rem; color: #c9d1d9; margin: 5px 0;">
+                项目主理人：<strong>魏子安 (Zian Wei)</strong> | 单位：<strong>浙江大学 (ZJU)</strong> | 邮箱：<strong>3240101782@zju.edu.cn</strong>
+            </p>
+            <p style="font-size: 1.15rem; color: #58a6ff; font-family: monospace; margin: 5px 0 0 0;">
+                🔗 GitHub Open-Source Repository: https://github.com/ytq0198/Quant-MAS
+            </p>
+        </div>
+        
+        <div class="footer"><div class="footer-left">Quant MAS 汇报完毕</div><div class="nav-indicator">12 / 12</div></div>
+    </div>
+
+    <script>
+        const slides = document.querySelectorAll('.slide');
+        let currentSlide = 0;
+
+        function updateSlideVisibility(index) {
+            slides.forEach((slide, idx) => {
+                if(idx === index) {
+                    slide.classList.add('active');
+                } else {
+                    slide.classList.remove('active');
+                }
+            });
+            // 每次切页自动告知 MathJax 引擎重新高保真渲染 LaTeX 语法
+            if (window.MathJax && window.MathJax.typesetPromise) {
+                window.MathJax.typesetPromise();
+            }
+        }
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                if (currentSlide < slides.length - 1) {
+                    currentSlide++;
+                    updateSlideVisibility(currentSlide);
+                }
+            } else if (e.key === 'ArrowLeft') {
+                if (currentSlide > 0) {
+                    currentSlide--;
+                    updateSlideVisibility(currentSlide);
+                }
+            }
+        });
+    </script>
+</body>
+</html>

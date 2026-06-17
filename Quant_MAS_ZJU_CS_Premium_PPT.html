@@ -1,0 +1,1362 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quant MAS v5.1 — SRTP 项目初期汇报 · 魏子安</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      /* ZJU CS Premium Cyber Dark Palette */
+      --bg: #060913;
+      --surface: rgba(11, 19, 43, 0.75);
+      --card: rgba(18, 30, 61, 0.55);
+      --border: rgba(0, 242, 254, 0.12);
+      --border-glow: rgba(0, 242, 254, 0.3);
+      
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      
+      /* Pure Quantum Accents */
+      --zju-blue: #005ca3; /* 浙大求是蓝基调转化 */
+      --cyan: #00f2fe;     /* 量化核心高亮 */
+      --blue: #38bdf8;     /* 系统逻辑层 */
+      --violet: #7c3aed;   /* 强化学习种群层 */
+      --orange: #fb923c;   /* 预警与对照 */
+      --red: #ef4444;      /* 过拟合警告 */
+      --green: #10b981;    /* 完美合规/样本外通过 */
+      
+      --slide-width: 1280px;
+      --slide-height: 720px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      width: 100%; height: 100%; overflow: hidden;
+      background: var(--bg); color: var(--text-primary);
+      font-family: 'Inter', 'Noto Sans SC', system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Presentation Container Scaling Matrix */
+    .viewport {
+      width: 100vw; height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      position: relative; overflow: hidden;
+    }
+    .deck {
+      width: var(--slide-width); height: var(--slide-height);
+      position: relative; flex-shrink: 0;
+      transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+      transform-origin: center center;
+    }
+
+    /* Global HUD Overlay Systems */
+    .progress-bar {
+      position: absolute; top: 0; left: 0; height: 4px; z-index: 100;
+      background: linear-gradient(90deg, var(--zju-blue), var(--cyan), var(--violet));
+      transition: width 0.4s cubic-bezier(0.1, 0.8, 0.2, 1);
+      box-shadow: 0 0 14px rgba(0, 242, 254, 0.6);
+    }
+    .hud-header {
+      position: absolute; top: 32px; left: 60px; right: 60px;
+      display: flex; justify-content: space-between; align-items: center;
+      z-index: 90; pointer-events: none; opacity: 0.4;
+      font-size: 0.75rem; letter-spacing: 0.15em; color: var(--text-secondary);
+    }
+    .hud-header .school-badge { font-weight: 700; color: var(--blue); }
+    
+    .hud-footer {
+      position: absolute; bottom: 24px; left: 60px; right: 60px;
+      display: flex; justify-content: space-between; align-items: center;
+      z-index: 90; pointer-events: none;
+      font-size: 0.7rem; color: var(--text-muted); font-family: 'Fira Code', monospace;
+    }
+    .hud-counter {
+      background: rgba(18, 30, 61, 0.8); padding: 4px 12px; border-radius: 20px;
+      border: 1px solid var(--border); color: var(--cyan); font-weight: 600;
+    }
+
+    /* Slide Node Base Struct */
+    .slide {
+      position: absolute; inset: 0; display: none;
+      padding: 72px 75px 64px 75px;
+      background: 
+        radial-gradient(circle at 90% 10%, rgba(0, 242, 254, 0.04), transparent 45%),
+        radial-gradient(circle at 10% 90%, rgba(124, 58, 237, 0.03), transparent 50%),
+        linear-gradient(135deg, #050811 0%, #0b1121 100%);
+      border: 1px solid rgba(255, 255, 255, 0.02);
+    }
+    .slide::before {
+      content: ""; position: absolute; inset: 0;
+      background-image: linear-gradient(rgba(0, 242, 254, 0.015) 1px, transparent 1px),
+                        linear-gradient(90deg, rgba(0, 242, 254, 0.015) 1px, transparent 1px);
+      background-size: 40px 40px; pointer-events: none;
+    }
+    .slide.active { display: flex; flex-direction: column; animation: slideFadeUp 0.45s cubic-bezier(0.16, 1, 0.3, 1); }
+    @keyframes slideFadeUp { from { opacity: 0; transform: translateY(12px) scale(0.995); } to { opacity: 1; transform: translateY(0) scale(1); } }
+
+    /* Content Typography Standards */
+    .header-group {
+      display: flex; justify-content: space-between; align-items: flex-end;
+      margin-bottom: 24px; padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+      position: relative;
+    }
+    .header-group::after {
+      content: ""; position: absolute; bottom: -1px; left: 0; width: 160px; height: 2px;
+      background: linear-gradient(90deg, var(--cyan), transparent);
+    }
+    .header-group .title-area h2 {
+      font-size: 1.8rem; font-weight: 700; color: #fff; letter-spacing: -0.02em;
+    }
+    .header-group .title-area .trace-tag {
+      font-size: 0.68rem; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.12em; color: var(--cyan); margin-bottom: 4px;
+    }
+    .header-group .slide-tracker {
+      font-family: 'Fira Code', monospace; font-size: 0.85rem; color: var(--text-muted);
+    }
+
+    .slide-body { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 20px; }
+    
+    /* Advanced Layout Utilities */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+    
+    /* Premium Information Cards */
+    .card {
+      background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+      padding: 22px 24px; backdrop-filter: blur(12px); position: relative;
+      transition: all 0.25s ease;
+    }
+    .card:hover { border-color: var(--border-glow); box-shadow: 0 8px 24px rgba(0, 242, 254, 0.04); }
+    .card h3 { font-size: 1.05rem; font-weight: 600; color: var(--blue); margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+    .card p, .card li { font-size: 0.88rem; line-height: 1.65; color: #cbd5e1; font-weight: 300; }
+    .card ul, .card ol { margin-left: 1.2rem; margin-top: 6px; }
+    .card li { margin-bottom: 6px; }
+    
+    /* Semi-transparent semantic sidebars */
+    .card-accent { border-left: 4px solid var(--cyan); background: linear-gradient(135deg, rgba(0,242,254,0.05), transparent); }
+    .card-accent h3 { color: var(--cyan); }
+    .card-warn { border-left: 4px solid var(--red); background: linear-gradient(135deg, rgba(239,68,68,0.04), transparent); }
+    .card-warn h3 { color: var(--red); }
+    .card-violet { border-left: 4px solid var(--violet); background: linear-gradient(135deg, rgba(124,58,237,0.04), transparent); }
+    .card-violet h3 { color: var(--violet); }
+
+    /* Tables Grid Spec */
+    table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 0.82rem; margin-top: 4px; }
+    th, td { padding: 10px 14px; text-align: left; border-bottom: 1px solid rgba(148, 163, 184, 0.08); }
+    th { background: rgba(56, 189, 248, 0.06); color: var(--blue); font-weight: 600; font-size: 0.78rem; letter-spacing: 0.04em; }
+    tr:last-child td { border-bottom: none; }
+    tr.hl-row td { background: rgba(0, 242, 254, 0.04); color: #fff; }
+    tr.warn-row td { background: rgba(239, 68, 68, 0.04); }
+    .text-hl { color: var(--cyan); font-weight: 600; }
+    .text-warn { color: var(--orange); font-weight: 600; }
+    .text-alert { color: var(--red); font-weight: 600; }
+    code { font-family: 'Fira Code', monospace; font-size: 0.8em; background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 4px; color: var(--cyan); border: 1px solid rgba(0,242,254,0.15); }
+
+    /* Mathematical Typography block */
+    .math-block {
+      background: rgba(4, 7, 15, 0.85); border: 1px solid var(--border); border-radius: 8px;
+      padding: 12px 16px; margin: 8px 0; text-align: center; font-family: 'Inter', sans-serif;
+    }
+    
+    /* Modern Token Flows & Badges */
+    .token-flow { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+    .token-flow span {
+      background: rgba(0, 242, 254, 0.08); border: 1px solid rgba(0, 242, 254, 0.2);
+      color: var(--cyan); padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 500;
+    }
+    .token-flow .arrow { background: none; border: none; color: var(--text-muted); padding: 0 2px; }
+
+    /* System Layer Grid Node (Slide 4 specific) */
+    .arch-container { display: flex; flex-direction: column; gap: 5px; }
+    .arch-layer { display: flex; border-radius: 6px; overflow: hidden; border: 1px solid var(--border); font-size: 0.8rem; }
+    .arch-idx { min-width: 56px; display: flex; align-items: center; justify-content: center; background: #132247; color: #fff; font-weight: 700; font-family: 'Fira Code', monospace; }
+    .arch-body { padding: 7px 16px; flex: 1; color: #e2e8f0; font-weight: 300; }
+    .arch-layer.high-alert .arch-idx { background: #5c0622; color: #fca5a5; }
+    .arch-layer.high-ok .arch-idx { background: #064e3b; color: #a7f3d0; }
+
+    /* Timeline Data Visualization Component */
+    .timeline { display: flex; flex-direction: column; position: relative; padding-left: 20px; }
+    .timeline::before { content: ""; position: absolute; left: 4px; top: 8px; bottom: 8px; width: 2px; background: linear-gradient(180deg, var(--cyan), var(--blue), var(--violet)); }
+    .tl-node { position: relative; padding-bottom: 12px; }
+    .tl-node:last-child { padding-bottom: 0; }
+    .tl-node::before { content: ""; position: absolute; left: -20px; top: 5px; width: 8px; height: 8px; border-radius: 50%; background: var(--cyan); box-shadow: 0 0 8px var(--cyan); }
+    .tl-meta { font-size: 0.65rem; font-family: 'Fira Code', monospace; color: var(--cyan); text-transform: uppercase; font-weight: 600; }
+    .tl-title { font-size: 0.85rem; font-weight: 600; color: #fff; margin: 1px 0; }
+    .tl-desc { font-size: 0.76rem; color: var(--text-secondary); line-height: 1.4; }
+    .tl-metric { font-size: 0.72rem; color: var(--orange); font-family: 'Fira Code', monospace; font-weight: 500; }
+
+    /* Walk-Forward Interactive Diagrams */
+    .wf-canvas { display: flex; align-items: center; gap: 5px; margin: 8px 0; font-size: 0.72rem; font-family: 'Fira Code', monospace; }
+    .wf-block { padding: 6px 12px; border-radius: 4px; border: 1px solid var(--border); text-align: center; font-weight: 500; }
+    .wf-block.tr { background: rgba(56,189,248,0.15); color: var(--blue); }
+    .wf-block.va { background: rgba(124,58,237,0.15); color: #a78bfa; }
+    .wf-block.te { background: rgba(251,146,96,0.15); color: var(--orange); }
+    .wf-block.oos { background: rgba(0,242,254,0.15); color: var(--cyan); border-color: rgba(0,242,254,0.4); box-shadow: 0 0 8px rgba(0,242,254,0.15); }
+
+    /* High-Fidelity Charts Built-In CSS Engine */
+    .chart-container { display: flex; align-items: flex-end; gap: 16px; height: 110px; padding-top: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+    .bar-group { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+    .bar-data { font-size: 0.75rem; font-family: 'Fira Code', monospace; font-weight: 600; color: var(--cyan); }
+    .bar-pillar { width: 100%; max-width: 48px; border-radius: 4px 4px 0 0; background: linear-gradient(180deg, var(--blue), rgba(56,189,248,0.2)); transition: height 0.5s ease; }
+    .bar-pillar.base-line { background: linear-gradient(180deg, var(--cyan), rgba(0,242,254,0.2)); }
+    .bar-pillar.warn-line { background: linear-gradient(180deg, var(--red), rgba(239,68,68,0.2)); }
+    .bar-tag { font-size: 0.65rem; color: var(--text-secondary); text-align: center; white-space: nowrap; }
+
+    /* High Density Dash-KPI Panels */
+    .kpi-dashboard { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+    .kpi-widget { text-align: center; padding: 12px 10px; border-radius: 8px; background: rgba(18, 30, 61, 0.4); border: 1px solid var(--border); }
+    .kpi-widget var { display: block; font-style: normal; font-size: 1.5rem; font-weight: 700; color: var(--cyan); font-family: 'Fira Code', monospace; }
+    .kpi-widget span { display: block; font-size: 0.65rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 2px; }
+
+    /* Structural Cover Aesthetic Layouts */
+    .slide-cover {
+      justify-content: center; align-items: center; text-align: center;
+      background: 
+        radial-gradient(circle at 50% 40%, rgba(0, 92, 163, 0.15), transparent 60%),
+        radial-gradient(circle at 85% 15%, rgba(0, 242, 254, 0.06), transparent 40%),
+        linear-gradient(150deg, #040712 0%, #080f21 100%);
+    }
+    .slide-cover .logo-title {
+      font-size: 3.5rem; font-weight: 800; letter-spacing: -0.04em; line-height: 1.1; margin-bottom: 8px;
+    }
+    .slide-cover .logo-title span {
+      background: linear-gradient(135deg, #fff 40%, var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .slide-cover .subtitle {
+      font-size: 1.25rem; font-weight: 300; color: var(--blue); letter-spacing: 0.05em; margin-bottom: 36px;
+    }
+    .cover-meta-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 12px 40px; text-align: left;
+      padding: 24px 40px; width: 780px; background: rgba(11, 19, 43, 0.6);
+      border: 1px solid var(--border); border-radius: 16px; font-size: 0.88rem; backdrop-filter: blur(20px);
+    }
+    .cover-meta-grid div { color: var(--text-secondary); }
+    .cover-meta-grid strong { color: #fff; font-weight: 500; font-family: 'Fira Code', monospace; }
+    .badge-strip { margin-top: 28px; display: flex; gap: 12px; }
+    .ui-badge {
+      padding: 5px 14px; border-radius: 30px; font-size: 0.68rem; font-weight: 600; font-family: 'Fira Code', monospace; letter-spacing: 0.02em;
+    }
+    .ui-badge.alert { background: rgba(239,68,68,0.1); color: #fca5a5; border: 1px solid rgba(239,68,68,0.3); }
+    .ui-badge.ok { background: rgba(16,185,129,0.1); color: #a7f3d0; border: 1px solid rgba(16,185,129,0.3); }
+    .ui-badge.info { background: rgba(0,242,254,0.1); color: var(--cyan); border: 1px solid rgba(0,242,254,0.3); }
+
+    /* Divider Slide Design Section */
+    .slide-section-divider { justify-content: center; align-items: center; text-align: center; }
+    .section-giant-num { font-size: 8rem; font-weight: 800; line-height: 1; opacity: 0.04; color: var(--cyan); position: absolute; font-family: 'Fira Code', monospace; }
+    .section-headline { font-size: 2.4rem; font-weight: 700; color: #fff; letter-spacing: -0.02em; z-index: 2; }
+    .section-subline { font-size: 1rem; color: var(--text-secondary); margin-top: 12px; max-width: 600px; line-height: 1.6; font-weight: 300; z-index: 2; }
+
+    /* Miscellaneous Content Holders */
+    .mock-visual-placeholder {
+      border: 1px dashed rgba(0,242,254,0.25); border-radius: 10px; background: rgba(4,7,15,0.4);
+      flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: 20px; text-align: center; font-size: 0.78rem; color: var(--text-muted); line-height: 1.6;
+    }
+    .mock-visual-placeholder svg { margin-bottom: 10px; color: var(--blue); opacity: 0.7; }
+
+    .slide-figure {
+      flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center;
+      border-radius: 10px; overflow: hidden; border: 1px solid var(--border);
+      background: rgba(4, 7, 15, 0.55); box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+    }
+    .slide-figure img {
+      width: 100%; height: 100%; object-fit: contain;
+      display: block;
+    }
+    .slide-figure--arch { max-height: 100%; }
+    .slide-figure--arch img { max-height: 520px; object-fit: contain; }
+    .slide-figure--ui img { max-height: 480px; object-fit: contain; object-position: top center; }
+    .figure-caption {
+      font-size: 0.68rem; color: var(--text-muted); text-align: center;
+      margin-top: 6px; letter-spacing: 0.03em;
+    }
+    .pill-matrix { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 6px; }
+    .pill-node { font-size: 0.68rem; padding: 3px 8px; border-radius: 4px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); color: var(--text-secondary); font-family: 'Fira Code', monospace; }
+
+    .toc-block { padding: 20px; border-radius: 10px; border: 1px solid var(--border); background: rgba(18, 30, 61, 0.3); }
+    .toc-block h3 { font-size: 1rem; color: var(--cyan); margin-bottom: 12px; font-weight: 600; }
+    .toc-block ol { margin-left: 1.1rem; font-size: 0.82rem; color: #cbd5e1; line-height: 1.8; font-weight: 300; }
+
+    .nav-keyboard-tip {
+      position: absolute; bottom: 22px; left: 50%; transform: translateX(-50%);
+      font-size: 0.65rem; color: var(--text-muted); background: rgba(0,0,0,0.4);
+      padding: 4px 12px; border-radius: 12px; pointer-events: none; letter-spacing: 0.05em;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="viewport">
+    <div class="progress-bar" id="progressBar"></div>
+    
+    <!-- Top Fixed Academic HUD Context -->
+    <div class="hud-header">
+      <div>浙江大学计算机科学与技术学院 · <span class="school-badge">求是创新</span></div>
+      <div>QUANTITATIVE MULTI-AGENT SYSTEM LAB</div>
+    </div>
+
+    <!-- Main Stack Deck Canvas -->
+    <div class="deck" id="deck">
+
+      <!-- SLIDE 01: Cover -->
+      <section class="slide slide-cover active">
+        <h1 class="logo-title"><span>Quant MAS v5.1</span></h1>
+        <p class="subtitle">基于多智能体协同的量化研究平台 · SRTP 项目初期进展汇报</p>
+        <div class="cover-meta-grid">
+          <div>研究机构：<strong>浙江大学计算机科学与技术学院</strong></div>
+          <div>汇报时间：<strong>2026 年 6 月</strong></div>
+          <div>项目汇报人：<strong>魏子安</strong></div>
+          <div>电子邮箱：<strong>3240101782@zju.edu.cn</strong></div>
+          <div>开源仓库：<strong>github.com/ytq0198/Quant-MAS</strong></div>
+          <div>当前进展：<strong>v5 控制台 · OOS 0.586 · 361 Tests</strong></div>
+        </div>
+        <div class="badge-strip">
+          <span class="ui-badge info">SRTP 中期 / 初期汇报</span>
+          <span class="ui-badge alert">Live Trading Disabled</span>
+          <span class="ui-badge ok">Research Platform Only</span>
+        </div>
+      </section>
+
+      <!-- SLIDE 02: Table of Contents -->
+      <section class="slide">
+        <div class="header-group">
+          <div class="title-area"><div class="trace-tag">Overview</div><h2>汇报大纲与核心结构</h2></div>
+          <div class="slide-tracker">TOC / 31</div>
+        </div>
+        <div class="slide-body grid-3">
+          <div class="toc-block">
+            <h3>Ⅰ 系统架构与 MAS 编排 (03-11)</h3>
+            <ol>
+              <li>量化研究的安全边界与 8 层架构</li>
+              <li>部署拓扑与 v5 Web 控制台</li>
+              <li>工具层：ToolRegistry 注册与调用</li>
+              <li>MCP 协议、ToolPolicy 安全网关</li>
+              <li>智能体层：Supervisor / Research / Report</li>
+              <li>编排层：ResearchWorkflow DAG 与 MCPScheduler</li>
+              <li>记忆/RAG：ExperimentMemory 与 ContextBuilder</li>
+            </ol>
+          </div>
+          <div class="toc-block">
+            <h3>Ⅱ 核心算法演进设计 (12-25)</h3>
+            <ol>
+              <li>算法演进全景路线 (v1 → v3)</li>
+              <li>数据验证清洗与技术特征工程</li>
+              <li>MovingAverage 规则对照基线</li>
+              <li>LightGBM 滚动重训与 OOS 循环</li>
+              <li>GRPO 强化学习组内策略优化机制</li>
+              <li>指标命名空间物理层隔离规范</li>
+            </ol>
+          </div>
+          <div class="toc-block">
+            <h3>Ⅲ 实验验证与成果分析 (26-31)</h3>
+            <ol>
+              <li>A6000 服务器群 8 组关键实验</li>
+              <li>样本外主结果分析与夏普对比</li>
+              <li>过拟合警示分析与文本消融结论</li>
+              <li>SRTP 研发里程碑与工程交付件</li>
+              <li>系统局限性、未来工作与问答</li>
+            </ol>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 03: Project Positioning -->
+      <section class="slide">
+        <div class="header-group">
+          <div class="title-area"><div class="trace-tag">Part I · Architecture</div><h2>项目定位：确定性科学研究平台</h2></div>
+          <div class="slide-tracker">03 / 31</div>
+        </div>
+        <div class="slide-body grid-2">
+          <div class="card card-warn">
+            <h3>学术回测 vs 实盘交易边界</h3>
+            <p>本平台在架构底层强制切断所有券商实时交易 API，聚焦于回测可复现性与学术审计。</p>
+            <table>
+              <thead>
+                <tr><th>功能矩阵 Pipeline</th><th>Quant MAS 平台协议</th></tr>
+              </thead>
+              <tbody>
+                <tr class="hl-row"><td>数据清洗 → 滚动回测 → OOS 验证 → 论文级审计</td><td class="text-hl">✓ 核心原生支持</td></tr>
+                <tr class="warn-row"><td>实盘账户对冲 / 自动下单执行</td><td class="text-alert">✗ 物理安全禁用</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="card card-accent">
+            <h3>Core Separation 核心隔离设计</h3>
+            <ul>
+              <li><strong>Quant Engine (确定性计算层)</strong>：使用纯 Python 计算核心，保证夏普比率、回撤等算力公式绝对无幻觉、可复现。</li>
+              <li><strong>Agent Layer (智能编排层)</strong>：负责策略调度、知识库 RAG、实验日志可读性解析，绝不介入底层矩阵运算。</li>
+              <li><strong>Web Console (图形监控端)</strong>：通过安全的 SSH 隧道提交 Job，保证异构数据链可见。</li>
+            </ul>
+            <div class="token-flow" style="margin-top:12px">
+              <span>Local Browser</span><span class="arrow">→</span><span>SSH Tunnel (:8000)</span><span class="arrow">→</span><span>GPU Compute Cluster</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 04: 8-Layer Architecture -->
+      <section class="slide">
+        <div class="header-group">
+          <div class="title-area"><div class="trace-tag">Part I · Architecture</div><h2>系统架构全景图（8 层分层设计）</h2></div>
+          <div class="slide-tracker">04 / 31</div>
+        </div>
+        <div class="slide-body" style="gap: 8px;">
+          <div class="slide-figure slide-figure--arch">
+            <img src="ppt-assets/architecture.png" alt="Quant MAS 8 层系统架构图：Data → Quant Engine → Experiment → Memory/RAG → Tools → Agents → Orchestration → Outputs">
+          </div>
+          <p class="figure-caption">Quant MAS Architecture — 8 层分层：数据层 · 量化引擎 · 实验记忆 · Memory/RAG · 工具 · 智能体 · 编排协议 · 输出与人工审核（右侧为安全边界与设计原则）</p>
+        </div>
+      </section>
+
+      <!-- SLIDE 05: Deployment Topology -->
+      <section class="slide">
+        <div class="header-group">
+          <div class="title-area"><div class="trace-tag">Part I · Infrastructure</div><h2>部署拓扑与 v5 全栈控制台</h2></div>
+          <div class="slide-tracker">05 / 31</div>
+        </div>
+        <div class="slide-body grid-2">
+          <div style="display:flex;flex-direction:column;min-height:0;">
+            <div class="slide-figure slide-figure--ui">
+              <img src="ppt-assets/ui-overview.png" alt="Quant MAS v5 Enterprise Overview 控制台：OOS 0.586、361 passed、Research Workflow 九步流水线">
+            </div>
+            <p class="figure-caption">v5 Enterprise Research Console · Overview 仪表盘（本地浏览器经 SSH 隧道连接远程 GPU 服务器）</p>
+          </div>
+          <div class="card card-accent" style="justify-content: center; display: flex; flex-direction: column;">
+            <h3>Enterprise Research UI</h3>
+            <p style="margin-bottom:12px;">13+ 功能页面：Experiments · Backtests · Walk-forward OOS · Agents · Audit · Paper Export · Help。Job API <code>POST /api/jobs</code> 提交回测与 OOS 任务。</p>
+            <ul style="font-size:0.82rem;margin-bottom:12px;">
+              <li>Research Workflow：Data → Features → Model → Backtest → Risk → OOS → Audit → Human Review → Paper</li>
+              <li>安全边界：<strong>Live trading disabled</strong> · Human review required</li>
+            </ul>
+            <div class="kpi-dashboard" style="grid-template-columns:1fr 1fr;">
+              <div class="kpi-widget"><var>361</var><span>Pytest Passed</span></div>
+              <div class="kpi-widget"><var>0.586</var><span>OOS Sharpe</span></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 06: Division of Labor -->
+      <section class="slide">
+        <div class="header-group">
+          <div class="title-area"><div class="trace-tag">Part I · Logic Separation</div><h2>智能编排层与量化引擎的核心分工</h2></div>
+          <div class="slide-tracker">06 / 31</div>
+        </div>
+        <div class="slide-body">
+          <div class="token-flow" style="justify-content: center; margin-bottom: 10px;">
+            <span>UI 任务触发</span><span class="arrow">→</span><span>Supervisor 分发</span><span class="arrow">→</span><span>ToolRegistry 鉴权</span><span class="arrow">→</span><span>BacktestTool 调度</span><span class="arrow">→</span><span>Engine 矩阵计算</span>
+          </div>
+          <table>
+            <thead>
+              <tr><th>功能图层</th><th>Quant Engine (数学内核)</th><th>Agent Layer (语言与决策树)</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>核心计算指标</strong></td><td>主算 Sharpe、年化权益曲线、最大回撤、时序特征计算</td><td>禁止直接计算连续指标，仅解析计算结果的文字逻辑</td></tr>
+              <tr><td><strong>工作流有向图 (DAG)</strong></td><td colspan="2" style="text-align:center; color:var(--blue)"><code>数据源输入 &rarr; 规则格式化验证 &rarr; 特征衍生矩阵 &rarr; 模型重训 &rarr; 回测计算 &rarr; 审计合规校验</code></td></tr>
+              <tr class="warn-row"><td><strong>安全防线控制</strong></td><td>历史模拟，严格防止时间前视函数 (No Future Leak)</td><td class="text-alert"><strong>硬编码禁止接入实盘资金通道</strong></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- SLIDE 07: Tool Layer -->
+      <section class="slide">
+        <div class="header-group">
+          <div class="title-area"><div class="trace-tag">Part I · Tool Layer (L5)</div><h2>工具层：BaseTool 接口与 ToolRegistry 注册中心</h2></div>
+          <div class="slide-tracker">07 / 31</div>
+        </div>
+        <div class="slide-body grid-2">
+          <div class="card card-accent">
+            <h3>统一工具抽象 BaseTool</h3>
+            <p>每个工具实现 <code>name</code>、<code>description</code> 与 <code>run(**kwargs) → ToolResult</code>。Agent 和编排层<strong>只能</strong>通过工具访问 Quant Engine，不能直接 import 回测内核。</p>
+            <div class="token-flow" style="margin-top:10px">
+              <span>Agent / Scheduler</span><span class="arrow">→</span><span>ToolRegistry.get(name)</span><span class="arrow">→</span><span>BaseTool.run()</span><span class="arrow">→</span><span>Engine</span>
+            </div>
+          </div>
+          <div class="card">
+            <h3>ToolRegistry 注册机制</h3>
+            <ol style="font-size:0.82rem">
+              <li><code>registry.register(tool)</code> — 按唯一 name 入库，重名抛错</li>
+              <li><code>registry.get(name)</code> — 按名检索并执行</li>
+              <li><code>registry.list() / names()</code> — 导出 MCP 元数据、前端 Tools 页</li>
+            </ol>
+            <p style="margin-top:8px;font-size:0.78rem;color:var(--text-secondary)">工作流默认注册：<code>create_default_tool_registry()</code> 注入 DataSummary · TrainModel · MLBacktest · Risk · Report</p>
+          </div>
+          <div class="card" style="grid-column:1/-1">
+            <h3>量化工具清单（SAFE_QUANT_TOOLS 白名单）</h3>
+            <table>
+              <tr><th>工具名</th><th>职责</th><th>典型参数</th></tr>
+              <tr><td><code>data_summary</code></td><td>数据概览与行数审计</td><td>path</td></tr>
+              <tr><td><code>backtest</code></td><td>MaCross / 策略回测</td><td>input_path, config_path, output_dir</td></tr>
+              <tr><td><code>train_model</code></td><td>LightGBM 方向模型训练</td><td>input_path, config_path</td></tr>
+              <tr><td><code>ml_backtest</code></td><td>ML 概率 → ml_signal 回测</td><td>features_path, model_path</td></tr>
+              <tr><td><code>risk_check</code></td><td>目标权重风控审查</td><td>targets_path, config_path</td></tr>
+              <tr><td><code>pipeline</code></td><td>端到端数据→特征流水线</td><td>symbols, skip_download</td></tr>
+              <tr><td><code>report</code></td><td>从 ExperimentMemory 生成报告</td><td>memory_path, output_path</td></tr>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 08: MCP Protocol -->
+      <section class="slide">
+        <div class="header-group">
+          <div class="title-area"><div class="trace-tag">Part I · Protocol Layer (L7)</div><h2>MCP 协议适配与 ToolPolicy 安全网关</h2></div>
+          <div class="slide-tracker">08 / 31</div>
+        </div>
+        <div class="slide-body">
+          <div class="token-flow" style="justify-content:center;margin-bottom:12px">
+            <span>MCPToolCall</span><span class="arrow">→</span><span>ToolPolicy.evaluate</span><span class="arrow">→</span><span>execute_mcp_tool_call</span><span class="arrow">→</span><span>ToolRegistry</span><span class="arrow">→</span><span>MCPToolResult</span>
+          </div>
+          <div class="grid-2">
+            <div class="card card-accent">
+              <h3>MCP 风格内部协议（M13）</h3>
+              <ul>
+                <li><code>tool_to_mcp_spec()</code> — BaseTool → MCPToolSpec（name / parameters / safety_tags）</li>
+                <li><code>registry_to_mcp_specs()</code> — 批量导出工具 schema，供 Agent 与 UI 发现</li>
+                <li><code>MCPToolCall(tool_name, arguments)</code> — 标准化调用载荷</li>
+                <li>每个工具参数在 <code>TOOL_PARAMETER_SPECS</code> 中显式声明类型与必填项</li>
+              </ul>
+            </div>
+            <div class="card card-warn">
+              <h3>ToolPolicy：Deny-by-default 白名单</h3>
+              <ul>
+                <li><strong>允许</strong>：data_summary, backtest, train_model, report, ml_backtest, pipeline, risk_check</li>
+                <li><strong>拒绝工具名模式</strong>：shell · exec · broker · order · live_trade</li>
+                <li><strong>拒绝参数模式</strong>：api_key · secret · password · token · .env 路径</li>
+                <li>决策：<code>ALLOW</code> / <code>DENY</code> / <code>REQUIRE_CONFIRMATION</code></li>
+              </ul>
+            </div>
+          </div>
+          <div class="card" style="margin-top:10px">
+            <p style="font-size:0.82rem"><strong>调用闭环</strong>：调度器或 Agent 发起 MCPToolCall → Policy 鉴权 → 通过后 <code>registry.get(tool_name).run(**arguments)</code> → 结果封装为 MCPToolResult 并写入 <code>audit.jsonl</code>。拒绝则直接 DENY，不触达 Engine。</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 09: Agent Layer -->
+      <section class="slide">
+        <div class="header-group">
+          <div class="title-area"><div class="trace-tag">Part I · Agent Layer (L6)</div><h2>智能体层：三类 Agent 与任务路由</h2></div>
+          <div class="slide-tracker">09 / 31</div>
+        </div>
+        <div class="slide-body grid-2">
+          <div class="card card-accent">
+            <h3>SupervisorAgent — 规则路由调度</h3>
+            <p>接收自然语言任务 → 关键词匹配 <code>RouteRule</code> → 选定唯一工具 → 经 ToolRegistry 执行。全程记录 <code>AgentEvent / ToolCallEvent / AgentFinishEvent</code>。</p>
+            <table style="margin-top:8px">
+              <tr><th>关键词示例</th><th>路由工具</th></tr>
+              <tr><td>回测 / backtest</td><td>backtest</td></tr>
+              <tr><td>训练 / model</td><td>train_model</td></tr>
+              <tr><td>ML回测 / ml_backtest</td><td>ml_backtest</td></tr>
+              <tr><td>全流程 / pipeline</td><td>pipeline</td></tr>
+              <tr><td>风控 / risk</td><td>risk_check</td></tr>
+              <tr><td>报告 / report</td><td>report</td></tr>
+            </table>
+          </div>
+          <div class="card">
+            <h3>ResearchAgent &amp; ReportAgent</h3>
+            <ul>
+              <li><strong>ResearchAgent</strong>：消费 <code>AgentContextBundle</code>（实验指标 + RAG 片段），LLM 输出 JSON：hypothesis · evidence · suggested_experiments · risks。<strong>禁止建议实盘下单</strong>。</li>
+              <li><strong>ReportAgent</strong>：将 Engine 产物格式化为可读研究报告，不修改数值。</li>
+              <li><strong>BaseAgent</strong>：有界步数 <code>max_steps</code>，防止 Agent 无限循环。</li>
+            </ul>
+            <p style="margin-top:8px;font-size:0.78rem;color:var(--text-secondary)">Web Job API 与 CLI 均可绕过 Agent 直接调 Engine；Agent 是「研究助手」，不是交易执行器。</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 10: Orchestration -->
+      <section class="slide">
+        <div class="header-group">
+          <div class="title-area"><div class="trace-tag">Part I · Orchestration (L7)</div><h2>编排层：ResearchWorkflow DAG 与 MCPScheduler</h2></div>
+          <div class="slide-tracker">10 / 31</div>
+        </div>
+        <div class="slide-body">
+          <p style="font-size:0.82rem;color:var(--text-secondary);margin-bottom:8px">Supervisor 是「单任务→单工具」；ResearchWorkflow 是「多节点状态机 DAG」，二者并存：</p>
+          <div class="token-flow" style="margin-bottom:12px">
+            <span>data_check</span><span class="arrow">→</span><span>feature_build</span><span class="arrow">→</span><span>train_model</span><span class="arrow">→</span><span>ml_backtest</span><span class="arrow">→</span><span>risk_check</span><span class="arrow">→</span><span>report</span>
+          </div>
+          <div class="grid-2">
+            <div class="card card-accent">
+              <h3>M4 ResearchWorkflow（6 节点固定 DAG）</h3>
+              <ul>
+                <li>状态载体：<code>QuantWorkflowState</code> — 跨节点传递路径、错误、completed_nodes</li>
+                <li>执行器：<code>run_sequential_workflow()</code> 或可选 LangGraph 后端</li>
+                <li>节点函数在 <code>nodes.py</code>，每步注入同一 ToolRegistry</li>
+                <li>任一步失败可 <code>stop_on_error</code> 中止并回滚审计</li>
+              </ul>
+            </div>
+            <div class="card card-violet">
+              <h3>M13 MCPScheduler（YAML Recipe 调度）</h3>
+              <ul>
+                <li><code>plan(recipe)</code> — 拓扑排序依赖图，输出节点执行序</li>
+                <li><code>run(recipe, dry_run=True)</code> — 逐节点 Policy 鉴权 → 执行 → 写 audit.jsonl</li>
+                <li>内置 recipe：mock_research · text_smoke（文本对齐→审计→WF 评估）</li>
+                <li><code>InMemoryMessageBus</code> 发布 PlanMessage / NodeResultMessage</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 11: Memory & RAG -->
+      <section class="slide">
+        <div class="header-group">
+          <div class="title-area"><div class="trace-tag">Part I · Memory / RAG (L3–L4)</div><h2>记忆层与 RAG：ContextBuilder 上下文装配</h2></div>
+          <div class="slide-tracker">11 / 31</div>
+        </div>
+        <div class="slide-body grid-2">
+          <div class="card">
+            <h3>ExperimentMemory（L3 实验记忆）</h3>
+            <ul>
+              <li>每次回测/OOS 注册到 <code>experiments.json</code>，含 config、metrics、artifact 路径</li>
+              <li>存储后端：JSON / SQLite / Postgres（可选 pgvector）</li>
+              <li><code>BaselineRegistry</code> 锁定主 baseline（OOS 0.586）</li>
+              <li><code>compare_experiments</code> 跨实验对比，禁止混用指标族</li>
+            </ul>
+          </div>
+          <div class="card card-accent">
+            <h3>RAG 检索链（L4 Memory/RAG）</h3>
+            <div class="token-flow" style="margin-bottom:8px">
+              <span>Document Loader</span><span class="arrow">→</span><span>chunk_text</span><span class="arrow">→</span><span>Embedding</span><span class="arrow">→</span><span>VectorStore</span><span class="arrow">→</span><span>Retriever.search</span>
+            </div>
+            <ul>
+              <li><code>SimpleRetriever</code> / <code>HybridRetriever</code> — 关键词 + 向量混合检索</li>
+              <li>默认 <code>HashEmbeddingClient</code>；生产可选 OpenAI 兼容 embedding · pgvector · Neo4j 图谱</li>
+              <li><code>ContextBuilder.build(task)</code> 合并实验快照 + RAG chunks → <code>AgentContextBundle</code> 供 ResearchAgent 使用</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 12: Section Divider II -->
+      <section class="slide slide-section-divider">
+        <div class="section-giant-num">PART II</div>
+        <h2 class="section-headline">核心算法设计、演进与隔离机制</h2>
+        <p class="section-subline">详细拆解从规则基线到多阶段 Walk-forward 滚动回测的模型设计，涵盖特征管道、文本信号消融、强化学习组内优化（GRPO）及指标物理隔离防线。</p>
+      </section>
+
+      <!-- SLIDE 13: Algorithm Evolution Timeline -->
+      <section class="slide">
+        <div class="header-group">
+          <div class="title-area"><div class="trace-tag">Part II · Evolution</div><h2>系统演进全景：从单一规则到复合种群验证</h2></div>
+          <div class="slide-tracker">13 / 31</div>
+        </div>
+        <div class="slide-body grid-2">
+          <div class="timeline">
+            <div class="tl-node">
+              <div class="tl-meta">v1 · 基础工程管道构建</div>
+              <div class="tl-title">确定性量化回测骨架</div>
+              <div class="tl-desc">构建 validate_ohlcv 洗数模块，实现经典均线策略，完成回测引擎单向闭环。</div>
+            </div>
+            <div class="tl-node">
+              <div class="tl-meta">对照组 · Baseline 建立</div>
+              <div class="tl-title">MaCross 全样本回测表现</div>
+              <div class="tl-desc">运行实验编号 server_ma_cross_real_001。全样本非样本外夏普比率达到 1.00。</div>
+            </div>
+            <div class="tl-node">
+              <div class="tl-meta">过拟合警示阶段</div>
+              <div class="tl-title">LightGBM 全段时序训练</div>
+              <div class="tl-desc">暴露机器学习在单一长波段训练中严重的 In-sample 过拟合。全样本夏普高达 2.78，平台硬编码拦截，禁止其作为结论。</div>
+            </div>
+          </div>
+          <div class="timeline">
+            <div class="tl-node">
+              <div class="tl-meta">v2 · 核心突破阶段</div>
+              <div class="tl-title">Walk-forward OOS 滚动重训</div>
+              <div class="tl-desc">开发 19 窗口滚动机制。多标的 CUDA 加速，产出真正具备学术意义的样本外主夏普指标 0.586。</div>
+            </div>
+            <div class="tl-node">
+              <div class="tl-meta">v3 · 多模态与强化进化 (M6-M12)</div>
+              <div class="tl-title">文本消融实验与 GRPO 种群机制</div>
+              <div class="tl-desc">集成 FinBERT 文本流进行三线消融实验；引入 TradingEnv 强化学习环境与组内策略优势评分（GRPO），规避过拟合。</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 09: Data Validation Pipeline -->
+      <section class="slide">
+        <div class="header-group">
+          <div class="title-area"><div class="trace-tag">Part II · Data Pipeline</div><h2>数据清洗机制 validate_ohlcv 规范</h2></div>
+          <div class="slide-tracker">14 / 31</div>
+        </div>
+        <div class="slide-body grid-2">
+          <div class="card">
+            <h3>多源异构整合 &rarr; 规范化 Schema</h3>
+            <p>平台屏蔽多数据源格式差异，上游数据获取完毕后强制执行严格的矩阵因果对齐。</p>
+            <ul>
+              <li>量价数据层：包含 AAPL, MSFT, SPY 的标准日 K 线</li>
+              <li>基本面/宏观层：接入 FRED 10 年期国债收益率与 SEC EDGAR 文本指标</li>
+              <li>情感文本层：Finnhub 新闻流，衍生出标准化情感因子表</li>
+            </ul>
+            <div class="math-block">
+              <math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+                <msub><mi>D</mi><mtext>Raw</mtext></msub>
+                <mover><mo>&rarr;</mo><mtext>validate_ohlcv</mtext></mover>
+                <msub><mi mathvariant="script">D</mi><mtext>Clean</mtext></msub>
+                <mo>&rarr;</mo>
+                <mtext>Apache Parquet</mtext>
+              </math>
+            </div>
+          </div>
+          <div class="card card-accent">
+            <h3>因果防御性校验规则 (底层硬编码)</h3>
+            <ol>
+              <li><strong>字段强校验</strong>：格式必须严格包含 <code>date, symbol, open, high, low, close, volume</code>，禁止缺项。</li>
+              <li><strong>合理性过滤</strong>：若检测到 <math xmlns="http://www.w3.org/1998/Math/MathML"><mtext>high</mtext><mo>&lt;</mo><mtext>low</mtext></math> 或 <math xmlns="http://www.w3.org/1998/Math/MathML"><mtext>volume</mtext><mo>&lt;</mo><mn>0</mn></math>，则整张表熔断拒绝，彻底杜绝幻觉数据。</li>
+              <li><strong>时序单调性</strong>：按标的分组并强制进行时间主键升序排序。</li>
+            </ol>
+            <p style="margin-top:10px; font-size:0.8rem; color:var(--text-secondary)">规避了任何可能由 LLM 上游工具链引发的时序颠倒等严重前视漏洞。</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 10: Feature Pipeline -->
+      <section class="slide">
+        <div class="header-group">
+          <div class="title-area"><div class="trace-tag">Part II · Feature Engineering</div><h2>特征衍生工程 build_feature_table</h2></div>
+          <div class="slide-tracker">15 / 31</div>
+        </div>
+        <div class="slide-body">
+          <div class="token-flow" style="margin-bottom:8px">
+            <span>原始量价</span><span class="arrow">&rarr;</span><span>对数收益率</span><span class="arrow">&rarr;</span><span>滑动均线距离</span><span class="arrow">&rarr;</span><span>滚动波动率</span><span class="arrow">&rarr;</span><span>成交量放大比</span><span class="arrow">&rarr;</span><span>RSI强弱因子</span><span class="arrow">&rarr;</span><span>[多模态文本激活]</span>
+          </div>
+          <div class="grid-2">
+            <div class="card card-accent">
+              <h3>15 维高鲁棒技术特征矩阵</h3>
+              <p>所有标的特征均进行横截面独立计算，防止不同股票间产生信息交叉泄漏。</p>
+              <div class="pill-matrix">
+                <span class="pill-node">return_1</span><span class="pill-node">ma_5</span><span class="pill-node">ma_20</span>
+                <span class="pill-node">ma_distance_5</span><span class="pill-node">ma_distance_20</span><span class="pill-node">volatility_20</span>
+                <span class="pill-node">volume_ratio</span><span class="pill-node">rsi_14</span>
+              </div>
+              <p style="margin-top:12px;"><strong>学习目标标签</strong>：<code>future_direction_5</code> (未来第 5 个交易日的对数涨跌方向)。测试集全矩阵规模共 6,033 行，全面对齐。</p>
+            </div>
+            <div class="card card-violet">
+              <h3>多模态文本信号融合 (M6 改进支线)</h3>
+              <ul>
+                <li>调用 <code>merge_text_signals_into_features</code>。</li>
+                <li>将 FinBERT 提取的情感强度按 <code>date + symbol</code> 严格右外连接至基础特征表。</li>
+                <li>缺失值处理：进行零填充或占位符标记，触发审计函数 <code>text_signal_audit_wf</code> 监控文本实际覆盖率。</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 11: MovingAverage Cross Baseline -->
+      <section class="slide">
+        <div class="header-group">
+          <div class="title-area"><div class="trace-tag">Part II · Control Baseline</div><h2>规则基线：MovingAverageCrossStrategy</h2></div>
+          <div class="slide-tracker">16 / 31</div>
+        </div>
+        <div class="slide-body grid-2">
+          <div class="card">
+            <h3>策略判定算子 (Long-Only 架构)</h3>
+            <p>用于提供绝对无过拟合倾向、纯规则驱动的对照业绩标杆。</p>
+            <ul>
+              <li>快均率算子：<math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mtext>MA</mtext><mtext>fast</mtext></msub></math> (Window = 5)</li>
+              <li>慢均率算子：<math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mtext>MA</mtext><mtext>slow</mtext></msub></math> (Window = 20)</li>
+              <li>信号机制：若满足 <math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mtext>MA</mtext><mtext>fast</mtext></msub><mo>&gt;</mo><msub><mtext>MA</mtext><mtext>slow</mtext></msub></math>，则分配目标仓位权重为 1.0 (全仓)；否则清仓归零。</li>
+            </ul>
+          </div>
+          <div class="card card-accent">
+            <h3>全样本业绩指标表现 (对照组)</h3>
+            <table>
+              <thead>
+                <tr><th>核心回测度量</th><th>规则基线计算值</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>夏普比率 (Sharpe Ratio)</td><td class="text-hl">1.00</td></tr>
+                <tr><td>全段总收益率 (Total Return)</td><td>202.0 %</td></tr>
+                <tr><td>历史最大回撤 (Max Drawdown)</td><td class="text-warn">-20.6 %</td></tr>
+                <tr class="hl-row"><td>在系统中的定位</td><td class="text-hl">用于检测回测引擎健壮性的默认基线</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 12: Backtest Engine Mechanics -->
+      <section class="slide">
+        <div class="header-group">
+          <div class="title-area"><div class="trace-tag">Part II · Engine Core</div><h2>回测引擎 BacktestEngine：确定性仿真成交</h2></div>
+          <div class="slide-tracker">17 / 31</div>
+        </div>
+        <div class="slide-body grid-2">
+          <div class="card card-accent">
+            <h3>无未来 leak 的严谨成交假设</h3>
+            <ol>
+              <li><strong>因果序列设计</strong>：策略在 T 日收盘后计算出 <code>target_weight</code>。</li>
+              <li><strong>成交价格机制</strong>：引擎强制模拟在 <strong>T+1 日开盘价 (Open Price)</strong> 进行撮合交易，避免使用收盘价造成的未来函数。</li>
+              <li><strong>摩擦损耗模型</strong>：引入滑点模型 (SlippageModel) 惩罚成交价，应用佣金模型 (CommissionModel) 扣除手续费。</li>
+              <li><strong>多标的复合缩放</strong>：初始现金按多标的均分，独立运行后，最终汇总权益曲线。</li>
+            </ol>
+          </div>
+          <div class="card">
+            <h3>结构化产物与审计链路</h3>
+            <ul>
+              <li><code>equity_curve.csv</code>：持久化记录全时序每日资产净值净变化。</li>
+              <li><code>trades.csv</code>：详尽审计每笔开仓、平仓开销明细。</li>
+              <li><code>metrics.json</code>：输出夏普比率、最大回撤、波动率等。</li>
+            </ul>
+            <p style="margin-top:10px; color:var(--text-secondary)">自动注册至全局实验存储器中，大语言模型仅能读取或优化其超参数，无法更改成交引擎的计算逻辑。</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 13: LightGBM Training Paradigms -->
+      <section class="slide">
+        <div class="header-group">
+          <div class="title-area"><div class="trace-tag">Part II · Machine Learning</div><h2>LightGBM 预测模型：两种切分模式对比</h2></div>
+          <div class="slide-tracker">18 / 31</div>
+        </div>
+        <div class="slide-body grid-2">
+          <div class="card">
+            <h3>模式 A：单次静态时序切分 (诊断用)</h3>
+            <p>基于 <code>TrainModelTool</code> 触发，将全样本按时间硬切为 70% 训练集、15% 验证集、15% 测试集。</p>
+            <ul>
+              <li>静态测试结果：<strong>测试集 AUC 为 0.479</strong> (接近随机)。</li>
+              <li>学术诊断结论：静态时序切分在非平稳金融时序中完全失效，印证了必须引入滚动前瞻重训的迫切性。</li>
+            </ul>
+          </div>
+          <div class="card card-accent">
+            <h3>模式 B：Walk-Forward 滚动重训 (主路径)</h3>
+            <p>每个滚动时间窗口重新 fit 一个独立的 LightGBM 实例，全面启用 <code>device=cuda</code> 硬件加速。</p>
+            <ul>
+              <li>核心超参数设置：<code>n_estimators=100</code>, <code>learning_rate=0.05</code>, <code>num_leaves=31</code>。</li>
+              <li>过拟合图景剖析：单窗内部训练集 AUC 逼近 0.997，但对应窗口的样本外 AUC 则骤降至 0.472，揭示了过拟合的严重程度。</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 14: ML Signal Strategy Transformation -->
+      <section class="slide">
+        <div class="header-group">
+          <div class="title-area"><div class="trace-tag">Part II · Strategy Adaptation</div><h2>决策映射：MLSignalStrategy 概率转化机制</h2></div>
+          <div class="slide-tracker">19 / 31</div>
+        </div>
+        <div class="slide-body grid-2">
+          <div class="card card-accent">
+            <h3>基于置信度区间的双阈值状态机</h3>
+            <p>模型不直接输出动作，而是通过策略层消费预计算的概率矩阵 <code>pred_proba</code>，确保运算的因果逻辑。</p>
+            <table>
+              <thead>
+                <tr><th>模型预测概率 <math xmlns="http://www.w3.org/1998/Math/MathML"><mi>p</mi></math></th><th>状态信号</th><th>映射目标权重 (Target Weight)</th></tr>
+              </thead>
+              <tbody>
+                <tr class="hl-row"><td><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>p</mi><mo>&ge;</mo><mn>0.60</mn></math> (多头阈值)</td><td>+1</td><td>1.0 (全仓买入/持有该标的)</td></tr>
+                <tr class="warn-row"><td><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>p</mi><mo>&le;</mo><mn>0.40</mn></math> (空头阈值)</td><td>-1</td><td>0.0 (平仓并保持空仓观望)</td></tr>
+                <tr><td><math xmlns="http://www.w3.org/1998/Math/MathML"><mn>0.40</mn><mo>&lt;</mo><mi>p</mi><mo>&lt;</mo><mn>0.60</mn></math></td><td>0</td><td>维持上一期的目标分配仓位不变</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="card">
+            <h3>核心逻辑的系统互补特性</h3>
+            <ul>
+              <li><strong>MaCross 策略</strong>：纯经验驱动，具有强解释性，作为系统的底线基准。</li>
+              <li><strong>MLSignal 策略</strong>：由数据置信度驱动，在非线性模式发掘上更优，配合 Walk-forward 构成了系统的主结论实验路径。</li>
+            </ul>
+            <p style="margin-top:10px; font-size:0.78rem; color:var(--text-muted)">注意：两者共用同一成交回测内核，确保了对比的绝对公平。</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 15: Walk-Forward Mechanism Detail -->
+      <section class="slide">
+        <div class="header-group">
+          <div class="title-area"><div class="trace-tag">Part II · Core Mechanism</div><h2>核心改进：Walk-forward 样本外滚动回测机制</h2></div>
+          <div class="slide-tracker">20 / 31</div>
+        </div>
+        <div class="slide-body">
+          <p style="font-size:0.85rem; color:var(--text-secondary)">为了彻底规避全样本静态过拟合陷阱，系统将时间切分为 19 个前后无信息泄漏的滚动滑动窗口：</p>
+          <div class="wf-canvas">
+            <div class="wf-block tr">Train (504 天)</div><span class="arrow">&rarr;</span>
+            <div class="wf-block va">Val (126 天)</div><span class="arrow">&rarr;</span>
+            <div class="wf-block te">Test (126 天)</div><span class="arrow">&rarr;</span>
+            <div class="wf-block oos">OOS 样本外锁定回测 (63 天)</div>
+            <span class="arrow" style="margin-left:15px">&rArr; 步长 Step = 63 天滚动演进，重复 &times; 19 轮</span>
+          </div>
+          <div class="grid-2" style="margin-top:8px">
+            <div class="card card-accent">
+              <h3>单窗算法内部循环流程 (run_walk_forward)</h3>
+              <ol style="font-size:0.82rem; line-height:1.5;">
+                <li>提取当前窗口的 <code>train/val/test/oos</code> 时间戳索引。</li>
+                <li>执行 <code>fit LightGBM(train)</code> 并对后续各时段进行预测。</li>
+                <li>计算并持久化各区间的 AUC、准确率，以便监控衰减。</li>
+                <li>在<strong>锁定的 OOS 样本外区间</strong>运行 <code>MLSignalStrategy</code>。</li>
+                <li>合并 19 段独立的 OOS 权益，产出全局最终业绩指标。</li>
+              </ol>
+            </div>
+            <div class="card">
+              <h3>主 Baseline 全局 OOS 业绩结果</h3>
+              <table>
+                <thead>
+                  <tr><th>样本外性能度量 (oos.*)</th><th>主实验注册计算值</th></tr>
+                </thead>
+                <tbody>
+                  <tr class="hl-row"><td><strong>oos.sharpe (夏普比率)</strong></td><td class="text-hl">0.586</td></tr>
+                  <tr><td>oos.total_return (全段收益率)</td><td>44.3 %</td></tr>
+                  <tr><td>oos.max_drawdown (最大回撤)</td><td class="text-alert">-25.5 %</td></tr>
+                  <tr><td>oos.annualized_return (年化收益)</td><td>约 8.0 %</td></tr>
+                  <tr><td>有效演进窗口总数 (Windows)</td><td>19 个窗口</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 16: Text Ablation Matrix -->
+      <section class="slide">
+        <div class="header-group">
+          <div class="title-area"><div class="trace-tag">Part II · M6 Ablation</div><h2>多模态文本流：三线消融实验矩阵</h2></div>
+          <div class="slide-tracker">21 / 31</div>
+        </div>
+        <div class="slide-body">
+          <table>
+            <thead>
+              <tr><th>实验编码</th><th>信号注入配置</th><th>研发设计目的</th><th>数据行实际覆盖率</th><th>样本外 oos.sharpe</th><th>&Delta; vs 纯量价基准</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>WF-text-001</strong></td><td>200条精选FinBERT情感流</td><td>验证极少量文本情绪是否具备穿透力</td><td>3.3 %</td><td>0.563</td><td>-0.023</td></tr>
+              <tr><td><strong>WF-text-002</strong></td><td>100%全覆盖占位虚假文本</td><td>测试系统的抗噪能力与性能上界平衡</td><td>100.0 %</td><td>0.579</td><td>-0.007</td></tr>
+              <tr class="hl-row"><td><strong>WF-text-003</strong></td><td>Finnhub 真实全量基本面新闻</td><td>观察真实市场舆情情绪的实际贡献</td><td>2.4 %</td><td class="text-hl">0.565</td><td>-0.021</td></tr>
+              <tr class="hl-row"><td><strong>纯量价基线</strong></td><td>不含任何多模态文本输入</td><td>测定基础 15 维高频因子表现</td><td>—</td><td class="text-hl">0.586</td><td>基准线</td></tr>
+            </tbody>
+          </table>
+          <div class="card card-warn" style="margin-top:12px">
+            <h3>消融实验工程化推论</h3>
+            <p><strong>学术级结论</strong>：多模态文本信号注入后，性能未能跑赢基础量价基线。系统底层审计显示：核心矛盾在于<strong>覆盖率过于稀疏</strong> (真实高价值新闻仅覆盖 146 / 6033 交易行)，导致模型倾向于学到噪声。这证实了 Walk-forward 回测对于发现多模态虚假增益的严谨价值。</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 17: GRPO Motivation -->
+      <section class="slide">
+        <div class="header-group">
+          <div class="title-area"><div class="trace-tag">Part II · Reinforcement Learning</div><h2>强化学习模块：基于 GRPO 的组内策略优化 (M7)</h2></div>
+          <div class="slide-tracker">22 / 31</div>
+        </div>
+        <div class="slide-body">
+          <div class="grid-2">
+            <div class="card">
+              <h3>去 Critic 架构的量化探索动机</h3>
+              <p>传统 PPO 依赖 Critic 网络拟合状态价值函数 V(s)，在低信噪比的金融序列中，Critic 自身极易发散，导致多智能体不收敛。</p>
+              <ul>
+                <li><strong>组内无监督评分</strong>：针对同一市场状态，并行采样由 G 个策略突变体组成的智能体组，免除 Critic 显存开销。</li>
+                <li><strong>相对优势判定</strong>：直接通过智能体组内收益的相对排名提取优势函数，天然过滤掉了大盘普涨/普跌的系统性高噪声。</li>
+              </ul>
+            </div>
+            <div class="card card-warn">
+              <h3>严谨物理边界拦截规约</h3>
+              <p>强化学习及 GRPO 的动作空间探索，其产出指标一律强制归入 <code>simulation.*</code> 或 <code>training.*</code> 命名空间中。</p>
+              <p class="text-alert" style="font-weight:600; margin-top:8px;">★ 严禁将强化学习仿真过程中的超高收益指标直接写入主成效表中，策略必须通过多阶段 OOS 回测判定桥才能进行最终汇报。</p>
+            </div>
+          </div>
+          <div class="card card-accent" style="margin-top:10px">
+            <h3>数学目标算子方程与优势函数定义</h3>
+            <div class="math-block">
+              <math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+                <msub><mi>J</mi><mtext>GRPO</mtext></msub><mo>(</mo><mi>&theta;</mi><mo>)</mo><mo>=</mo>
+                <mi mathvariant="double-struck">E</mi><mfenced close="]" open="[">
+                  <mrow>
+                    <mfrac><mn>1</mn><mi>G</mi></mfrac>
+                    <munderover><mo>&sum;</mo><mrow><mi>i</mi><mo>=</mo><1</mo></mrow><mi>G</mi></munderover>
+                    <mfenced close="}" open="{">
+                      <mrow>
+                        <mo>min</mo><mfenced><mrow>
+                          <msub><mi>r</mi><mi>i</mi></msub><mo>(</mo><mi>&theta;</mi><mo>)</mo><msub><mi>A</mi><mi>i</mi></msub><mo>,</mo>
+                          <mtext>clip</mtext><mo>(</mo><msub><mi>r</mi><mi>i</mi></msub><mo>(</mo><mi>&theta;</mi><mo>)</mo><mo>,</mo><mn>1</mn><mo>-</mo><mi>&epsilon;</mi><mo>,</mo><mn>1</mn><mo>+</mo><mi>&epsilon;</mi><mo>)</mo><msub><mi>A</mi><mi>i</mi></msub>
+                        </mrow></mfenced>
+                        <mo>-</mo>
+                        <mi>&beta;</mi><msub><mi>D</mi><mtext>KL</mtext></msub><mfenced><mrow>
+                          <msub><mi>&pi;</mi><mi>&theta;</mi></msub><mo>&#x2225;</mo><msub><mi>&pi;</mi><mtext>ref</mtext></msub>
+                        </mrow></mfenced>
+                      </mrow>
+                    </mfenced>
+                  </mrow>
+                </mfenced>
+              </math>
+            </div>
+            <div class="math-block" style="margin-top:6px;">
+              <math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+                <msub><mi>A</mi><mi>i</mi></msub><mo>=</mo>
+                <mfrac>
+                  <mrow><msub><mi>R</mi><mi>i</mi></msub><mo>-</mo><mtext>mean</mtext><mo>(</mo><msub><mi>R</mi><mn>1</mn></msub><mo>,</mo><mo>&hellip;</mo><mo>,</mo><msub><mi>R</mi><mi>G</mi></msub><mo>)</mo></mrow>
+                  <mrow><mtext>std</mtext><mo>(</mo><msub><mi>R</mi><mn>1</mn></msub><mo>,</mo><mo>&hellip;</mo><mo>,</mo><msub><mi>R</mi><mi>G</mi></msub><mo>)</mo></mrow>
+                </mfrac>
+              </math>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 18: TradingEnv MDP Design -->
+      <section class="slide">
+        <div class="header-group">
+          <div class="title-area"><div class="trace-tag">Part II · MDP Formulation</div><h2>强化学习仿真：TradingEnv 状态与复合奖励设计</h2></div>
+          <div class="slide-tracker">23 / 31</div>
+        </div>
+        <div class="slide-body grid-2">
+          <div class="card card-accent">
+            <h3>状态空间设计 State (S_t)</h3>
+            <p>包含技术特征、账户状态、以及多模态上下文的异构状态向量。</p>
+            <div class="math-block">
+              <math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+                <msub><mi>S</mi><mi>t</mi></msub><mo>=</mo><mfenced close="}" open="{">
+                  <mrow>
+                    <msub><mi>X</mi><mrow><mi>t</mi><mo>-</mo><mi>N</mi><mo>:</mo><mi>t</mi></mrow></msub><mo>,</mo>
+                    <msub><mi>w</mi><mrow><mi>t</mi><mo>-</mo><1</mo></mrow></msub><mo>,</mo>
+                    <msub><mtext>Drawdown</mtext><mi>t</mi></msub><mo>,</mo>
+                    <msub><mi mathvariant="script">M</mi><mtext>RAG</mtext></msub><mo>(</mo><mi>t</mi><mo>)</mo>
+                  </mrow>
+                </mfenced>
+              </math>
+            </div>
+            <ul>
+              <li><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi>X</mi><mrow><mi>t</mi><mo>-</mo><mi>N</mi><mo>:</mo><mi>t</mi></mrow></msub></math>：滑动窗口内的 15 维技术矩阵</li>
+              <li><math xmlns="http://www.w3.org/1998/Math/MathML"><msub><mi mathvariant="script">M</mi><mtext>RAG</mtext></msub><mo>(</mo><mi>t</mi><mo>)</mo></math>：外部知识库检索出的历史相似形态因子</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>动作空间 Action (A_t)</h3>
+            <ul>
+              <li><strong>连续仓位模式</strong>：直接通过 Softmax 层产生多资产的目标分配权重向量，满足：<math xmlns="http://www.w3.org/1998/Math/MathML"><mo>&sum;</mo><msub><mi>w</mi><mi>i</mi></msub><mo>=</mo><mn>1</mn><mo>,</mo><msub><mi>w</mi><mi>i</mi></msub><mo>&ge;</mo><mn>0</mn></math>。</li>
+            </ul>
+            <h3 style="margin-top:14px;">复合奖励塑形方程 Reward (R_t)</h3>
+            <div class="math-block">
+              <math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+                <input></input>
+                <msub><mi>R</mi><mi>t</mi></msub><mo>=</mo>
+                <mtext>Sharpe</mtext><mo>(</mo><msub><mi>r</mi><mi>t</mi></msub><mo>)</mo>
+                <mo>-</mo><msub><mi>&lambda;</mi><mn>1</mn></msub><munder><mo>max</mo><mi>&tau;</mi></munder><msub><mi>D</mi><mi>&tau;</mi></msub>
+                <mo>-</mo><msub><mi>&lambda;</mi><mn>2</mn></msub><msubsup><mrow><mo>&#x2225;</mo><mi>&Delta;</mi><msub><mi>w</mi><mi>t</mi></msub><mo>&#x2225;</mo></mrow><mn>2</mn><mn>2</mn></msubsup>
+              </math>
+            </div>
+            <p style="font-size:0.75rem; color:var(--text-secondary)">融合了资产夏普比率、历史动态回撤惩罚算子与换手率磨损惩罚算子，防止频繁调仓导致资产耗尽。</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 19: Population Manager & Lessons -->
+      <section class="slide">
+        <div class="header-group">
+          <div class="title-area"><div class="trace-tag">Part II · Evolution Optimization</div><h2>种群自博弈演化与强化学习转样本外的失效教训</h2></div>
+          <div class="slide-tracker">24 / 31</div>
+        </div>
+        <div class="slide-body grid-2">
+          <div class="card card-violet">
+            <h3>种群管理器机制 PopulationManager</h3>
+            <ul>
+              <li><strong>策略多样性保护机制</strong>：维护由多个候选 Agent 组成的动态策略池，通过计算各 Agent 决策向量间的汉明距离 (Hamming Distance) 建立强硬防线，强制淘汰相似策略。</li>
+              <li><strong>自博弈淘汰模型</strong>：在池内执行局部演进博弈，计算相对胜率评分，确保种群多方向探索。</li>
+              <li>在学术探索子集测试中，种群中筛选出的最强 Agent 在局部 OOS 曾触及 1.039 的高表现（仅限局部研究探索）。</li>
+            </ul>
+          </div>
+          <div class="card card-warn">
+            <h3>M12 核心算法失效改进惨痛教训</h3>
+            <p>在研发中期，强化学习架构曾遭遇了重大的 OOS 失效陷阱，下表记录了团队的迭代进化过程：</p>
+            <table>
+              <thead>
+                <tr><th>研发迭代阶段</th><th>算法核心缺陷诊断</th><th>实际 OOS 真实夏普</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>M12.3 (POP-009)</td><td class="text-alert">Policy网络对输入特征完全脱钩，仅盲目最大化局部仿真奖励 &rarr; 最终导致全段空仓现金流躺平</td><td>0.000</td></tr>
+                <tr class="hl-row"><td>M12.4 (POP-010)</td><td class="text-hl">修正特征注意力机制，重构感知感知层网络 (Observation-aware RL)</td><td class="text-hl">0.387</td></tr>
+                <tr class="hl-row"><td>主控对照组</td><td>LightGBM 滚动滑动 Walk-forward 模型</td><td class="text-hl">0.586</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 20: Namespace Separation -->
+      <section class="slide">
+        <div class="header-group">
+          <div class="title-area"><div class="trace-tag">Part II · Compliance Registry</div><h2>系统红线：指标命名空间物理隔离机制</h2></div>
+          <div class="slide-tracker">25 / 31</div>
+        </div>
+        <div class="slide-body">
+          <p style="font-size:0.85rem; color:var(--text-secondary)">为了防止量化研究领域极具欺骗性的“假繁荣”现象，Quant MAS 在框架源码层设计了核心命名空间防御隔离红线，对各项性能指标进行物理层面的隔离保护：</p>
+          <table>
+            <thead>
+              <tr><th>物理命名空间 Namespace</th><th>允许激活的系统调用场景</th><th>最高准入与合规审查红线</th></tr>
+            </thead>
+            <tbody>
+              <tr class="hl-row"><td><strong class="text-hl" style="font-size:1rem;">oos.*</strong></td><td>仅允许在 Walk-forward 19 窗滚动回测的<strong>纯外部样本外闭环区间</strong>内产生和调用。</td><td class="text-hl">🏆 <strong>全系统唯一合规学术指标</strong>。仅允许此命名空间下的夏普比率写入论文主表。</td></tr>
+              <tr><td><strong>simulation.*</strong></td><td>强化学习环境 (TradingEnv) 仿真运行、多智能体交互演练、机器学习单次时序切分测试。</td><td class="text-alert">❌ <strong>禁止写入结论</strong>。如：单次训练产生的夏普比率高达 2.78，只允许作为过拟合预警诊断数据。</td></tr>
+              <tr><td><strong>training.*</strong></td><td>各基本算法模型在训练集上的拟合表现。包含内部 Loss 损失曲线、训练 AUC 矩阵。</td><td class="text-alert">❌ <strong>禁止跨层调用</strong>。仅作为梯度收敛与早停 (Early Stopping) 的观测依据。</td></tr>
+              <tr><td><strong>population.*</strong></td><td>种群自博弈博弈内部产生的评分、汉明距离指标、池内 Elo 胜率矩阵。</td><td class="text-warn">⚠ <strong>必须经过桥接</strong>。仅可作为优种筛选权值，无法直接参与大盘业绩交叉对比。</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- SLIDE 26: Section Divider III -->
+      <section class="slide slide-section-divider">
+        <div class="section-giant-num">PART III</div>
+        <h2 class="section-headline">服务器实验结果、消融分析与交付成果</h2>
+        <p class="section-subline">基于 A6000 算力集群于 2026-06-04 导出的生产环境真实计算数据 (文件落盘于 docs/ppt_data/*)，全面分析各组对照实验夏普比率与研发交付清单。</p>
+      </section>
+
+      <!-- SLIDE 22: Server Experiments Overview -->
+      <section class="slide">
+        <div class="header-group">
+          <div class="title-area"><div class="trace-tag">Part III · Empirical Evaluation</div><h2>算力集群 8 组关键实验注册一览表</h2></div>
+          <div class="slide-tracker">27 / 31</div>
+        </div>
+        <div class="slide-body">
+          <p style="font-size:0.82rem; color:var(--text-secondary); margin-bottom:4px;">系统集中跑测并在 <code>experiments.json</code> 中完成学术备案的 8 组经典实验全貌：</p>
+          <table>
+            <thead>
+              <tr><th>实验注册标识符符</th><th>算法命名空间</th><th>输出关键度量指标</th><th>系统核心角色与学术定位</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>ma_cross_real_001</td><td>ma_cross</td><td>sharpe: 1.00</td><td>无机器学习干预的传统规则基线，提供基本对照</td></tr>
+              <tr><td>lgbm_gpu_001</td><td>lightgbm</td><td>test_auc: 0.479</td><td>机器学习单次静态切分测试，用于诊断非平稳衰减</td></tr>
+              <tr class="warn-row"><td>ml_backtest_001</td><td>ml_backtest</td><td class="text-alert">sharpe: 2.78 (In-Sample)</td><td>极端过拟合警示样本，系统判定不可用，执行硬拦截</td></tr>
+              <tr class="hl-row"><td><strong>walk_forward_001</strong></td><td><strong>walk_forward</strong></td><td class="text-hl"><strong>oos.sharpe: 0.586</strong></td><td>🏆 <strong>当前论文级主 Baseline</strong>。19 窗滚动机制，无前视泄漏</td></tr>
+              <tr><td>walk_forward_text_001</td><td>text_ablation</td><td>oos.sharpe: 0.563</td><td>多模态 M6 文本消融 A 栈：200条少样本情绪流测试</td></tr>
+              <tr><td>walk_forward_text_002</td><td>text_ablation</td><td>oos.sharpe: 0.579</td><td>多模态 M6 文本消融 B 栈：100%覆盖占位基准对照</td></tr>
+              <tr class="hl-row"><td>walk_forward_text_003</td><td>text_ablation</td><td>oos.sharpe: 0.565</td><td>多模态 M6 文本消融 C 栈：Finnhub 真实全量舆情流</td></tr>
+              <tr><td>EXP-LLM-002</td><td>llm_agent</td><td>Logs Audit Pass</td><td>大语言模型智能代理层日志健全度与可读性审计实验</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- SLIDE 23: Main OOS Results & Chart -->
+      <section class="slide">
+        <div class="header-group">
+          <div class="title-area"><div class="trace-tag">Part III · Data Analytics</div><h2>真实样本外主业绩表现与过拟合警示对比</h2></div>
+          <div class="slide-tracker">28 / 31</div>
+        </div>
+        <div class="slide-body grid-2">
+          <div>
+            <div class="chart-container">
+              <div class="bar-group">
+                <div class="bar-data">0.586</div>
+                <div class="bar-pillar base-line" style="height: 48px;"></div>
+                <div class="bar-tag">WF主基线</div>
+              </div>
+              <div class="bar-group">
+                <div class="bar-data">0.563</div>
+                <div class="bar-pillar" style="height: 45px;"></div>
+                <div class="bar-tag">文本消融001</div>
+              </div>
+              <div class="bar-group">
+                <div class="bar-data">0.579</div>
+                <div class="bar-pillar" style="height: 47px;"></div>
+                <div class="bar-tag">文本消融002</div>
+              </div>
+              <div class="bar-group">
+                <div class="bar-data">0.565</div>
+                <div class="bar-pillar" style="height: 46px;"></div>
+                <div class="bar-tag">文本消融003</div>
+              </div>
+            </div>
+            <div class="chart-container" style="margin-top:14px; height: 65px;">
+              <div class="bar-group">
+                <div class="bar-data text-alert">2.78</div>
+                <div class="bar-pillar warn-line" style="height: 42px;"></div>
+                <div class="bar-tag">ML全段拟合(过拟合预警)</div>
+              </div>
+              <div class="bar-group">
+                <div class="bar-data">1.00</div>
+                <div class="bar-pillar" style="height: 20px;"></div>
+                <div class="bar-tag">均线交叉对照组</div>
+              </div>
+            </div>
+          </div>
+          <div class="card card-accent">
+            <h3>滚动模型特征重要度 (Feature Importance) Top 5</h3>
+            <p>通过分析 19 个时间窗口中 LightGBM 树节点分裂数均值，提取出主导策略的底层因子榜：</p>
+            <table>
+              <thead>
+                <tr><th>因子特征字段命名</th><th>全窗口分裂频次贡献均值 (Gain)</th></tr>
+              </thead>
+              <tbody>
+                <tr class="hl-row"><td><strong>volatility_20</strong> (滚动历史波动率)</td><td class="text-hl">414</td></tr>
+                <tr><td><strong>volume_ma_20</strong> (成交量移动平均距离)</td><td>378</td></tr>
+                <tr><td><strong>ma_20</strong> (20日经典价格移动平均线)</td><td>329</td></tr>
+                <tr><td><strong>ma_distance_20</strong> (当前收盘价离散位移)</td><td>251</td></tr>
+                <tr><td><strong>rsi_14</strong> (14日相对强弱震荡指标)</td><td>221</td></tr>
+              </tbody>
+            </table>
+            <p style="margin-top:6px; font-size:0.75rem; color:var(--text-secondary)"><strong>因子洞察</strong>：高波动率与成交量放大因子主导了模型的非线性划分，有效与线性均线交叉策略形成了逻辑层互补。</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 24: Engineering Milestones -->
+      <section class="slide">
+        <div class="header-group">
+          <div class="title-area"><div class="trace-tag">Part III · Milestones</div><h2>工程里程碑与开发完成度总览</h2></div>
+          <div class="slide-tracker">29 / 31</div>
+        </div>
+        <div class="slide-body">
+          <div class="kpi-dashboard" style="margin-bottom:8px;">
+            <div class="kpi-widget"><var>361 Cases</var><span>单元测试通过率 100%</span></div>
+            <div class="kpi-widget"><var>M1 - M13</var><span>任务节点全线闭环</span></div>
+            <div class="kpi-widget"><var>46 个</var><span>结构化落盘数据源</span></div>
+            <div class="kpi-widget"><var>v5.1 Alpha</var><span>全架构代码已开源</span></div>
+          </div>
+          <table>
+            <thead>
+              <tr><th>软件里程碑模块</th><th>交付算法与工程物理实物描述</th><th>交付检查状态</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>M1 – M2 基础建设</td><td>实现 <code>BaselineRegistry</code> 基线中心，打通多源清洗系统</td><td class="text-hl">✅ 完美交付落盘</td></tr>
+              <tr><td>M4 – M5 智能拓扑</td><td>部署 6 节点分布式有向计算图有向图 (DAG)，构建基于 pgvector 的 RAG 知识检索</td><td class="text-hl">✅ 完美交付落盘</td></tr>
+              <tr><td>M6 多模态消融</td><td>产出 3 组完整的文本消融分析日志，发布覆盖率审计报告</td><td class="text-hl">✅ 完美交付落盘</td></tr>
+              <tr><td>M7 强化进阶</td><td>完成 <code>TradingEnv</code> 强化学习环境构建，注入无 Critic 的 GRPO 裁剪算子</td><td class="text-hl">✅ 完美交付落盘</td></tr>
+              <tr><td>M11 – M12 种群防御</td><td>开发 <code>PopulationManager</code>，建立基于汉明距离的多样性过滤淘汰防线</td><td class="text-hl">✅ 完美交付落盘</td></tr>
+              <tr class="hl-row"><td><strong>M13 学术收口</strong></td><td><strong>支持全量 MCP 模型上下文协议，打通 361 组 pytest，完成一键生成学术 CSV 导出件</strong></td><td class="text-hl">✅ <strong>全面完工</strong></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- SLIDE 25: Limitations & Future Work -->
+      <section class="slide">
+        <div class="header-group">
+          <div class="title-area"><div class="trace-tag">Part III · Conclusion</div><h2>系统局限性与下一步展望</h2></div>
+          <div class="slide-tracker">30 / 31</div>
+        </div>
+        <div class="slide-body grid-3">
+          <div class="card card-warn">
+            <h3>多模态文本局限性</h3>
+            <p>目前外部高质量金融新闻流的实际覆盖率仅为 2.4%，导致模型对情感密集的异动行情缺乏捕捉能力。</p>
+            <p style="margin-top:6px; color:var(--text-secondary)"><strong>未来改进</strong>：计划在下一阶段开展 EXP-TEXT-002 实验，引入 LoRA 轻量化微调的金融垂直领域大模型 FinBERT-ZJU，并成倍拉长数据回测时序窗口。</p>
+          </div>
+          <div class="card">
+            <h3>强化学习转化缺陷</h3>
+            <p>多智能体种群自博弈在仿真环境 (Simulation) 中产生的极高奖励，经由样本外 OOS 回测验证后，依然存在较为显著的性能回撤衰减。</p>
+            <p style="margin-top:6px; color:var(--text-secondary)"><strong>架构反思</strong>：真实市场的机制切换 (Regime Switching) 极其严酷，强化学习的动作奖励塑形仍需更强健的方差控制算子进行硬性约束。</p>
+          </div>
+          <div class="card card-accent">
+            <h3>下一阶段工作清单</h3>
+            <ol>
+              <li>推进学术论文撰写与更多 OOS 稳健性检验。</li>
+              <li>采用异构随机种子重跑 19 窗 Walk-forward 回测，以验证参数的统计显著性 (p-value)。</li>
+              <li>重构 WebUI，提供端到端由大语言模型自主触发、自主提交、自主监控的全自动量化科学实验工作流。</li>
+            </ol>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 31: Q&A Cover -->
+      <section class="slide slide-cover">
+        <h1 class="logo-title" style="font-size: 2.8rem;"><span>感谢聆听 · 欢迎交流讨论</span></h1>
+        <p class="subtitle" style="margin-bottom: 24px;">Quant MAS · 多智能体量化研究平台 · SRTP 项目初期汇报</p>
+        <div class="cover-meta-grid" style="grid-template-columns: 1fr;">
+          <div>汇报人：<strong>魏子安</strong> · 浙江大学计算机科学与技术学院</div>
+          <div>开源仓库：<strong>github.com/ytq0198/Quant-MAS</strong>（361 项测试 · 完整架构与实验数据）</div>
+        </div>
+        <p style="margin-top:24px; font-size:0.85rem; color:var(--text-secondary); line-height:1.7; max-width:850px; text-align: center;">
+          <strong>系统核心设计小结</strong>：拒绝制造高幻觉的“炒股降维打击工具”，致力于打造一个严谨、因果链完全闭环的量化研究基础设施。<br>通过将多智能体协同 (Agent Layer) 与确定性数学运算核心 (Quant Engine) 彻底分离，配合物理隔离的 <code>oos.*</code> 命名空间防线，让每一次算法改进都具备真实、可溯源的科学研究价值。
+        </p>
+      </section>
+
+    </div>
+
+    <!-- Bottom Navigation Shortcut Guidelines -->
+    <div class="hud-footer">
+      <div>PROJECT FILE: <span style="color:var(--blue);">paper_main_results.csv</span></div>
+      <div class="nav-keyboard-tip">快捷键: &larr; &rarr; 翻页 · [F] 切换全屏显示</div>
+      <div class="hud-counter"><span id="slideCurrent">1</span> / <span id="slideTotal">26</span></div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const deck = document.getElementById("deck");
+      const slides = Array.from(deck.querySelectorAll(".slide"));
+      const totalSlides = slides.length;
+      let currentIdx = 0;
+
+      document.getElementById("slideTotal").textContent = totalSlides;
+
+      // Premium Fixed Aspect Ratio Fluid Scaling Engine
+      function adjustSlideScale() {
+        const targetWidth = 1280;
+        const targetHeight = 720;
+        const windowWidth = window.innerWidth;
+        const windowHeight = window.innerHeight;
+
+        const scaleX = windowWidth / targetWidth;
+        const scaleY = windowHeight / targetHeight;
+        // Strict proportional bounding box
+        const optimalScale = Math.min(scaleX, scaleY) * 0.96; 
+
+        deck.style.transform = `scale(${optimalScale})`;
+      }
+
+      function updatePresentationViewState(targetIdx) {
+        currentIdx = Math.max(0, Math.min(totalSlides - 1, targetIdx));
+        
+        slides.forEach((slideNode, loopIdx) => {
+          slideNode.classList.toggle("active", loopIdx === currentIdx);
+        });
+
+        // Update Dynamic HUD overlays
+        document.getElementById("progressBar").style.width = `${((currentIdx + 1) / totalSlides) * 100}%`;
+        document.getElementById("slideCurrent").textContent = currentIdx + 1;
+      }
+
+      // Matrix Keyboard Controller
+      document.addEventListener("keydown", function (event) {
+        if (["ArrowRight", " ", "PageDown"].includes(event.key)) {
+          event.preventDefault();
+          updatePresentationViewState(currentIdx + 1);
+        } else if (["ArrowLeft", "PageUp"].includes(event.key)) {
+          event.preventDefault();
+          updatePresentationViewState(currentIdx - 1);
+        } else if (event.key === "Home") {
+          event.preventDefault();
+          updatePresentationViewState(0);
+        } else if (event.key === "End") {
+          event.preventDefault();
+          updatePresentationViewState(totalSlides - 1);
+        } else if (event.key.toLowerCase() === "f") {
+          if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen().catch(() => {});
+          } else {
+            document.exitFullscreen();
+          }
+        }
+      });
+
+      // Spatial Mouse Tap Controller
+      document.body.addEventListener("click", function (event) {
+        // Prevent action mapping trigger on code or table elements
+        if (event.target.closest('table') || event.target.closest('.card') || event.target.closest('.toc-block')) {
+          return;
+        }
+        if (event.clientX > window.innerWidth * 0.55) {
+          updatePresentationViewState(currentIdx + 1);
+        } else if (event.clientX < window.innerWidth * 0.45) {
+          updatePresentationViewState(currentIdx - 1);
+        }
+      });
+
+      window.addEventListener("resize", adjustSlideScale);
+      
+      // Initialize Context
+      adjustSlideScale();
+      updatePresentationViewState(0);
+    })();
+  </script>
+</body>
+</html>

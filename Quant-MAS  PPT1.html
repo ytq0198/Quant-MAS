@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quant MAS v5.1 — SRTP 结题汇报 · 魏子安</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <style>
+    :root {
+      --bg: #030712;
+      --surface: rgba(15, 23, 42, 0.85);
+      --card: rgba(30, 41, 59, 0.65);
+      --border: rgba(148, 163, 184, 0.12);
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+      --dim: #64748b;
+      --cyan: #2dd4bf;
+      --cyan-dim: rgba(45, 212, 191, 0.15);
+      --blue: #60a5fa;
+      --orange: #fb923c;
+      --red: #f87171;
+      --green: #4ade80;
+      --violet: #a78bfa;
+      --slide-pad-x: clamp(40px, 5vw, 72px);
+      --slide-pad-y: clamp(36px, 4vh, 52px);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      width: 100%; height: 100%; overflow: hidden;
+      background: var(--bg); color: var(--text);
+      font-family: "DM Sans", "Noto Sans SC", system-ui, sans-serif;
+      font-feature-settings: "kern" 1;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .progress {
+      position: fixed; top: 0; left: 0; height: 3px; z-index: 200;
+      background: linear-gradient(90deg, var(--cyan), var(--blue), var(--violet));
+      transition: width .35s cubic-bezier(.4,0,.2,1);
+      box-shadow: 0 0 12px rgba(45, 212, 191, 0.5);
+    }
+    .hud {
+      position: fixed; top: 16px; right: 24px; z-index: 200;
+      font-size: .78rem; color: var(--dim); font-family: "DM Sans", monospace;
+      background: rgba(3, 7, 18, 0.7); padding: 6px 14px; border-radius: 20px;
+      border: 1px solid var(--border); backdrop-filter: blur(8px);
+    }
+    .hud span { color: var(--cyan); font-weight: 600; }
+    .nav-tip {
+      position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%);
+      color: var(--dim); font-size: .72rem; z-index: 200;
+      background: rgba(3,7,18,.6); padding: 5px 16px; border-radius: 16px;
+    }
+
+    .deck { width: 100%; height: 100%; position: relative; }
+    .slide {
+      position: absolute; inset: 0; display: none; flex-direction: column;
+      padding: var(--slide-pad-y) var(--slide-pad-x);
+      background:
+        linear-gradient(rgba(45, 212, 191, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(45, 212, 191, 0.03) 1px, transparent 1px),
+        radial-gradient(ellipse 70% 50% at 95% 5%, rgba(45, 212, 191, 0.08), transparent),
+        radial-gradient(ellipse 50% 40% at 5% 95%, rgba(96, 165, 250, 0.06), transparent),
+        linear-gradient(165deg, #0f172a 0%, #030712 100%);
+      background-size: 48px 48px, 48px 48px, auto, auto, auto;
+    }
+    .slide.active { display: flex; animation: slideIn .4s cubic-bezier(.22,1,.36,1); }
+    @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
+    .slide-inner { max-width: 1180px; width: 100%; margin: 0 auto; flex: 1; display: flex; flex-direction: column; min-height: 0; }
+
+    /* Cover */
+    .slide--cover { justify-content: center; align-items: center; text-align: center; background-size: 56px 56px, 56px 56px, auto, auto, auto; }
+    .slide--cover .slide-inner { align-items: center; justify-content: center; }
+    .cover-title { font-size: clamp(2.2rem, 4.5vw, 3.2rem); font-weight: 700; letter-spacing: -.03em; line-height: 1.12; }
+    .cover-title em { font-style: normal; background: linear-gradient(135deg, var(--cyan), var(--blue)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .cover-tag { font-size: clamp(1rem, 1.8vw, 1.2rem); color: var(--blue); margin: 16px 0 36px; font-weight: 400; letter-spacing: .02em; }
+    .meta-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 10px 32px; text-align: left;
+      padding: 28px 36px; max-width: 760px; width: 100%;
+      background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+      font-size: .9rem; color: var(--muted); backdrop-filter: blur(12px);
+      box-shadow: 0 20px 50px rgba(0,0,0,.35);
+    }
+    .meta-grid strong { color: var(--text); font-weight: 600; }
+    .badges { margin-top: 28px; display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+    .badge {
+      padding: 6px 16px; border-radius: 999px; font-size: .72rem; font-weight: 600;
+      letter-spacing: .04em; text-transform: uppercase;
+    }
+    .badge--danger { background: rgba(248,113,113,.12); color: #fca5a5; border: 1px solid rgba(248,113,113,.3); }
+    .badge--ok { background: rgba(74,222,128,.1); color: var(--green); border: 1px solid rgba(74,222,128,.25); }
+    .badge--info { background: var(--cyan-dim); color: var(--cyan); border: 1px solid rgba(45,212,191,.3); }
+
+    /* Section divider */
+    .slide--section { justify-content: center; align-items: center; text-align: center; }
+    .section-num { font-size: 5rem; font-weight: 700; line-height: 1; opacity: .12; color: var(--cyan); position: absolute; top: 18%; left: 8%; }
+    .section-title { font-size: clamp(2rem, 4vw, 2.8rem); font-weight: 700; letter-spacing: -.02em; }
+    .section-sub { font-size: 1.1rem; color: var(--muted); margin-top: 12px; max-width: 560px; line-height: 1.6; }
+
+    /* Header */
+    .header {
+      display: flex; justify-content: space-between; align-items: flex-end;
+      margin-bottom: 22px; padding-bottom: 14px;
+      border-bottom: 1px solid var(--border);
+      position: relative;
+    }
+    .header::after {
+      content: ""; position: absolute; bottom: -1px; left: 0; width: 120px; height: 2px;
+      background: linear-gradient(90deg, var(--cyan), transparent);
+    }
+    .header h2 { font-size: clamp(1.35rem, 2.2vw, 1.75rem); font-weight: 600; color: #fff; letter-spacing: -.02em; line-height: 1.25; }
+    .header .part { font-size: .68rem; font-weight: 600; text-transform: uppercase; letter-spacing: .12em; color: var(--cyan); margin-bottom: 6px; }
+    .header .num { font-family: "DM Sans", monospace; font-size: .82rem; color: var(--dim); }
+
+    .body { flex: 1; min-height: 0; overflow: hidden; display: flex; flex-direction: column; gap: 14px; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+
+    .card {
+      background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+      padding: 18px 20px; backdrop-filter: blur(10px);
+      transition: border-color .2s;
+    }
+    .card:hover { border-color: rgba(45, 212, 191, 0.25); }
+    .card h3 { font-size: .92rem; font-weight: 600; color: var(--blue); margin-bottom: 10px; letter-spacing: -.01em; }
+    .card p, .card li { font-size: .84rem; line-height: 1.68; color: #cbd5e1; }
+    .card ul, .card ol { margin-left: 1.15rem; margin-top: 4px; }
+    .card li { margin-bottom: 5px; }
+    .card--accent { border-left: 3px solid var(--cyan); background: linear-gradient(135deg, rgba(45,212,191,.06), transparent); }
+    .card--accent h3 { color: var(--cyan); }
+    .card--warn { border-left: 3px solid var(--red); }
+    .card--warn h3 { color: var(--red); }
+    .card--ok { border-left: 3px solid var(--green); }
+    .card--violet { border-left: 3px solid var(--violet); }
+    .card--violet h3 { color: var(--violet); }
+
+    .footer {
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: .7rem; color: var(--dim); padding-top: 12px; margin-top: auto;
+      border-top: 1px solid var(--border);
+    }
+    .footer strong { color: var(--blue); font-weight: 500; }
+
+    table { width: 100%; border-collapse: collapse; font-size: .78rem; }
+    th, td { padding: 9px 12px; text-align: left; border-bottom: 1px solid rgba(51,65,85,.6); }
+    th { background: rgba(96, 165, 250, 0.08); color: var(--blue); font-weight: 600; font-size: .72rem; text-transform: uppercase; letter-spacing: .04em; }
+    tr.highlight td { background: rgba(45, 212, 191, 0.06); }
+    tr.warn td { background: rgba(251, 146, 60, 0.06); }
+    .hl { color: var(--cyan); font-weight: 700; }
+    .warn-t { color: var(--orange); font-weight: 600; }
+    code { font-family: "DM Sans", ui-monospace, monospace; font-size: .76em; background: rgba(15,23,42,.8); padding: 2px 7px; border-radius: 5px; color: var(--cyan); border: 1px solid var(--border); }
+
+    .formula {
+      background: rgba(9, 13, 19, 0.9); border: 1px solid var(--border); border-radius: 10px;
+      padding: 14px 18px; margin: 10px 0; text-align: center; font-size: .9rem;
+      overflow-x: auto;
+    }
+
+    .flow { display: flex; flex-wrap: wrap; align-items: center; gap: 5px; }
+    .flow span {
+      background: var(--cyan-dim); border: 1px solid rgba(45,212,191,.2);
+      color: var(--cyan); padding: 5px 12px; border-radius: 8px;
+      font-size: .72rem; font-weight: 500;
+    }
+    .flow .arr { background: none; border: none; color: var(--dim); padding: 0 2px; font-size: .65rem; }
+
+    .arch-layer { display: flex; margin-bottom: 4px; border-radius: 8px; overflow: hidden; border: 1px solid var(--border); font-size: .76rem; }
+    .arch-num { min-width: 68px; display: flex; align-items: center; justify-content: center; background: #1e3a5f; color: #fff; font-weight: 700; font-size: .68rem; }
+    .arch-body { padding: 8px 14px; flex: 1; line-height: 1.45; color: #e2e8f0; }
+    .arch-layer.l8 .arch-num { background: #881337; }
+    .arch-layer.l2 .arch-num { background: #065f46; }
+
+    /* Timeline / evolution */
+    .timeline { display: flex; flex-direction: column; gap: 0; position: relative; padding-left: 28px; }
+    .timeline::before { content: ""; position: absolute; left: 8px; top: 8px; bottom: 8px; width: 2px; background: linear-gradient(180deg, var(--cyan), var(--blue), var(--violet)); border-radius: 2px; }
+    .tl-item { position: relative; padding: 10px 0 10px 20px; }
+    .tl-item::before { content: ""; position: absolute; left: -24px; top: 16px; width: 10px; height: 10px; border-radius: 50%; background: var(--cyan); box-shadow: 0 0 0 3px rgba(45,212,191,.25); }
+    .tl-item.done::before { background: var(--green); box-shadow: 0 0 0 3px rgba(74,222,128,.25); }
+    .tl-phase { font-size: .65rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--cyan); }
+    .tl-title { font-size: .88rem; font-weight: 600; color: #fff; margin: 2px 0 4px; }
+    .tl-desc { font-size: .76rem; color: var(--muted); line-height: 1.5; }
+    .tl-metric { font-size: .72rem; color: var(--orange); font-family: monospace; margin-top: 3px; }
+
+    .wf-diagram {
+      display: flex; align-items: center; gap: 4px; flex-wrap: wrap; margin: 12px 0;
+      font-size: .68rem; font-weight: 600;
+    }
+    .wf-block {
+      padding: 8px 10px; border-radius: 6px; text-align: center; min-width: 52px;
+      border: 1px solid var(--border);
+    }
+    .wf-block.train { background: rgba(96,165,250,.15); color: var(--blue); }
+    .wf-block.val { background: rgba(167,139,250,.12); color: var(--violet); }
+    .wf-block.test { background: rgba(251,146,60,.12); color: var(--orange); }
+    .wf-block.oos { background: rgba(45,212,191,.15); color: var(--cyan); border-color: rgba(45,212,191,.4); }
+    .wf-arrow { color: var(--dim); font-size: .8rem; }
+
+    .chart-row { display: flex; align-items: flex-end; gap: 12px; height: 120px; padding-top: 6px; }
+    .bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 0; }
+    .bar-val { font-size: .76rem; font-weight: 700; color: var(--cyan); }
+    .bar { width: 100%; max-width: 44px; border-radius: 6px 6px 0 0; background: linear-gradient(180deg, var(--blue), #3b82f6); }
+    .bar--base { background: linear-gradient(180deg, var(--cyan), #14b8a6); }
+    .bar--warn { background: linear-gradient(180deg, #ea580c, #fb923c); }
+    .bar-label { font-size: .6rem; color: var(--muted); text-align: center; line-height: 1.2; }
+
+    .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+    .kpi { text-align: center; padding: 14px 8px; border-radius: 12px; background: var(--card); border: 1px solid var(--border); }
+    .kpi b { display: block; font-size: 1.3rem; font-weight: 700; color: var(--cyan); letter-spacing: -.02em; }
+    .kpi span { font-size: .65rem; color: var(--muted); margin-top: 2px; display: block; }
+
+    .toc-part { padding: 18px 20px; border-radius: 12px; border: 1px solid var(--border); background: var(--card); }
+    .toc-part h3 { font-size: .95rem; color: var(--cyan); margin-bottom: 10px; font-weight: 600; }
+    .toc-part ol { margin-left: 1.2rem; font-size: .8rem; color: #cbd5e1; line-height: 1.75; }
+
+    .img-ph {
+      border: 1px dashed rgba(148,163,184,.25); border-radius: 12px;
+      background: rgba(15,23,42,.4); min-height: 120px;
+      display: flex; align-items: center; justify-content: center;
+      text-align: center; padding: 16px; font-size: .76rem; color: var(--dim); line-height: 1.55;
+    }
+
+    .pill-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+    .pill { font-size: .68rem; padding: 4px 10px; border-radius: 6px; background: rgba(15,23,42,.6); border: 1px solid var(--border); color: var(--muted); }
+
+    .compact .card { padding: 14px 16px; }
+    .compact .card p, .compact .card li { font-size: .78rem; line-height: 1.55; }
+
+    @media (max-width: 900px) {
+      .grid-2, .grid-3, .kpi-row, .meta-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="progress" id="progress"></div>
+  <div class="hud"><span id="cur">1</span> / <span id="total">0</span></div>
+  <div class="nav-tip">← → 翻页 · F 全屏</div>
+
+  <div class="deck" id="deck">
+
+    <!-- 01 Cover -->
+    <section class="slide slide--cover active">
+      <div class="slide-inner">
+        <h1 class="cover-title">Quant MAS <em>v5.1</em></h1>
+        <p class="cover-tag">多智能体量化研究平台 · SRTP 结题汇报</p>
+        <div class="meta-grid">
+          <div><strong>汇报人</strong> 魏子安 · 浙江大学</div>
+          <div><strong>联系</strong> 3240101782@zju.edu.cn</div>
+          <div><strong>开源</strong> github.com/ytq0198/Quant-MAS</div>
+          <div><strong>主指标</strong> OOS Sharpe 0.586 · 361 tests</div>
+        </div>
+        <div class="badges">
+          <span class="badge badge--danger">Live trading disabled</span>
+          <span class="badge badge--info">Research-only</span>
+          <span class="badge badge--ok">Paper-grade = oos.*</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 02 TOC -->
+    <section class="slide">
+      <div class="slide-inner">
+        <div class="header"><div><div class="part">Overview</div><h2>汇报结构</h2></div><div class="num slide-num"></div></div>
+        <div class="body grid-3">
+          <div class="toc-part">
+            <h3>Ⅰ 整体架构 · 6 页</h3>
+            <ol>
+              <li>项目定位与安全边界</li>
+              <li>8 层系统架构</li>
+              <li>部署与 Web 控制台</li>
+              <li>Agent / Engine 分工</li>
+            </ol>
+          </div>
+          <div class="toc-part">
+            <h3>Ⅱ 核心算法 · 14 页</h3>
+            <ol>
+              <li>算法演进路线（v1→v3）</li>
+              <li>数据验证 · 特征 · 文本</li>
+              <li>MaCross · BacktestEngine</li>
+              <li>LightGBM · ml_signal · WF OOS</li>
+              <li>GRPO · TradingEnv · Population</li>
+              <li>指标族隔离</li>
+            </ol>
+          </div>
+          <div class="toc-part">
+            <h3>Ⅲ 实验结果 · 7 页</h3>
+            <ol>
+              <li>8 条服务器实验</li>
+              <li>OOS 主结果 0.586</li>
+              <li>In-sample 警示 · 文本 ablation</li>
+              <li>里程碑 · 局限 · Q&amp;A</li>
+            </ol>
+          </div>
+        </div>
+        <div class="footer"><span>Quant MAS v5.1</span><span>浙江大学 SRTP</span></div>
+      </div>
+    </section>
+
+    <!-- PART I (03-06) - condensed same content with slide-inner wrapper -->
+    <section class="slide">
+      <div class="slide-inner">
+        <div class="header"><div><div class="part">Part I · Architecture</div><h2>项目定位：研究平台，非实盘系统</h2></div><div class="num slide-num"></div></div>
+        <div class="body grid-2">
+          <div class="card card--warn">
+            <h3>量化研究 vs 实盘交易</h3>
+            <table>
+              <tr><th>能力</th><th>Quant MAS</th></tr>
+              <tr class="highlight"><td>数据 → 回测 → OOS → 审计 → 论文</td><td class="hl">✓ 核心</td></tr>
+              <tr><td>券商 API / 实盘下单</td><td class="warn-t">✗ 禁用</td></tr>
+            </table>
+          </div>
+          <div class="card card--accent">
+            <h3>Core Separation 核心分离</h3>
+            <ul>
+              <li><strong>Quant Engine</strong> — 确定性 Python 计算，可复现</li>
+              <li><strong>Agent Layer</strong> — 编排、RAG、解释，不下单</li>
+              <li><strong>Web Console</strong> — Job 提交、审查、可观测性</li>
+            </ul>
+            <div class="flow" style="margin-top:10px"><span>Browser</span><span class="arr">→</span><span>SSH :8000</span><span class="arr">→</span><span>GPU Server</span></div>
+          </div>
+        </div>
+        <div class="footer"><span>安全边界内建于设计</span><strong>非投资建议</strong></div>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="slide-inner">
+        <div class="header"><div><div class="part">Part I</div><h2>8 层系统架构</h2></div><div class="num slide-num"></div></div>
+        <div class="body" style="gap:4px">
+          <div class="arch-layer l8"><div class="arch-num">L8</div><div class="arch-body"><strong>Outputs / Human Review</strong> — 报告、Audit、论文导出、人工审查</div></div>
+          <div class="arch-layer"><div class="arch-num">L7</div><div class="arch-body"><strong>Orchestration</strong> — M4 DAG · M13 MCP · LangGraph · ToolPolicy</div></div>
+          <div class="arch-layer"><div class="arch-num">L6</div><div class="arch-body"><strong>Agent</strong> — Supervisor · Research · Report · ToolRegistry</div></div>
+          <div class="arch-layer"><div class="arch-num">L5</div><div class="arch-body"><strong>Tools</strong> — Backtest · Train · Risk · Pipeline · Report</div></div>
+          <div class="arch-layer"><div class="arch-num">L4</div><div class="arch-body"><strong>Memory/RAG</strong> — HybridRetriever · pgvector · Neo4j</div></div>
+          <div class="arch-layer"><div class="arch-num">L3</div><div class="arch-body"><strong>Experiment</strong> — ExperimentMemory · BaselineRegistry</div></div>
+          <div class="arch-layer l2"><div class="arch-num">L2</div><div class="arch-body"><strong>Quant Engine</strong> — validate_ohlcv · WF OOS · BacktestEngine</div></div>
+          <div class="arch-layer"><div class="arch-num" style="background:#334155">L1</div><div class="arch-body" style="color:var(--muted)"><strong>Data</strong> — Stooq/YFinance/FRED/SEC → Parquet</div></div>
+        </div>
+        <div class="footer"><span>architecture.png</span><strong>8 Layers</strong></div>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="slide-inner">
+        <div class="header"><div><div class="part">Part I</div><h2>部署拓扑 & v5 Web 控制台</h2></div><div class="num slide-num"></div></div>
+        <div class="body grid-2">
+          <div class="img-ph">[配图：SSH 隧道 / architecture.png]</div>
+          <div>
+            <div class="card card--accent" style="margin-bottom:12px"><h3>Enterprise Research Console</h3><p>13+ 页面 · Job Console · Help 指南 · 中英文 · <code>POST /api/jobs</code></p></div>
+            <div class="kpi-row" style="grid-template-columns:1fr 1fr"><div class="kpi"><b>361</b><span>pytest</span></div><div class="kpi"><b>CUDA</b><span>GPU OOS</span></div></div>
+          </div>
+        </div>
+        <div class="footer"><span>a6000-9961</span><strong>Web + CLI</strong></div>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="slide-inner">
+        <div class="header"><div><div class="part">Part I</div><h2>Agent 与 Quant Engine 分工</h2></div><div class="num slide-num"></div></div>
+        <div class="body">
+          <div class="flow" style="justify-content:center;margin-bottom:14px"><span>UI Job</span><span class="arr">→</span><span>Supervisor</span><span class="arr">→</span><span>ToolRegistry</span><span class="arr">→</span><span>BacktestTool</span><span class="arr">→</span><span>artifacts</span></div>
+          <table>
+            <tr><th></th><th>Quant Engine</th><th>Agent</th></tr>
+            <tr><td>算什么</td><td>Sharpe、权益、oos.*</td><td>不直接算指标</td></tr>
+            <tr><td>DAG</td><td colspan="2" style="text-align:center"><code>Target → Data → Features → Train → Backtest → Audit</code></td></tr>
+            <tr class="warn"><td>实盘</td><td>历史模拟</td><td><strong>禁止</strong></td></tr>
+          </table>
+        </div>
+        <div class="footer"><span>MCP · ToolPolicy</span><strong>Human Review</strong></div>
+      </div>
+    </section>
+
+    <!-- PART II SECTION -->
+    <section class="slide slide--section">
+      <div class="section-num">Ⅱ</div>
+      <div class="slide-inner" style="align-items:center;text-align:center">
+        <p class="section-title">核心算法设计与演进</p>
+        <p class="section-sub">从规则基线 → ML 单段回测 → Walk-forward OOS → 文本消融 → GRPO/种群扩展<br>展示<strong style="color:var(--cyan)">改进过程</strong>与每阶段指标族边界</p>
+      </div>
+    </section>
+
+    <!-- 08 Algorithm evolution timeline -->
+    <section class="slide">
+      <div class="slide-inner">
+        <div class="header"><div><div class="part">Part II · Evolution</div><h2>算法演进路线：从 v1 到 v3</h2></div><div class="num slide-num"></div></div>
+        <div class="body grid-2">
+          <div class="timeline">
+            <div class="tl-item done"><div class="tl-phase">v1 · Prompt 1–20</div><div class="tl-title">确定性量化流水线</div><div class="tl-desc">validate_ohlcv · MaCross · BacktestEngine · 首版 WF 骨架</div></div>
+            <div class="tl-item done"><div class="tl-phase">对照实验</div><div class="tl-title">MaCross 全样本回测</div><div class="tl-desc">server_ma_cross_real_001</div><div class="tl-metric">sharpe 1.00 · 非 OOS</div></div>
+            <div class="tl-item done"><div class="tl-phase">ML 单段（警示）</div><div class="tl-title">LightGBM + 全段回测</div><div class="tl-desc">暴露 in-sample 过拟合风险</div><div class="tl-metric warn-t">sharpe 2.78 · 禁止作主结论</div></div>
+            <div class="tl-item done"><div class="tl-phase">EXP-20260602-008</div><div class="tl-title">Walk-forward OOS 主 Baseline</div><div class="tl-desc">19 窗 · CUDA · ml_signal</div><div class="tl-metric">oos.sharpe 0.586 🏆</div></div>
+          </div>
+          <div class="timeline">
+            <div class="tl-item done"><div class="tl-phase">M6 · 文本消融</div><div class="tl-title">FinBERT + Finnhub 三线实验</div><div class="tl-desc">WF-text 001/002/003 · 覆盖率 3.3% / 100% / 2.4%</div><div class="tl-metric">oos 0.563–0.579 · 未超 baseline</div></div>
+            <div class="tl-item done"><div class="tl-phase">M7 · RL/GRPO</div><div class="tl-title">TradingEnv + 组内相对优势</div><div class="tl-desc">simulation.* 仿真训练 · 非主表指标</div></div>
+            <div class="tl-item done"><div class="tl-phase">M11–M12 · 种群/RL OOS</div><div class="tl-title">PopulationManager · 候选策略 OOS 验证</div><div class="tl-desc">M12.3 教训：无视观测 → oos 0.0；M12.4 观测感知 → oos 0.387</div></div>
+            <div class="tl-item done"><div class="tl-phase">M13 · 编排收口</div><div class="tl-title">MCP · YAML Recipe · 论文导出</div><div class="tl-desc">361 pytest · paper_main_results.csv</div></div>
+          </div>
+        </div>
+        <div class="footer"><span>docs/progress.md</span><strong>改进过程可追溯</strong></div>
+      </div>
+    </section>
+
+    <!-- 09 Data validation -->
+    <section class="slide">
+      <div class="slide-inner">
+        <div class="header"><div><div class="part">Part II · Data</div><h2>数据验证管道 validate_ohlcv（M2）</h2></div><div class="num slide-num"></div></div>
+        <div class="body grid-2">
+          <div class="card">
+            <h3>多源抓取 → 统一 Schema</h3>
+            <ul>
+              <li>OHLCV：Stooq / YFinance · AAPL MSFT SPY</li>
+              <li>宏观：FRED（DGS10 等）· SEC EDGAR JSON</li>
+              <li>文本：Finnhub 新闻 → sentiment 信号表</li>
+            </ul>
+            <div class="formula">$$\text{Raw} \xrightarrow{\texttt{validate\_ohlcv}} \mathcal{D}_{clean} \rightarrow \text{Parquet}$$</div>
+          </div>
+          <div class="card card--accent">
+            <h3>校验规则（LLM 上游、确定性执行）</h3>
+            <ul>
+              <li>必需列：date, symbol, open, high, low, close, volume</li>
+              <li>拒绝 high &lt; low、负 volume、重复 date+symbol</li>
+              <li>按 symbol 分组排序，保证时序单调</li>
+              <li>输出 <code>data/raw/market_data.parquet</code></li>
+            </ul>
+            <p style="margin-top:8px;font-size:.78rem;color:var(--muted)">脏数据在 Agent 介入前被拦截，避免「幻觉式策略」。</p>
+          </div>
+        </div>
+        <div class="footer"><span>src/quant_mas/data/</span><strong>Layer 1→2</strong></div>
+      </div>
+    </section>
+
+    <!-- 10 Feature pipeline -->
+    <section class="slide">
+      <div class="slide-inner">
+        <div class="header"><div><div class="part">Part II · Features</div><h2>特征工程流水线 build_feature_table（M6）</h2></div><div class="num slide-num"></div></div>
+        <div class="body">
+          <div class="flow" style="margin-bottom:12px">
+            <span>OHLCV</span><span class="arr">→</span><span>returns</span><span class="arr">→</span><span>MA/距离</span><span class="arr">→</span><span>volatility</span><span class="arr">→</span><span>volume</span><span class="arr">→</span><span>RSI</span><span class="arr">→</span><span>label</span><span class="arr">→</span><span>[+text]</span>
+          </div>
+          <div class="grid-2">
+            <div class="card">
+              <h3>15 维技术特征（per symbol 独立计算）</h3>
+              <div class="pill-row">
+                <span class="pill">return_1</span><span class="pill">ma_5/20</span><span class="pill">ma_distance</span>
+                <span class="pill">volatility_20</span><span class="pill">volume_ratio</span><span class="pill">rsi_14</span>
+              </div>
+              <p style="margin-top:10px">标签：<code>future_direction_5</code>（5 日后涨跌方向）· 6033 行 · 3 标的</p>
+            </div>
+            <div class="card card--violet">
+              <h3>文本信号合并（可选 · M6 改进线）</h3>
+              <ul>
+                <li><code>merge_text_signals_into_features</code></li>
+                <li>FinBERT sentiment → 按 date+symbol 对齐</li>
+                <li>缺失 fillna(0) 或占位实验（WF-002）</li>
+                <li>审计：<code>text_signal_audit_wf*</code> 测覆盖率</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="footer"><span>features/pipelines.py</span><strong>15 features</strong></div>
+      </div>
+    </section>
+
+    <!-- 11 MaCross -->
+    <section class="slide">
+      <div class="slide-inner">
+        <div class="header"><div><div class="part">Part II · Strategy</div><h2>规则基线：MovingAverageCrossStrategy</h2></div><div class="num slide-num"></div></div>
+        <div class="body grid-2">
+          <div class="card">
+            <h3>信号逻辑（long-only）</h3>
+            <ul>
+              <li>快均线 MA<sub>fast</sub>（默认 5） vs 慢均线 MA<sub>slow</sub>（默认 20）</li>
+              <li>fast &gt; slow → target_weight = 1.0（满仓该标的）</li>
+              <li>否则 → target_weight = 0（空仓）</li>
+              <li>按 symbol 分组独立计算，避免跨标的泄漏</li>
+            </ul>
+          </div>
+          <div class="card card--accent">
+            <h3>实验结果（对照用）</h3>
+            <table>
+              <tr><th>指标</th><th>值</th></tr>
+              <tr><td>sharpe</td><td>1.00</td></tr>
+              <tr><td>total_return</td><td>202%</td></tr>
+              <tr><td>max_drawdown</td><td>−20.6%</td></tr>
+              <tr><td>用途</td><td class="warn-t">UI 默认回测 · 非 OOS 主结论</td></tr>
+            </table>
+            <p style="margin-top:8px;font-size:.78rem">实现：<code>src/quant_mas/strategies/ma_cross.py</code></p>
+          </div>
+        </div>
+        <div class="footer"><span>server_ma_cross_real_001</span><strong>Phase 1 Baseline</strong></div>
+      </div>
+    </section>
+
+    <!-- 12 BacktestEngine -->
+    <section class="slide">
+      <div class="slide-inner">
+        <div class="header"><div><div class="part">Part II · Engine</div><h2>BacktestEngine：确定性成交模拟</h2></div><div class="num slide-num"></div></div>
+        <div class="body grid-2 compact">
+          <div class="card card--accent">
+            <h3>执行假设</h3>
+            <ol>
+              <li>策略输出 <code>target_weight</code>（T 日收盘后可知）</li>
+              <li><strong>下一根 K 线开盘价</strong> 成交（无未来函数）</li>
+              <li>SlippageModel 调整成交价 · CommissionModel 扣费</li>
+              <li>多标的：initial_cash 均分 · 权益曲线合并缩放</li>
+            </ol>
+          </div>
+          <div class="card">
+            <h3>输出产物</h3>
+            <ul>
+              <li><code>equity_curve.csv</code> — 每日权益</li>
+              <li><code>trades.csv</code> — 成交明细</li>
+              <li><code>metrics.json</code> — Sharpe、回撤、年化</li>
+              <li>注册 ExperimentMemory → experiments.json</li>
+            </ul>
+            <p style="margin-top:8px;color:var(--muted);font-size:.78rem">LLM 不可修改此引擎数学逻辑，仅可调配置参数。</p>
+          </div>
+        </div>
+        <div class="footer"><span>backtest/engine.py</span><strong>Deterministic</strong></div>
+      </div>
+    </section>
+
+    <!-- 13 LightGBM -->
+    <section class="slide">
+      <div class="slide-inner">
+        <div class="header"><div><div class="part">Part II · ML</div><h2>LightGBM 方向模型（两种训练模式）</h2></div><div class="num slide-num"></div></div>
+        <div class="body grid-2">
+          <div class="card">
+            <h3>模式 A：单次时序切分（TrainModelTool）</h3>
+            <ul>
+              <li>train 70% / val 15% / test 15%（按时间）</li>
+              <li>输出 train/val/test AUC、accuracy</li>
+              <li>server_lgbm_gpu_001：<strong>test_auc 0.479</strong> ≈ 随机</li>
+              <li>→ 说明不能只看 test 段，必须 WF OOS</li>
+            </ul>
+          </div>
+          <div class="card card--accent">
+            <h3>模式 B：Walk-forward 每窗重训（主路径）</h3>
+            <ul>
+              <li>每窗独立 fit LightGBM · device=cuda</li>
+              <li>超参：n_estimators=100, lr=0.05, num_leaves=31</li>
+              <li>Train AUC ≈ 0.997 vs OOS AUC ≈ 0.472</li>
+              <li>→ 过拟合可视化，支撑 OOS 必要性</li>
+            </ul>
+          </div>
+        </div>
+        <div class="footer"><span>models/lightgbm_direction</span><strong>LightGBM</strong></div>
+      </div>
+    </section>
+
+    <!-- 14 ml_signal -->
+    <section class="slide">
+      <div class="slide-inner">
+        <div class="header"><div><div class="part">Part II · Strategy</div><h2>MLSignalStrategy：概率 → 仓位</h2></div><div class="num slide-num"></div></div>
+        <div class="body grid-2">
+          <div class="card card--accent">
+            <h3>状态机（每 symbol 独立）</h3>
+            <table>
+              <tr><th>pred_proba</th><th>signal</th><th>target_weight</th></tr>
+              <tr><td>≥ 0.6 (buy_threshold)</td><td>+1</td><td>1.0</td></tr>
+              <tr><td>≤ 0.4 (sell_threshold)</td><td>−1</td><td>0.0</td></tr>
+              <tr><td>中间区间</td><td>0</td><td>保持上一权重</td></tr>
+            </table>
+            <p style="margin-top:8px;font-size:.78rem">策略<strong>不调用模型</strong>，只消费预计算 pred_proba 表 — 严格因果。</p>
+          </div>
+          <div class="card">
+            <h3>与 MaCross 对比</h3>
+            <ul>
+              <li>MaCross：纯规则，可解释，UI 默认</li>
+              <li>ml_signal：ML 概率驱动，WF OOS 主路径</li>
+              <li>二者共用同一 BacktestEngine 成交逻辑</li>
+            </ul>
+          </div>
+        </div>
+        <div class="footer"><span>strategies/ml_signal.py</span><strong>Threshold Strategy</strong></div>
+      </div>
+    </section>
+
+    <!-- 15 Walk-forward detail -->
+    <section class="slide">
+      <div class="slide-inner">
+        <div class="header"><div><div class="part">Part II · OOS</div><h2>Walk-forward OOS：窗口机制（核心改进）</h2></div><div class="num slide-num"></div></div>
+        <div class="body">
+          <p style="font-size:.82rem;color:var(--muted);margin-bottom:8px">相对「全样本一次训练」，WF 将时间轴切为 19 个滚动窗口，每窗 OOS 段从未参与训练。</p>
+          <div class="wf-diagram">
+            <div class="wf-block train">Train<br>504d</div><span class="wf-arrow">→</span>
+            <div class="wf-block val">Val<br>126d</div><span class="wf-arrow">→</span>
+            <div class="wf-block test">Test<br>126d</div><span class="wf-arrow">→</span>
+            <div class="wf-block oos">OOS<br>63d</div>
+            <span class="wf-arrow" style="margin-left:8px">⇒ step 63d 滚动 ×19</span>
+          </div>
+          <div class="grid-2" style="margin-top:10px">
+            <div class="card card--accent">
+              <h3>每窗算法循环（run_walk_forward）</h3>
+              <ol style="font-size:.8rem">
+                <li>切片 train/val/test/oos 日期索引</li>
+                <li>fit LightGBM(train) → predict 各段</li>
+                <li>evaluate AUC/accuracy（分 split 记录）</li>
+                <li>OOS 段 → MLSignalStrategy → BacktestEngine</li>
+                <li>汇总 oos_equity_curve · windows.csv</li>
+              </ol>
+            </div>
+            <div class="card">
+              <h3>主 Baseline 汇总指标</h3>
+              <table>
+                <tr><th>oos.*</th><th>值</th></tr>
+                <tr class="highlight"><td>sharpe</td><td class="hl">0.586</td></tr>
+                <tr><td>total_return</td><td>44.3%</td></tr>
+                <tr><td>max_drawdown</td><td>−25.5%</td></tr>
+                <tr><td>annualized_return</td><td>~8.0%</td></tr>
+                <tr><td>windows</td><td>19</td></tr>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class="footer"><span>backtest/walk_forward.py</span><strong>EXP-20260602-008</strong></div>
+      </div>
+    </section>
+
+    <!-- 16 Text ablation evolution -->
+    <section class="slide">
+      <div class="slide-inner">
+        <div class="header"><div><div class="part">Part II · M6 Ablation</div><h2>文本信号改进实验：三线消融</h2></div><div class="num slide-num"></div></div>
+        <div class="body">
+          <table>
+            <tr><th>阶段</th><th>实验</th><th>设计意图</th><th>覆盖率</th><th>oos.sharpe</th><th>Δ vs 0.586</th></tr>
+            <tr><td>① Smoke</td><td>WF-text-001</td><td>200 条 FinBERT 能否起效</td><td>3.3%</td><td>0.563</td><td>−0.023</td></tr>
+            <tr><td>② 噪声对照</td><td>WF-text-002</td><td>100% 占位文本（上界/噪声）</td><td>100%</td><td>0.579</td><td>−0.007</td></tr>
+            <tr class="highlight"><td>③ 真实新闻</td><td>WF-text-003</td><td>Finnhub 基本面新闻</td><td>2.4%</td><td class="hl">0.565</td><td>−0.021</td></tr>
+            <tr class="highlight"><td>Baseline</td><td>无文本</td><td>纯量价 15 维</td><td>—</td><td class="hl">0.586</td><td>—</td></tr>
+          </table>
+          <div class="card card--warn" style="margin-top:12px"><p><strong>改进结论：</strong>文本未稳定超越 baseline — 主因<strong>覆盖率过低</strong>（真实新闻仅 146/6033 行），非 WF 框架问题。下一步：LoRA FinBERT + 更长窗口（EXP-TEXT-002 规划中）。</p></div>
+        </div>
+        <div class="footer"><span>real_news_text_experiment.md</span><strong>M6 Complete</strong></div>
+      </div>
+    </section>
+
+    <!-- 17 GRPO objective -->
+    <section class="slide">
+      <div class="slide-inner">
+        <div class="header"><div><div class="part">Part II · RL/GRPO</div><h2>GRPO：无 Critic 的组内策略优化（M7）</h2></div><div class="num slide-num"></div></div>
+        <div class="body">
+          <div class="grid-2 compact">
+            <div class="card"><h3>相对 PPO 的改进动机</h3><ul><li>PPO 需 Critic 估计 V(s)，金融噪声下易不收敛</li><li>GRPO 去掉 Critic，同状态采样 G 个动作/策略</li><li>用组内收益排名计算优势，省显存、适合多 Agent</li></ul></div>
+            <div class="card card--warn"><h3>指标边界</h3><p>GRPO 训练产物归属 <code>simulation.*</code> / <code>training.*</code>。<strong>不进 paper_main_results 主表</strong>。推广到 OOS 须走 M11.7/M11.8 候选验证桥。</p></div>
+          </div>
+          <div class="card card--accent" style="margin-top:10px">
+            <h3>裁剪目标函数 + KL 惩罚</h3>
+            <div class="formula">$$J_{GRPO}(\theta) = \mathbb{E}\left[\min(r_i A_i, \text{clip}(r_i) A_i) - \beta D_{KL}(\pi_\theta \| \pi_{ref})\right]$$</div>
+            <div class="formula" style="margin-top:8px">$$A_i = \frac{R_i - \mathrm{mean}(R_{1..G})}{\mathrm{std}(R_{1..G})}$$</div>
+          </div>
+        </div>
+        <div class="footer"><span>rl/grpo_agent.py</span><strong>simulation only</strong></div>
+      </div>
+    </section>
+
+    <!-- 18 TradingEnv -->
+    <section class="slide">
+      <div class="slide-inner">
+        <div class="header"><div><div class="part">Part II · RL/GRPO</div><h2>TradingEnv MDP 与奖励塑形</h2></div><div class="num slide-num"></div></div>
+        <div class="body grid-2 compact">
+          <div class="card">
+            <h3>状态 S<sub>t</sub></h3>
+            <div class="formula" style="font-size:.82rem">$$S_t = \{X_{t-N:t}, w_{t-1}, Drawdown_t, M_{RAG}(t)\}$$</div>
+            <ul><li>多模态特征窗口 · 上一期权重 · 回撤 · RAG 检索上下文</li></ul>
+          </div>
+          <div class="card">
+            <h3>动作 A<sub>t</sub></h3>
+            <ul>
+              <li>离散：{Buy, Sell, Hold} 或 logits .argmax</li>
+              <li>连续：目标权重向量 Σw=1, w≥0</li>
+            </ul>
+          </div>
+          <div class="card card--accent" style="grid-column:1/-1">
+            <h3>奖励 R<sub>t</sub>（Sharpe + 回撤 + 换手）</h3>
+            <div class="formula">$$R_t = \frac{E[r_t]-r_f}{\sigma(r_t)} - \lambda_1 \max D_\tau - \lambda_2 \|\Delta w_t\|_2^2$$</div>
+          </div>
+        </div>
+        <div class="footer"><span>rl/trading_env.py</span><strong>M7 TradingEnv</strong></div>
+      </div>
+    </section>
+
+    <!-- 19 Population + RL OOS lessons -->
+    <section class="slide">
+      <div class="slide-inner">
+        <div class="header"><div><div class="part">Part II · M11–M12</div><h2>种群演化与 RL→OOS 验证教训</h2></div><div class="num slide-num"></div></div>
+        <div class="body grid-2 compact">
+          <div class="card card--violet">
+            <h3>PopulationManager（M11）</h3>
+            <ul>
+              <li>多 Agent 候选池 · 自博弈 / Elo 相对评分</li>
+              <li>汉明距离多样性 guard：相似策略强制淘汰</li>
+              <li>M11.7/M11.8：候选策略必须过 WF OOS 桥接</li>
+              <li>本地 EXP：候选 best oos 可达 1.039（研究扩展，非服务器主表）</li>
+            </ul>
+          </div>
+          <div class="card card--warn">
+            <h3>RL OOS 改进链（M12 教训）</h3>
+            <table>
+              <tr><th>EXP</th><th>问题</th><th>oos.sharpe</th></tr>
+              <tr><td>M12.3 POP-009</td><td>policy 不读观测 → 全现金</td><td>0.0</td></tr>
+              <tr class="highlight"><td>M12.4 POP-010</td><td>Observation-aware RL</td><td class="hl">0.387</td></tr>
+              <tr class="highlight"><td>Baseline</td><td>LightGBM WF</td><td class="hl">0.586</td></tr>
+            </table>
+            <p style="margin-top:6px;font-size:.76rem">→ simulation 高 reward ≠ oos 有效；必须独立 OOS 验证。</p>
+          </div>
+        </div>
+        <div class="footer"><span>agents/population_manager.py</span><strong>Evolution + Audit</strong></div>
+      </div>
+    </section>
+
+    <!-- 20 Metrics -->
+    <section class="slide">
+      <div class="slide-inner">
+        <div class="header"><div><div class="part">Part II · Compliance</div><h2>指标命名空间物理隔离</h2></div><div class="num slide-num"></div></div>
+        <div class="body">
+          <table>
+            <tr><th>命名空间</th><th>场景</th><th>规则</th></tr>
+            <tr class="highlight"><td class="hl">oos.*</td><td>Walk-forward 样本外</td><td>🏆 唯一论文级合法指标</td></tr>
+            <tr><td>simulation.*</td><td>RL 仿真 / ML 单段</td><td>❌ 禁止作主结论（如 sharpe 2.78）</td></tr>
+            <tr><td>training.*</td><td>AUC / 损失</td><td>❌ 仅收敛分析</td></tr>
+            <tr><td>population.*</td><td>种群竞争</td><td>❌ 须过 OOS 桥接才可对比</td></tr>
+          </table>
+        </div>
+        <div class="footer"><span>research_protocol.md</span><strong>Metric Families</strong></div>
+      </div>
+    </section>
+
+    <!-- PART III SECTION -->
+    <section class="slide slide--section">
+      <div class="section-num">Ⅲ</div>
+      <div class="slide-inner" style="align-items:center;text-align:center">
+        <p class="section-title">实验数据分析结果</p>
+        <p class="section-sub">a6000 服务器 · 2026-06-04 导出 · docs/ppt_data<br>主表仅 <strong style="color:var(--cyan)">oos.*</strong></p>
+      </div>
+    </section>
+
+    <!-- 22 Experiments -->
+    <section class="slide">
+      <div class="slide-inner">
+        <div class="header"><div><div class="part">Part III</div><h2>服务器 8 条实验概览</h2></div><div class="num slide-num"></div></div>
+        <div class="body">
+          <table>
+            <tr><th>实验</th><th>family</th><th>关键指标</th><th>角色</th></tr>
+            <tr><td>ma_cross_real_001</td><td>ma_cross</td><td>sharpe 1.00</td><td>规则对照</td></tr>
+            <tr><td>lgbm_gpu_001</td><td>lightgbm</td><td>test_auc 0.479</td><td>训练诊断</td></tr>
+            <tr class="warn"><td>ml_backtest_001</td><td>ml_backtest</td><td class="warn-t">sharpe 2.78</td><td>过拟合警示</td></tr>
+            <tr class="highlight"><td>walk_forward_001</td><td>walk_forward</td><td class="hl">oos 0.586</td><td>主 baseline</td></tr>
+            <tr><td>walk_forward_text_*</td><td>text_ablation</td><td>oos 0.563–0.579</td><td>M6 三线</td></tr>
+            <tr><td>EXP-LLM-002</td><td>llm</td><td>—</td><td>Agent 解释层</td></tr>
+          </table>
+        </div>
+        <div class="footer"><span>experiments.json</span><strong>8 Experiments</strong></div>
+      </div>
+    </section>
+
+    <!-- 23 OOS main -->
+    <section class="slide">
+      <div class="slide-inner">
+        <div class="header"><div><div class="part">Part III</div><h2>OOS 主结果 & In-sample 警示</h2></div><div class="num slide-num"></div></div>
+        <div class="body grid-2">
+          <div>
+            <div class="chart-row">
+              <div class="bar-wrap"><div class="bar-val hl">.586</div><div class="bar bar--base" style="height:110px"></div><div class="bar-label">WF base</div></div>
+              <div class="bar-wrap"><div class="bar-val">.563</div><div class="bar" style="height:106px"></div><div class="bar-label">text_001</div></div>
+              <div class="bar-wrap"><div class="bar-val">.579</div><div class="bar" style="height:109px"></div><div class="bar-label">text_002</div></div>
+              <div class="bar-wrap"><div class="bar-val">.565</div><div class="bar" style="height:107px"></div><div class="bar-label">text_003</div></div>
+            </div>
+            <div class="chart-row" style="margin-top:16px;height:80px">
+              <div class="bar-wrap"><div class="bar-val warn-t">2.78</div><div class="bar bar--warn" style="height:70px"></div><div class="bar-label">ML in-sample ⚠</div></div>
+              <div class="bar-wrap"><div class="bar-val">1.00</div><div class="bar" style="height:28px"></div><div class="bar-label">MA cross</div></div>
+            </div>
+          </div>
+          <div class="card card--accent">
+            <h3>特征重要性 Top 5</h3>
+            <table>
+              <tr><th>feature</th><th>imp</th></tr>
+              <tr><td>volatility_20</td><td>414</td></tr>
+              <tr><td>volume_ma_20</td><td>378</td></tr>
+              <tr><td>ma_20</td><td>329</td></tr>
+              <tr><td>ma_distance_20</td><td>251</td></tr>
+              <tr><td>rsi_14</td><td>221</td></tr>
+            </table>
+            <p style="margin-top:10px;font-size:.78rem">波动率与成交量特征主导 → 与 MA 规则基线形成互补对照。</p>
+          </div>
+        </div>
+        <div class="footer"><span>paper_main_results.csv</span><strong>oos.sharpe = 0.586</strong></div>
+      </div>
+    </section>
+
+    <!-- 24 Milestones -->
+    <section class="slide">
+      <div class="slide-inner">
+        <div class="header"><div><div class="part">Part III</div><h2>工程里程碑 & 模块完成度</h2></div><div class="num slide-num"></div></div>
+        <div class="body">
+          <div class="kpi-row" style="margin-bottom:14px">
+            <div class="kpi"><b>361</b><span>pytest</span></div>
+            <div class="kpi"><b>M1–M13</b><span>全部 ✅</span></div>
+            <div class="kpi"><b>46</b><span>ppt_data</span></div>
+            <div class="kpi"><b>v5</b><span>UI+Job</span></div>
+          </div>
+          <table>
+            <tr><th>模块</th><th>算法/交付</th><th>状态</th></tr>
+            <tr><td>M1–M2</td><td>BaselineRegistry · 多源数据</td><td>✅</td></tr>
+            <tr><td>M4–M5</td><td>6-Node DAG · ResearchAgent · RAG</td><td>✅</td></tr>
+            <tr><td>M6</td><td>文本消融 WF 三线</td><td>✅</td></tr>
+            <tr><td>M7</td><td>GRPO · TradingEnv</td><td>✅</td></tr>
+            <tr><td>M11–M12</td><td>Population · RL→OOS 桥</td><td>✅</td></tr>
+            <tr class="highlight"><td>M13</td><td>MCP · 论文 CSV 导出</td><td>✅ 361 tests</td></tr>
+          </table>
+        </div>
+        <div class="footer"><span>GitHub ytq0198/Quant-MAS</span><strong>Milestones</strong></div>
+      </div>
+    </section>
+
+    <!-- 25 Limitations -->
+    <section class="slide">
+      <div class="slide-inner">
+        <div class="header"><div><div class="part">Part III</div><h2>局限性与未来工作</h2></div><div class="num slide-num"></div></div>
+        <div class="body grid-3 compact">
+          <div class="card card--warn"><h3>数据/文本</h3><p>新闻覆盖 2.4%；LoRA FinBERT（EXP-TEXT-002）待做。</p></div>
+          <div class="card"><h3>系统</h3><p>无实盘；RL/Population 主表 ablation CSV 待补全导出。</p></div>
+          <div class="card card--accent"><h3>下一步</h3><p>论文撰写 · 多种子 WF · 更长 RL 训练 · UI Agent 全流程。</p></div>
+        </div>
+        <div class="footer"><span>诚实报告</span><strong>Research-only</strong></div>
+      </div>
+    </section>
+
+    <!-- 26 Q&A -->
+    <section class="slide slide--cover">
+      <div class="slide-inner">
+        <h1 class="cover-title" style="font-size:2.4rem">感谢聆听 · Q &amp; A</h1>
+        <p class="cover-tag">Quant MAS · Multi-Agent Quantitative Research Platform</p>
+        <div class="meta-grid" style="grid-template-columns:1fr">
+          <div><strong>魏子安</strong> · 浙江大学 · 3240101782@zju.edu.cn</div>
+          <div><strong>GitHub</strong> github.com/ytq0198/Quant-MAS</div>
+        </div>
+        <p style="margin-top:28px;font-size:.88rem;color:var(--muted);line-height:1.85;max-width:680px">
+          不是自动炒股 → 研究平台 · OOS 0.586 vs ML 2.78 → 样本外 vs 过拟合<br>
+          Agent 编排 · Engine 计算 · 改进过程可追溯
+        </p>
+      </div>
+    </section>
+
+  </div>
+
+  <script>
+    (function () {
+      const slides = Array.from(document.querySelectorAll(".slide"));
+      const total = slides.length;
+      let idx = 0;
+      document.getElementById("total").textContent = total;
+
+      function typeset() {
+        if (window.MathJax && window.MathJax.typesetPromise) {
+          window.MathJax.typesetPromise().catch(function () {});
+        }
+      }
+
+      function show(i) {
+        idx = Math.max(0, Math.min(total - 1, i));
+        slides.forEach(function (s, j) { s.classList.toggle("active", j === idx); });
+        document.getElementById("progress").style.width = ((idx + 1) / total * 100) + "%";
+        document.getElementById("cur").textContent = idx + 1;
+        document.querySelectorAll(".slide-num").forEach(function (el) {
+          el.textContent = String(idx + 1).padStart(2, "0") + " / " + String(total).padStart(2, "0");
+        });
+        typeset();
+      }
+
+      document.addEventListener("keydown", function (e) {
+        if (["ArrowRight", " ", "PageDown"].includes(e.key)) { e.preventDefault(); show(idx + 1); }
+        else if (["ArrowLeft", "PageUp"].includes(e.key)) { e.preventDefault(); show(idx - 1); }
+        else if (e.key === "Home") show(0);
+        else if (e.key === "End") show(total - 1);
+        else if (e.key === "f" || e.key === "F") {
+          if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(function () {});
+          else document.exitFullscreen();
+        }
+      });
+
+      document.getElementById("deck").addEventListener("click", function (e) {
+        if (e.clientX > window.innerWidth * 0.55) show(idx + 1);
+        else show(idx - 1);
+      });
+
+      show(0);
+    })();
+  </script>
+</body>
+</html>

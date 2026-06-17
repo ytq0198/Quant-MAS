@@ -60,6 +60,7 @@ const en = {
   "nav.paper": "Paper Artifacts",
   "nav.database": "Database",
   "nav.observability": "Observability",
+  "nav.help": "Help",
   "nav.settings": "Settings",
 
   "page.overview": "Overview",
@@ -74,7 +75,10 @@ const en = {
   "page.paper": "Paper Artifacts",
   "page.database": "Database Backends",
   "page.observability": "Observability",
+  "page.help": "Help & User Guide",
   "page.settings": "Settings",
+
+  "help.badge": "User guide",
 
   "brand.subtitle": "v5 Enterprise",
 
@@ -108,6 +112,11 @@ const en = {
   "overview.selectedBaseline": "Selected baseline",
   "overview.safetyBoundary": "Safety Boundary",
   "overview.moduleShortcuts": "Module Shortcuts",
+  "overview.openHelp": "Open full user guide",
+
+  "shortcut.help.title": "Help & Guide",
+  "shortcut.help.desc": "System setup, page-by-page operations, troubleshooting",
+  "shortcut.help.badge": "Docs",
 
   "shortcut.experiments.title": "Experiments",
   "shortcut.experiments.desc": "Registry and experiment metadata",
@@ -336,6 +345,7 @@ const zh: Record<TranslationKey, string> = {
   "nav.paper": "论文产物",
   "nav.database": "数据库",
   "nav.observability": "可观测性",
+  "nav.help": "帮助",
   "nav.settings": "设置",
 
   "page.overview": "概览",
@@ -350,7 +360,10 @@ const zh: Record<TranslationKey, string> = {
   "page.paper": "论文产物",
   "page.database": "数据库后端",
   "page.observability": "可观测性",
+  "page.help": "帮助与使用指南",
   "page.settings": "设置",
+
+  "help.badge": "使用指南",
 
   "brand.subtitle": "v5 企业版",
 
@@ -383,6 +396,11 @@ const zh: Record<TranslationKey, string> = {
   "overview.selectedBaseline": "已选基线",
   "overview.safetyBoundary": "安全边界",
   "overview.moduleShortcuts": "模块快捷入口",
+  "overview.openHelp": "打开完整使用指南",
+
+  "shortcut.help.title": "帮助与指南",
+  "shortcut.help.desc": "系统搭建、各页面操作步骤、故障排查",
+  "shortcut.help.badge": "文档",
 
   "shortcut.experiments.title": "实验",
   "shortcut.experiments.desc": "实验注册表与元数据",

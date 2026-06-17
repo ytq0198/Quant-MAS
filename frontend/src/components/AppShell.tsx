@@ -46,7 +46,7 @@ export function AppShell({
             <PageToolbar />
             {children}
           </main>
-          {page !== "settings" && (
+          {page !== "settings" && page !== "help" && (
             <ContextPanel status={status} selectedExperimentId={selectedExperimentId} />
           )}
         </div>
